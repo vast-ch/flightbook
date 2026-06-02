@@ -1,0 +1,109 @@
+{
+  "nav": {
+    "offer": "Angebot",
+    "premium": "Flightbook Premium",
+    "schools": "Flightbook Schools",
+    "login": "Login",
+    "loginInstructor": "Login Fluglehrer",
+    "register": "Registrieren",
+    "skipToContent": "Zum Inhalt springen"
+  },
+  "hero": {
+    "title": "Flightbook",
+    "subtitle": "Das digitale Flugbuch für Gleitschirm und Delta",
+    "ios": "iOS",
+    "android": "Android",
+    "subscribePremium": "Flightbook Premium abonnieren"
+  },
+  "pricing": {
+    "title": "Angebot",
+    "free": {
+      "badge": "Pilot",
+      "title": "Flightbook FREE",
+      "price": "FREE",
+      "features": [
+        "Flüge verwalten (Max 25 Flüge)",
+        "Passagierbestätigungen (Max 10)",
+        "Gleitschirme verwalten",
+        "IGC Upload",
+        "Statistiken"
+      ],
+      "cta": "Registrieren"
+    },
+    "premium": {
+      "badge": "Pilot",
+      "title": "Flightbook Premium",
+      "price": "CHF 12.-",
+      "period": "/ Jahr",
+      "features": ["Flüge verwalten", "Passagierbestätigungen", "Gleitschirme verwalten", "IGC Upload", "Statistiken"],
+      "cta": "Jetzt abonnieren"
+    },
+    "schools": {
+      "badge": "Flugschule",
+      "title": "Flightbook Schools",
+      "price": "FREE",
+      "features": [
+        "Transparenter Lernfortschritt",
+        "Einfache Teilnahmeverwaltung",
+        "Individuelles Kontrollblatt",
+        "Push Notifikationen"
+      ],
+      "cta": "Flugschule erstellen"
+    },
+    "notes": [
+      "Die ersten 25 Flüge sind Gratis und können kostenlos hinzugefügt werden.",
+      "Preisänderung ab dem 1. Februar 2023 für neue Nutzer. Steigende Serverkosten zwingen mich dazu, die Anwendung kostenpflichtig zu machen.",
+      "Die gesamte Anwendung bleibt Open Source. Für jeden, der sich an der Entwicklung der App beteiligen möchte, gibt es ein kostenloses Konto, das natürlich lebenslang zur Verfügung steht."
+    ]
+  },
+  "premium": {
+    "title": "Flightbook Premium",
+    "features": [
+      {
+        "title": "Flüge sammeln",
+        "description": "Tracke alle deine Flüge: Start- und Landeplätze mit wichtigen Informationen für dich. Und: Verwalte alle deine Schirme, damit du jederzeit den Überblick vom Alter und der Anzahl Flüge auf deinen Geräten hast."
+      },
+      {
+        "title": "Tracks visualisieren",
+        "description": "Du kannst deine IGC Files direkt von deinem Vario oder Tracker hochladen, sammeln und deine Flüge analysieren, ohne dass du sie irgendwo öffentlich einreichen musst."
+      },
+      {
+        "title": "Statistiken analysieren",
+        "description": "Ob die Anzahl Flüge pro Jahr, Flugstunden oder Einkommen aus dem Tandembetrieb: In der App kannst du deine Flugzahlen gezielt filtern und anpassen."
+      },
+      {
+        "title": "SHV-Nachweis mitnehmen",
+        "description": "Damit du die Daten nie verlierst, kannst du sie jederzeit in einem Excel-Format exportieren. Ausserdem kannst du an der SHV-Prüfung dein Flightbook via PDF-Export einfach als zugelassenes Flugbuch vorweisen."
+      }
+    ],
+    "cta": "Registrieren"
+  },
+  "schools": {
+    "title": "Flightbook Schools",
+    "features": [
+      {
+        "title": "Transparenter Lernfortschritt",
+        "description": "Als Fluglehrer kannst du die Daten deiner Schüler*innen einsehen. Entsprechend hast du immer die Übersicht darüber, wer wie viele Flüge hat und wer in welchem Bereich nochmal nachbessern muss. Du hast also den Lernfortschritt deiner Truppe jederzeit transparent im Blick."
+      },
+      {
+        "title": "Einfache Teilnahmeverwaltung",
+        "description": "Du verwaltest Höhenflüge, Groundhandling Sessions oder Theorieeinheiten direkt im Tool. Deine Schüler sagen zu oder ab und du weisst immer, wer an welchem Kurs dabei ist. Du musst also nicht mehr länger ellenlange Chats durchsuchen, sondern generierst deine Teilnehmerliste per Knopfdruck."
+      },
+      {
+        "title": "Top für Flugschüler",
+        "description": "Auch deine Schüler werden profitieren, wenn du auf Flightbook Pro umstellst: Sie nutzen die App, um ihre Flüge und Manöver, Start- und Landeplätze zu tracken. Sogar das SHV-Flugbuch für die Prüfung kann direkt aus der App generiert werden. Ausserdem sind sie immer informiert, wann der nächste Kurs stattfindet und wer alles kommt. Sie können Flightbook Basic für nur 12 Franken pro Jahr (auch nach der Schulung) nutzen, um ihre Fortschritte als Flieger*innen zu tracken."
+      }
+    ],
+    "cta": "Flugschule erstellen"
+  },
+  "footer": {
+    "brand": "Flightbook",
+    "switchLanguage": "Français"
+  },
+  "meta": {
+    "title": "Flightbook - Dein digitales Flugbuch",
+    "description": "Verwalte deine Flüge in einer iOS und Android App. Diese App kann für Schulungen verwendet werden und ist an den SHV Prüfungen zugelassen.",
+    "ogTitle": "Flightbook - Dein digitales Flugbuch",
+    "ogDescription": "Verwalte deine Flüge in einer iOS und Android App. Diese App kann für Schulungen verwendet werden und ist an den SHV Prüfungen zugelassen."
+  }
+}

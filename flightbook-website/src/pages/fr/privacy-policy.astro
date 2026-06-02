@@ -1,0 +1,130 @@
+---
+import Layout from '~/layouts/PageLayout.astro';
+
+const metadata = {
+  title: 'Politique de confidentialité - Flightbook',
+  description: 'Politique de confidentialité Flightbook - Comment nous collectons, utilisons et protégeons vos données personnelles',
+  robots: {
+    index: true,
+    follow: true,
+  },
+};
+---
+
+<Layout metadata={metadata}>
+  <section class="px-4 py-16 sm:px-6 mx-auto lg:px-8 lg:py-20 max-w-4xl">
+    <h1 class="text-4xl md:text-5xl font-bold leading-tighter tracking-tighter mb-8 font-heading">
+      Politique de confidentialité
+    </h1>
+    
+    <p class="text-muted mb-8">Date d'entrée en vigueur : 22 avril 2026</p>
+    
+    <div class="prose prose-lg dark:prose-invert max-w-none">
+      <p>
+        Flightbook exploite l'application Flightbook (le "Service"). Cette politique de confidentialité explique comment nous collectons, utilisons et protégeons vos données personnelles lorsque vous utilisez notre Service.
+      </p>
+      <p>
+        En utilisant Flightbook, vous acceptez la collecte et l'utilisation des informations conformément à cette politique de confidentialité.
+      </p>
+
+      <h2>Informations que nous collectons</h2>
+
+      <h3>Données personnelles</h3>
+      <p>Nous pouvons collecter les données personnelles suivantes :</p>
+      <ul>
+        <li>Adresse e-mail</li>
+        <li>Informations du compte utilisateur</li>
+      </ul>
+
+      <h3>Données d'utilisation</h3>
+      <p>
+        Nous pouvons collecter des informations techniques telles que l'adresse IP, le type de navigateur, les informations sur l'appareil et les modèles d'utilisation pour améliorer le Service.
+      </p>
+
+      <h3>Cookies</h3>
+      <p>
+        Nous utilisons des cookies et des technologies similaires pour exploiter et améliorer le Service. Vous pouvez contrôler l'utilisation des cookies via les paramètres de votre navigateur.
+      </p>
+
+      <h2>Comment nous utilisons les données</h2>
+      <p>Nous utilisons les données collectées pour :</p>
+      <ul>
+        <li>Fournir et maintenir le Service</li>
+        <li>Gérer la planification et les rendez-vous</li>
+        <li>Améliorer les fonctionnalités et l'expérience utilisateur</li>
+        <li>Fournir un support client</li>
+        <li>Assurer la sécurité et prévenir les abus</li>
+      </ul>
+
+      <h2>Intégration Google Calendar</h2>
+      <p>
+        Flightbook s'intègre avec Google Calendar pour permettre aux utilisateurs de synchroniser les rendez-vous de cours de vol.
+        L'accès aux données utilisateur Google n'est accordé qu'avec le consentement explicite de l'utilisateur via OAuth.
+      </p>
+      <p>Nous demandons les autorisations suivantes :</p>
+      <ul>
+        <li><strong>calendar.events</strong> – pour créer et mettre à jour les événements du calendrier</li>
+        <li><strong>calendar.readonly</strong> – pour récupérer la liste des calendriers disponibles</li>
+      </ul>
+      <p>
+        Flightbook utilise les données Google Calendar uniquement dans le but de synchroniser les rendez-vous de cours.
+        Flightbook ne lit, n'importe ni n'analyse les événements de calendrier existants.
+      </p>
+      <p>
+        Les données utilisateur Google ne sont pas utilisées pour la publicité, le profilage ou l'analyse sans rapport avec la fonctionnalité principale du Service.
+        Aucune donnée utilisateur Google n'est vendue ou partagée avec des tiers.
+      </p>
+
+      <h2>Conservation des données</h2>
+      <p>
+        Nous conservons les données personnelles uniquement aussi longtemps que nécessaire pour fournir le Service. Des données minimales telles que les identifiants d'événements de calendrier peuvent être stockées pour maintenir la synchronisation.
+      </p>
+      <p>
+        Vous pouvez déconnecter votre compte Google à tout moment, ce qui arrête tout accès ultérieur aux données Google.
+      </p>
+
+      <h2>Partage des données</h2>
+      <p>Nous ne vendons ni ne louons vos données personnelles.</p>
+      <p>
+        Nous pouvons partager des données avec des prestataires de services de confiance uniquement dans la mesure nécessaire pour exploiter le Service. Ces prestataires sont tenus de protéger vos données.
+      </p>
+
+      <h2>Base juridique du traitement</h2>
+      <p>Nous traitons les données personnelles sur la base du consentement de l'utilisateur et pour l'exécution de nos services.</p>
+
+      <h2>Vos droits</h2>
+      <p>Vous avez le droit de :</p>
+      <ul>
+        <li>Accéder à vos données personnelles</li>
+        <li>Demander la correction ou la suppression de vos données</li>
+        <li>Retirer votre consentement à tout moment</li>
+      </ul>
+
+      <h2>Sécurité des données</h2>
+      <p>
+        Nous mettons en œuvre des mesures techniques et organisationnelles appropriées pour protéger vos données personnelles.
+      </p>
+
+      <h2>Transferts internationaux de données</h2>
+      <p>
+        Vos données peuvent être traitées en Suisse ou dans d'autres pays où les lois sur la protection des données peuvent différer. Nous veillons à ce que des garanties appropriées soient en place.
+      </p>
+
+      <h2>Liens tiers</h2>
+      <p>
+        Le Service peut contenir des liens vers des sites Web externes. Nous ne sommes pas responsables de leurs pratiques en matière de confidentialité.
+      </p>
+
+      <h2>Modifications de cette politique de confidentialité</h2>
+      <p>
+        Nous pouvons mettre à jour cette politique de temps à autre. Les mises à jour seront publiées sur cette page avec une date d'entrée en vigueur révisée.
+      </p>
+
+      <h2>Contact</h2>
+      <p>Si vous avez des questions concernant cette politique de confidentialité, veuillez nous contacter :</p>
+      <ul>
+        <li>E-mail : <a href="mailto:yannick.lagger@flightbook.ch">yannick.lagger@flightbook.ch</a></li>
+      </ul>
+    </div>
+  </section>
+</Layout>

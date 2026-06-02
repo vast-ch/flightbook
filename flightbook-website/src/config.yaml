@@ -1,0 +1,79 @@
+site:
+  name: Flightbook
+  site: 'https://flightbook.ch'
+  base: '/'
+  trailingSlash: false
+
+  googleSiteVerificationId: false
+
+# Default SEO metadata
+metadata:
+  title:
+    default: Flightbook
+    template: '%s — Flightbook'
+  description: 'Verwalte deine Flüge in einer iOS und Android App. Diese App kann für Schulungen verwendet werden und ist an den SHV Prüfungen zugelassen.'
+  robots:
+    index: true
+    follow: true
+  openGraph:
+    site_name: Flightbook
+    images:
+      - url: 'https://raw.githubusercontent.com/laggery/Flightbook-MobileApp/7d738a8497449768f4a38d647cfdf7da138f77b6/src/assets/icons/icon-128x128.png'
+        width: 128
+        height: 128
+    type: website
+  twitter:
+    handle: '@flightbook'
+    site: '@flightbook'
+    cardType: summary_large_image
+
+i18n:
+  language: de
+  textDirection: ltr
+  languages:
+    de:
+      name: Deutsch
+      locale: de-CH
+    fr:
+      name: Français
+      locale: fr-CH
+
+apps:
+  blog:
+    isEnabled: false
+    postsPerPage: 6
+
+    post:
+      isEnabled: true
+      permalink: '/%slug%' # Variables: %slug%, %year%, %month%, %day%, %hour%, %minute%, %second%, %category%
+      robots:
+        index: true
+
+    list:
+      isEnabled: true
+      pathname: 'blog' # Blog main path, you can change this to "articles" (/articles)
+      robots:
+        index: true
+
+    category:
+      isEnabled: true
+      pathname: 'category' # Category main path /category/some-category, you can change this to "group" (/group/some-category)
+      robots:
+        index: true
+
+    tag:
+      isEnabled: true
+      pathname: 'tag' # Tag main path /tag/some-tag, you can change this to "topics" (/topics/some-category)
+      robots:
+        index: false
+
+    isRelatedPostsEnabled: true
+    relatedPostsCount: 4
+
+analytics:
+  vendors:
+    googleAnalytics:
+      id: null # Add your Google Analytics ID here, e.g., "G-XXXXXXXXXX"
+
+ui:
+  theme: 'system' # Values: "system" | "light" | "dark" | "light:only" | "dark:only"

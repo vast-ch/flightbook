@@ -1,0 +1,76 @@
+---
+import type { Locale } from '~/utils/i18n';
+
+interface Props {
+  currentLocale: Locale;
+}
+
+const { currentLocale } = Astro.props;
+
+const otherLocalePath = currentLocale === 'de' ? '/fr' : '/';
+const currentPath = Astro.url.pathname;
+const hash = Astro.url.hash;
+
+// Preserve hash when switching languages
+let targetPath = otherLocalePath;
+if (currentLocale === 'de' && currentPath !== '/') {
+  // Going from German to French
+  targetPath = `/fr${currentPath}${hash}`;
+} else if (currentLocale === 'fr') {
+  // Going from French to German
+  const pathWithoutFr = currentPath.replace(/^\/fr/, '') || '/';
+  targetPath = `${pathWithoutFr}${hash}`;
+}
+---
+
+<div class="language-switcher flex gap-1">
+  <a
+    href={currentLocale === 'de' ? '/' : otherLocalePath}
+    class:list={[
+      'lang-btn px-3 py-1 rounded text-sm font-medium transition-colors',
+      currentLocale === 'de'
+        ? 'bg-primary text-white'
+        : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600',
+    ]}
+    aria-label="Switch to German"
+    data-lang="de"
+  >
+    DE
+  </a>
+  <a
+    href={currentLocale === 'fr' ? '/fr' : targetPath}
+    class:list={[
+      'lang-btn px-3 py-1 rounded text-sm font-medium transition-colors',
+      currentLocale === 'fr'
+        ? 'bg-primary text-white'
+        : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600',
+    ]}
+    aria-label="Switch to French"
+    data-lang="fr"
+  >
+    FR
+  </a>
+</div>
+
+<script>
+  // Store language preference when clicking
+  document.querySelectorAll('.lang-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const lang = btn.getAttribute('data-lang');
+      if (lang) {
+        try {
+          localStorage.setItem('flightbook-lang', lang);
+        } catch (e) {
+          console.warn('Could not store language preference:', e);
+        }
+      }
+    });
+  });
+</script>
+
+<style>
+  .lang-btn {
+    min-width: 2.5rem;
+    text-align: center;
+  }
+</style>

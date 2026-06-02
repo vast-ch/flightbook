@@ -1,0 +1,90 @@
+---
+interface PricingPlan {
+  badge: string;
+  title: string;
+  price: string;
+  period?: string;
+  features: string[];
+  cta: string;
+  ctaLink: string;
+  featured?: boolean;
+}
+
+interface Props {
+  title: string;
+  plans: PricingPlan[];
+  notes: string[];
+}
+
+const { title, plans, notes } = Astro.props;
+---
+
+<section id="angebot" class="scroll-mt-16 py-16 md:py-20">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6">
+    <div class="mb-10 md:mb-16 text-center">
+      <h2 class="text-4xl md:text-5xl font-bold leading-tighter tracking-tighter mb-4 font-heading">
+        {title}
+      </h2>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-6 lg:gap-8">
+      {
+        plans.map((plan) => (
+          <div
+            class:list={[
+              'relative flex flex-col p-6 bg-white dark:bg-slate-900 rounded-lg shadow-lg border-2',
+              plan.featured ? 'border-primary dark:border-primary' : 'border-gray-200 dark:border-gray-700',
+            ]}
+          >
+            <div class="absolute top-0 right-0 mt-4 mr-4">
+              <span
+                class:list={[
+                  'inline-block px-3 py-1 text-xs font-semibold rounded-full',
+                  plan.badge === 'Flugschule' || plan.badge === 'Instructeur'
+                    ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                    : 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
+                ]}
+              >
+                {plan.badge}
+              </span>
+            </div>
+            <div class="mb-6">
+              <h3 class="text-2xl font-bold mb-2">{plan.title}</h3>
+              <div class="text-3xl font-bold text-primary">
+                {plan.price}
+                {plan.period && <span class="text-lg font-normal text-gray-600 dark:text-gray-400">{plan.period}</span>}
+              </div>
+            </div>
+            <ul class="mb-6 flex-grow space-y-3">
+              {plan.features.map((feature) => (
+                <li class="flex items-start">
+                  <svg
+                    class="w-5 h-5 text-green-500 mr-2 flex-shrink-0 mt-0.5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span class="text-gray-700 dark:text-gray-300">{feature}</span>
+                </li>
+              ))}
+            </ul>
+            <div>
+              <a
+                href={plan.ctaLink}
+                class:list={['btn w-full text-center', plan.featured ? 'btn-primary' : 'btn-outline']}
+              >
+                {plan.cta}
+              </a>
+            </div>
+          </div>
+        ))
+      }
+    </div>
+
+    <div class="mt-12 max-w-4xl mx-auto space-y-4 text-center text-sm text-gray-600 dark:text-gray-400">
+      {notes.map((note) => <p>{note}</p>)}
+    </div>
+  </div>
+</section>

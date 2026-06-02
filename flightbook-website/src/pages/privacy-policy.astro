@@ -1,0 +1,130 @@
+---
+import Layout from '~/layouts/PageLayout.astro';
+
+const metadata = {
+  title: 'Privacy Policy - Flightbook',
+  description: 'Flightbook Privacy Policy - How we collect, use, and protect your personal data',
+  robots: {
+    index: true,
+    follow: true,
+  },
+};
+---
+
+<Layout metadata={metadata}>
+  <section class="px-4 py-16 sm:px-6 mx-auto lg:px-8 lg:py-20 max-w-4xl">
+    <h1 class="text-4xl md:text-5xl font-bold leading-tighter tracking-tighter mb-8 font-heading">
+      Privacy Policy
+    </h1>
+    
+    <p class="text-muted mb-8">Effective date: April 22, 2026</p>
+    
+    <div class="prose prose-lg dark:prose-invert max-w-none">
+      <p>
+        Flightbook operates the Flightbook application (the "Service"). This Privacy Policy explains how we collect, use, and protect your personal data when you use our Service.
+      </p>
+      <p>
+        By using Flightbook, you agree to the collection and use of information in accordance with this Privacy Policy.
+      </p>
+
+      <h2>Information We Collect</h2>
+
+      <h3>Personal Data</h3>
+      <p>We may collect the following personal data:</p>
+      <ul>
+        <li>Email address</li>
+        <li>User account information</li>
+      </ul>
+
+      <h3>Usage Data</h3>
+      <p>
+        We may collect technical information such as IP address, browser type, device information, and usage patterns to improve the Service.
+      </p>
+
+      <h3>Cookies</h3>
+      <p>
+        We use cookies and similar technologies to operate and improve the Service. You can control cookie usage through your browser settings.
+      </p>
+
+      <h2>How We Use Data</h2>
+      <p>We use collected data to:</p>
+      <ul>
+        <li>Provide and maintain the Service</li>
+        <li>Manage scheduling and appointments</li>
+        <li>Improve functionality and user experience</li>
+        <li>Provide customer support</li>
+        <li>Ensure security and prevent misuse</li>
+      </ul>
+
+      <h2>Google Calendar Integration</h2>
+      <p>
+        Flightbook integrates with Google Calendar to allow users to synchronize flight lesson appointments.
+        Access to Google user data is granted only with explicit user consent via OAuth.
+      </p>
+      <p>We request the following permissions:</p>
+      <ul>
+        <li><strong>calendar.events</strong> – to create and update calendar events</li>
+        <li><strong>calendar.readonly</strong> – to retrieve the list of available calendars</li>
+      </ul>
+      <p>
+        Flightbook uses Google Calendar data solely for the purpose of synchronizing lesson appointments.
+        Flightbook does not read, import, or analyze existing calendar events.
+      </p>
+      <p>
+        Google user data is not used for advertising, profiling, or analytics unrelated to the core functionality of the Service.
+        No Google user data is sold or shared with third parties.
+      </p>
+
+      <h2>Data Retention</h2>
+      <p>
+        We retain personal data only as long as necessary to provide the Service. Minimal data such as calendar event identifiers may be stored to maintain synchronization.
+      </p>
+      <p>
+        You can disconnect your Google account at any time, which stops further access to Google data.
+      </p>
+
+      <h2>Data Sharing</h2>
+      <p>We do not sell or rent your personal data.</p>
+      <p>
+        We may share data with trusted service providers only as necessary to operate the Service. These providers are obligated to protect your data.
+      </p>
+
+      <h2>Legal Basis for Processing</h2>
+      <p>We process personal data based on user consent and for the performance of our services.</p>
+
+      <h2>Your Rights</h2>
+      <p>You have the right to:</p>
+      <ul>
+        <li>Access your personal data</li>
+        <li>Request correction or deletion of your data</li>
+        <li>Withdraw consent at any time</li>
+      </ul>
+
+      <h2>Data Security</h2>
+      <p>
+        We implement appropriate technical and organizational measures to protect your personal data.
+      </p>
+
+      <h2>International Data Transfers</h2>
+      <p>
+        Your data may be processed in Switzerland or other countries where data protection laws may differ. We ensure appropriate safeguards are in place.
+      </p>
+
+      <h2>Third-Party Links</h2>
+      <p>
+        The Service may contain links to external websites. We are not responsible for their privacy practices.
+      </p>
+
+      <h2>Changes to This Privacy Policy</h2>
+      <p>
+        We may update this policy from time to time. Updates will be posted on this page with a revised effective date.
+      </p>
+
+      <h2>Contact</h2>
+      <p>If you have any questions about this Privacy Policy, please contact us:</p>
+      <ul>
+        <li>Email: <a href="mailto:yannick.lagger@flightbook.ch">yannick.lagger@flightbook.ch</a></li>
+      </ul>
+    </div>
+  </section>
+</Layout>

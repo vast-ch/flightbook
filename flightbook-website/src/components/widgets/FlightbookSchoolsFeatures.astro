@@ -1,0 +1,403 @@
+---
+import Image from '~/components/common/Image.astro';
+import studentImg from '~/assets/images/flightbook/student.png';
+import subscriptionImg from '~/assets/images/flightbook/subscription.png';
+import appointmentImg from '~/assets/images/flightbook/appointment.png';
+import appointmentCreateImg from '~/assets/images/flightbook/appointment-create.png';
+import homeMobileImg from '~/assets/images/flightbook/home-mobile.png';
+import appointmentMobileImg from '~/assets/images/flightbook/appointment-mobile.png';
+import appointmentDetailImg from '~/assets/images/flightbook/appointment-detail.png';
+import placeMobileImg from '~/assets/images/flightbook/place-mobile.png';
+
+interface Feature {
+  title: string;
+  description: string;
+}
+
+interface Props {
+  title: string;
+  features: Feature[];
+  cta: string;
+}
+
+const { title, features, cta } = Astro.props;
+
+// Slider images for feature 2 (Einfache Teilnahmeverwaltung)
+const sliderImages = [
+  { src: subscriptionImg, alt: 'Subscription Management' },
+  { src: appointmentImg, alt: 'Appointment Overview' },
+  { src: appointmentCreateImg, alt: 'Create Appointment' },
+];
+
+// Slider images for feature 3 (Top für Flugschüler)
+const studentSliderImages = [
+  { src: homeMobileImg, alt: 'Home Screen' },
+  { src: appointmentMobileImg, alt: 'Appointments' },
+  { src: appointmentDetailImg, alt: 'Appointment Details' },
+  { src: placeMobileImg, alt: 'Places' },
+];
+---
+
+<section id="schools" class="scroll-mt-16 py-16 md:py-20">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6">
+    <div class="mb-10 md:mb-16 text-center">
+      <h2 class="text-4xl md:text-5xl font-bold leading-tighter tracking-tighter mb-4 font-heading">
+        {title}
+      </h2>
+    </div>
+
+    <div class="space-y-16">
+      <!-- Feature 1: Transparenter Lernfortschritt - Image on right -->
+      <div class="grid md:grid-cols-2 gap-8 items-center">
+        <div>
+          <h3 class="text-2xl font-bold mb-4">{features[0].title}</h3>
+          <p class="text-gray-600 dark:text-gray-400 text-lg">{features[0].description}</p>
+        </div>
+        <div class="flex justify-center">
+          <div class="max-w-md">
+            <Image
+              src={studentImg}
+              alt="Transparenter Lernfortschritt"
+              class="w-full h-auto rounded-lg shadow-lg"
+              loading="lazy"
+              widths={[400, 600]}
+              sizes="(max-width: 768px) 400px, 600px"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Feature 2: Einfache Teilnahmeverwaltung - Slider on left -->
+      <div class="grid md:grid-cols-2 gap-8 items-center">
+        <div class="md:order-2">
+          <h3 class="text-2xl font-bold mb-4">{features[1].title}</h3>
+          <p class="text-gray-600 dark:text-gray-400 text-lg">{features[1].description}</p>
+        </div>
+        <div class="md:order-1 flex justify-center items-center">
+          <div class="max-w-md w-full">
+            <div class="schools-slideshow-container relative rounded-lg overflow-hidden shadow-lg bg-gray-100 dark:bg-gray-800">
+              {
+                sliderImages.map((img, index) => (
+                  <div class:list={['schools-slide', index === 0 && 'active']}>
+                    <Image
+                      src={img.src}
+                      alt={img.alt}
+                      class="w-full h-auto"
+                      loading="lazy"
+                      widths={[400, 600]}
+                      sizes="(max-width: 768px) 400px, 600px"
+                    />
+                  </div>
+                ))
+              }
+              <button class="schools-prev" aria-label="Previous slide">&#10094;</button>
+              <button class="schools-next" aria-label="Next slide">&#10095;</button>
+            </div>
+            <div class="schools-dots-container text-center mt-4">
+              {sliderImages.map((_, index) => <span class:list={['schools-dot', index === 0 && 'active']} data-slide={index}></span>)}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feature 3: Top für Flugschüler - Slider on right -->
+      <div class="grid md:grid-cols-2 gap-8 items-center">
+        <div>
+          <h3 class="text-2xl font-bold mb-4">{features[2].title}</h3>
+          <p class="text-gray-600 dark:text-gray-400 text-lg">{features[2].description}</p>
+        </div>
+        <div class="flex justify-center">
+          <div class="max-w-[250px] w-full">
+            <div class="student-slideshow-container relative rounded-lg overflow-hidden shadow-lg bg-gray-100 dark:bg-gray-800">
+              {
+                studentSliderImages.map((img, index) => (
+                  <div class:list={['student-slide', index === 0 && 'active']}>
+                    <Image
+                      src={img.src}
+                      alt={img.alt}
+                      class="w-full h-auto"
+                      loading="lazy"
+                      widths={[250, 300]}
+                      sizes="250px"
+                    />
+                  </div>
+                ))
+              }
+              <button class="student-prev" aria-label="Previous slide">&#10094;</button>
+              <button class="student-next" aria-label="Next slide">&#10095;</button>
+            </div>
+            <div class="student-dots-container text-center mt-4">
+              {studentSliderImages.map((_, index) => <span class:list={['student-dot', index === 0 && 'active']} data-slide={index}></span>)}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-12 text-center">
+      <a href="https://instructor.flightbook.ch/school/register" class="btn btn-primary">
+        {cta}
+      </a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .schools-slideshow-container {
+    position: relative;
+  }
+
+  .schools-slide {
+    display: none;
+  }
+
+  .schools-slide.active {
+    display: block;
+  }
+
+  .schools-prev,
+  .schools-next {
+    cursor: pointer;
+    position: absolute;
+    top: 50%;
+    width: auto;
+    margin-top: -22px;
+    padding: 16px;
+    color: white;
+    font-weight: bold;
+    font-size: 18px;
+    transition: 0.3s ease;
+    border-radius: 0 3px 3px 0;
+    user-select: none;
+    background-color: rgba(0, 0, 0, 0.5);
+    border: none;
+  }
+
+  .schools-next {
+    right: 0;
+    border-radius: 3px 0 0 3px;
+  }
+
+  .schools-prev:hover,
+  .schools-next:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+  }
+
+  .schools-dots-container {
+    text-align: center;
+    padding: 10px 0;
+  }
+
+  .schools-dot {
+    cursor: pointer;
+    height: 12px;
+    width: 12px;
+    margin: 0 4px;
+    background-color: #bbb;
+    border-radius: 50%;
+    display: inline-block;
+    transition: background-color 0.3s ease;
+  }
+
+  .schools-dot.active,
+  .schools-dot:hover {
+    background-color: #1b3e71;
+  }
+
+  /* Student slider styles */
+  .student-slideshow-container {
+    position: relative;
+  }
+
+  .student-slide {
+    display: none;
+  }
+
+  .student-slide.active {
+    display: block;
+  }
+
+  .student-prev,
+  .student-next {
+    cursor: pointer;
+    position: absolute;
+    top: 50%;
+    width: auto;
+    margin-top: -22px;
+    padding: 12px;
+    color: white;
+    font-weight: bold;
+    font-size: 16px;
+    transition: 0.3s ease;
+    border-radius: 0 3px 3px 0;
+    user-select: none;
+    background-color: rgba(0, 0, 0, 0.5);
+    border: none;
+  }
+
+  .student-next {
+    right: 0;
+    border-radius: 3px 0 0 3px;
+  }
+
+  .student-prev:hover,
+  .student-next:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+  }
+
+  .student-dots-container {
+    text-align: center;
+    padding: 10px 0;
+  }
+
+  .student-dot {
+    cursor: pointer;
+    height: 10px;
+    width: 10px;
+    margin: 0 3px;
+    background-color: #bbb;
+    border-radius: 50%;
+    display: inline-block;
+    transition: background-color 0.3s ease;
+  }
+
+  .student-dot.active,
+  .student-dot:hover {
+    background-color: #1b3e71;
+  }
+</style>
+
+<script>
+  function initSchoolsSlideshow() {
+    const schoolsSection = document.querySelector('#schools');
+    if (!schoolsSection) return;
+
+    const slides = schoolsSection.querySelectorAll('.schools-slide');
+    const dots = schoolsSection.querySelectorAll('.schools-dot');
+    const prevBtn = schoolsSection.querySelector('.schools-prev');
+    const nextBtn = schoolsSection.querySelector('.schools-next');
+    let currentSlide = 0;
+    let autoSlideInterval: number;
+
+    function showSlide(n: number) {
+      slides.forEach((slide) => slide.classList.remove('active'));
+      dots.forEach((dot) => dot.classList.remove('active'));
+
+      currentSlide = (n + slides.length) % slides.length;
+
+      slides[currentSlide].classList.add('active');
+      dots[currentSlide].classList.add('active');
+    }
+
+    function nextSlide() {
+      showSlide(currentSlide + 1);
+    }
+
+    function prevSlide() {
+      showSlide(currentSlide - 1);
+    }
+
+    function startAutoSlide() {
+      autoSlideInterval = window.setInterval(nextSlide, 5000);
+    }
+
+    function stopAutoSlide() {
+      clearInterval(autoSlideInterval);
+    }
+
+    prevBtn?.addEventListener('click', () => {
+      prevSlide();
+      stopAutoSlide();
+      startAutoSlide();
+    });
+
+    nextBtn?.addEventListener('click', () => {
+      nextSlide();
+      stopAutoSlide();
+      startAutoSlide();
+    });
+
+    dots.forEach((dot, index) => {
+      dot.addEventListener('click', () => {
+        showSlide(index);
+        stopAutoSlide();
+        startAutoSlide();
+      });
+    });
+
+    startAutoSlide();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initSchoolsSlideshow);
+  } else {
+    initSchoolsSlideshow();
+  }
+
+  // Student slider initialization
+  function initStudentSlideshow() {
+    const schoolsSection = document.querySelector('#schools');
+    if (!schoolsSection) return;
+
+    const slides = schoolsSection.querySelectorAll('.student-slide');
+    const dots = schoolsSection.querySelectorAll('.student-dot');
+    const prevBtn = schoolsSection.querySelector('.student-prev');
+    const nextBtn = schoolsSection.querySelector('.student-next');
+    let currentSlide = 0;
+    let autoSlideInterval: number;
+
+    function showSlide(n: number) {
+      slides.forEach((slide) => slide.classList.remove('active'));
+      dots.forEach((dot) => dot.classList.remove('active'));
+
+      currentSlide = (n + slides.length) % slides.length;
+
+      slides[currentSlide].classList.add('active');
+      dots[currentSlide].classList.add('active');
+    }
+
+    function nextSlide() {
+      showSlide(currentSlide + 1);
+    }
+
+    function prevSlide() {
+      showSlide(currentSlide - 1);
+    }
+
+    function startAutoSlide() {
+      autoSlideInterval = window.setInterval(nextSlide, 5000);
+    }
+
+    function stopAutoSlide() {
+      clearInterval(autoSlideInterval);
+    }
+
+    prevBtn?.addEventListener('click', () => {
+      prevSlide();
+      stopAutoSlide();
+      startAutoSlide();
+    });
+
+    nextBtn?.addEventListener('click', () => {
+      nextSlide();
+      stopAutoSlide();
+      startAutoSlide();
+    });
+
+    dots.forEach((dot, index) => {
+      dot.addEventListener('click', () => {
+        showSlide(index);
+        stopAutoSlide();
+        startAutoSlide();
+      });
+    });
+
+    startAutoSlide();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initStudentSlideshow);
+  } else {
+    initStudentSlideshow();
+  }
+</script>
