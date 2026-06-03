@@ -16,10 +16,11 @@
    analytics:
      vendors:
        googleAnalytics:
-         id: "G-XXXXXXXXXX"  # Replace with your actual ID
+         id: 'G-XXXXXXXXXX' # Replace with your actual ID
    ```
 
 3. **Rebuild the site:**
+
    ```bash
    npm run build
    ```
@@ -32,6 +33,7 @@
 ## What Gets Tracked
 
 The Google Analytics integration will automatically track:
+
 - Page views
 - User sessions
 - Traffic sources
