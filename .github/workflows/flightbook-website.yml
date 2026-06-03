@@ -1,12 +1,22 @@
-name: GitHub Actions
+name: flightbook-website
 
 on:
   pull_request:
     branches:
       - main
+    paths:
+      - 'flightbook-website/**'
+      - '.github/workflows/flightbook-website.yml'
   push:
     branches:
       - main
+    paths:
+      - 'flightbook-website/**'
+      - '.github/workflows/flightbook-website.yml'
+
+defaults:
+  run:
+    working-directory: flightbook-website
 
 jobs:
   build:
@@ -22,6 +32,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: npm
+          cache-dependency-path: flightbook-website/package-lock.json
       - run: npm ci
       - run: npm run build
       # - run: npm test
@@ -35,5 +46,6 @@ jobs:
         with:
           node-version: 22
           cache: npm
+          cache-dependency-path: flightbook-website/package-lock.json
       - run: npm ci
       - run: npm run check
