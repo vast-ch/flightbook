@@ -1,0 +1,362 @@
+import * as request from 'supertest';
+import { BaseE2ETest } from '../base-e2e-test';
+import { JwtTestHelper } from '../jwt-helper';
+import { removeIds } from '../utils/snapshot-utils';
+import { Testdata } from '../testdata';
+import { Subscription } from '../../src/training/subscription/subscription.entity';
+import { AppointmentBuilderTest } from '../utils/appointment-builder-test';
+import { GuestSubscription } from '../../src/training/subscription/guest-subscription.entity';
+import { plainToClass } from 'class-transformer';
+import { AppointmentDto } from '../../src/training/appointment/interface/appointment-dto';
+import { State } from '../../src/training/appointment/state';
+import moment = require('moment');
+
+describe('student appointment (e2e)', () => {
+  const testInstance = new BaseE2ETest();
+
+  beforeEach(async () => {
+    await testInstance.cleanupBetweenTests();
+  });
+
+  it('/student/schools/:id/appointments (GET)', async () => {
+    // given
+    const { studentUser, testSchool } = await testInstance.createSchoolDataWithAppointment();
+    await testInstance.createSchoolDataWithAppointment('student2@student.com', 'instructor2@instructor.com', 'tandemPilot2@tandemPilot.com', 'test school 2', 'appointment type 2');
+
+    const keycloakToken = JwtTestHelper.createKeycloakToken({ sub: studentUser.id, email: studentUser.email });
+
+    //when
+    return request(testInstance.app.getHttpServer())
+      .get(`/student/schools/${testSchool.id}/appointments`)
+      .set('Authorization', `Bearer ${keycloakToken}`)
+      .expect(200)
+      .then(async (response) => {
+        expect(response.body).toHaveLength(4);
+        expect(removeIds(response.body[0])).toMatchSnapshot();
+
+        const db = await testInstance.appointmentRepository.find();
+        expect(db).toHaveLength(8);
+      });
+  });
+
+  it('/student/schools/:id/appointments/:appointmentId (GET)', async () => {
+    // given
+    const { studentUser, testSchool, appointments } = await testInstance.createSchoolDataWithAppointment();
+
+    const keycloakToken = JwtTestHelper.createKeycloakToken({ sub: studentUser.id, email: studentUser.email });
+
+    //when
+    return request(testInstance.app.getHttpServer())
+      .get(`/student/schools/${testSchool.id}/appointments/${appointments[0].id}`)
+      .set('Authorization', `Bearer ${keycloakToken}`)
+      .expect(200)
+      .then(async (response) => {
+        expect(response.body.id).toEqual(appointments[0].id);
+        expect(removeIds(response.body)).toMatchSnapshot();
+      });
+  });
+
+  it('/student/schools/:schoolId/appointments/:appointmentId/subscriptions (POST)', async () => {
+    // given
+    const { studentUser, student, testSchool, appointments } = await testInstance.createSchoolDataWithAppointment();
+
+    const keycloakToken = JwtTestHelper.createKeycloakToken({ sub: studentUser.id, email: studentUser.email });
+
+    //when
+    return request(testInstance.app.getHttpServer())
+      .post(`/student/schools/${testSchool.id}/appointments/${appointments[0].id}/subscriptions`)
+      .set('Authorization', `Bearer ${keycloakToken}`)
+      .expect(201)
+      .then(async (response) => {
+        expect(response.body.subscriptions).toHaveLength(1);
+        expect(response.body.subscriptions[0].student.id).toEqual(student.id);
+        expect(removeIds(response.body)).toMatchSnapshot();
+      });
+  });
+
+  it('/student/schools/:schoolId/appointments/:appointmentId/subscriptions deadline passed (POST)', async () => {
+    // given
+    const { studentUser, student, testSchool, appointments } = await testInstance.createSchoolDataWithAppointment();
+    appointments[0].deadline = moment().subtract(1, 'hour').toDate();
+    appointments[0].scheduling = new Date();
+    await testInstance.appointmentRepository.save(appointments[0]);
+
+    const keycloakToken = JwtTestHelper.createKeycloakToken({ sub: studentUser.id, email: studentUser.email });
+
+    //when
+    return request(testInstance.app.getHttpServer())
+      .post(`/student/schools/${testSchool.id}/appointments/${appointments[0].id}/subscriptions`)
+      .set('Authorization', `Bearer ${keycloakToken}`)
+      .expect(400)
+      .then(async (response) => {
+        expect(response.body.message).toEqual("Deadline passed");
+      });
+  });
+
+  it('/student/schools/:schoolId/appointments/:appointmentId/subscriptions waiting list (POST)', async () => {
+    // given
+    const { studentUser, student, testSchool, appointments } = await testInstance.createSchoolDataWithAppointment();
+    const subscription = new Subscription();
+    subscription.appointment = appointments[0];
+    subscription.user = studentUser;
+    await testInstance.subscriptionRepository.save(subscription);
+    const studentUser2 = await testInstance.getDefaultUser();
+    const student2 = Testdata.createStudent(studentUser2, testSchool);
+    await testInstance.studentRepository.save(student2);
+
+    const keycloakToken2 = JwtTestHelper.createKeycloakToken({ sub: studentUser2.id, email: studentUser2.email });
+
+    //when
+    return request(testInstance.app.getHttpServer())
+      .post(`/student/schools/${testSchool.id}/appointments/${appointments[0].id}/subscriptions`)
+      .set('Authorization', `Bearer ${keycloakToken2}`)
+      .expect(201)
+      .then(async (response) => {
+        expect(response.body.subscriptions).toHaveLength(2);
+        expect(response.body.subscriptions[1].student.id).toEqual(student2.id);
+        expect(response.body.subscriptions[1].waitingList).toBeTruthy();
+        expect(removeIds(response.body)).toMatchSnapshot();
+      });
+  });
+
+  it('/student/schools/:schoolId/appointments/:appointmentId/subscriptions unauthorized (POST)', async () => {
+    // given
+    const { testSchool, appointments } = await testInstance.createSchoolDataWithAppointment();
+
+    const keycloakToken = JwtTestHelper.createKeycloakToken();
+
+    //when
+    return request(testInstance.app.getHttpServer())
+      .post(`/student/schools/${testSchool.id}/appointments/${appointments[0].id}/subscriptions`)
+      .set('Authorization', `Bearer ${keycloakToken}`)
+      .expect(401);
+  });
+
+  it('/student/schools/:schoolId/appointments/:appointmentId/subscriptions deadline passed (DELETE)', async () => {
+    // given
+    const { studentUser, testSchool, appointments } = await testInstance.createSchoolDataWithAppointment();
+    appointments[0].deadline = moment().subtract(1, 'hour').toDate();
+    appointments[0].scheduling = new Date();
+    await testInstance.appointmentRepository.save(appointments[0]);
+    
+    const subscription = new Subscription();
+    subscription.appointment = appointments[0];
+    subscription.user = studentUser;
+    await testInstance.subscriptionRepository.save(subscription);
+
+    const keycloakToken = JwtTestHelper.createKeycloakToken({ sub: studentUser.id, email: studentUser.email });
+
+    //when
+    return request(testInstance.app.getHttpServer())
+      .delete(`/student/schools/${testSchool.id}/appointments/${appointments[0].id}/subscriptions`)
+      .set('Authorization', `Bearer ${keycloakToken}`)
+      .expect(400)
+      .then(async (response) => {
+        expect(response.body.message).toEqual("Deadline passed");
+      });
+  });
+
+  it('/student/schools/:schoolId/appointments/:appointmentId/subscriptions (DELETE)', async () => {
+    // given
+    const { studentUser, testSchool, appointments } = await testInstance.createSchoolDataWithAppointment();
+    const subscription = new Subscription();
+    subscription.appointment = appointments[0];
+    subscription.user = studentUser;
+    await testInstance.subscriptionRepository.save(subscription);
+
+    const keycloakToken = JwtTestHelper.createKeycloakToken({ sub: studentUser.id, email: studentUser.email });
+
+    //when
+    return request(testInstance.app.getHttpServer())
+      .delete(`/student/schools/${testSchool.id}/appointments/${appointments[0].id}/subscriptions`)
+      .set('Authorization', `Bearer ${keycloakToken}`)
+      .expect(204)
+      .then(async () => {
+        const db = await testInstance.appointmentRepository.findOne({
+          relations: {
+            subscriptions: true
+          },
+          where: {
+            id: appointments[0].id
+          }
+        });
+        expect(db.subscriptions).toHaveLength(0);
+      });
+  });
+
+  it('/student/schools/:schoolId/appointments/:appointmentId/subscriptions badRequest (DELETE)', async () => {
+    // given
+    const { studentUser, testSchool, appointments } = await testInstance.createSchoolDataWithAppointment();
+
+    const keycloakToken = JwtTestHelper.createKeycloakToken({ sub: studentUser.id, email: studentUser.email });
+
+    //when
+    return request(testInstance.app.getHttpServer())
+      .delete(`/student/schools/${testSchool.id}/appointments/${appointments[0].id}/subscriptions`)
+      .set('Authorization', `Bearer ${keycloakToken}`)
+      .expect(400)
+      .then(async (response) => {
+        expect(removeIds(response.body)).toMatchSnapshot();
+      });
+  });
+
+  it('/student/schools/:schoolId/appointments/:appointmentId/subscriptions unauthorized (DELETE)', async () => {
+    // given
+    const { studentUser, testSchool, appointments } = await testInstance.createSchoolDataWithAppointment();
+    const subscription = new Subscription();
+    subscription.appointment = appointments[0];
+    subscription.user = studentUser;
+    await testInstance.subscriptionRepository.save(subscription);
+
+    const keycloakToken = JwtTestHelper.createKeycloakToken();
+
+    //when
+    return request(testInstance.app.getHttpServer())
+      .delete(`/student/schools/${testSchool.id}/appointments/${appointments[0].id}/subscriptions`)
+      .set('Authorization', `Bearer ${keycloakToken}`)
+      .expect(401);
+  });
+});
+
+describe('instructor appointment (e2e)', () => {
+  const testInstance = new BaseE2ETest();
+
+  beforeEach(async () => {
+    await testInstance.cleanupBetweenTests();
+  });
+
+  it('/instructor/schools/:id/appointments (GET)', async () => {
+    // given
+    const { instructorUser, testSchool } = await testInstance.createSchoolDataWithAppointment();
+    await testInstance.createSchoolDataWithAppointment('student2@student.com', 'instructor2@instructor.com', 'tandemPilot2@tandemPilot.com', 'test school 2', 'appointment type 2');
+
+    const keycloakToken = JwtTestHelper.createKeycloakToken({ sub: instructorUser.id, email: instructorUser.email });
+
+    //when
+    return request(testInstance.app.getHttpServer())
+      .get(`/instructor/schools/${testSchool.id}/appointments`)
+      .set('Authorization', `Bearer ${keycloakToken}`)
+      .expect(200)
+      .then(async (response) => {
+        expect(response.body.entity).toHaveLength(4);
+        expect(removeIds(response.body.entity[0])).toMatchSnapshot();
+
+        const db = await testInstance.appointmentRepository.find();
+        expect(db).toHaveLength(8);
+      });
+  });
+
+  it('/instructor/appointments (GET)', async () => {
+    // given
+    const { instructorUser, testSchool } = await testInstance.createSchoolDataWithAppointment();
+    const defaultUser = Testdata.getDefaultUser();
+    const appointment = new AppointmentBuilderTest(testSchool, defaultUser)
+      .setScheduling(new Date("2025-11-24T12:00:00"))
+      .build();
+    await testInstance.appointmentRepository.save(appointment);
+
+    const keycloakToken = JwtTestHelper.createKeycloakToken({ sub: instructorUser.id, email: instructorUser.email });
+
+    //when
+    return request(testInstance.app.getHttpServer())
+      .get(`/instructor/appointments`)
+      .set('Authorization', `Bearer ${keycloakToken}`)
+      .expect(200)
+      .then(async (response) => {
+        expect(response.body.entity).toHaveLength(4);
+        expect(removeIds(response.body.entity[0])).toMatchSnapshot();
+
+        const db = await testInstance.appointmentRepository.find();
+        expect(db).toHaveLength(5);
+      });
+  });
+
+  it('/instructor/schools/:id/appointments (POST)', async () => {
+    // given
+    const { studentUser, student, instructorUser, testSchool } = await testInstance.createSchoolDataWithAppointment();
+    const defaultUser = Testdata.getDefaultUser();
+    const appointment = new AppointmentBuilderTest(testSchool, defaultUser)
+      .setScheduling(new Date("2025-11-24T12:00:00"))
+      .setDeadline(new Date("2025-11-24T12:00:00"))
+      .setState(State.ANNOUNCED)
+      .build();
+    const guestSubscription = new GuestSubscription();
+    guestSubscription.firstname = "guest";
+    guestSubscription.lastname = "guest";
+    appointment.guestSubscriptions = [guestSubscription];
+    const subscription = new Subscription();
+    subscription.user = studentUser;
+    appointment.subscriptions = [subscription];
+    const appointmentDto = plainToClass(AppointmentDto, appointment);
+
+    const keycloakToken = JwtTestHelper.createKeycloakToken({ sub: instructorUser.id, email: instructorUser.email });
+
+    //when
+    return request(testInstance.app.getHttpServer())
+      .post(`/instructor/schools/${testSchool.id}/appointments`)
+      .set('Authorization', `Bearer ${keycloakToken}`)
+      .send(appointmentDto)
+      .expect(201)
+      .then(async (response) => {
+        expect(response.body.id).toBeDefined();
+        expect(removeIds(response.body)).toMatchSnapshot();
+
+        const db = await testInstance.appointmentRepository.findOne(
+          {
+            relations: {
+              subscriptions: true,
+              guestSubscriptions: true
+            },
+            where: { 
+              id: response.body.id 
+            }
+          });
+        expect(db.id).toEqual(response.body.id);
+        expect(db.subscriptions).toHaveLength(1);
+        expect(db.guestSubscriptions).toHaveLength(1);
+        expect(db.state).toEqual(State.ANNOUNCED);
+      });
+  });
+
+  it('/instructor/schools/:id/appointments (PUT)', async () => {
+    // given
+    const { studentUser, student, instructorUser, testSchool, appointments } = await testInstance.createSchoolDataWithAppointment();
+
+    const guestSubscription = new GuestSubscription();
+    guestSubscription.firstname = "guest";
+    guestSubscription.lastname = "guest";
+    appointments[0].guestSubscriptions = [guestSubscription];
+    const subscription = new Subscription();
+    subscription.user = studentUser;
+    appointments[0].subscriptions = [subscription];
+    appointments[0].state = State.CANCELED;
+    const appointmentDto = plainToClass(AppointmentDto, appointments[0]);
+
+    const keycloakToken = JwtTestHelper.createKeycloakToken({ sub: instructorUser.id, email: instructorUser.email });
+
+    //when
+    return request(testInstance.app.getHttpServer())
+      .put(`/instructor/schools/${testSchool.id}/appointments/${appointments[0].id}`)
+      .set('Authorization', `Bearer ${keycloakToken}`)
+      .send(appointmentDto)
+      .expect(200)
+      .then(async (response) => {
+        expect(response.body.id).toBeDefined();
+        expect(removeIds(response.body)).toMatchSnapshot();
+
+        const db = await testInstance.appointmentRepository.findOne(
+          {
+            relations: {
+              subscriptions: true,
+              guestSubscriptions: true
+            },
+            where: { 
+              id: response.body.id 
+            }
+          });
+        expect(db.subscriptions).toHaveLength(1);
+        expect(db.guestSubscriptions).toHaveLength(1);
+        expect(db.state).toEqual(State.CANCELED);
+      });
+  });
+});

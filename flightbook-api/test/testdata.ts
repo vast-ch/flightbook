@@ -1,0 +1,344 @@
+import { User } from "../src/user/domain/user.entity";
+import { News } from "../src/news/news.entity";
+import { readFileSync } from "fs";
+import * as path from 'path';
+import { ControlSheet } from "../src/training/control-sheet/control-sheet.entity";
+import { Place } from "../src/place/place.entity";
+import { PlaceDto } from "../src/place/interface/place-dto";
+import { PlaceMapper } from "../src/place/place.mapper";
+import { Glider } from "../src/glider/glider.entity";
+import { plainToClass } from "class-transformer";
+import { GliderDto } from "../src/glider/interface/glider-dto";
+import { Flight } from "../src/flight/domain/flight.entity";
+import { FlightDto } from "../src/flight/interface/flight-dto";
+import { UserWriteDto } from "../src/user/interface/user-write-dto";
+import { School } from "../src/training/school/domain/school.entity";
+import { SchoolDto } from "../src/training/school/interface/school-dto";
+import { TeamMember } from "../src/training/team-member/team-member.entity";
+import { Enrollment } from "../src/training/enrollment/enrollment.entity";
+import { randomStringGenerator } from "@nestjs/common/utils/random-string-generator.util";
+import { EnrollmentType } from "../src/training/enrollment/enrollment-type";
+import { Student } from "../src/training/student/student.entity";
+import { Note } from "../src/training/note/note.entity";
+import { NoteDto } from "../src/training/note/interface/note-dto";
+import { EmergencyContact } from "../src/training/emergency-contact/emergency-contact.entity";
+import { EmergencyContactDto } from "../src/training/emergency-contact/interface/emergency-contact-dto";
+import { AppointmentType } from "../src/training/appointment/appointment-type.entity";
+import { AppointmentTypeDto } from "../src/training/appointment/interface/appointment-type-dto";
+import { PassengerConfirmation } from "../src/tandem/passenger-confirmation/passenger-confirmation.entity";
+import { PassengerConfirmationDto } from "../src/tandem/passenger-confirmation/interface/passenger-confirmation-dto";
+import { TandemPilot } from "../src/training/tandem-pilot/tandem-pilot.entity";
+import { CustomFieldType } from "../src/training/school/domain/school-config";
+
+export class Testdata {
+    public static EMAIL = "test@user.com";
+    public static INSTRUCTOR_APP_ORIGIN = "http://localhost:4200";
+    public static MOBILE_APP_ORIGIN = "http://localhost:3000";
+
+    public static request = {
+        user: {
+            userId: 1
+        }
+    }
+
+    public static token = {
+        userId: 1
+    }
+
+    public static createNews(language: string): News {
+        const news = new News();
+        news.date = '01.01.2024';
+        news.title = 'title';
+        news.text = 'text';
+        news.language = language;
+        return news;
+    }
+
+    public static createPlaceDto(name: string): PlaceDto {
+        return PlaceMapper.toPlaceDto(this.createPlace(name));
+    }
+
+    public static createPlace(name: string, user?: User): Place {
+        const place = new Place();
+        place.name = name;
+        place.altitude = 1000;
+        place.country = 'CH'
+        place.notes = "notice"
+        place.user = user || this.getDefaultUser();
+        return place;
+    }
+
+    public static createGliderDto(brand: string, name: string, tandem: boolean): GliderDto {
+        return plainToClass(GliderDto, this.createGlider(brand, name, tandem));
+    }
+
+    public static createGlider(brand: string, name: string, tandem: boolean, user?: User): Glider {
+        const glider = new Glider();
+        glider.brand = brand;
+        glider.name = name;
+        glider.buyDate = '2020-01-01';
+        glider.note = "note";
+        glider.tandem = tandem;
+        glider.archived = false;
+        glider.user = user || this.getDefaultUser();
+        return glider;
+    }
+
+    public static createFlightDto(
+        start: Place,
+        landing: Place,
+        glider: Glider,
+        date?: string,
+        timestamp?: Date
+    ): FlightDto {
+        return plainToClass(FlightDto, this.createFlight(start, landing, glider, date, timestamp));
+    }
+
+    public static createFlight(
+        start?: Place,
+        landing?: Place,
+        glider?: Glider,
+        date?: string,
+        timestamp?: Date,
+        user?: User,
+        tandemSchool?: School
+    ): Flight {
+        const flight = new Flight();
+        flight.date = date || '2024-01-01';
+        flight.start = start || this.createPlace("Start");
+        flight.landing = landing || this.createPlace("Landing");
+        flight.glider = glider || this.createGlider("Brand", "Name", false);
+        flight.km = 100.2;
+        flight.time = "01:30";
+        flight.description = "description";
+        flight.user = user || this.getDefaultUser();
+        flight.timestamp = timestamp || new Date();
+        if (tandemSchool) {
+            flight.tandemSchoolData = {
+                tandemSchool: tandemSchool,
+                paymentState: undefined,
+                paymentComment: undefined,
+                paymentAmount: undefined,
+                instructor: undefined,
+                paymentTimestamp: undefined,
+                schoolCustomValues: undefined
+            };
+        }
+        return flight;
+    }
+
+    public static createControlSheet(userCanEdit: boolean): ControlSheet {
+        const controlSheet = new ControlSheet();
+        controlSheet.userCanEdit = userCanEdit;
+        controlSheet.altitudeFlight.id = 1;
+        controlSheet.trainingHill.id = 1;
+        controlSheet.theory.id = 1;
+        controlSheet.level.id = 1;
+        controlSheet.user = this.getDefaultUser();
+        return controlSheet;
+    }
+
+    public static createNoteDto(student: Student): NoteDto {
+        return plainToClass(NoteDto, this.createNote(student));
+    }
+
+    public static createNote(student: Student): Note {
+        const note = new Note();
+        note.text = "note";
+        note.date = new Date("2024-01-01");
+        note.title = "title";
+        note.student = student;
+        return note;
+    }
+
+    public static createPassengerConfirmationDto(): PassengerConfirmationDto {
+        return plainToClass(PassengerConfirmationDto, this.createPassengerConfirmation());
+    }
+
+    public static createPassengerConfirmation(school?: School, user?: User): PassengerConfirmation {
+        const passengerConfirmation = new PassengerConfirmation();
+        passengerConfirmation.date = new Date("2024-01-01");
+        passengerConfirmation.firstname = "firstname";
+        passengerConfirmation.lastname = "lastname";
+        passengerConfirmation.email = "email";
+        passengerConfirmation.phone = "phone";
+        passengerConfirmation.place = "place";
+        passengerConfirmation.validated = true;
+        passengerConfirmation.canUseData = true;
+        passengerConfirmation.signature = "signature";
+        passengerConfirmation.signatureMimeType = "image/svg+xml";
+        passengerConfirmation.user = user || this.getDefaultUser();
+        if (school) {
+            passengerConfirmation.tandemSchool = school;
+        }
+        return passengerConfirmation;
+    }
+
+    public static createAppointmentTypeDto(): AppointmentTypeDto {
+        return plainToClass(AppointmentTypeDto, this.createAppointmentType("appointment type"));
+    }
+
+    public static createAppointmentType(name: string): AppointmentType {
+        const appointmentType = new AppointmentType();
+        appointmentType.name = name;
+        appointmentType.meetingPoint = "meeting point";
+        appointmentType.maxPeople = 1;
+        appointmentType.color = "color";
+        appointmentType.time = "08:00";
+        appointmentType.deadlineOffsetHours = 1;
+        return appointmentType;
+    }
+
+    public static createUserDto(
+        firstname: string,
+        lastname: string,
+        email: string
+    ): UserWriteDto {
+        const user: UserWriteDto = {
+            firstname: firstname,
+            lastname: lastname,
+            email: email,
+            password: "Password123!",
+            phone: undefined,
+            config: undefined
+        };
+        return user;
+    }
+
+    public static createSchoolDto(name: string): SchoolDto {
+        return plainToClass(SchoolDto, this.createSchool(name));
+    }
+
+    public static createSchool(name: string): School {
+        const school = new School();
+        school.name = name;
+        school.address1 = "address";
+        school.address2 = "address2";
+        school.plz = "1234";
+        school.city = "city";
+        school.phone = "0123456789";
+        school.email = "school@example.com";
+        school.language = "de";
+        school.configuration = {
+            schoolModule: {
+                active: true,
+                validateFlights: true,
+                userCanEditControlSheet: true,
+            },
+            tandemModule: {
+                active: true,
+                flightConfig: {
+                    customFields: [
+                        {
+                            key: "discount",
+                            type: CustomFieldType.NUMBER,
+                            label: "Discount",
+                            disabled: false,
+                            required: false
+                        },
+                        {
+                            key: "flightType",
+                            type: CustomFieldType.DROPDOWN,
+                            label: "Type",
+                            options: ["Classic", "Premium", "Deluxe"],
+                            disabled: false,
+                            required: true
+                        },
+                        {
+                            key: "foto",
+                            type: CustomFieldType.BOOLEAN,
+                            label: "Foto",
+                            disabled: false,
+                            required: false
+                        }
+                    ]
+                }
+            }
+        };
+        return school;
+    }
+
+    public static createEnrollment(school: School, email: string, type: EnrollmentType): Enrollment {
+        const enrollment = new Enrollment();
+        enrollment.school = school;
+        enrollment.email = email;
+        enrollment.expireAt = new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000); // 7 days from now
+        enrollment.token = randomStringGenerator();
+        enrollment.type = type;
+        return enrollment;
+    }
+
+    public static createTeamMember(school: School, user: User, isAdmin: boolean = false): TeamMember {
+        const teamMember = new TeamMember();
+        teamMember.school = school;
+        teamMember.user = user;
+        teamMember.admin = isAdmin;
+        return teamMember;
+    }
+
+    public static createStudent(user: User, school: School): Student {
+        const student = new Student();
+        student.user = user;
+        student.school = school;
+        student.isArchived = false;
+        student.isTandem = false;
+        return student;
+    }
+
+    public static createTandemPilot(user: User, school: School): TandemPilot {
+        const tandemPilot = new TandemPilot();
+        tandemPilot.user = user;
+        tandemPilot.school = school;
+        tandemPilot.isArchived = false;
+        return tandemPilot;
+    }
+
+    public static createUser(email?: string, firstname?: string, lastname?: string): User {
+        const user = new User();
+        user.firstname = firstname || "test";
+        user.lastname = lastname || "user";
+        user.email = email || this.EMAIL;
+        return user;
+    }
+
+    public static getDefaultUser(): User {
+        const user = new User();
+        user.id = 1;
+        user.firstname = "test";
+        user.lastname = "user";
+        user.email = "test@user.com";
+        return user;
+    }
+
+    public static createEmergencyContactDto(user: User): EmergencyContactDto {
+        return plainToClass(EmergencyContactDto, this.createEmergencyContact(user));
+    }
+
+    public static createEmergencyContact(user: User): EmergencyContact {
+        const emergencyContact = new EmergencyContact();
+        emergencyContact.user = user;
+        emergencyContact.firstname = "emergency firstname";
+        emergencyContact.lastname = "emergency lastname";
+        emergencyContact.phone = "0123456789";
+        emergencyContact.additionalInformation = "emergency additional information";
+        return emergencyContact;
+    }
+
+    public static readFile(fileName: string): Express.Multer.File {
+        const filePath = path.join(__dirname, `/resources/${fileName}`);
+        const buffer = readFileSync(filePath);
+        const file = {
+            buffer,
+            originalname: "test.csv",
+            filename: "test.csv",
+            encoding: "UTF8",
+            stream: null,
+            mimetype: null,
+            destination: null,
+            path: null,
+            fieldname: null,
+            size: null
+        }
+        return file
+    }
+}

@@ -1,0 +1,34 @@
+{
+    "import": {
+        "flugbuch": {
+            "name": "Flugbuch.ch",
+            "description": "You can import data from the flugbuch.ch application. (Not for Flightbook exports)",
+            "fileType": "csv"
+        },
+        "fb_places": {
+            "name": "Flightbook places",
+            "description":"This allows you to import exported places from Flightbook.",
+            "fileType": "csv"
+        },
+        "vfr": {
+            "name": "VFRnav",
+            "description":"You can import data from the VFRnav application. (Not for Flightbook exports)",
+            "fileType": "xlsx"
+        },
+        "logfly": {
+            "name": "Logfly",
+            "description":"You can import data from the Logfly application. (Not for Flightbook exports)",
+            "fileType": "csv"
+        },
+        "xcontest": {
+            "name": "XContest.org",
+            "description":"You can import data from the XContest.org application.",
+            "fileType": "json"
+        }
+    },
+    "versionCheck": {
+        "forceUpdate": "This version is no longer supported. Please update the app to continue.",
+        "optionalUpdate": "A new version of the app is available. Updating is recommended.",
+        "upToDate": "Your app is up to date."
+    }
+}

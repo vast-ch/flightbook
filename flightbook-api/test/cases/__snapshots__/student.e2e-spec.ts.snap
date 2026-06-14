@@ -1,0 +1,59 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`instructor student (e2e) /instructor/schools/:id/appointments/:appointment_id/students (GET) 1`] = `
+[
+  {
+    "controlSheet": null,
+    "emergencyContacts": [],
+    "isAppointmentActive": true,
+    "isArchived": false,
+    "isTandem": false,
+    "statistic": {
+      "average": null,
+      "bestDistance": null,
+      "income": null,
+      "nbFlights": 0,
+      "nbFlightsAlone": 0,
+      "nbLandingplaces": 0,
+      "nbStartplaces": 0,
+      "time": null,
+      "totalDistance": null,
+    },
+    "user": {
+      "email": "student@student.com",
+      "firstname": "student",
+      "lastname": "student",
+      "phone": null,
+    },
+  },
+]
+`;
+
+exports[`instructor student (e2e) /instructor/schools/:id/students (GET) 1`] = `
+[
+  {
+    "controlSheet": null,
+    "countNotValidatedFlights": 0,
+    "isAppointmentActive": true,
+    "isArchived": false,
+    "isTandem": false,
+    "statistic": {
+      "average": null,
+      "bestDistance": null,
+      "income": null,
+      "nbFlights": 0,
+      "nbFlightsAlone": 0,
+      "nbLandingplaces": 0,
+      "nbStartplaces": 0,
+      "time": null,
+      "totalDistance": null,
+    },
+    "user": {
+      "email": "student@student.com",
+      "firstname": "student",
+      "lastname": "student",
+      "phone": null,
+    },
+  },
+]
+`;

@@ -1,0 +1,55 @@
+version: '3.1'
+
+volumes:
+  postgres-data:
+  minio-data:
+
+services:
+  db:
+    image: postgis/postgis:15-3.4
+    restart: always
+    environment:
+      POSTGRES_USER: flightbook_dev
+      POSTGRES_PASSWORD: dev
+      POSTGRES_DB: flightbook_dev
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    ports:
+      - 5432:5432 
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8180:8080
+
+  minio:
+    image: minio/minio:latest
+    environment:
+      MINIO_ACCESS_KEY: flightbook_dev
+      MINIO_SECRET_KEY: flightbook_dev_secret
+    volumes:
+      - minio-data:/data
+    ports: 
+      - 80:9000
+      - 9001:9001
+    command: server /data --console-address ":9001"
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:25.0.6
+    command: start-dev --import-realm
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    volumes:
+      - ./realms:/opt/keycloak/data/import
+    ports:
+      - "8080:8080"
+  pgadmin:
+    image: dpage/pgadmin4:7
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@flightbook.ch
+      PGADMIN_DEFAULT_PASSWORD: test
+    ports:
+      - "7180:80"
