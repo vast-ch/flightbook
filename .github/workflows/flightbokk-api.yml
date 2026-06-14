@@ -20,9 +20,11 @@ jobs:
           node-version: '24'
       - 
         name: Install dependencies
+        working-directory: ./flightbook-api
         run: npm install
       - 
         name: Run tests
+        working-directory: ./flightbook-api
         run: npm run test:e2e
   docker:
     needs: [e2e_test]
@@ -45,6 +47,7 @@ jobs:
         id: docker_build
         uses: docker/build-push-action@v7
         with:
+          context: ./flightbook-api
           push: true
           tags: laggery/flightbook-api:latest, laggery/flightbook-api:${{ github.run_number }}
       -
