@@ -1,0 +1,155 @@
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Between, LessThanOrEqual, MoreThanOrEqual, Repository } from 'typeorm';
+import { Subscription } from '../subscription/subscription.entity';
+import { Appointment } from './appointment.entity';
+import { State } from './state';
+import { GuestSubscription } from '../subscription/guest-subscription.entity';
+
+@Injectable()
+export class AppointmentRepository extends Repository<Appointment> {
+
+    constructor(
+        @InjectRepository(Appointment)
+        repository: Repository<Appointment>
+    ) { 
+        super(repository.target, repository.manager, repository.queryRunner);
+     }
+
+    async getAppointmentById(id: number): Promise<Appointment> {
+        let appointment = await this.findOneOrFail({
+            relations: {
+                subscriptions:{
+                    user: true
+                },
+                guestSubscriptions: true,
+                instructor: true,
+                school: true,
+                type: true
+            },
+            where: {
+                id: id
+            }
+        });
+        appointment.subscriptions = this.orderSubscriptionByTimestampAsc(appointment.subscriptions);
+        return appointment;
+    }
+
+    async getAppointmentsBySchoolId(schoolId: number, query: any): Promise<[Appointment[], number]> {
+        const options: any = {
+            relations: {
+                subscriptions:{
+                    user: true
+                },
+                guestSubscriptions: true,
+                instructor: true,
+                takeOffCoordinator: true,
+                type: true
+            },
+            where: {
+                school: {
+                    id: schoolId
+                }
+            },
+            order: {
+                scheduling: 'DESC'
+            }
+        };
+
+        if (query && query.limit) {
+            if (Number.isNaN(Number(query.limit))) {
+                throw new BadRequestException("limit is not a number");
+            }
+            options.take = query.limit;
+        }
+
+        if (query && query.offset) {
+            if (Number.isNaN(Number(query.offset))) {
+                throw new BadRequestException("offset is not a number");
+            }
+            options.skip = query.offset;
+        }
+
+        if (query && query.from && query.to) {
+            options.where.scheduling = Between(`${query.from}`, `${query.to} 23:59:00.000000`);
+        } else if (query && query.from) {
+            options.where.scheduling = MoreThanOrEqual(query.from);
+        } else if (query && query.to) {
+            options.where.scheduling = LessThanOrEqual(query.to);
+        }
+
+        const state = State[query?.state];
+        if (query && query.state && state) {
+            options.where.state = state;
+        }
+
+        if (query && query.instructorId) {
+            options.where.instructor = {
+                id: query.instructorId
+            };
+        }
+
+        let entityNumber: [Appointment[], number] = await this.findAndCount(options);
+        entityNumber[0].forEach((appointment: Appointment) => {
+            appointment.subscriptions = this.orderSubscriptionByTimestampAsc(appointment.subscriptions);
+            appointment.guestSubscriptions = this.orderGuestSubscriptionById(appointment.guestSubscriptions);
+        })
+
+        return entityNumber;
+    }
+
+    async getAppointmentsByInstructorId(instructorId: number, query: any): Promise<[Appointment[], number]> {
+        const options: any = {
+            relations: {
+                subscriptions:{
+                    user: true
+                },
+                school: true,
+                guestSubscriptions: true,
+                takeOffCoordinator: true,
+                type: true
+            },
+            where: {
+                instructor: {
+                    id: instructorId
+                }
+            },
+            order: {
+                scheduling: 'DESC'
+            }
+        };
+
+        if (query && query.from && query.to) {
+            options.where.scheduling = Between(`${query.from}`, `${query.to} 23:59:00.000000`);
+        } else if (query && query.from) {
+            options.where.scheduling = MoreThanOrEqual(query.from);
+        } else if (query && query.to) {
+            options.where.scheduling = LessThanOrEqual(query.to);
+        }
+
+        const state = State[query?.state];
+        if (query && query.state && state) {
+            options.where.state = state;
+        }
+
+        if (query && query.school_id) {
+            options.where.school = {
+                id: query.school_id
+            };
+        }
+
+        let entityNumber: [Appointment[], number] = await this.findAndCount(options);
+
+        return entityNumber;
+    }
+
+    // @TODO Can be removed after migrate to typeorm 0.3.x and added order by for sub objects
+    private orderSubscriptionByTimestampAsc(subscriptions: Subscription[]): Subscription[] {
+        return subscriptions.sort((a: Subscription, b: Subscription) => a.timestamp.getTime() - b.timestamp.getTime());
+    }
+
+    // @TODO Can be removed after migrate to typeorm 0.3.x and added order by for sub objects
+    private orderGuestSubscriptionById(subscriptions: GuestSubscription[]): GuestSubscription[] {
+        return subscriptions.sort((a: GuestSubscription, b: GuestSubscription) => a.id - b.id);
+    }
+}

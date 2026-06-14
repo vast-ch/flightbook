@@ -1,0 +1,808 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Schools (e2e) /schools (POST) 1`] = `
+{
+  "address1": "address",
+  "address2": "address2",
+  "city": "city",
+  "configuration": {
+    "schoolModule": {
+      "active": true,
+      "userCanEditControlSheet": true,
+      "validateFlights": true,
+    },
+    "tandemModule": {
+      "active": false,
+    },
+  },
+  "email": "school@example.com",
+  "language": "de",
+  "name": "School 1",
+  "phone": "0123456789",
+  "plz": "1234",
+}
+`;
+
+exports[`Schools (e2e) /schools (POST) 2`] = `
+{
+  "address1": "address",
+  "address2": "address2",
+  "city": "city",
+  "configuration": {
+    "schoolModule": {
+      "active": true,
+      "userCanEditControlSheet": true,
+      "validateFlights": true,
+    },
+    "tandemModule": {
+      "active": false,
+    },
+  },
+  "email": "school@example.com",
+  "language": "de",
+  "name": "School 1",
+  "phone": "0123456789",
+  "plz": "1234",
+}
+`;
+
+exports[`Schools (e2e) /schools/:id/google-calendar/calendars (GET) - success 1`] = `
+[
+  {
+    "id": "primary",
+    "primary": true,
+    "summary": "Primary Calendar",
+  },
+  {
+    "id": "calendar-2",
+    "primary": false,
+    "summary": "Secondary Calendar",
+  },
+  {
+    "id": "calendar-3",
+    "primary": false,
+    "summary": "Test Calendar",
+  },
+]
+`;
+
+exports[`Schools (e2e) /schools/configuration (PUT) 1`] = `
+{
+  "address1": "address",
+  "address2": "address2",
+  "city": "city",
+  "configuration": {
+    "schoolModule": {
+      "active": false,
+      "userCanEditControlSheet": false,
+      "validateFlights": false,
+    },
+    "tandemModule": {
+      "active": false,
+      "flightConfig": {
+        "customFields": [
+          {
+            "disabled": true,
+            "key": "discount",
+            "label": "Discount 2",
+            "required": false,
+            "type": "number",
+          },
+          {
+            "disabled": true,
+            "key": "flightType",
+            "label": "Type 2",
+            "options": [
+              "Classic",
+              "Premium",
+              "Deluxe",
+            ],
+            "required": true,
+            "type": "dropdown",
+          },
+          {
+            "disabled": true,
+            "key": "foto",
+            "label": "Foto 2",
+            "required": false,
+            "type": "boolean",
+          },
+        ],
+      },
+    },
+  },
+  "email": "school@example.com",
+  "language": "de",
+  "name": "School 1",
+  "phone": "0123456789",
+  "plz": "1234",
+}
+`;
+
+exports[`Schools (e2e) /schools/configuration (PUT) 2`] = `
+{
+  "address1": "address",
+  "address2": "address2",
+  "city": "city",
+  "configuration": {
+    "schoolModule": {
+      "active": false,
+      "userCanEditControlSheet": false,
+      "validateFlights": false,
+    },
+    "tandemModule": {
+      "active": false,
+      "flightConfig": {
+        "customFields": [
+          {
+            "disabled": true,
+            "key": "discount",
+            "label": "Discount 2",
+            "required": false,
+            "type": "number",
+          },
+          {
+            "disabled": true,
+            "key": "flightType",
+            "label": "Type 2",
+            "options": [
+              "Classic",
+              "Premium",
+              "Deluxe",
+            ],
+            "required": true,
+            "type": "dropdown",
+          },
+          {
+            "disabled": true,
+            "key": "foto",
+            "label": "Foto 2",
+            "required": false,
+            "type": "boolean",
+          },
+        ],
+      },
+    },
+  },
+  "email": "school@example.com",
+  "language": "de",
+  "name": "School 1",
+  "phone": "0123456789",
+  "plz": "1234",
+}
+`;
+
+exports[`Schools (e2e) /schools/configuration (PUT) with custom fields - all field types 1`] = `
+[
+  {
+    "disabled": false,
+    "key": "discount",
+    "label": "Discount",
+    "required": false,
+    "type": "number",
+  },
+  {
+    "disabled": false,
+    "key": "flightType",
+    "label": "Type",
+    "options": [
+      "Classic",
+      "Premium",
+      "Deluxe",
+    ],
+    "required": true,
+    "type": "dropdown",
+  },
+  {
+    "disabled": false,
+    "key": "foto",
+    "label": "Foto",
+    "required": false,
+    "type": "boolean",
+  },
+  {
+    "disabled": false,
+    "key": "additionalInformation",
+    "label": "Additional Information",
+    "required": true,
+    "type": "text",
+  },
+  {
+    "disabled": false,
+    "key": "flightDate",
+    "label": "Flight Date",
+    "required": false,
+    "type": "date",
+  },
+]
+`;
+
+exports[`Schools (e2e) /schools/configuration (PUT) with custom fields - all field types 2`] = `
+[
+  {
+    "disabled": false,
+    "key": "discount",
+    "label": "Discount",
+    "required": false,
+    "type": "number",
+  },
+  {
+    "disabled": false,
+    "key": "flightType",
+    "label": "Type",
+    "options": [
+      "Classic",
+      "Premium",
+      "Deluxe",
+    ],
+    "required": true,
+    "type": "dropdown",
+  },
+  {
+    "disabled": false,
+    "key": "foto",
+    "label": "Foto",
+    "required": false,
+    "type": "boolean",
+  },
+  {
+    "disabled": false,
+    "key": "additionalInformation",
+    "label": "Additional Information",
+    "required": true,
+    "type": "text",
+  },
+  {
+    "disabled": false,
+    "key": "flightDate",
+    "label": "Flight Date",
+    "required": false,
+    "type": "date",
+  },
+]
+`;
+
+exports[`Schools (e2e) /schools/google-calendar/callback (GET) - success 1`] = `
+{
+  "accessToken": "mock-access-token",
+  "calendarId": "primary",
+  "refreshToken": "mock-refresh-token",
+  "tokenExpiry": Any<String>,
+}
+`;
+
+exports[`Schools tandem pilots (e2e) /schools/:id/tandem-pilots (GET) 1`] = `
+[
+  {
+    "isArchived": false,
+    "user": {
+      "email": "tandem-pilot@tandem-pilot.com",
+      "firstname": "tandem-pilot",
+      "lastname": "tandem-pilot",
+      "phone": null,
+    },
+  },
+]
+`;
+
+exports[`Schools tandem pilots (e2e) /schools/:id/tandem-pilots/:tandemPilotId/flights (GET) 1`] = `
+[
+  {
+    "date": "2025-01-03",
+    "description": "description",
+    "glider": {
+      "archived": false,
+      "brand": "Gin",
+      "checks": null,
+      "color": null,
+      "name": "Yeti",
+      "nbFlights": null,
+      "note": "note",
+      "tandem": false,
+      "time": null,
+    },
+    "igc": null,
+    "km": 100.2,
+    "landing": {
+      "altitude": 1000,
+      "country": "CH",
+      "name": "Bitsch",
+      "notes": "notice",
+    },
+    "number": "4",
+    "price": null,
+    "shvAlone": false,
+    "start": {
+      "altitude": 1000,
+      "country": "CH",
+      "name": "Belalp",
+      "notes": "notice",
+    },
+    "tandemSchoolData": {
+      "tandemSchool": {
+        "address1": "address",
+        "address2": "address2",
+        "city": "city",
+        "email": "school@example.com",
+        "language": "de",
+        "name": "test school",
+        "phone": "0123456789",
+        "plz": "1234",
+      },
+    },
+    "time": "01:30:00",
+  },
+  {
+    "date": "2025-01-02",
+    "description": "description",
+    "glider": {
+      "archived": false,
+      "brand": "Ozone",
+      "checks": null,
+      "color": null,
+      "name": "Delta",
+      "nbFlights": null,
+      "note": "note",
+      "tandem": false,
+      "time": null,
+    },
+    "igc": null,
+    "km": 100.2,
+    "landing": {
+      "altitude": 1000,
+      "country": "CH",
+      "name": "Belalp",
+      "notes": "notice",
+    },
+    "number": "3",
+    "price": null,
+    "shvAlone": false,
+    "start": {
+      "altitude": 1000,
+      "country": "CH",
+      "name": "Fiesch",
+      "notes": "notice",
+    },
+    "tandemSchoolData": {
+      "tandemSchool": {
+        "address1": "address",
+        "address2": "address2",
+        "city": "city",
+        "email": "school@example.com",
+        "language": "de",
+        "name": "test school",
+        "phone": "0123456789",
+        "plz": "1234",
+      },
+    },
+    "time": "01:30:00",
+  },
+  {
+    "date": "2025-01-01",
+    "description": "description",
+    "glider": {
+      "archived": false,
+      "brand": "Advance",
+      "checks": null,
+      "color": null,
+      "name": "Bibeta 6",
+      "nbFlights": null,
+      "note": "note",
+      "tandem": true,
+      "time": null,
+    },
+    "igc": null,
+    "km": 100.2,
+    "landing": {
+      "altitude": 1000,
+      "country": "CH",
+      "name": "Fiesch",
+      "notes": "notice",
+    },
+    "number": "2",
+    "price": null,
+    "shvAlone": false,
+    "start": {
+      "altitude": 1000,
+      "country": "CH",
+      "name": "riederalp",
+      "notes": "notice",
+    },
+    "tandemSchoolData": {
+      "tandemSchool": {
+        "address1": "address",
+        "address2": "address2",
+        "city": "city",
+        "email": "school@example.com",
+        "language": "de",
+        "name": "test school",
+        "phone": "0123456789",
+        "plz": "1234",
+      },
+    },
+    "time": "01:30:00",
+  },
+  {
+    "date": "2025-01-01",
+    "description": "description",
+    "glider": {
+      "archived": false,
+      "brand": "Advance",
+      "checks": null,
+      "color": null,
+      "name": "Bibeta 6",
+      "nbFlights": null,
+      "note": "note",
+      "tandem": true,
+      "time": null,
+    },
+    "igc": null,
+    "km": 100.2,
+    "landing": {
+      "altitude": 1000,
+      "country": "CH",
+      "name": "Fiesch",
+      "notes": "notice",
+    },
+    "number": "1",
+    "price": null,
+    "shvAlone": false,
+    "start": {
+      "altitude": 1000,
+      "country": "CH",
+      "name": "riederalp",
+      "notes": "notice",
+    },
+    "tandemSchoolData": {
+      "tandemSchool": {
+        "address1": "address",
+        "address2": "address2",
+        "city": "city",
+        "email": "school@example.com",
+        "language": "de",
+        "name": "test school",
+        "phone": "0123456789",
+        "plz": "1234",
+      },
+    },
+    "time": "01:30:00",
+  },
+]
+`;
+
+exports[`Schools tandem pilots (e2e) /schools/:id/tandem-pilots/:tandemPilotId/flights/:flightId (PUT) 1`] = `
+{
+  "date": "2025-01-01",
+  "description": "description",
+  "glider": {
+    "archived": false,
+    "brand": "Advance",
+    "buyDate": "2020-01-01",
+    "checks": null,
+    "color": null,
+    "name": "Bibeta 6",
+    "nbFlights": null,
+    "note": "note",
+    "tandem": true,
+    "time": null,
+  },
+  "igc": null,
+  "km": 100.2,
+  "landing": {
+    "altitude": 1000,
+    "country": "CH",
+    "name": "Fiesch",
+    "notes": "notice",
+    "point": null,
+  },
+  "price": null,
+  "shvAlone": false,
+  "start": {
+    "altitude": 1000,
+    "country": "CH",
+    "name": "riederalp",
+    "notes": "notice",
+    "point": null,
+  },
+  "tandemSchoolData": {
+    "instructor": {
+      "config": null,
+      "email": "instructor@instructor.com",
+      "firstname": "instructor",
+      "lastname": "instructor",
+      "loginType": "LOCAL",
+      "phone": null,
+    },
+    "paymentAmount": 100,
+    "paymentComment": "paid",
+    "paymentState": "PAID",
+    "paymentTimestamp": Any<String>,
+    "schoolCustomValues": null,
+    "tandemSchool": {
+      "address1": "address",
+      "address2": "address2",
+      "city": "city",
+      "configuration": {
+        "schoolModule": {
+          "active": true,
+          "userCanEditControlSheet": true,
+          "validateFlights": true,
+        },
+        "tandemModule": {
+          "active": true,
+          "flightConfig": {
+            "customFields": [
+              {
+                "disabled": false,
+                "key": "discount",
+                "label": "Discount",
+                "required": false,
+                "type": "number",
+              },
+              {
+                "disabled": false,
+                "key": "flightType",
+                "label": "Type",
+                "options": [
+                  "Classic",
+                  "Premium",
+                  "Deluxe",
+                ],
+                "required": true,
+                "type": "dropdown",
+              },
+              {
+                "disabled": false,
+                "key": "foto",
+                "label": "Foto",
+                "required": false,
+                "type": "boolean",
+              },
+            ],
+          },
+        },
+      },
+      "email": "school@example.com",
+      "language": "de",
+      "name": "test school",
+      "phone": "0123456789",
+      "plz": "1234",
+    },
+  },
+  "time": "01:30:00",
+  "validation": {
+    "comment": null,
+    "instructor": null,
+    "school": null,
+    "state": null,
+    "timestamp": null,
+  },
+}
+`;
+
+exports[`Schools tandem pilots (e2e) /schools/:id/tandem-pilots/:tandemPilotId/passenger-confirmations (GET) 1`] = `
+[
+  {
+    "canUseData": true,
+    "date": "2024-01-01T00:00:00.000Z",
+    "email": "email",
+    "firstname": "firstname",
+    "lastname": "lastname",
+    "phone": "phone",
+    "place": "place",
+    "signature": "signature",
+    "signatureMimeType": "image/svg+xml",
+    "tandemSchool": {
+      "address1": "address",
+      "address2": "address2",
+      "city": "city",
+      "configuration": {
+        "schoolModule": {
+          "active": true,
+          "userCanEditControlSheet": true,
+          "validateFlights": true,
+        },
+        "tandemModule": {
+          "active": true,
+          "flightConfig": {
+            "customFields": [
+              {
+                "disabled": false,
+                "key": "discount",
+                "label": "Discount",
+                "required": false,
+                "type": "number",
+              },
+              {
+                "disabled": false,
+                "key": "flightType",
+                "label": "Type",
+                "options": [
+                  "Classic",
+                  "Premium",
+                  "Deluxe",
+                ],
+                "required": true,
+                "type": "dropdown",
+              },
+              {
+                "disabled": false,
+                "key": "foto",
+                "label": "Foto",
+                "required": false,
+                "type": "boolean",
+              },
+            ],
+          },
+        },
+      },
+      "email": "school@example.com",
+      "language": "de",
+      "name": "test school",
+      "phone": "0123456789",
+      "plz": "1234",
+    },
+    "validated": true,
+  },
+]
+`;
+
+exports[`Student schools (e2e) /student/schools (GET) 1`] = `
+[
+  {
+    "address1": "address",
+    "address2": "address2",
+    "city": "city",
+    "configuration": {
+      "schoolModule": {
+        "active": true,
+        "userCanEditControlSheet": true,
+        "validateFlights": true,
+      },
+      "tandemModule": {
+        "active": true,
+        "flightConfig": {
+          "customFields": [
+            {
+              "disabled": false,
+              "key": "discount",
+              "label": "Discount",
+              "required": false,
+              "type": "number",
+            },
+            {
+              "disabled": false,
+              "key": "flightType",
+              "label": "Type",
+              "options": [
+                "Classic",
+                "Premium",
+                "Deluxe",
+              ],
+              "required": true,
+              "type": "dropdown",
+            },
+            {
+              "disabled": false,
+              "key": "foto",
+              "label": "Foto",
+              "required": false,
+              "type": "boolean",
+            },
+          ],
+        },
+      },
+    },
+    "email": "school@example.com",
+    "language": "de",
+    "name": "test school",
+    "phone": "0123456789",
+    "plz": "1234",
+  },
+]
+`;
+
+exports[`instructor schools (e2e) /instructor/schools (GET) 1`] = `
+[
+  {
+    "address1": "address",
+    "address2": "address2",
+    "city": "city",
+    "configuration": {
+      "schoolModule": {
+        "active": true,
+        "userCanEditControlSheet": true,
+        "validateFlights": true,
+      },
+      "tandemModule": {
+        "active": true,
+        "flightConfig": {
+          "customFields": [
+            {
+              "disabled": false,
+              "key": "discount",
+              "label": "Discount",
+              "required": false,
+              "type": "number",
+            },
+            {
+              "disabled": false,
+              "key": "flightType",
+              "label": "Type",
+              "options": [
+                "Classic",
+                "Premium",
+                "Deluxe",
+              ],
+              "required": true,
+              "type": "dropdown",
+            },
+            {
+              "disabled": false,
+              "key": "foto",
+              "label": "Foto",
+              "required": false,
+              "type": "boolean",
+            },
+          ],
+        },
+      },
+    },
+    "email": "school@example.com",
+    "language": "de",
+    "name": "test school",
+    "phone": "0123456789",
+    "plz": "1234",
+  },
+  {
+    "address1": "address",
+    "address2": "address2",
+    "city": "city",
+    "configuration": {
+      "schoolModule": {
+        "active": true,
+        "userCanEditControlSheet": true,
+        "validateFlights": true,
+      },
+      "tandemModule": {
+        "active": true,
+        "flightConfig": {
+          "customFields": [
+            {
+              "disabled": false,
+              "key": "discount",
+              "label": "Discount",
+              "required": false,
+              "type": "number",
+            },
+            {
+              "disabled": false,
+              "key": "flightType",
+              "label": "Type",
+              "options": [
+                "Classic",
+                "Premium",
+                "Deluxe",
+              ],
+              "required": true,
+              "type": "dropdown",
+            },
+            {
+              "disabled": false,
+              "key": "foto",
+              "label": "Foto",
+              "required": false,
+              "type": "boolean",
+            },
+          ],
+        },
+      },
+    },
+    "email": "school@example.com",
+    "language": "de",
+    "name": "School 2",
+    "phone": "0123456789",
+    "plz": "1234",
+  },
+]
+`;

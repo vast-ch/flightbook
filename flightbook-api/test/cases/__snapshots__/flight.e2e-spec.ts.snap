@@ -1,0 +1,517 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Flights (e2e) /flights (POST) 1`] = `
+{
+  "date": "2025-01-02",
+  "description": "description",
+  "glider": {
+    "archived": false,
+    "brand": "Advance",
+    "buyDate": "2020-01-01",
+    "checks": null,
+    "color": null,
+    "name": "Bibeta 6",
+    "nbFlights": null,
+    "note": "note",
+    "tandem": true,
+    "time": null,
+  },
+  "igc": null,
+  "km": 100.2,
+  "landing": {
+    "altitude": 1000,
+    "country": "CH",
+    "name": "Fiesch",
+    "notes": "notice",
+  },
+  "price": null,
+  "shvAlone": false,
+  "start": {
+    "altitude": 1000,
+    "country": "CH",
+    "name": "riederalp",
+    "notes": "notice",
+  },
+  "tandemSchoolData": {
+    "paymentAmount": null,
+    "paymentComment": null,
+    "paymentState": null,
+    "paymentTimestamp": null,
+    "schoolCustomValues": null,
+  },
+  "time": "01:30",
+  "validation": {
+    "comment": null,
+    "state": null,
+    "timestamp": null,
+  },
+}
+`;
+
+exports[`Flights (e2e) /flights (POST) 2`] = `
+{
+  "date": "2025-01-02",
+  "description": "description",
+  "igc": null,
+  "km": 100.2,
+  "price": null,
+  "shvAlone": false,
+  "tandemSchoolData": {
+    "paymentAmount": null,
+    "paymentComment": null,
+    "paymentState": null,
+    "paymentTimestamp": null,
+    "schoolCustomValues": null,
+  },
+  "time": "01:30:00",
+  "timestamp": {},
+  "userId": 1,
+  "validation": {
+    "comment": null,
+    "state": null,
+    "timestamp": null,
+  },
+}
+`;
+
+exports[`Flights (e2e) /flights (POST) with custom field values from tandem school 1`] = `
+[
+  {
+    "key": "discount",
+    "value": 20,
+  },
+  {
+    "key": "flightType",
+    "value": "Premium",
+  },
+  {
+    "key": "foto",
+    "value": true,
+  },
+]
+`;
+
+exports[`Flights (e2e) /flights (POST) with custom field values from tandem school 2`] = `
+[
+  {
+    "key": "discount",
+    "value": 20,
+  },
+  {
+    "key": "flightType",
+    "value": "Premium",
+  },
+  {
+    "key": "foto",
+    "value": true,
+  },
+]
+`;
+
+exports[`Flights (e2e) /flights (PUT) 1`] = `
+{
+  "date": "2025-01-01",
+  "description": "Updated description",
+  "glider": {
+    "archived": false,
+    "brand": "Advance",
+    "buyDate": "2020-01-01",
+    "checks": null,
+    "color": null,
+    "name": "Bibeta 6",
+    "nbFlights": null,
+    "note": "note",
+    "tandem": true,
+    "time": null,
+  },
+  "igc": null,
+  "km": 200.5,
+  "landing": {
+    "altitude": 1000,
+    "country": "CH",
+    "name": "Fiesch",
+    "notes": "notice",
+  },
+  "price": null,
+  "start": {
+    "altitude": 1000,
+    "country": "CH",
+    "name": "riederalp",
+    "notes": "notice",
+  },
+  "tandemSchoolData": {
+    "paymentAmount": null,
+    "paymentComment": null,
+    "paymentState": null,
+    "paymentTimestamp": null,
+    "schoolCustomValues": null,
+  },
+  "time": "02:15",
+  "validation": {
+    "comment": null,
+    "state": null,
+    "timestamp": null,
+  },
+}
+`;
+
+exports[`Flights (e2e) /flights (PUT) 2`] = `
+{
+  "date": "2025-01-01",
+  "description": "Updated description",
+  "igc": null,
+  "km": 200.5,
+  "price": null,
+  "shvAlone": false,
+  "tandemSchoolData": {
+    "paymentAmount": null,
+    "paymentComment": null,
+    "paymentState": null,
+    "paymentTimestamp": null,
+    "schoolCustomValues": null,
+  },
+  "time": "02:15:00",
+  "timestamp": {},
+  "userId": 1,
+  "validation": {
+    "comment": null,
+    "state": null,
+    "timestamp": null,
+  },
+}
+`;
+
+exports[`Flights (e2e) /flights/:id (GET) 1`] = `
+{
+  "date": "2025-01-01",
+  "description": "description",
+  "glider": {
+    "archived": false,
+    "brand": "Advance",
+    "buyDate": "2020-01-01",
+    "checks": null,
+    "color": null,
+    "name": "Bibeta 6",
+    "nbFlights": null,
+    "note": "note",
+    "tandem": true,
+    "time": null,
+  },
+  "igc": null,
+  "km": 100.2,
+  "landing": {
+    "altitude": 1000,
+    "country": "CH",
+    "name": "Fiesch",
+    "notes": "notice",
+    "point": null,
+  },
+  "price": null,
+  "shvAlone": false,
+  "start": {
+    "altitude": 1000,
+    "country": "CH",
+    "name": "riederalp",
+    "notes": "notice",
+    "point": null,
+  },
+  "tandemSchoolData": {
+    "instructor": null,
+    "paymentAmount": null,
+    "paymentComment": null,
+    "paymentState": null,
+    "paymentTimestamp": null,
+    "schoolCustomValues": null,
+    "tandemSchool": null,
+  },
+  "time": "01:30:00",
+  "validation": {
+    "comment": null,
+    "instructor": null,
+    "school": null,
+    "state": null,
+    "timestamp": null,
+  },
+}
+`;
+
+exports[`Flights (e2e) /flights/statistic (GET) 1`] = `
+{
+  "average": "5400.000000",
+  "bestDistance": 100.2,
+  "income": null,
+  "nbFlights": 4,
+  "nbFlightsAlone": 0,
+  "nbLandingplaces": 3,
+  "nbStartplaces": 3,
+  "time": "21600.000000",
+  "totalDistance": 400.8,
+}
+`;
+
+exports[`Instructor Flight Validation (e2e) /instructor/schools/:school_id/students/:id/flights/:flightId (PUT) 1`] = `
+{
+  "date": "2025-01-01",
+  "description": "description",
+  "glider": {
+    "archived": false,
+    "brand": "Advance",
+    "buyDate": "2020-01-01",
+    "checks": null,
+    "color": null,
+    "name": "Bibeta 6",
+    "nbFlights": null,
+    "note": "note",
+    "tandem": true,
+    "time": null,
+  },
+  "igc": null,
+  "km": 100.2,
+  "landing": {
+    "altitude": 1000,
+    "country": "CH",
+    "name": "Fiesch",
+    "notes": "notice",
+    "point": null,
+  },
+  "price": null,
+  "shvAlone": false,
+  "start": {
+    "altitude": 1000,
+    "country": "CH",
+    "name": "riederalp",
+    "notes": "notice",
+    "point": null,
+  },
+  "tandemSchoolData": {
+    "instructor": null,
+    "paymentAmount": null,
+    "paymentComment": null,
+    "paymentState": null,
+    "paymentTimestamp": null,
+    "schoolCustomValues": null,
+    "tandemSchool": null,
+  },
+  "time": "01:30:00",
+  "validation": {
+    "comment": "Validated",
+    "instructor": {
+      "config": null,
+      "email": "instructor@instructor.com",
+      "firstname": "instructor",
+      "lastname": "instructor",
+      "loginType": "LOCAL",
+      "phone": null,
+    },
+    "school": {
+      "address1": "address",
+      "address2": "address2",
+      "city": "city",
+      "configuration": {
+        "schoolModule": {
+          "active": true,
+          "userCanEditControlSheet": true,
+          "validateFlights": true,
+        },
+        "tandemModule": {
+          "active": true,
+          "flightConfig": {
+            "customFields": [
+              {
+                "disabled": false,
+                "key": "discount",
+                "label": "Discount",
+                "required": false,
+                "type": "number",
+              },
+              {
+                "disabled": false,
+                "key": "flightType",
+                "label": "Type",
+                "options": [
+                  "Classic",
+                  "Premium",
+                  "Deluxe",
+                ],
+                "required": true,
+                "type": "dropdown",
+              },
+              {
+                "disabled": false,
+                "key": "foto",
+                "label": "Foto",
+                "required": false,
+                "type": "boolean",
+              },
+            ],
+          },
+        },
+      },
+      "email": "school@example.com",
+      "language": "de",
+      "name": "test school",
+      "phone": "0123456789",
+      "plz": "1234",
+    },
+    "state": "VALIDATED",
+    "timestamp": Any<String>,
+  },
+}
+`;
+
+exports[`V2 Flights (e2e) /v2/flights (GET) 1`] = `
+{
+  "currentPage": 1,
+  "entity": [
+    {
+      "date": "2025-01-03",
+      "description": "description",
+      "glider": {
+        "archived": false,
+        "brand": "Gin",
+        "checks": null,
+        "color": null,
+        "name": "Yeti",
+        "nbFlights": null,
+        "note": "note",
+        "tandem": false,
+        "time": null,
+      },
+      "igc": null,
+      "km": 100.2,
+      "landing": {
+        "altitude": 1000,
+        "country": "CH",
+        "name": "Bitsch",
+        "notes": "notice",
+      },
+      "number": "4",
+      "price": null,
+      "shvAlone": false,
+      "start": {
+        "altitude": 1000,
+        "country": "CH",
+        "name": "Belalp",
+        "notes": "notice",
+      },
+      "time": "01:30:00",
+    },
+    {
+      "date": "2025-01-02",
+      "description": "description",
+      "glider": {
+        "archived": false,
+        "brand": "Ozone",
+        "checks": null,
+        "color": null,
+        "name": "Delta",
+        "nbFlights": null,
+        "note": "note",
+        "tandem": false,
+        "time": null,
+      },
+      "igc": null,
+      "km": 100.2,
+      "landing": {
+        "altitude": 1000,
+        "country": "CH",
+        "name": "Belalp",
+        "notes": "notice",
+      },
+      "number": "3",
+      "price": null,
+      "shvAlone": false,
+      "start": {
+        "altitude": 1000,
+        "country": "CH",
+        "name": "Fiesch",
+        "notes": "notice",
+      },
+      "time": "01:30:00",
+    },
+    {
+      "date": "2025-01-01",
+      "description": "description",
+      "glider": {
+        "archived": false,
+        "brand": "Advance",
+        "checks": null,
+        "color": null,
+        "name": "Bibeta 6",
+        "nbFlights": null,
+        "note": "note",
+        "tandem": true,
+        "time": null,
+      },
+      "igc": null,
+      "km": 100.2,
+      "landing": {
+        "altitude": 1000,
+        "country": "CH",
+        "name": "Fiesch",
+        "notes": "notice",
+      },
+      "number": "2",
+      "price": null,
+      "shvAlone": false,
+      "start": {
+        "altitude": 1000,
+        "country": "CH",
+        "name": "riederalp",
+        "notes": "notice",
+      },
+      "time": "01:30:00",
+    },
+    {
+      "date": "2025-01-01",
+      "description": "description",
+      "glider": {
+        "archived": false,
+        "brand": "Advance",
+        "checks": null,
+        "color": null,
+        "name": "Bibeta 6",
+        "nbFlights": null,
+        "note": "note",
+        "tandem": true,
+        "time": null,
+      },
+      "igc": null,
+      "km": 100.2,
+      "landing": {
+        "altitude": 1000,
+        "country": "CH",
+        "name": "Fiesch",
+        "notes": "notice",
+      },
+      "number": "1",
+      "price": null,
+      "shvAlone": false,
+      "start": {
+        "altitude": 1000,
+        "country": "CH",
+        "name": "riederalp",
+        "notes": "notice",
+      },
+      "time": "01:30:00",
+    },
+  ],
+  "itemCount": 4,
+  "itemsPerPage": 100,
+  "totalItems": 4,
+  "totalPages": 1,
+}
+`;
+
+exports[`V2 Flights (e2e) /v2/flights/statistic (GET) 1`] = `
+{
+  "average": "5400.000000",
+  "bestDistance": 100.2,
+  "income": 0,
+  "nbFlights": 4,
+  "time": "21600.000000",
+  "totalDistance": 400.8,
+  "type": "yearly",
+  "year": "2025",
+}
+`;

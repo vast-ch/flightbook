@@ -1,0 +1,47 @@
+{
+    "import": {
+        "flugbuch": {
+            "name": "Flugbuch.ch",
+            "description": "Il s'agit de données provenant de l'application flugbuch.ch. (Pas un export de Flightbook)",
+            "fileType": "csv"
+        },
+        "fb_places": {
+            "name": "Déco / attero Flightbook",
+            "description":"Avec cette fonction, tu peux importer des décollages et atterrissages exportés de Flightbook.",
+            "fileType": "csv"
+        },
+        "vfr": {
+            "name": "VFRnav",
+            "description":"Il s'agit de données provenant de l'application VFRnav. (Pas un export de Flightbook)",
+            "fileType": "xlsx"
+        },
+        "logfly": {
+            "name": "Logfly",
+            "description":"Il s'agit de données provenant de l'application Logfly. (Pas un export de Flightbook)",
+            "fileType": "csv"
+        },
+        "xcontest": {
+            "name": "XContest.org",
+            "description":"Il s'agit de données provenant de l'application XContest.org.",
+            "fileType": "json"
+        }
+    },
+    "versionCheck": {
+        "forceUpdate": "Cette version n'est plus supportée. Veuillez mettre à jour l'application pour continuer.",
+        "optionalUpdate": "Une nouvelle version de l’application est disponible. Une mise à jour est recommandée.",
+        "upToDate": "Votre application est à jour."
+    },
+    "appointment": {
+        "stateValue": {
+            "ANNOUNCED": "Annoncé",
+            "CONFIRMED": "Confirmé",
+            "CANCELED": "Annulé"
+        },
+        "state": "Statut",
+        "meetingPoint": "Point de rencontre",
+        "maxPeople": "Max participants",
+        "instructor": "Instructeur",
+        "takeOffCoordinator": "Aide au décollage",
+        "description": "Description"
+    }
+}

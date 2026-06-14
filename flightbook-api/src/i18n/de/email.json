@@ -1,0 +1,51 @@
+{
+    "appointment": {
+        "type": "Terminart",
+        "new": {
+            "subject": "{school}: Neuer Termin am: {date}",
+            "content": "<p>Informationen zum Termin</p><ul> <li>Datum: {date}</li>{type}<li>Treffpunkt: {meetingPoint}</li><li>Beschreibung: {description}</li><li>Max Teilnehmer: {maxPeople}</li></ul>"
+        },
+        "subscription": {
+            "subject": "{school}: Anmeldung: {date}",
+            "content": "<p>{school} hat dich für den Termin vom {date} angemeldet</p><p>Informationen zum Termin</p><ul> <li>Datum: {date}</li>{type}<li>Treffpunkt: {meetingPoint}</li><li>Beschreibung: {description}</li><li>Max Teilnehmer: {maxPeople}</li></ul>"
+        },
+        "unsubscribe": {
+            "subject": "{name}: Abmeldung von {date}",
+            "content": "<p>{name} hat sich für den Termin vom {date} abgemeldet</p>"
+        },
+        "informWaitingStudent": {
+            "subject": "{school}: Anmeldung: {date}",
+            "content": "<p>Jemand hat sich für den Termin vom {date} abgemeldet. Sie können jetzt teilnehmen.</p><p>Informationen zum Termin</p><ul> <li>Datum: {date}</li>{type}<li>Treffpunkt: {meetingPoint}</li><li>Beschreibung: {description}</li><li>Max Teilnehmer: {maxPeople}</li></ul>"
+        }
+    },
+    "enrollment": {
+        "student": {
+            "subject": "Flugbuch teilen",
+            "content": "<p>Hallo</p><p>{school} ladet Sie ein, Ihr Flugbuch zu teilen. Sie können diese Einladung annehmen, indem Sie dem untenstehenden Link folgen.</p><p>Link : <a href='{link}'>{link}</a></p><p>Der Link läuft am {date} ab</p>"
+        },
+        "teamMember": {
+            "subject": "Mitglied des Teams {school}",
+            "content": "<p>{school} ladet Sie ein, Mitglied seines Teams zu werden. Sie können diese Einladung annehmen, indem Sie dem untenstehenden Link folgen.</p><p>Link: <a href='{link}'>{link}</a></p><p>Der Link läuft am {date} ab</p>"
+        },
+        "tandemPilot": {
+            "subject": "Tandem-Pilot {school}",
+            "content": "<p>{school} lädt Sie ein, ihrem Team als Tandem-Pilot beizutreten. Sie können diese Einladung annehmen, indem Sie dem untenstehenden Link folgen.</p><p>Link: <a href='{link}'>{link}</a></p><p>Der Link läuft am {date} ab</p>"
+        }
+    },
+    "payment": {
+        "invoiceUpcoming": {
+            "subject": "Bevorstehende Rechnung",
+            "content": "<p>Guten Tag</p><p>Ihr Abonnement wird in 30 Tagen automatisch verlängert. Sie werden mit einem Betrag von CHF 12.- belastet.</p><p>Das Abonnement kann jederzeit in der Applikation unter \"Einstellungen\" gekündet werden.</p><p>Wir würden uns freuen, Sie auch in Zukunft zu unseren Kunden zählen zu können.</p><p>Freundliche Grüsse</br>Flightbook Team</p>"
+        }
+    },
+    "verification": {
+        "subject": "Bestätige dein Flightbook-Konto",
+        "welcome": "Willkommen bei Flightbook!",
+        "verify_prompt": "Bitte bestätige deine E-Mail-Adresse durch Klicken auf den untenstehenden Link:",
+        "link_expiry": "Dieser Link läuft in 24 Stunden ab."
+    },
+    "welcome": {
+        "subject": "Willkommen bei Flightbook",
+        "content": "<table cellpadding=0 cellspacing=0 style=\"margin:0 auto;width:100%;background-color:#fff\"><tr><td><div style=\"background-color:#fff;border:1px solid #eee;box-sizing:border-box;font-family:Lato,Helvetica,'Helvetica Neue',Arial,sans-serif;margin:auto;max-width:600px;overflow:hidden;width:600px\"><div style=background-color:#1b3e71;display:flex;align-items:center;padding:20px><h4 style=color:#fff;font-weight:400;font-size:16px;margin:0;flex:1>Willkommen bei Flightbook!<br></h4><img height=80px src=https://raw.githubusercontent.com/laggery/Flightbook-MobileApp/7d738a8497449768f4a38d647cfdf7da138f77b6/src/assets/icons/icon-128x128.png style=border-radius:10px;margin-left:auto width=80px></div><div style=\"padding:25px 40px 50px\"><p>Hallo {name},<br><p>schön, dass du Flightbook nutzt!<br><p>Aktuell verwendest du <b>Flightbook Free</b>, mit dem du Zugang zu allen Funktionen hast. Allerdings kannst du in dieser Version nur bis zu <b>25 Flüge</b> hinzufügen.<br><p>Möchtest du mehr? Dann wechsle zu <b>Flightbook Premium</b> – für nur <b>12 CHF pro Jahr</b> (das sind gerade einmal <b>1 CHF pro Monat</b>)!<br><p style=\"text-align:center;margin:20px 0\"><a href=https://m.flightbook.ch/settings style=\"border:none;border-radius:4px;color:#fff;cursor:pointer;display:inline-block;font-size:14px;font-weight:700;text-decoration:none;padding:12px 24px;background-color:#1b3e71\">Flightbook Premium abonnieren</a><br><p>Mit deinem Upgrade unterstützt du das Projekt und hilfst, die Serverkosten zu decken. Vielen Dank für deine Unterstützung!<br><p>Viel Spass mit Flightbook! Falls du Fragen hast oder Hilfe benötigst, lass es mich wissen.<br><p>Freundliche Grüsse,<br><p>Yannick<br></div></div></table>"
+    }
+}

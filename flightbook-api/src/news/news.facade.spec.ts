@@ -1,0 +1,30 @@
+import { NewsFacade } from './news.facade';
+import { NewsRepository } from './news.repository';
+import { Testdata } from '../../test/testdata';
+
+describe('NewsFacade', () => {
+  let newsFacade: NewsFacade;
+  let newsRepository: jest.Mocked<NewsRepository>;
+
+  beforeAll(async () => {
+    newsRepository = {
+      getNews: jest.fn(),
+    } as any;
+    newsFacade = new NewsFacade(newsRepository);
+  });
+
+  it('Should get news', async () => {
+    // given
+    const mockNews = Testdata.createNews('de');
+
+    newsRepository.getNews.mockResolvedValue([mockNews]);
+
+    // when
+    const newsList = await newsFacade.getNews('de');
+
+    // then
+    expect(newsRepository.getNews).toHaveBeenCalled();
+    expect(newsList).toHaveLength(1);
+    expect(newsList[0]).toEqual(mockNews);
+  });
+});

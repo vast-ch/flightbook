@@ -1,0 +1,666 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`instructor appointment (e2e) /instructor/appointments (GET) 1`] = `
+{
+  "deadline": null,
+  "description": "description",
+  "guestSubscriptions": [],
+  "maxPeople": 1,
+  "meetingPoint": "meeting point",
+  "scheduling": "2025-11-27T12:00:00.000Z",
+  "school": {
+    "address1": "address",
+    "address2": "address2",
+    "city": "city",
+    "configuration": {
+      "schoolModule": {
+        "active": true,
+        "userCanEditControlSheet": true,
+        "validateFlights": true,
+      },
+      "tandemModule": {
+        "active": true,
+        "flightConfig": {
+          "customFields": [
+            {
+              "disabled": false,
+              "key": "discount",
+              "label": "Discount",
+              "required": false,
+              "type": "number",
+            },
+            {
+              "disabled": false,
+              "key": "flightType",
+              "label": "Type",
+              "options": [
+                "Classic",
+                "Premium",
+                "Deluxe",
+              ],
+              "required": true,
+              "type": "dropdown",
+            },
+            {
+              "disabled": false,
+              "key": "foto",
+              "label": "Foto",
+              "required": false,
+              "type": "boolean",
+            },
+          ],
+        },
+      },
+    },
+    "email": "school@example.com",
+    "language": "de",
+    "name": "test school",
+    "phone": "0123456789",
+    "plz": "1234",
+  },
+  "state": "CONFIRMED",
+  "subscriptions": [],
+  "takeOffCoordinatorText": "takeoff coordinator",
+  "type": {
+    "archived": false,
+    "color": "color",
+    "deadlineOffsetHours": 1,
+    "maxPeople": 1,
+    "meetingPoint": "meeting point",
+    "name": "appointment type 1",
+    "time": "08:00:00",
+  },
+}
+`;
+
+exports[`instructor appointment (e2e) /instructor/schools/:id/appointments (GET) 1`] = `
+{
+  "countGuestSubscription": 0,
+  "countSubscription": 0,
+  "countWaitingList": 0,
+  "deadline": null,
+  "description": "description",
+  "guestSubscriptions": [],
+  "instructor": {
+    "email": "instructor@instructor.com",
+    "firstname": "instructor",
+    "lastname": "instructor",
+    "phone": null,
+  },
+  "maxPeople": 1,
+  "meetingPoint": "meeting point",
+  "scheduling": "2025-11-27T12:00:00.000Z",
+  "state": "CONFIRMED",
+  "subscriptions": [],
+  "takeOffCoordinatorText": "takeoff coordinator",
+  "type": {
+    "archived": false,
+    "color": "color",
+    "deadlineOffsetHours": 1,
+    "maxPeople": 1,
+    "meetingPoint": "meeting point",
+    "name": "appointment type 1",
+    "time": "08:00:00",
+  },
+}
+`;
+
+exports[`instructor appointment (e2e) /instructor/schools/:id/appointments (POST) 1`] = `
+{
+  "countGuestSubscription": 1,
+  "countSubscription": 1,
+  "countWaitingList": 0,
+  "deadline": "2025-11-24T12:00:00.000Z",
+  "description": "description",
+  "guestSubscriptions": [
+    {
+      "firstname": "guest",
+      "lastname": "guest",
+    },
+  ],
+  "instructor": {
+    "email": "test@user.com",
+    "firstname": "test",
+    "lastname": "user",
+    "phone": null,
+  },
+  "maxPeople": 1,
+  "meetingPoint": "meeting point",
+  "scheduling": "2025-11-24T12:00:00.000Z",
+  "school": {
+    "address1": "address",
+    "address2": "address2",
+    "city": "city",
+    "configuration": {
+      "schoolModule": {
+        "active": true,
+        "userCanEditControlSheet": true,
+        "validateFlights": true,
+      },
+      "tandemModule": {
+        "active": true,
+        "flightConfig": {
+          "customFields": [
+            {
+              "disabled": false,
+              "key": "discount",
+              "label": "Discount",
+              "required": false,
+              "type": "number",
+            },
+            {
+              "disabled": false,
+              "key": "flightType",
+              "label": "Type",
+              "options": [
+                "Classic",
+                "Premium",
+                "Deluxe",
+              ],
+              "required": true,
+              "type": "dropdown",
+            },
+            {
+              "disabled": false,
+              "key": "foto",
+              "label": "Foto",
+              "required": false,
+              "type": "boolean",
+            },
+          ],
+        },
+      },
+    },
+    "email": "school@example.com",
+    "language": "de",
+    "name": "test school",
+    "phone": "0123456789",
+    "plz": "1234",
+  },
+  "state": "ANNOUNCED",
+  "subscriptions": [
+    {
+      "student": {
+        "isAppointmentActive": true,
+        "isArchived": false,
+        "isTandem": false,
+        "statistic": null,
+        "user": {
+          "email": "student@student.com",
+          "firstname": "student",
+          "lastname": "student",
+          "phone": null,
+        },
+      },
+      "user": {
+        "email": "student@student.com",
+        "firstname": "student",
+        "lastname": "student",
+        "phone": null,
+      },
+      "waitingList": false,
+    },
+  ],
+  "takeOffCoordinatorText": "takeoff coordinator",
+}
+`;
+
+exports[`instructor appointment (e2e) /instructor/schools/:id/appointments (PUT) 1`] = `
+{
+  "countGuestSubscription": 1,
+  "countSubscription": 1,
+  "countWaitingList": 0,
+  "deadline": null,
+  "description": "description",
+  "guestSubscriptions": [
+    {
+      "firstname": "guest",
+      "lastname": "guest",
+    },
+  ],
+  "instructor": {
+    "email": "instructor@instructor.com",
+    "firstname": "instructor",
+    "lastname": "instructor",
+    "phone": null,
+  },
+  "maxPeople": 1,
+  "meetingPoint": "meeting point",
+  "scheduling": "2025-11-28T12:00:00.000Z",
+  "school": {
+    "address1": "address",
+    "address2": "address2",
+    "city": "city",
+    "configuration": {
+      "schoolModule": {
+        "active": true,
+        "userCanEditControlSheet": true,
+        "validateFlights": true,
+      },
+      "tandemModule": {
+        "active": true,
+        "flightConfig": {
+          "customFields": [
+            {
+              "disabled": false,
+              "key": "discount",
+              "label": "Discount",
+              "required": false,
+              "type": "number",
+            },
+            {
+              "disabled": false,
+              "key": "flightType",
+              "label": "Type",
+              "options": [
+                "Classic",
+                "Premium",
+                "Deluxe",
+              ],
+              "required": true,
+              "type": "dropdown",
+            },
+            {
+              "disabled": false,
+              "key": "foto",
+              "label": "Foto",
+              "required": false,
+              "type": "boolean",
+            },
+          ],
+        },
+      },
+    },
+    "email": "school@example.com",
+    "language": "de",
+    "name": "test school",
+    "phone": "0123456789",
+    "plz": "1234",
+  },
+  "state": "CANCELED",
+  "subscriptions": [
+    {
+      "student": {
+        "isAppointmentActive": true,
+        "isArchived": false,
+        "isTandem": false,
+        "statistic": null,
+        "user": {
+          "email": "student@student.com",
+          "firstname": "student",
+          "lastname": "student",
+          "phone": null,
+        },
+      },
+      "user": {
+        "email": "student@student.com",
+        "firstname": "student",
+        "lastname": "student",
+        "phone": null,
+      },
+      "waitingList": false,
+    },
+  ],
+  "takeOffCoordinatorText": "takeoff coordinator",
+  "type": {
+    "archived": false,
+    "color": "color",
+    "deadlineOffsetHours": 1,
+    "maxPeople": 1,
+    "meetingPoint": "meeting point",
+    "name": "appointment type 1",
+    "time": "08:00:00",
+  },
+}
+`;
+
+exports[`student appointment (e2e) /student/schools/:id/appointments (GET) 1`] = `
+{
+  "countGuestSubscription": 0,
+  "countSubscription": 0,
+  "countWaitingList": 0,
+  "deadline": null,
+  "description": "description",
+  "guestSubscriptions": [],
+  "instructor": {
+    "email": "instructor@instructor.com",
+    "firstname": "instructor",
+    "lastname": "instructor",
+    "phone": null,
+  },
+  "maxPeople": 1,
+  "meetingPoint": "meeting point",
+  "scheduling": "2025-11-27T12:00:00.000Z",
+  "state": "CONFIRMED",
+  "subscriptions": [],
+  "takeOffCoordinatorText": "takeoff coordinator",
+  "type": {
+    "archived": false,
+    "color": "color",
+    "deadlineOffsetHours": 1,
+    "maxPeople": 1,
+    "meetingPoint": "meeting point",
+    "name": "appointment type 1",
+    "time": "08:00:00",
+  },
+}
+`;
+
+exports[`student appointment (e2e) /student/schools/:id/appointments/:appointmentId (GET) 1`] = `
+{
+  "countGuestSubscription": 0,
+  "countSubscription": 0,
+  "countWaitingList": 0,
+  "deadline": null,
+  "description": "description",
+  "guestSubscriptions": [],
+  "instructor": {
+    "email": "instructor@instructor.com",
+    "firstname": "instructor",
+    "lastname": "instructor",
+    "phone": null,
+  },
+  "maxPeople": 1,
+  "meetingPoint": "meeting point",
+  "scheduling": "2025-11-24T12:00:00.000Z",
+  "school": {
+    "address1": "address",
+    "address2": "address2",
+    "city": "city",
+    "configuration": {
+      "schoolModule": {
+        "active": true,
+        "userCanEditControlSheet": true,
+        "validateFlights": true,
+      },
+      "tandemModule": {
+        "active": true,
+        "flightConfig": {
+          "customFields": [
+            {
+              "disabled": false,
+              "key": "discount",
+              "label": "Discount",
+              "required": false,
+              "type": "number",
+            },
+            {
+              "disabled": false,
+              "key": "flightType",
+              "label": "Type",
+              "options": [
+                "Classic",
+                "Premium",
+                "Deluxe",
+              ],
+              "required": true,
+              "type": "dropdown",
+            },
+            {
+              "disabled": false,
+              "key": "foto",
+              "label": "Foto",
+              "required": false,
+              "type": "boolean",
+            },
+          ],
+        },
+      },
+    },
+    "email": "school@example.com",
+    "language": "de",
+    "name": "test school",
+    "phone": "0123456789",
+    "plz": "1234",
+  },
+  "state": "CONFIRMED",
+  "subscriptions": [],
+  "takeOffCoordinatorText": "takeoff coordinator",
+  "type": {
+    "archived": false,
+    "color": "color",
+    "deadlineOffsetHours": 1,
+    "maxPeople": 1,
+    "meetingPoint": "meeting point",
+    "name": "appointment type 1",
+    "time": "08:00:00",
+  },
+}
+`;
+
+exports[`student appointment (e2e) /student/schools/:schoolId/appointments/:appointmentId/subscriptions (POST) 1`] = `
+{
+  "countGuestSubscription": 0,
+  "countSubscription": 1,
+  "countWaitingList": 0,
+  "deadline": null,
+  "description": "description",
+  "guestSubscriptions": [],
+  "instructor": {
+    "email": "instructor@instructor.com",
+    "firstname": "instructor",
+    "lastname": "instructor",
+    "phone": null,
+  },
+  "maxPeople": 1,
+  "meetingPoint": "meeting point",
+  "scheduling": "2025-11-24T12:00:00.000Z",
+  "school": {
+    "address1": "address",
+    "address2": "address2",
+    "city": "city",
+    "configuration": {
+      "schoolModule": {
+        "active": true,
+        "userCanEditControlSheet": true,
+        "validateFlights": true,
+      },
+      "tandemModule": {
+        "active": true,
+        "flightConfig": {
+          "customFields": [
+            {
+              "disabled": false,
+              "key": "discount",
+              "label": "Discount",
+              "required": false,
+              "type": "number",
+            },
+            {
+              "disabled": false,
+              "key": "flightType",
+              "label": "Type",
+              "options": [
+                "Classic",
+                "Premium",
+                "Deluxe",
+              ],
+              "required": true,
+              "type": "dropdown",
+            },
+            {
+              "disabled": false,
+              "key": "foto",
+              "label": "Foto",
+              "required": false,
+              "type": "boolean",
+            },
+          ],
+        },
+      },
+    },
+    "email": "school@example.com",
+    "language": "de",
+    "name": "test school",
+    "phone": "0123456789",
+    "plz": "1234",
+  },
+  "state": "CONFIRMED",
+  "subscriptions": [
+    {
+      "student": {
+        "isAppointmentActive": true,
+        "isArchived": false,
+        "isTandem": false,
+        "statistic": null,
+        "user": {
+          "email": "student@student.com",
+          "firstname": "student",
+          "lastname": "student",
+          "phone": null,
+        },
+      },
+      "user": {
+        "email": "student@student.com",
+        "firstname": "student",
+        "lastname": "student",
+        "phone": null,
+      },
+      "waitingList": false,
+    },
+  ],
+  "takeOffCoordinatorText": "takeoff coordinator",
+  "type": {
+    "archived": false,
+    "color": "color",
+    "deadlineOffsetHours": 1,
+    "maxPeople": 1,
+    "meetingPoint": "meeting point",
+    "name": "appointment type 1",
+    "time": "08:00:00",
+  },
+}
+`;
+
+exports[`student appointment (e2e) /student/schools/:schoolId/appointments/:appointmentId/subscriptions badRequest (DELETE) 1`] = `
+{
+  "error": "Bad Request",
+  "message": "Invalid unsubscribe: user must be subscribed to the appointment",
+  "statusCode": 400,
+}
+`;
+
+exports[`student appointment (e2e) /student/schools/:schoolId/appointments/:appointmentId/subscriptions waiting list (POST) 1`] = `
+{
+  "countGuestSubscription": 0,
+  "countSubscription": 1,
+  "countWaitingList": 1,
+  "deadline": null,
+  "description": "description",
+  "guestSubscriptions": [],
+  "instructor": {
+    "email": "instructor@instructor.com",
+    "firstname": "instructor",
+    "lastname": "instructor",
+    "phone": null,
+  },
+  "maxPeople": 1,
+  "meetingPoint": "meeting point",
+  "scheduling": "2025-11-24T12:00:00.000Z",
+  "school": {
+    "address1": "address",
+    "address2": "address2",
+    "city": "city",
+    "configuration": {
+      "schoolModule": {
+        "active": true,
+        "userCanEditControlSheet": true,
+        "validateFlights": true,
+      },
+      "tandemModule": {
+        "active": true,
+        "flightConfig": {
+          "customFields": [
+            {
+              "disabled": false,
+              "key": "discount",
+              "label": "Discount",
+              "required": false,
+              "type": "number",
+            },
+            {
+              "disabled": false,
+              "key": "flightType",
+              "label": "Type",
+              "options": [
+                "Classic",
+                "Premium",
+                "Deluxe",
+              ],
+              "required": true,
+              "type": "dropdown",
+            },
+            {
+              "disabled": false,
+              "key": "foto",
+              "label": "Foto",
+              "required": false,
+              "type": "boolean",
+            },
+          ],
+        },
+      },
+    },
+    "email": "school@example.com",
+    "language": "de",
+    "name": "test school",
+    "phone": "0123456789",
+    "plz": "1234",
+  },
+  "state": "CONFIRMED",
+  "subscriptions": [
+    {
+      "student": {
+        "isAppointmentActive": true,
+        "isArchived": false,
+        "isTandem": false,
+        "statistic": null,
+        "user": {
+          "email": "student@student.com",
+          "firstname": "student",
+          "lastname": "student",
+          "phone": null,
+        },
+      },
+      "user": {
+        "email": "student@student.com",
+        "firstname": "student",
+        "lastname": "student",
+        "phone": null,
+      },
+      "waitingList": false,
+    },
+    {
+      "student": {
+        "isAppointmentActive": true,
+        "isArchived": false,
+        "isTandem": false,
+        "statistic": null,
+        "user": {
+          "email": "test@user.com",
+          "firstname": "test",
+          "lastname": "user",
+          "phone": null,
+        },
+      },
+      "user": {
+        "email": "test@user.com",
+        "firstname": "test",
+        "lastname": "user",
+        "phone": null,
+      },
+      "waitingList": true,
+    },
+  ],
+  "takeOffCoordinatorText": "takeoff coordinator",
+  "type": {
+    "archived": false,
+    "color": "color",
+    "deadlineOffsetHours": 1,
+    "maxPeople": 1,
+    "meetingPoint": "meeting point",
+    "name": "appointment type 1",
+    "time": "08:00:00",
+  },
+}
+`;

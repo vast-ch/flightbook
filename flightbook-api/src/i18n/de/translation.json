@@ -1,0 +1,47 @@
+{
+    "import": {
+        "flugbuch": {
+            "name": "Flugbuch.ch",
+            "description": "Es handelt sich um Daten aus der flugbuch.ch-Applikation. (Nicht um Flightbook-Exporte)",
+            "fileType": "csv"
+        },
+        "fb_places": {
+            "name": "Start-Landeplätze von Flightbook",
+            "description":"Hiermit kannst du exportierte Start- und Landeplätze von Flightbook importieren.",
+            "fileType": "csv"
+        },
+        "vfr": {
+            "name": "VFRnav",
+            "description":"Es handelt sich um Daten aus der VFRnav Applikation. (Nicht um Flightbook-Exporte)",
+            "fileType": "xlsx"
+        },
+        "logfly": {
+            "name": "Logfly",
+            "description":"Es handelt sich um Daten aus der Logfly Applikation. (Nicht um Flightbook-Exporte)",
+            "fileType": "csv"
+        },
+        "xcontest": {
+            "name": "XContest.org",
+            "description":"Es handelt sich um Daten aus der XContest.org Applikation.",
+            "fileType": "json"
+        }
+    },
+    "versionCheck": {
+        "forceUpdate": "Diese Version wird nicht mehr unterstützt. Bitte aktualisiere die App, um fortzufahren.",
+        "optionalUpdate": "Eine neue Version der App ist verfügbar. Ein Update wird empfohlen.",
+        "upToDate": "Deine App ist auf dem neuesten Stand."
+    },
+    "appointment": {
+        "stateValue": {
+            "ANNOUNCED": "Angesagt",
+            "CONFIRMED": "Bestätigt",
+            "CANCELED": "Abgesagt"
+        },
+        "state": "Status",
+        "meetingPoint": "Treffpunkt",
+        "maxPeople": "Max Teilnehmer*innen",
+        "instructor": "Fluglehrer*in",
+        "takeOffCoordinator": "Starthelfer*in",
+        "description": "Beschreibung"
+    }
+}

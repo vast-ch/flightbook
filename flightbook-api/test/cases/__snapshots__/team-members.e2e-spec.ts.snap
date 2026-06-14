@@ -1,0 +1,15 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`instructor team members (e2e) /instructor/schools/:id/team-members (GET) 1`] = `
+[
+  {
+    "admin": true,
+    "user": {
+      "email": "instructor@instructor.com",
+      "firstname": "instructor",
+      "lastname": "instructor",
+      "phone": null,
+    },
+  },
+]
+`;

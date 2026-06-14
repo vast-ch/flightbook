@@ -1,0 +1,32 @@
+{
+    "import": {
+        "flugbuch": {
+            "name": "Flugbuch.ch",
+            "description": "Questi dati provengono dall'applicazione flugbuch.ch (non sono un'esportazione da Flightbook)"
+        },
+        "fb_places": {
+            "name": "Decollo e atterraggio Flightbook",
+            "description":"Con questa funzione è possibile importare decolli e atterraggi esportati da Flightbook."
+        },
+        "vfr": {
+            "name": "VFRnav",
+            "description":"Questi dati provengono dall'applicazione VFRnav (non sono un'esportazione da Flightbook)",
+            "fileType": "xlsx"
+        },
+        "logfly": {
+            "name": "Logfly",
+            "description":"Questi dati provengono dall'applicazione Logfly (non sono un'esportazione da Flightbook)",
+            "fileType": "csv"
+        },
+        "xcontest": {
+            "name": "XContest.org",
+            "description":"Questi dati provengono dall'applicazione XContest.org.",
+            "fileType": "json"
+        }
+    },
+    "versionCheck": {
+        "forceUpdate": "Questa versione non è più supportata. Aggiorna l’app per continuare.",
+        "optionalUpdate": "È disponibile una nuova versione dell’app. Si consiglia di effettuare l’aggiornamento.",
+        "upToDate": "La tua app è aggiornata."
+    }
+}

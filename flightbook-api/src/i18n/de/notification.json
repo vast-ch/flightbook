@@ -1,0 +1,32 @@
+{
+    "appointment": {
+        "new": {
+            "title": "Neuer Termin",
+            "body": "{school}\r\nDatum: {date}\r\nTreffpunkt: {meetingPoint}"
+        },
+        "subscription": {
+            "title": "Anmeldung",
+            "body": "{school} hat dich für den Termin vom {date} angemeldet"
+        },
+        "stateChanged": {
+            "title": "Terminstatus wurde geändert",
+            "body": "{school}:\r\nTerminstatus vom {date} wurde geändert."
+        },
+        "informWaitingStudent": {
+            "title": "{school}: Anmeldung",
+            "body": "Jemand hat sich für den Termin vom {date} abgemeldet. Sie können jetzt teilnehmen."
+        }
+    },
+    "flightValidation": {
+        "rejected": {
+            "title": "Flug abgelehnt",
+            "body": "Der Flug vom {date} wurde abgelehnt."
+        }
+    },
+    "flightPayment": {
+        "rejected": {
+            "title": "Zahlung abgelehnt",
+            "body": "Die Zahlung für den Flug vom {date} wurde abgelehnt."
+        }
+    }
+}
