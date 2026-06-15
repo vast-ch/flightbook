@@ -3,7 +3,7 @@ name: Fligthtbook Instructor App - main
 on:
   push:
     branches:
-      - 'master'
+      - 'main'
     paths:
       - 'flightbook-instructor-app/**'   
 
