@@ -1,0 +1,65 @@
+<h1 mat-dialog-title>{{ title }}</h1>
+<mat-dialog-content [formGroup]="form">
+  <mat-form-field>
+    <mat-label>{{ 'appointmentType.name'| translate }}</mat-label>
+    <input matInput placeholder="{{ 'appointmentType.name'| translate }}" formControlName="name" required>
+    <mat-error>
+      {{ 'formMessage.nameRequired'| translate }}
+    </mat-error>
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>{{ 'appointmentType.color' | translate }}</mat-label>
+    <input matInput type="color" formControlName="color" />
+    @if (this.form.controls['color'].hasError('invalidColor')) {
+      <mat-error
+        >
+        {{ 'appointmentType.invalidColor' | translate }}
+      </mat-error>
+    }
+  </mat-form-field>
+  <mat-label>{{ 'appointmentType.default' | translate }}</mat-label>
+  <mat-form-field>
+    <mat-label>{{ 'appointment.meetingPoint'| translate }}</mat-label>
+    <input matInput placeholder="Treffpunkt" formControlName="meetingPoint">
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>{{ 'appointmentType.time'| translate }}</mat-label>
+    <input matInput type="time" formControlName="time">
+  </mat-form-field>
+  <div>
+    <p class="deadline-offset-hours-title">{{ 'appointmentType.deadlineOffsetHours'| translate }}</p>
+    <div class="deadline-offset-hours">
+      <mat-form-field>
+        <mat-label>{{ 'appointmentType.deadlineDays'| translate }}</mat-label>
+        <input matInput placeholder="{{ 'appointmentType.deadlineDays'| translate }}" type="number"
+          formControlName="deadlineDays" min="0">
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>{{ 'appointmentType.deadlineHours'| translate }}</mat-label>
+        <input matInput placeholder="{{ 'appointmentType.deadlineHours'| translate }}" type="number"
+          formControlName="deadlineHours" min="0">
+      </mat-form-field>
+    </div>
+  </div>
+  <mat-form-field>
+    <mat-label>{{ 'appointment.maxPeople'| translate }}</mat-label>
+    <input matInput placeholder="{{ 'appointment.maxPeople'| translate }}" type="number"
+      formControlName="maxPeople">
+  </mat-form-field>
+  <mat-form-field appearance="fill">
+    <mat-label>{{ 'appointment.instructor'| translate }}</mat-label>
+    <mat-select formControlName="instructor">
+      <mat-option [value]=""></mat-option>
+      @for (teamMember of data.teamMembers; track teamMember) {
+        <mat-option [value]="teamMember.user.email">
+          {{teamMember.user.firstname}} {{teamMember.user.lastname}}
+        </mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-raised-button (click)="onCancel()">{{ 'buttons.cancel'| translate }}</button>
+  <button mat-raised-button color="primary" (click)="onSave()" [disabled]="form.invalid">{{ 'buttons.save'| translate }}</button>
+</mat-dialog-actions>

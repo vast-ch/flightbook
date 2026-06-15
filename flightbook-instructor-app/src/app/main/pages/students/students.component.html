@@ -1,0 +1,76 @@
+<mat-sidenav-container autosize>
+  <mat-sidenav #sidenav mode="side" opened>
+    <mat-list class="student-list">
+      <mat-list-item>
+        <button class="student-list-button" mat-raised-button color="primary" (click)=openEmailDialog()>{{'student.addStudent'| translate }}</button>
+      </mat-list-item>
+      <!-- <mat-list-item>
+      <button class="student-list-button" mat-raised-button color="primary" (click)=printStudentList()>{{ 'student.list'| translate }}</button>
+    </mat-list-item> -->
+    <mat-tab-group mat-align-tabs="start" (selectedTabChange)="tabChange($event)">
+      <mat-tab label="{{ 'student.actif'| translate }}">
+        <mat-form-field class="sort-select">
+          <mat-label>{{ 'student.sort.sortBy' | translate }}</mat-label>
+          <mat-select value="firstname" (selectionChange)="selectSort($event.value)">
+            <mat-option value="firstname">
+              {{ 'student.sort.firstname' | translate }}
+            </mat-option>
+            <mat-option value="lastname">
+              {{ 'student.sort.lastname' | translate }}
+            </mat-option>
+            <mat-option value="nbFlightsAsc">
+              {{ 'student.sort.nbFlightsAsc' | translate }}
+            </mat-option>
+            <mat-option value="nbFlightsDesc">
+              {{ 'student.sort.nbFlightsDesc' | translate }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        @for (student of students; track student) {
+          <mat-list-item class="student-info" (click)=studentDetail(student)>
+            <!-- <mat-checkbox (change)=checkboxChange($event,student) (click)=$event.stopPropagation() color="primary"></mat-checkbox> -->
+            @if(school?.configuration?.schoolModule?.validateFlights){
+              <p class="student-name"><span>{{ student.user?.firstname }} {{ student.user?.lastname }}</span>
+              @if (student.countNotValidatedFlights && student.countNotValidatedFlights > 0){
+                <mat-icon matBadge="{{student.countNotValidatedFlights}}" matBadgeColor="warn" matBadgePosition="above after" matBadgeSize="small" aria-hidden="false">{{student.isTandem ? "people" : "person"}}</mat-icon>
+              } @else {
+                <mat-icon 
+                [class.exam-ready]="student.statistic && student.statistic.nbFlights && student.statistic.nbFlights > 50 && student.statistic.nbStartplaces && student.statistic.nbStartplaces >=5 && student.statistic.nbLandingplaces && student.statistic.nbLandingplaces >=5 && student.statistic.nbFlightsAlone && student.statistic.nbFlightsAlone >=1 && student.controlSheet && student.controlSheet.passTheoryExam">
+                {{student.isTandem ? "people" : "person"}}
+              </mat-icon>
+              }
+            </p>
+          } @else{
+            <p class="student-name"><span>{{ student.user?.firstname }} {{ student.user?.lastname }}</span>
+              <mat-icon [class.exam-ready]="student.statistic && student.statistic.nbFlights && student.statistic.nbFlights > 50 && student.statistic.nbStartplaces && student.statistic.nbStartplaces >=5 && student.statistic.nbLandingplaces && student.statistic.nbLandingplaces >=5 && student.statistic.nbFlightsAlone && student.statistic.nbFlightsAlone >=1 && student.controlSheet && student.controlSheet.passTheoryExam">
+                {{student.isTandem ? "people" : "person"}}
+              </mat-icon>
+            </p>
+          }
+          <p>{{ 'student.lastflight'| translate }}: {{ student.lastFlight?.date | date:'dd.MM.yyyy' }}</p>
+          <p>{{ 'student.amountofflights'| translate }}: {{ student.statistic?.nbFlights }}</p>
+          <p>{{ 'student.flight.glider'| translate }}: {{ student.lastFlight?.glider?.brand }} {{
+          student.lastFlight?.glider?.name }}</p>
+        </mat-list-item>
+      }
+    </mat-tab>
+    <mat-tab label="{{ 'student.archived'| translate }}">
+      @for (student of archivedStudents; track student) {
+        <mat-list-item class="student-info" (click)=studentDetail(student)>
+          <p class="student-name"><span>{{ student.user?.firstname }} {{ student.user?.lastname }}</span><mat-icon>{{student.isTandem ? "people" : "person"}}</mat-icon></p>
+          <p>{{ 'student.lastflight'| translate }}: {{ student.lastFlight?.date | date:'dd.MM.yyyy' }}</p>
+          <p>{{ 'student.amountofflights'| translate }}: {{ student.statistic?.nbFlights }}</p>
+          <p>{{ 'student.flight.glider'| translate }}: {{ student.lastFlight?.glider?.brand }} {{
+          student.lastFlight?.glider?.name }}</p>
+        </mat-list-item>
+      }
+    </mat-tab>
+  </mat-tab-group>
+</mat-list>
+</mat-sidenav>
+
+<mat-sidenav-content>
+  <fb-student-detail [student]="selectedStudent" [school]="school" (backButtonClick)=backButton()
+  (removeUserButtonClick)=syncStudentList(false) (validateFlightsButtonClick)=updateFlightsBadge($event)></fb-student-detail>
+</mat-sidenav-content>
+</mat-sidenav-container>

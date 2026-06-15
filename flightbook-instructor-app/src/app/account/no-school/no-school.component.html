@@ -1,0 +1,12 @@
+<mat-card>
+    <mat-card-title>{{ 'noSchool.title' | translate }}</mat-card-title>
+    <mat-card-content>
+      <p>{{ 'noSchool.message' | translate }}</p>
+      <button mat-raised-button color="primary" class="button-spacing" (click)="navigateToRegister()">
+        {{ 'school.register' | translate }}
+      </button>
+      <button mat-raised-button color="primary" class="button-spacing" (click)="navigateToFlightbook()">
+        {{ 'noSchool.flightbookApp' | translate }}
+      </button>
+    </mat-card-content>
+  </mat-card>

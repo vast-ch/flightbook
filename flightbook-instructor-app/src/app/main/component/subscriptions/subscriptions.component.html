@@ -1,0 +1,44 @@
+@if (appointment.subscriptions.length == 0 && appointment.guestSubscriptions.length == 0) {
+  <p class="no-subscriptions">{{ 'appointment.noSubscription' | translate }}</p>
+} @else {
+  <mat-dialog-content>
+    <h1 mat-dialog-title>@if (appointment.maxPeople) {
+      <span>{{ appointment.countSubscription }}/{{ appointment.maxPeople }} </span>
+    }{{ 'appointment.registrations' | translate }}</h1>
+    <p class="item-value subscriptions">
+      @for (subscription of subscribed; track subscription) {
+        <span class="subscription-item">
+          {{ subscription.user?.firstname }} {{ subscription.user?.lastname }} @if (subscription?.student?.isTandem) {
+          <mat-icon>people</mat-icon>
+        }
+      </span>
+    }
+  </p>
+  @if (waitingList.length > 0) {
+    <div>
+      <h1 mat-dialog-title class="waiting-list">{{ 'appointment.waitingList' | translate }}</h1>
+      <p class="item-value subscriptions">
+        @for (subscription of waitingList; track subscription) {
+          <span class="subscription-item">
+            {{ subscription.user?.firstname }} {{ subscription.user?.lastname }} @if (subscription?.student?.isTandem) {
+            <mat-icon>people</mat-icon>
+          }
+        </span>
+      }
+    </p>
+  </div>
+}
+@if (appointment &&  appointment.guestSubscriptions && appointment.guestSubscriptions.length > 0) {
+  <div>
+    <h1 mat-dialog-title class="guest-list">{{ 'appointment.guestStudent' | translate }}</h1>
+    <p class="item-value subscriptions">
+      @for (guestSubscription of appointment.guestSubscriptions; track guestSubscription) {
+        <span class="subscription-item">
+          {{ guestSubscription.firstname }} {{ guestSubscription.lastname }}
+        </span>
+      }
+    </p>
+  </div>
+}
+</mat-dialog-content>
+}

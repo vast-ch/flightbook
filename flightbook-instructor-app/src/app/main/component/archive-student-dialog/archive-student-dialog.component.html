@@ -1,0 +1,16 @@
+<h1 mat-dialog-title>{{ ('student.archiveStudentMessage' | translate).replace('$REPLACE_NAME', studentName) }}</h1>
+<mat-dialog-content>
+  <div class="toggle-container">
+    <mat-slide-toggle 
+      [(ngModel)]="isAppointmentActive" 
+      color="primary"
+      labelPosition="before">
+      {{ 'student.isAppointmentActive' | translate }}
+    </mat-slide-toggle>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-raised-button (click)="onCancel()">{{ 'buttons.cancel' | translate }}</button>
+  <button mat-raised-button color="warn" (click)="onConfirm()" cdkFocusInitial>{{ 'buttons.done' | translate }}</button>
+</mat-dialog-actions>

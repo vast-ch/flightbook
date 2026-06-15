@@ -1,0 +1,17 @@
+.phone-number-container {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+
+  mat-form-field:first-child {
+    width: 173px;
+  }
+
+  mat-form-field:last-child {
+    flex: 1;
+  }
+}
+
+.phone-number-error {
+  margin-left: -187px;
+}

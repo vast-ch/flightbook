@@ -1,0 +1,29 @@
+mat-card {
+    max-width: 432px;
+    margin: 2em auto;
+    text-align: center;
+}
+  
+mat-form-field {
+    display: block;
+}
+
+.loginError {
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+.language-list, .forgot-password {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.language, .register-school, .forgot-password {
+    cursor: pointer;
+    color: var(--ion-color-primary, #3880ff);
+    text-decoration: none;
+}
+
+.fr {
+    margin-right: 10px;
+}

@@ -1,0 +1,39 @@
+<mat-sidenav-container autosize>
+  <mat-sidenav #sidenav mode="side" opened>
+    <mat-list class="tandem-pilot-list">
+      <mat-list-item>
+        <button class="tandem-pilot-list-button" mat-raised-button color="primary" (click)=openEmailDialog()>{{'tandemPilot.addTandemPilot'| translate }}</button>
+        <button mat-icon-button color="primary" (click)="exportAllPilotsData()" matTooltip="{{ 'export.exportAllPilotsData' | translate }}">
+          <mat-icon>download</mat-icon>
+        </button>
+      </mat-list-item>
+      <mat-tab-group mat-align-tabs="start" (selectedTabChange)="tabChange($event)">
+        <mat-tab label="{{ 'tandemPilot.actif'| translate }}">
+          @for (tandemPilot of tandemPilots; track tandemPilot) {
+            <mat-list-item class="tandem-pilot-info" (click)=tandemPilotDetail(tandemPilot)>
+              <p class="tandem-pilot-name">
+                <span>{{ tandemPilot.user?.firstname }} {{ tandemPilot.user?.lastname }}</span>
+                <mat-icon>people</mat-icon>
+              </p>
+            </mat-list-item>
+          }
+        </mat-tab>
+        <mat-tab label="{{ 'tandemPilot.archived'| translate }}">
+          @for (tandemPilot of archivedTandemPilots; track tandemPilot) {
+            <mat-list-item class="tandem-pilot-info" (click)=tandemPilotDetail(tandemPilot)>
+              <p class="tandem-pilot-name">
+                <span>{{ tandemPilot.user?.firstname }} {{ tandemPilot.user?.lastname }}</span>
+                <mat-icon>people</mat-icon>
+              </p>
+            </mat-list-item>
+          }
+        </mat-tab>
+      </mat-tab-group>
+    </mat-list>
+  </mat-sidenav>
+
+  <mat-sidenav-content>
+    <fb-tandem-pilot-detail [tandemPilot]="selectedTandemPilot" [school]="school" (backButtonClick)=backButton()
+    (removeUserButtonClick)=syncTandemPilotList(false)></fb-tandem-pilot-detail>
+  </mat-sidenav-content>
+</mat-sidenav-container>

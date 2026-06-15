@@ -1,0 +1,27 @@
+mat-card {
+    margin-left: 1%;
+    margin-right: 1%;
+    margin-bottom: 1%;
+    margin-top: 1%;
+}
+
+.google-calendar-config {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+    margin-top: 12px;
+
+    span {
+        color: green;
+        font-weight: 500;
+    }
+
+    mat-form-field {
+        width: 100%;
+    }
+
+    button {
+        width: fit-content;
+    }
+}

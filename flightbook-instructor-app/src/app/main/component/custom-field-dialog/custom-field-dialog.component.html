@@ -1,0 +1,63 @@
+<h1 mat-dialog-title>{{ title | translate }}</h1>
+<mat-dialog-content [formGroup]="form">
+  <mat-form-field>
+    <mat-label>{{ 'tandemConfig.label' | translate }}</mat-label>
+    <input matInput placeholder="{{ 'tandemConfig.label' | translate }}" formControlName="label" required>
+    <mat-error>
+      {{ 'tandemConfig.labelRequired' | translate }}
+    </mat-error>
+  </mat-form-field>
+
+  <mat-form-field>
+    <mat-label>{{ 'tandemConfig.fieldType' | translate }}</mat-label>
+    <mat-select formControlName="type" required>
+      @for (type of fieldTypes; track type.value) {
+        <mat-option [value]="type.value">
+          {{ type.label | translate }}
+        </mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+
+  <div class="toggle-row">
+    <mat-slide-toggle formControlName="required" color="primary">
+      {{ 'tandemConfig.required' | translate }}
+    </mat-slide-toggle>
+  </div>
+
+  <div class="toggle-row">
+    <mat-slide-toggle formControlName="disabled" color="primary">
+      {{ 'tandemConfig.disabled' | translate }}
+    </mat-slide-toggle>
+  </div>
+
+  @if (showOptionsField) {
+    <div class="options-form" formArrayName="options">
+      <div class="options-header">
+        <mat-label>{{ 'tandemConfig.options' | translate }}</mat-label>
+        <button mat-mini-fab color="primary" type="button" (click)="addOption()">
+          <mat-icon>add</mat-icon>
+        </button>
+      </div>
+      @for (option of options.controls; track option; let i = $index) {
+        <div class="option-item">
+          <button mat-icon-button color="warn" type="button" (click)="removeOption(i)" [disabled]="options.length === 1">
+            <mat-icon>remove</mat-icon>
+          </button>
+          <mat-form-field class="option-field">
+            <mat-label>{{ 'tandemConfig.option' | translate }} {{i + 1}}</mat-label>
+            <input matInput [formControlName]="i" required>
+            <mat-error>
+              {{ 'tandemConfig.optionRequired' | translate }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+      }
+    </div>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-raised-button (click)="onCancel()">{{ 'buttons.cancel' | translate }}</button>
+  <button mat-raised-button color="primary" (click)="onSave()" [disabled]="form.invalid">{{ 'buttons.save' | translate }}</button>
+</mat-dialog-actions>

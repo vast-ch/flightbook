@@ -1,0 +1,470 @@
+{
+    "flightbook": "Flugbuch",
+    "title": "Instructor App",
+    "menu": {
+        "students": "Schüler",
+        "appointments": "Termine",
+        "tandemPilots": "Tandempiloten",
+        "team": "Team",
+        "configuration": "Konfiguration"
+    },
+    "language": {
+        "fr": "Französisch",
+        "de": "Deutsch",
+        "en": "Englisch",
+        "it": "Italienisch"
+    },
+    "country": {
+        "switzerland": "Schweiz",
+        "france": "Frankreich",
+        "germany": "Deutschland",
+        "austria": "Osterreich",
+        "italy": "Italien",
+        "other": "Andere"
+    },
+    "login": {
+        "title": "Log In",
+        "email": "E-Mail",
+        "password": "Passwort",
+        "passwordlost": "Passwort vergessen?"
+    },
+    "account": {
+        "title": "Konto",
+        "register": "Account erstellen",
+        "firstname": "Vorname",
+        "lastname": "Nachname",
+        "name": "Name",
+        "email": "E-Mail",
+        "phone": "Telefon",
+        "prefix": "Vorwahl",
+        "delete": "Löschen",
+        "has": "Hast du bereits einen Flightbook-Account?"
+    },
+    "school": {
+        "school": "Schule",
+        "register": "Flugschule registrieren",
+        "confirmation": "Bestätigung",
+        "name": "Name",
+        "address": "Adresse",
+        "address2": "Adresse 2",
+        "zip": "PLZ",
+        "city": "Stadt",
+        "phone": "Telefon",
+        "email": "E-Mail",
+        "language": "Kommunkationssprache",
+        "success": "Die Flugschule {{school}} wurde erstellt",
+        "manage": "Du kannst die Flugschule auf der <a target='_blank' href='{{link}}'>{{link}}</a> Seite verwalten",
+        "access": "Zugreifen"
+    },
+    "enrollment": {
+        "title": "Einschreibung",
+        "accept": "Akzeptieren",
+        "shareFlightbook": "Flugbuch teilen",
+        "accessFlightbook": "möchte Zugriff auf dein Flugbuch haben.",
+        "hasAccess": "hat nun Einsicht in dein Flugbuch",
+        "addTeam": "möchte dich ins Team aufnehmen.",
+        "inTeam": "Du bist nun im Team von",
+        "acceptQuestion": "Bist du damit einverstanden?",
+        "confirmation": "Bestätigung",
+        "wrongToken": "Dieses Token gibt es nicht oder ist ungültig",
+        "payment": "Zahlung",
+        "paymentInformation": "Das Flugbuch kostet pro Jahr 12.- <br>Damit das Flugbuch mit einer Flugschule geteilt werden kann, musst du diese Zahlung begleichen.",
+        "tandemPaymentInformation": "Sie können bis zu 25 Flüge kostenlos registrieren. <br>Für die uneingeschränkte Nutzung beträgt die Jahresgebühr CHF 12.–. <br>Eine Zahlung ist aktuell nicht erforderlich.",
+        "paymentResilation": "Eine Kündigung ist jeweils per Ende Jahr möglich, worüber du jeweils 30 Tage zuvor per Mail informiert wirst.",
+        "paymentButton": "Bezahlen",
+        "accessTandemFlights": "möchte Zugriff auf deine Tandemflüge haben welche mit der Flugschule verknüpft sind.",
+        "hasTandemAccess": "hat nun Einsicht in deine Tandemflüge"
+    },
+    "error": {
+        "title": "Fehler"
+    },
+    "student": {
+        "information": "Informationen",
+        "addStudent": "Schüler hinzufügen",
+        "archiveStudentMessage": "Möchtest du $REPLACE_NAME wirklich archivieren?",
+        "amountofflights": "Anzahl Flüge",
+        "nbStartplaces": "Anzahl Startplätze",
+        "nbLandingplaces": "Anzahl Landeplätze",
+        "nbFlightsAlone": "Anzahl Alleinflüge",
+        "lastflight": "Letzter Flug",
+        "flighthour": "Flugstunden",
+        "average": "Durchschnittszeit",
+        "list": "Teilnehmerliste",
+        "noStudentSelected": "Kein Schüler*in wurde ausgewählt.",
+        "flights": "Flüge",
+        "flight": {
+            "number": "Nr",
+            "glider": "Gleitschirm",
+            "date": "Datum",
+            "start": "Start",
+            "startCountry": "Start Land",
+            "landing": "Landung",
+            "landingCountry": "Landung Land",
+            "time": "Dauer",
+            "km": "Km",
+            "description": "Beschreibung",
+            "diff": "Diff.",
+            "alone": "Allein",
+            "maneuver": "Manöver",
+            "validationState": {
+                "label": "Status",
+                "comment": "Kommentar",
+                "VALIDATED": "Validiert",
+                "REJECTED": "Abgelehnt",
+                "PENDING": "Angefragt"
+            },
+            "paymentState": {
+                "label": "Zahlungsstatus",
+                "amount": "Betrag",
+                "comment": "Kommentar",
+                "PAID": "Ausbezahlt",
+                "REJECTED": "Abgelehnt",
+                "PENDING": "Angefragt"
+            },
+            "validationActions": "Aktionen",
+            "validateAll": "Alle Flüge im Status \"Angefragt\" validieren",
+            "noData": "Keine Daten"
+        },
+        "phone": "Tel",
+        "emergencyContact": "Notfallkontakt",
+        "actif": "Aktiv",
+        "archived": "Archiviert",
+        "tandem": "Tandem",
+        "isAppointmentActive": "Termine weiterhin ersichtlich?",
+        "sort": {
+            "sortBy": "Sortieren nach",
+            "firstname": "Vorname",
+            "lastname": "Nachname",
+            "nbFlightsAsc": "Anzahl Flüge (aufsteigend)",
+            "nbFlightsDesc": "Anzahl Flüge (absteigend)"
+        }
+    },
+    "tandemPilot": {
+        "addTandemPilot": "Tandempilot hinzufügen",
+        "archiveTandemPilotMessage": "Möchtest du $REPLACE_NAME wirklich archivieren?",
+        "actif": "Aktiv",
+        "archived": "Archiviert",
+        "noTandemPilotSelected": "Kein Tandempilot wurde ausgewählt.",
+        "passengerConfirmations": "Passagierbestätigungen",
+        "pilotName": "Pilotname"
+    },
+    "passengerConfirmation" : {
+        "date": "Datum",
+        "name": "Name",
+        "email": "E-Mail",
+        "phone": "Telefon",
+        "place": "Ort",
+        "canUseData": "Werbung",
+        "noData": "Keine Daten",
+        "yes": "Ja",
+        "no": "Nein"
+    },
+    "studentList": {
+        "date": "Datum",
+        "place": "Ort",
+        "topic": "Tagesthema",
+        "flight": "Flug",
+        "takeOffCoordinator": "Startleiter*in",
+        "information": "Informationen",
+        "level": "Level",
+        "comments": "Bemerkungen"
+    },
+    "studentNote": {
+        "date": "Datum",
+        "title": "Notizen",
+        "addNote": "Notiz hinzufügen",
+        "noteTitle": "Titel (optional)",
+        "comment": "Kommentar"
+    },
+    "export": {
+        "pilote": "Pilot",
+        "nbStartplaces": "Anzahl Startplätze",
+        "nbLandingplaces": "Anzahl Landeplätze",
+        "nbflights": "Anzahl Flüge",
+        "flightsAlone": "Alleinflüge",
+        "nbflightsAlone": "Anzahl Alleinflüge",
+        "flights": "Flüge",
+        "startplaces": "Startplätze",
+        "landingplaces": "Landeplätze",
+        "firstlastname": "Name",
+        "school": "Stempel / Unterschrift",
+        "exportPilotData": "Pilotdaten exportieren",
+        "exportAllPilotsData": "Alle Pilotdaten exportieren",
+        "startDate": "Startdatum",
+        "endDate": "Enddatum",
+        "startDateRequired": "Startdatum ist erforderlich",
+        "endDateRequired": "Enddatum ist erforderlich",
+        "dateRangeInvalid": "Startdatum muss vor dem Enddatum liegen",
+        "flightData": "Flugdaten",
+        "passengerConfirmations": "Passagierbestätigungen"
+    },
+    "place": {
+        "place": "Ort",
+        "name": "Name",
+        "altitude": "Höhe",
+        "country": "Land",
+        "notes": "Notizen"
+    },
+    "controlSheet": {
+        "title": "Kontrollblatt",
+        "userCanEdit": "Darf der Schüler*in das Kontrollblatt bearbeiten?",
+        "exam": {
+            "title": "Prüfungen",
+            "theory": "Theorie bestanden am",
+            "practice": "Praxis bestanden am"
+        },
+        "trainingHill": {
+            "title": "Übungshang",
+            "auslegen": "Auslegen",
+            "aufziehen": "Aufzieh- und Laufübungen",
+            "slalom": "Slalomlauf",
+            "laufenAngebremst": "Laufen mit angebremstem Schirm",
+            "vorbereitung": "Startvorbereitungen und 5-Punkte-Check",
+            "startphasen": "3-Phasen-Start",
+            "richtungsaenderungen": "Flüge mit Richtungsänderungen",
+            "startabbruch": "Startabbruch (Entscheidungslinie)",
+            "seitenwindstart": "Seitenwindstart (evtl. Simulation)",
+            "schlechtAusgelegt": "Start mit schlecht ausgelegter Kalotte",
+            "starts": "Start mit vorwärts & rückwärts Aufziehen",
+            "landungen": "Landetechnik und Landungen",
+            "notlandung": "Einweisung Notlandeübungen",
+            "notschirm": "Einweisung Rettungssystem",
+            "kurven": "90 - 180° -Kurven (Landeeinteilung)",
+            "entwirren": "Entwirren",
+            "faltmethoden": "Faltmethoden",
+            "theorietest": "Theorietest vor dem 1. Höhenflug"
+        },
+        "theory": {
+            "title": "Theorie",
+            "fluglehre": "Fluglehre",
+            "wetterkunde": "Wetterkunde",
+            "flugpraxis": "Flugpraxis",
+            "gesetzgebung": "Gesetzgebung",
+            "materialkunde": "Materialkunde"
+        },
+        "altitudeFlight": {
+            "title": "Höhenflüge",
+            "tandem": "Doppelsitzerflug als Passagier (fak.)",
+            "notlandung": "Einweisung Notlandung",
+            "startplatzwahl": "Geländebeurteilung und Startplatzwahl",
+            "aufziehen": "Start mit vorwärts & rückwerts Aufziehen",
+            "kreise": "Links- und rechtsdrehende Kreise",
+            "richtungswechsel": "Schnelle Richtungswechsel",
+            "acht": "Kreis links, Kreis rechts (Acht)",
+            "engekreise": "Enge Kreise",
+            "sackflug": "Einweisung Sackflug",
+            "geschwBereich": "Erfliegen des sicheren Geschw.-Bereiches",
+            "beschlunigung": "Anwedung des Beschleunigungssystems",
+            "negativsteuerung": "Positiv- und Negativsteuerung",
+            "gewichtsverlagerung": "Steuern mit Gewichtsverlagerung",
+            "traggurten": "Steuern mit hinteren Traggurten",
+            "pendeln": "Nicken / Pendeln um die Querachse",
+            "rollen": "Rollen",
+            "klappen": "Einseitiges Einklappen",
+            "ohren": "Ohren anlegen",
+            "bStall": "B-Leinen-Stall (fak.)",
+            "spirale": "Einweisung Spirale",
+            "instrumente": "Flug mit Instrumente",
+            "soaring": "Hangsoaring (über 30 Minuten)",
+            "thermik": "Thermikflug (über 30 Minuten)",
+            "landevolte": "Landevolte links/rechts",
+            "punktlandung": "Ziellandungen",
+            "rueckenwindlandung": "Einweisung Rückenwindlandung",
+            "traggurtenLandung": "Landung mit hinteren Traggurten",
+            "hanglandung": "Hanglandung",
+            "touchAndGo": "Touch and go (fak.)",
+            "examProgramme": "Prüfungsprogramme"
+        },
+        "level": {
+            "title": "Level",
+            "start": "Start",
+            "maneuver": "Manöver",
+            "landing": "Landung"
+        }
+    },
+    "emergencyContact": {
+        "title": "Notfallkontakt",
+        "firstname": "Vorname",
+        "lastname": "Nachname",
+        "phone": "Telefon",
+        "email": "E-Mail",
+        "additionalInformation": "Zusatzinformation"
+    },
+    "formMessage": {
+        "emailExist": "Diese E-Mail-Adresse wird bereits verwendet!",
+        "schoolExist": "Diese Flugschule gibt es bereits!",
+        "emailAlreadyAdded": "Diese E-Mail-Adresse wurde bereits hinzugefügt",
+        "invalidEmail": "Bitte gib eine gültige E-Mail-Adresse ein.",
+        "invalidPassword": "Bitte gib ein gültiges Passwort ein.",
+        "emailpwdnotcorrect": "E-Mail-Adresse oder Password ist nicht korrekt!",
+        "required": "Dieses Feld ist erforderlich",
+        "firstnameRequired": "Vorname ist erforderlich",
+        "lastnameRequired": "Nachname ist erforderlich",
+        "nameRequired": "Name ist erforderlich",
+        "addressRequired": "Adresse ist erforderlich",
+        "zipRequired": "PLZ ist erforderlich",
+        "cityRequired": "Stadt ist erforderlich",
+        "phoneRequired": "Telefon ist erforderlich",
+        "emailRequired": "E-Mail-Adresse ist erforderlich",
+        "requestSent": "Die Anfrage wurde gesendet",
+        "phoneInvalidFormat": "Telefonnummer muss folgendes Format haben: {{format}}"
+    },
+    "message": {
+        "error": "Ein Fehler ist aufgetreten. Bitte versuche es später erneut oder sende eine E-Mail an: yannick.lagger@flightbook.ch",
+        "403": "Du hast keine Berechtigung für diese Abfrage",
+        "noFlight": "Dieser Schüler*in hat keinen Flug",
+        "pdfDownloaded": "Das PDF wurde heruntergeladen",
+        "changeSaved": "Änderung gespeichert"
+    },
+    "buttons": {
+        "login": "Anmelden",
+        "save": "Speichern",
+        "done": "Ok",
+        "logout": "Abmelden",
+        "createAccount": "Registrieren",
+        "addControlSheet": "Ausbildungskontrollblatt hinzufügen",
+        "cancel": "Abbrechen",
+        "send": "Senden",
+        "yes": "Ja",
+        "no": "Nein",
+        "change_password": "Passwort ändern",
+        "export": "Exportieren",
+        "skip": "Überspringen"
+    },
+    "appointment": {
+        "appointment": "Termin",
+        "calendar": "Kalender",
+        "list": "Liste",
+        "new": "Neuer Termin",
+        "dateTime": "Datum und Zeit",
+        "date": "Datum",
+        "time": "Zeit",
+        "deadline": "An / Abmeldefrist",
+        "meetingPoint": "Treffpunkt",
+        "maxPeople": "Max Teilnehmer*innen",
+        "registrations": "Anmeldungen",
+        "guestRegistrations": "Gast",
+        "state": "Status",
+        "instructor": "Fluglehrer*in",
+        "takeOffCoordinator": "Starthelfer*in",
+        "description": "Beschreibung",
+        "stateValue": {
+            "ANNOUNCED": "Angesagt",
+            "CONFIRMED": "Bestätigt",
+            "CANCELED": "Abgesagt"
+        },
+        "passed": "Vergangene Termine",
+        "subscribeStudent": "Schüler*in anmelden",
+        "guestSubscribeStudent": "Gastschüler*in anmelden",
+        "guestStudent": "Gastschüler*in",
+        "student": "Schüler*in",
+        "waitingList": "Warteliste",
+        "noSubscription": "Zurzeit hat es keine Anmeldungen",
+        "type": "Terminart",
+        "allInstructors": "Alle"
+    },
+    "appointmentExport": {
+        "title": "Schulungstage Exportieren",
+        "school": "Flugschule",
+        "startDate": "Von",
+        "endDate": "Bis",
+        "unknownType": "Terminart unbekannt",
+        "day":  "Tag",
+        "date": "Datum",
+        "noFlights": "Keine Flüge",
+        "noData": "Keine Termine in diesem Zeitraum"
+    },
+    "fullcalendar": {
+        "today": "Heute"
+    },
+    "team": {
+        "title": "Team",
+        "addMember": "Mitglied hinzufügen",
+        "removeMessage": "Möchtest du $REPLACE_NAME wirklich aus dem Team entfernen?"
+    },
+    "setting": {
+        "title": "Einstellungen",
+        "option": "Option",
+        "value": "Aktiviert",
+        "types": {
+            "validateFlights": "Flüge validieren",
+            "googleCalendar": "Google Kalender"
+        },
+        "googleCalendar": {
+            "connect": "Verbinden",
+            "disconnect": "Trennen",
+            "connected": "Verbunden",
+            "connecting": "Verbinde...",
+            "changeCalendar": "Kalender ändern",
+            "selectCalendar": "Kalender auswählen",
+            "primary": "Primär",
+            "save": "Speichern",
+            "cancel": "Abbrechen"
+        }
+    },
+    "tandemConfig": {
+        "title": "Tandem Zusatzfelder",
+        "addField": "Feld hinzufügen",
+        "editField": "Feld bearbeiten",
+        "label": "Bezeichnung",
+        "labelRequired": "Bezeichnung ist erforderlich",
+        "fieldType": "Typ",
+        "required": "Erforderlich",
+        "disabled": "Deaktiviert",
+        "edit": "Bearbeiten",
+        "options": "Optionen",
+        "option": "Option",
+        "optionRequired": "Option ist erforderlich",
+        "optionsPlaceholder": "z.B. Option1, Option2, Option3",
+        "optionsHint": "Geben Sie die Optionen durch Kommas getrennt ein",
+        "optionsRequired": "Optionen sind für Dropdown-Felder erforderlich",
+        "types": {
+            "text": "Text",
+            "number": "Zahl",
+            "date": "Datum",
+            "boolean": "Ja/Nein",
+            "dropdown": "Auswahl"
+        }
+    },
+    "appointmentType": {
+        "title": "Terminart",
+        "addType": "Hinzufügen",
+        "name": "Name",
+        "archive": "Archivieren",
+        "edit": "Ändern",
+        "color": "Farbe",
+        "invalidColor": "Bitte gib eine gültige Farbe ein.",
+        "default": "Standardwerte",
+        "time": "Zeit",
+        "deadlineOffsetHours": "An / Abmeldeschluss vor Beginn",
+        "deadlineDays": "Tage",
+        "deadlineHours": "Stunden"
+    },
+    "paginator": {
+        "itemPerPage": "Pro Seite:",
+        "of": "von"
+    },
+    "noSchool": {
+        "title": "Keine Flugschule gefunden",
+        "message": "Aktuell arbeitest du für keine Flugshule. Du kannst entwerder eine Flugschule erstellen oder auf die Flightbook Applikation wechseln.",
+        "flightbookApp": "Flightbook-App"
+    },
+    "password": {
+        "oldPassword": "Altes Passwort",
+        "newPassword": "Neues Passwort",
+        "confirmPassword": "Passwort bestätigen",
+        "errors": {
+            "oldPasswordRequired": "Altes Passwort ist erforderlich",
+            "newPasswordRequired": "Neues Passwort ist erforderlich",
+            "newPasswordMinLength": "Das neue Passwort muss mindestens 6 Zeichen lang sein",
+            "confirmPasswordRequired": "Passwort bestätigen ist erforderlich",
+            "passwordsMismatch": "Die Passwörter stimmen nicht überein",
+            "incorrectOldPassword": "Das alte Passwort ist nicht korrekt",
+            "changeFailed": "Fehler beim Ändern des Passworts",
+            "oldPasswordInvalid": "Das alte Passwort ist nicht korrekt"
+        },
+        "success": {
+            "changed": "Passwort wurde erfolgreich geändert"
+        }
+    }
+}

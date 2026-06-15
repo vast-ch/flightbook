@@ -1,0 +1,52 @@
+@if (isMobile()) {
+  <button class="back-button" mat-mini-fab color="primary" (click)=backButton()>
+    <mat-icon>arrow_back</mat-icon>
+  </button>
+}
+<mat-card class="tandem-config-card">
+  <mat-card-title>{{ 'tandemConfig.title' | translate }}</mat-card-title>
+  <button class="add-button" mat-raised-button color="primary" (click)="openCustomFieldForm()">
+    <mat-icon>add_circle</mat-icon> {{ 'tandemConfig.addField' | translate }}
+  </button>
+  <mat-card-content>
+    <table mat-table [dataSource]="customFields" cdkDropList (cdkDropListDropped)="drop($event)">
+
+      <!-- Label Column -->
+      <ng-container matColumnDef="label">
+        <th mat-header-cell *matHeaderCellDef>{{ 'tandemConfig.label' | translate }}</th>
+        <td mat-cell *matCellDef="let element">{{ element.label }}</td>
+      </ng-container>
+
+      <!-- Type Column -->
+      <ng-container matColumnDef="type">
+        <th mat-header-cell *matHeaderCellDef>{{ 'tandemConfig.fieldType' | translate }}</th>
+        <td mat-cell *matCellDef="let element">{{ getFieldTypeLabel(element.type) | translate }}</td>
+      </ng-container>
+
+      <!-- Disabled Column -->
+      <ng-container matColumnDef="disabled">
+        <th mat-header-cell *matHeaderCellDef>{{ 'tandemConfig.disabled' | translate }}</th>
+        <td mat-cell *matCellDef="let element">
+          <mat-slide-toggle 
+            (change)="toggleDisabled($event, element)" 
+            [checked]="element.disabled" 
+            [color]="color">
+          </mat-slide-toggle>
+        </td>
+      </ng-container>
+
+      <!-- Edit Column -->
+      <ng-container matColumnDef="edit">
+        <th mat-header-cell *matHeaderCellDef>{{ 'tandemConfig.edit' | translate }}</th>
+        <td mat-cell *matCellDef="let element">
+          <button mat-icon-button (click)="openCustomFieldForm(element)">
+            <mat-icon>edit</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;" cdkDrag [cdkDragData]="row"></tr>
+    </table>
+  </mat-card-content>
+</mat-card>

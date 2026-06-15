@@ -1,0 +1,21 @@
+<div [formGroup]="phoneForm" class="phone-number-container">
+  <mat-form-field>
+    <mat-label>{{ 'account.prefix' | translate }}</mat-label>
+    <mat-select formControlName="prefix">
+      @for (prefix of prefixes; track prefix.prefix) {
+        <mat-option [value]="prefix.prefix">{{prefix.name}} ({{prefix.prefix}})</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field>
+    <mat-label>{{ 'account.phone' | translate }}</mat-label>
+    <input matInput 
+           formControlName="phone" 
+           [placeholder]="getPlaceholder()"
+           type="text">
+    @if (phoneForm.get('phone')?.errors?.['pattern']) {
+      <mat-error class="phone-number-error">{{ 'formMessage.phoneInvalidFormat' | translate : { format: getPlaceholder() } }}</mat-error>
+    }
+  </mat-form-field>
+</div>

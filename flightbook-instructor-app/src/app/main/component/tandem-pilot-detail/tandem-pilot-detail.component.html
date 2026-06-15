@@ -1,0 +1,168 @@
+@if (tandemPilot) {
+  <div class='data'>
+    @if (isMobile()) {
+      <button class="menu-button" mat-mini-fab color="primary" (click)=backButton()>
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+    }
+    <h2>{{ tandemPilot.user?.firstname }} {{ tandemPilot.user?.lastname }}
+      <div class="icon-list">
+        <mat-icon color="primary" class="export-tandem-pilot" (click)="exportPilotData()">download</mat-icon>
+        @if (!tandemPilot.isArchived) {
+          <mat-icon color="warn" class="archive-tandem-pilot" (click)="archiveTandemPilot()">archive</mat-icon>
+        }
+      </div>
+    </h2>
+
+    <mat-expansion-panel class='card' expanded>
+      <mat-expansion-panel-header>
+        <mat-panel-title><h3>{{ 'student.flights'| translate }}</h3></mat-panel-title>
+      </mat-expansion-panel-header>
+      @if (flights.length > 0) {
+      <div class="table-container">
+        <table mat-table [dataSource]="flights">
+          <!-- Date Column -->
+          <ng-container matColumnDef="date">
+            <th mat-header-cell *matHeaderCellDef>{{ 'student.flight.date'| translate }}</th>
+            <td mat-cell *matCellDef="let element"> {{ element.date | date:'dd.MM.yyyy'}} </td>
+          </ng-container>
+
+          <!-- Start Column -->
+          <ng-container matColumnDef="start">
+            <th mat-header-cell *matHeaderCellDef>{{ 'student.flight.start'| translate }}</th>
+            <td mat-cell *matCellDef="let element"> {{element.start?.name}} </td>
+          </ng-container>
+
+          <!-- Landing Column -->
+          <ng-container matColumnDef="landing">
+            <th mat-header-cell *matHeaderCellDef>{{ 'student.flight.landing'| translate }}</th>
+            <td mat-cell *matCellDef="let element"> {{element.landing?.name}} </td>
+          </ng-container>
+
+          <!-- Time Column -->
+          <ng-container matColumnDef="time">
+            <th mat-header-cell *matHeaderCellDef>{{ 'student.flight.time'| translate }}</th>
+            <td mat-cell *matCellDef="let element"> {{element.time?.split(':').slice(0, 2).join(':')}} </td>
+          </ng-container>
+
+          <!-- Description Column -->
+          <ng-container matColumnDef="description">
+            <th class="description" mat-header-cell *matHeaderCellDef>{{ 'student.flight.description'| translate }}</th>
+            <td class="description" mat-cell *matCellDef="let element"> {{element.description}} </td>
+          </ng-container>
+
+          <!-- Custom Field Columns -->
+          @for (customField of getActiveCustomFields(); track customField.key) {
+            <ng-container [matColumnDef]="customField.key">
+              <th mat-header-cell *matHeaderCellDef>{{ customField.label }}</th>
+              <td mat-cell *matCellDef="let element">
+                {{ formatCustomFieldValue(getCustomFieldValue(element, customField.key), customField.type) }}
+              </td>
+            </ng-container>
+          }
+
+          <!-- Payment State Column -->
+          <ng-container matColumnDef="paymentState">
+            <th class="payment-state" mat-header-cell *matHeaderCellDef>{{ 'student.flight.paymentState.label'| translate }}</th>
+            <td class="payment-state" mat-cell *matCellDef="let element">
+                <span [matTooltip]="element.tandemSchoolData?.paymentComment ? element.tandemSchoolData?.paymentComment : ''"
+                  [matTooltipDisabled]="!element.tandemSchoolData?.paymentComment">
+                  @if (!element.tandemSchoolData?.paymentState || element.tandemSchoolData?.paymentState === '') {
+                    {{ 'student.flight.paymentState.PENDING'| translate }}
+                  } @else {
+                    {{ 'student.flight.paymentState.' + element.tandemSchoolData?.paymentState| translate }}
+                  }
+                </span>
+          </ng-container>
+
+          <!-- Payment Amount Column -->
+          <ng-container matColumnDef="paymentAmount">
+            <th class="payment-amount" mat-header-cell *matHeaderCellDef>{{ 'student.flight.paymentState.amount'| translate }}</th>
+            <td class="payment-amount" mat-cell *matCellDef="let element"> {{element.tandemSchoolData?.paymentAmount}} </td>
+          </ng-container>
+
+          <!-- Payment Buttons Column -->
+          <ng-container matColumnDef="paymentButtons">
+              <th class="payment-actions" mat-header-cell *matHeaderCellDef>{{ 'student.flight.validationActions'| translate }}</th>
+              <td class="payment-actions" mat-cell *matCellDef="let element">
+                <button mat-icon-button (click)="managePaymentModal(element, TandemSchoolPaymentState.PAID)"><mat-icon>check</mat-icon></button>
+                <button mat-icon-button (click)="managePaymentModal(element, TandemSchoolPaymentState.REJECTED)"><mat-icon>close</mat-icon></button>
+              </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedFlightColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedFlightColumns;"></tr>
+        </table>
+      </div>
+      <mat-paginator #flightsPaginator [length]="flightsPagerEntity.totalItems" [pageSize]="flightsPagerEntity.itemsPerPage"
+        [pageSizeOptions]="[5, 10, 20, 50]" (page)="handleFlightsPage($event)">
+      </mat-paginator>
+      } @else {
+      <p>{{ 'student.flight.noData'| translate }}</p>
+    }
+    </mat-expansion-panel>
+
+    <mat-expansion-panel class='card' expanded>
+      <mat-expansion-panel-header>
+        <mat-panel-title><h3>{{ 'tandemPilot.passengerConfirmations'| translate }}</h3></mat-panel-title>
+      </mat-expansion-panel-header>
+      @if (passengerConfirmations.length > 0) {
+      <div class="table-container">
+        <table mat-table [dataSource]="passengerConfirmations">
+          <!-- Date Column -->
+          <ng-container matColumnDef="date">
+            <th mat-header-cell *matHeaderCellDef>{{ 'passengerConfirmation.date'| translate }}</th>
+            <td mat-cell *matCellDef="let element"> {{ element.date | date:'dd.MM.yyyy'}} </td>
+          </ng-container>
+
+          <!-- Name Column -->
+          <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef>{{ 'passengerConfirmation.name'| translate }}</th>
+            <td mat-cell *matCellDef="let element"> {{ element.firstname }} {{ element.lastname }} </td>
+          </ng-container>
+
+          <!-- Place Column -->
+          <ng-container matColumnDef="place">
+            <th mat-header-cell *matHeaderCellDef>{{ 'passengerConfirmation.place'| translate }}</th>
+            <td mat-cell *matCellDef="let element"> {{ element.place }} </td>
+          </ng-container>
+
+          <!-- Phone Column -->
+          <ng-container matColumnDef="phone">
+            <th mat-header-cell *matHeaderCellDef>{{ 'passengerConfirmation.phone'| translate }}</th>
+            <td mat-cell *matCellDef="let element"> {{ element.phone }} </td>
+          </ng-container>
+
+          <!-- Email Column -->
+          <ng-container matColumnDef="email">
+            <th mat-header-cell *matHeaderCellDef>{{ 'passengerConfirmation.email'| translate }}</th>
+            <td mat-cell *matCellDef="let element"> {{ element.email }} </td>
+          </ng-container>
+
+          <!-- Can Use Data Column -->
+          <ng-container matColumnDef="canUseData">
+            <th mat-header-cell *matHeaderCellDef>{{ 'passengerConfirmation.canUseData'| translate }}</th>
+            <td mat-cell *matCellDef="let element">
+              @if (element.canUseData) {
+                {{ 'passengerConfirmation.yes'| translate }}
+              } @else {
+                {{ 'passengerConfirmation.no'| translate }}
+              }
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedPassengerColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedPassengerColumns;"></tr>
+        </table>
+      </div>
+      <mat-paginator #passengerConfirmationsPaginator [length]="passengerConfirmationsPagerEntity.totalItems" [pageSize]="passengerConfirmationsPagerEntity.itemsPerPage"
+        [pageSizeOptions]="[5, 10, 20, 50]" (page)="handlePassengerConfirmationPage($event)">
+      </mat-paginator>
+    } @else {
+      <p>{{ 'passengerConfirmation.noData'| translate }}</p>
+    }
+    </mat-expansion-panel>
+  </div>
+} @else {
+  <p class="no-tandem-pilot-selected">{{ 'tandemPilot.noTandemPilotSelected'| translate }}</p>
+}

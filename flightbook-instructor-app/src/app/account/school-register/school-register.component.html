@@ -1,0 +1,50 @@
+<mat-card>
+  <mat-card-title>{{ 'school.register'| translate }}</mat-card-title>
+  <mat-card-content>
+    <mat-stepper #stepper>
+      <mat-step>
+        <ng-template matStepLabel>{{ 'account.title'| translate }}</ng-template>
+        <div class="language-list">
+          <p>
+            <a (click)="setLanguage('fr')" class="language fr">{{ 'language.fr' | translate }}</a>
+            <a (click)="setLanguage('de')" class="language de">{{ 'language.de' | translate }}</a>
+          </p>
+        </div>
+        <p>{{ 'account.has'| translate }}</p>
+        <mat-button-toggle-group name="hasAccount" aria-label="Has an account">
+          <mat-button-toggle (click)="hasFbAccount(true)" value="true">{{ 'buttons.yes'| translate }}</mat-button-toggle>
+          <mat-button-toggle (click)="hasFbAccount(false)" value="false">{{ 'buttons.no'| translate }}</mat-button-toggle>
+        </mat-button-toggle-group>
+        @if (hasAccount != undefined) {
+          <div class="acountForm">
+            @if (hasAccount) {
+              <fb-login [loginPageRedirect]="false" [showLanguage]="false" (loginEvent)="loginEvent($event, stepper)">
+              </fb-login>
+            } @else {
+              <fb-user-register (loginEvent)="loginEvent($event, stepper)"></fb-user-register>
+            }
+          </div>
+        }
+      </mat-step>
+      <mat-step>
+        <ng-template matStepLabel>{{ 'school.school'| translate }}</ng-template>
+        <ng-template matStepContent>
+          <fb-school-register-form [school]="school" (saved)="schoolSaved($event, stepper)"></fb-school-register-form>
+        </ng-template>
+      </mat-step>
+      <mat-step>
+        <ng-template matStepLabel>{{ 'school.confirmation'| translate }}</ng-template>
+        <mat-card class="mat-card-stepper">
+          <mat-card-content>
+            <p>{{ 'school.success'| translate: {school: school.name} }}</p>
+            <p [innerHTML]="'school.manage'| translate: {link: link} "></p>
+            <mat-icon class="check-icon">check_circle</mat-icon>
+            <p><a color="primary" mat-raised-button target="_blank" href="https://instructor.flightbook.ch">
+              {{ 'school.access'| translate }}
+            </a></p>
+          </mat-card-content>
+        </mat-card>
+      </mat-step>
+    </mat-stepper>
+  </mat-card-content>
+</mat-card>

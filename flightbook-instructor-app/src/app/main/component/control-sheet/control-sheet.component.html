@@ -1,0 +1,49 @@
+@if (controlSheet) {
+  <!-- <mat-label>{{ 'controlSheet.userCanEdit'| translate }} </mat-label><mat-slide-toggle (change)="canEditChange($event)" [checked]="controlSheet.userCanEdit" color="primary"></mat-slide-toggle> -->
+  <h4>{{ 'controlSheet.trainingHill.title' | translate }}</h4>
+  <ul>
+    @for (item of controlSheet.trainingHill | keyvalue; track item) {
+      @if (item.key != 'id') {
+        <li>
+          <app-start-rating [selectedRating]="item.value" (clickRating)="saveTrainingHill($event, item.key)"></app-start-rating><span class="definition">{{ ('controlSheet.trainingHill.' + item.key) | translate }}</span>
+        </li>
+      }
+    }
+  </ul>
+  <h4>{{ 'controlSheet.theory.title' | translate }}</h4>
+  <ul>
+    @for (item of controlSheet.theory | keyvalue; track item) {
+      @if (item.key != 'id') {
+        <li>
+          <app-start-rating [selectedRating]="item.value" (clickRating)="saveTheory($event, item.key)"></app-start-rating><span class="definition">{{ ('controlSheet.theory.' + item.key) | translate }}</span>
+        </li>
+      }
+    }
+  </ul>
+  <h4>{{ 'controlSheet.altitudeFlight.title' | translate }}</h4>
+  <ul>
+    @for (item of controlSheet.altitudeFlight | keyvalue; track item) {
+      @if (item.key != 'id') {
+        <li>
+          <app-start-rating [selectedRating]="item.value" (clickRating)="saveAltitudeFlight($event, item.key)"></app-start-rating><span class="definition">{{ ('controlSheet.altitudeFlight.' + item.key) | translate }}</span>
+        </li>
+      }
+    }
+  </ul>
+  <h4>{{ 'controlSheet.exam.title' | translate }}</h4>
+  <mat-form-field class="exam-date-field">
+    <mat-label>{{ 'controlSheet.exam.theory' | translate }}:</mat-label>
+    <input matInput [value]="controlSheet.passTheoryExam" [matDatepicker]="theoryPicker" (dateChange)="saveExamTheory($event.value)" placeholder="{{ 'controlSheet.exam.theory' | translate }}">
+    <mat-datepicker-toggle matIconSuffix [for]="theoryPicker"></mat-datepicker-toggle>
+    <mat-datepicker #theoryPicker></mat-datepicker>
+  </mat-form-field>
+  <mat-form-field class="exam-date-field">
+    <mat-label>{{ 'controlSheet.exam.practice' | translate }}:</mat-label>
+    <input matInput [value]="controlSheet.passPracticeExam" [matDatepicker]="practicePicker" (dateChange)="saveExamPractice($event.value)" placeholder="{{ 'controlSheet.exam.practice' | translate }}">
+    <mat-datepicker-toggle matIconSuffix [for]="practicePicker"></mat-datepicker-toggle>
+    <mat-datepicker #practicePicker></mat-datepicker>
+  </mat-form-field>
+} @else {
+  <button mat-raised-button color="primary" (click)="addControlSheet()">{{ 'buttons.addControlSheet'| translate }}</button>
+}
+

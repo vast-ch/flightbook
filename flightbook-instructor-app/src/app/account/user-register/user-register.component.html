@@ -1,0 +1,40 @@
+<mat-card>
+  <mat-card-title>{{ 'account.title' | translate }}</mat-card-title>
+  <mat-card-content>
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      @if (registerInvalid) {
+        <mat-error class="registerationError">
+          {{ 'formMessage.emailExist' | translate }}
+        </mat-error>
+      }
+      <mat-form-field class="full-width-input">
+        <input matInput placeholder="{{ 'login.email' | translate }}" formControlName="email" required>
+        <mat-error>
+          {{ 'formMessage.invalidEmail'| translate }}
+        </mat-error>
+      </mat-form-field>
+      <mat-form-field class="full-width-input">
+        <input matInput placeholder="{{ 'account.firstname' | translate }}" formControlName="firstname" required>
+        <mat-error>
+          {{ 'formMessage.firstnameRequired'| translate }}
+        </mat-error>
+      </mat-form-field>
+      <mat-form-field class="full-width-input">
+        <input matInput placeholder="{{ 'account.lastname' | translate }}" formControlName="lastname" required>
+        <mat-error>
+          {{ 'formMessage.lastnameRequired'| translate }}
+        </mat-error>
+      </mat-form-field>
+
+      <app-phone-number formControlName="phone" class="full-width-input"></app-phone-number>
+
+      <mat-form-field class="full-width-input">
+        <input matInput type="password" placeholder="{{ 'login.password' | translate }}" formControlName="password" required>
+        <mat-error>
+          {{ 'formMessage.invalidPassword'| translate }}
+        </mat-error>
+      </mat-form-field>
+      <button mat-raised-button [disabled]="form.invalid" color="primary">{{ 'buttons.createAccount' | translate }}</button>
+    </form>
+  </mat-card-content>
+</mat-card>

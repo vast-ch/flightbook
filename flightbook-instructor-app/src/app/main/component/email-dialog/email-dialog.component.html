@@ -1,0 +1,15 @@
+<h1 mat-dialog-title>{{ title }}</h1>
+<mat-dialog-content [formGroup]="form">
+    <mat-form-field>
+        <mat-label>{{ 'login.email'| translate }}</mat-label>
+        <input matInput placeholder="{{ 'login.email'| translate }}" formControlName="email" required>
+        <mat-error>
+            {{ 'formMessage.invalidEmail'| translate }}
+        </mat-error>
+    </mat-form-field>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+    <button mat-raised-button (click)="onCancel()">{{ 'buttons.cancel'| translate }}</button>
+    <button mat-raised-button color="primary" (click)="onSend()" cdkFocusInitial>{{ 'buttons.send'| translate }}</button>
+</mat-dialog-actions>

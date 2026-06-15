@@ -1,0 +1,58 @@
+<mat-toolbar color="primary">
+  <div class="responsive-menu">
+    <button mat-icon-button (click)="menuSidenav.toggle()">
+      <mat-icon>menu</mat-icon>
+    </button>
+  </div>
+  <span>{{ 'title'| translate }}</span>
+  <div class="toolbar-link" fxShow="true" fxHide.lt-md="true">
+    <a mat-button [routerLink]="'/students'">{{ 'menu.students'| translate }}</a>
+    <a mat-button [routerLink]="'/appointments'">{{ 'menu.appointments'| translate }}</a>
+    @if(selectedSchool?.configuration?.tandemModule?.active) {
+      <a mat-button [routerLink]="'/tandem-pilots'">{{ 'menu.tandemPilots'| translate }}</a>
+    }
+    <a mat-button [routerLink]="'/configuration'">{{ 'menu.configuration'| translate }}</a>
+  </div>
+  <span class="menu-spacer"></span>
+  <span>
+    <button mat-icon-button [matMenuTriggerFor]="menu">
+      <mat-icon>account_circle</mat-icon>
+    </button>
+    <mat-menu #menu="matMenu" [overlapTrigger]="false">
+      <button (click)="openExportDialog()" mat-menu-item>
+        <mat-icon>file_download</mat-icon>
+        <span>{{ 'buttons.export'| translate }}</span>
+      </button>
+      <button (click)="openPasswordDialog()" mat-menu-item>
+        <mat-icon>lock</mat-icon>
+        <span>{{ 'buttons.change_password'| translate }}</span>
+      </button>
+      <button (click)=logout() mat-menu-item>
+        <mat-icon>exit_to_app</mat-icon>
+        <span>{{ 'buttons.logout'| translate }}</span>
+      </button>
+      @for (school of schools; track school) {
+        @if (school.id != selectedSchool?.id) {
+          <button (click)=switchSchool(school) mat-menu-item>
+            <!-- <mat-icon>exit_to_app</mat-icon> -->
+            <span>{{ school.name }}</span>
+          </button>
+        }
+      }
+    </mat-menu>
+  </span>
+</mat-toolbar>
+
+<mat-sidenav-container class="menu-sidenav-container">
+  <mat-sidenav #menuSidenav [autoFocus]="false">
+    <mat-nav-list class="side-nav-menu">
+      <a mat-list-item (click)="menuSidenav.toggle()" [routerLink]="'/students'">{{ 'menu.students'| translate }}</a>
+      <a mat-list-item (click)="menuSidenav.toggle()" [routerLink]="'/appointments'">{{ 'menu.appointments'| translate }}</a>
+      @if(selectedSchool?.configuration?.tandemModule?.active) {
+        <a mat-list-item (click)="menuSidenav.toggle()" [routerLink]="'/tandem-pilots'">{{ 'menu.tandemPilots'| translate }}</a>
+      }
+      <a mat-list-item (click)="menuSidenav.toggle()" [routerLink]="'/configuration'">{{ 'menu.configuration'| translate }}</a>
+    </mat-nav-list>
+  </mat-sidenav>
+  <mat-sidenav-content><router-outlet></router-outlet></mat-sidenav-content>
+</mat-sidenav-container>

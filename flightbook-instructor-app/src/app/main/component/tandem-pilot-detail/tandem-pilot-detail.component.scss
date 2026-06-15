@@ -1,0 +1,97 @@
+.card, h2 {
+    margin-left: 1%;
+    margin-right: 1%;
+    margin-bottom: 1%;
+}
+
+h2 {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.no-tandem-pilot-selected {
+    text-align: center;
+    font-weight: bold;
+    margin-top: 70px;
+}
+
+.icon-list {
+    float: right;
+}
+
+.icon-list mat-icon {
+    line-height: 30px;
+    cursor: pointer;
+}
+
+.archive-tandem-pilot {
+    cursor: pointer;
+    margin-left: 15px;
+}
+
+.menu-button {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    z-index: 10;
+}
+
+.mat-table {
+    width: 100%;
+}
+
+.mat-mdc-cell, .mat-mdc-header-cell {
+    padding: 0;
+}
+
+.mat-column-nb {
+    width: 41px;
+}
+
+.mat-column-date {
+    width: 85px;
+}
+
+.mat-column-start,
+.mat-column-landing {
+    min-width: 130px;
+    max-width: 200px;
+}
+
+.mat-column-time {
+    width: 85px;
+}
+
+.mat-column-km {
+    width: 43px;
+}
+
+.mat-column-description {
+    max-width: 413px;
+}
+
+.mat-column-name {
+    min-width: 150px;
+}
+
+.mat-column-place {
+    min-width: 130px;
+}
+
+.mat-column-canUseData {
+    width: 100px;
+    text-align: center;
+}
+
+.table-container {
+    overflow-x: auto;
+    width: 100%;
+}
+
+@media only screen and (max-width: 768px) {
+    h2 {
+        margin-top: 56px;
+    }
+}

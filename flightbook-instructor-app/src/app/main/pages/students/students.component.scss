@@ -1,0 +1,86 @@
+.mat-sidenav-container {
+    height: 100%;
+}
+
+.mat-sidenav {
+    min-width: 300px;
+}
+
+.student-list-button {
+    margin:0 auto;
+    display:block;
+}
+
+.student-name {
+    display: flex;
+    align-items: center;
+    display: inline;
+}
+
+.student-name mat-icon {
+    float: right;
+}
+
+/* Override Angular Material's default overflow hidden to show badges properly */
+::ng-deep {
+    .student-list {
+        /* Target all list item elements and their children that might have overflow: hidden */
+        .mdc-list-item, 
+        .mdc-list-item__content,
+        .mat-mdc-list-item,
+        .mat-mdc-list-item-content,
+        .mat-mdc-list-item-unscoped-content,
+        .mat-list-item-content,
+        .mat-list-text {
+            overflow: visible !important;
+        }
+    }
+    
+    /* Ensure badge is visible */
+    .mat-badge {
+        overflow: visible !important;
+    }
+    
+    .mat-badge-content {
+        z-index: 10 !important; /* Higher z-index to ensure visibility */
+        color: white !important; /* Set badge text color to white */
+    }
+}
+
+mat-list mat-list-item.student-info {
+    height: auto;
+    padding: 16px;
+    border-bottom: solid 1px rgba(0, 0, 0, 0.12);
+
+    p {
+        font-size: 14px;
+        font-weight: 400;
+        margin: 0;
+        line-height: 16px;
+        letter-spacing: 0.25px;
+    }
+
+    .student-name {
+        font-size: 16px;
+    }
+}
+
+@media only screen and (max-width: 768px) {
+    .mat-sidenav {
+        width: 100%;
+    }
+}
+
+// Sort
+.sort-select {
+    width: 100%;
+}
+
+::ng-deep .sort-select .mat-mdc-form-field-subscript-wrapper {
+    display: none !important;
+}
+
+// Exam ready
+.exam-ready {
+    color: rgb(102, 187, 106) !important;
+}

@@ -1,0 +1,159 @@
+@use '@angular/material' as mat;
+
+/* You can add global styles to this file, and also import other style files */
+
+html, body { height: 100%; }
+body { height: calc(100% - 64px); margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+@include mat.elevation-classes();
+@include mat.app-background();
+
+// theme palette colors
+/* For use in src/lib/core/theming/_palette.scss */
+$md-fbprimary: (
+    50 : #e7f0ff,
+    100 : #c3d9ff,
+    200 : #9cc0ff,
+    300 : #74a6ff,
+    400 : #5693ff,
+    500 : #3880ff,
+    600 : #3278ff,
+    700 : #2b6dff,
+    800 : #2463ff,
+    900 : #1750ff,
+    A100 : #ffffff,
+    A200 : #fcfdff,
+    A400 : #c9d5ff,
+    A700 : #b0c1ff,
+    contrast: (
+        50 : #000000,
+        100 : #000000,
+        200 : #000000,
+        300 : #000000,
+        400 : #000000,
+        500 : #ffffff,
+        600 : #ffffff,
+        700 : #ffffff,
+        800 : #ffffff,
+        900 : #ffffff,
+        A100 : #000000,
+        A200 : #000000,
+        A400 : #000000,
+        A700 : #000000,
+    )
+);
+
+$md-fbaccent: (
+    50 : #efefef,
+    100 : #d7d7d7,
+    200 : #bcbcbc,
+    300 : #a1a1a1,
+    400 : #8d8d8d,
+    500 : #797979,
+    600 : #717171,
+    700 : #666666,
+    800 : #5c5c5c,
+    900 : #494949,
+    A100 : #f7b6b6,
+    A200 : #f28888,
+    A400 : #ff4747,
+    A700 : #ff2e2e,
+    contrast: (
+        50 : #000000,
+        100 : #000000,
+        200 : #000000,
+        300 : #000000,
+        400 : #000000,
+        500 : #ffffff,
+        600 : #ffffff,
+        700 : #ffffff,
+        800 : #ffffff,
+        900 : #ffffff,
+        A100 : #000000,
+        A200 : #000000,
+        A400 : #ffffff,
+        A700 : #ffffff,
+    )
+);
+
+$md-fbwarn: (
+    50 : #ffe9ec,
+    100 : #ffc8d0,
+    200 : #ffa4b0,
+    300 : #ff8090,
+    400 : #ff6479,
+    500 : #ff4961,
+    600 : #ff4259,
+    700 : #ff394f,
+    800 : #ff3145,
+    900 : #ff2133,
+    A100 : #ffffff,
+    A200 : #ffffff,
+    A400 : #ffd0d3,
+    A700 : #ffb7bc,
+    contrast: (
+        50 : #000000,
+        100 : #000000,
+        200 : #000000,
+        300 : #000000,
+        400 : #000000,
+        500 : #000000,
+        600 : #ffffff,
+        700 : #ffffff,
+        800 : #ffffff,
+        900 : #ffffff,
+        A100 : #000000,
+        A200 : #000000,
+        A400 : #000000,
+        A700 : #000000,
+    )
+);
+
+$fb-primary: mat.m2-define-palette($md-fbprimary);
+$fb-accent: mat.m2-define-palette($md-fbaccent);
+$fb-warn: mat.m2-define-palette($md-fbwarn);
+
+$fb-theme: mat.m2-define-light-theme((
+  color: (
+    primary: $fb-primary,
+    accent: $fb-accent,
+    warn: $fb-warn,
+  )
+));
+
+@include mat.all-component-themes($fb-theme);
+
+
+// mat card style
+mat-card {
+  padding: 16px;
+
+  .mat-mdc-card-title { 
+    margin-bottom: 8px;
+    font-size: 24px;
+    font-weight: 500;
+  }
+
+  .mat-mdc-card-content {
+    padding: 0;
+  }
+}
+
+// table style
+table {
+  width: 100%;
+
+  .mdc-data-table__header-cell {
+    color: mat.m2-get-color-from-palette($fb-accent, 400);
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  .mat-icon {
+    height: 21px;
+  }
+}
+
+.mat-mdc-table .mdc-data-table__row {
+  height: 48px;
+}

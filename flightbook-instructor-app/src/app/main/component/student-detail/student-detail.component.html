@@ -1,0 +1,198 @@
+@if (student) {
+  <div class='data'>
+    @if (isMobile()) {
+      <button class="menu-button" mat-mini-fab color="primary" (click)=backButton()>
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+    }
+    <h2>{{ student.user?.firstname }} {{ student.user?.lastname }}
+      <div class="icon-list ">
+        @if (student.isArchived) {
+          <mat-slide-toggle class="isAppointmentActive" color="primary" (change)="changeStudentIsAppointmentActive($event)" [checked]="student.isAppointmentActive" labelPosition="before">{{ 'student.isAppointmentActive'| translate }}</mat-slide-toggle>
+        }
+        <mat-slide-toggle class="tandem" color="primary" (change)="changeStudentIsTandem($event)" [disabled]="student.isArchived" [checked]="student.isTandem" labelPosition="before">{{ 'student.tandem'| translate }}</mat-slide-toggle>
+        <mat-icon class="print-flights" (click)="printFlightbook()">print</mat-icon>
+        @if (!student.isArchived) {
+          <mat-icon color="warn" class="archive-student" (click)="archiveStudent()">archive</mat-icon>
+        }
+      </div>
+    </h2>
+    <mat-expansion-panel class='card' hideToggle expanded>
+      <mat-expansion-panel-header>
+        <mat-panel-title><h3>{{ 'student.information'| translate }}</h3></mat-panel-title>
+      </mat-expansion-panel-header>
+      @if (student.statistic) {
+        <div class="basic-stat">
+          <div><label>{{ 'student.lastflight'| translate }}:</label><span>{{ student.lastFlight?.date | date:'dd.MM.yyyy' }}</span></div>
+          <div><label>{{ 'student.flight.glider'| translate }}:</label><span>{{ student.lastFlight?.glider?.brand }} {{ student.lastFlight?.glider?.name }}</span></div>
+          <div><label>{{ 'student.amountofflights'| translate }}:</label><span id="nbFlights">{{ student.statistic.nbFlights || "0" }}</span></div>
+          <div><label>{{ 'student.nbStartplaces' | translate }}:</label><span id="nbStartplaces">{{ student.statistic.nbStartplaces || "0" }}</span></div>
+          <div><label>{{ 'student.nbLandingplaces' | translate }}:</label><span id="nbLandingplaces">{{ student.statistic.nbLandingplaces || "0" }}</span></div>
+          <div><label>{{ 'student.nbFlightsAlone' | translate }}:</label><span id="nbFlightsAlone">{{ student.statistic.nbFlightsAlone || "0" }}</span></div>
+          <div><label>{{ 'student.flighthour'| translate }}:</label><span>{{ student.statistic.time || "0" | hoursFormat }}</span></div>
+          <div><label>{{ 'student.average'| translate }}:</label><span>{{ student.statistic.average || "0" | hoursFormat }}</span></div>
+        </div>
+      }
+    </mat-expansion-panel>
+    <mat-expansion-panel class='card level' expanded>
+      <mat-expansion-panel-header>
+        <mat-panel-title><h3>{{ 'controlSheet.level.title'| translate }}</h3></mat-panel-title>
+      </mat-expansion-panel-header>
+      <fb-level [level]="student.controlSheet?.level" (saveLevelEvent)="saveControlSheet(student.controlSheet)"></fb-level>
+    </mat-expansion-panel>
+    <mat-expansion-panel class='card'>
+      <mat-expansion-panel-header>
+        <mat-panel-title><h3>{{ 'studentNote.title'| translate }}</h3></mat-panel-title>
+      </mat-expansion-panel-header>
+      <fb-student-note [student]="student"></fb-student-note>
+    </mat-expansion-panel>
+    @if ((student.isArchived && student.controlSheet) || !student.isArchived) {
+      <mat-expansion-panel class='card'>
+        <mat-expansion-panel-header>
+          <mat-panel-title><h3>{{ 'controlSheet.title'| translate }}</h3></mat-panel-title>
+        </mat-expansion-panel-header>
+        <fb-control-sheet [controlSheet]="student.controlSheet" (saveControlSheetEvent)="saveControlSheet($event)"></fb-control-sheet>
+      </mat-expansion-panel>
+    }
+    <mat-expansion-panel class='card'>
+      <mat-expansion-panel-header>
+        <mat-panel-title><h3>{{ 'student.flights'| translate }}</h3></mat-panel-title>
+        @if (school?.configuration?.schoolModule?.validateFlights) {
+          <mat-panel-description>
+            <button [matTooltip]="'student.flight.validateAll'| translate" class="validate-all-button" mat-icon-button (click)="validateAllFlights(); $event.stopPropagation()"><mat-icon>check</mat-icon></button>
+          </mat-panel-description>
+        }
+      </mat-expansion-panel-header>
+      <div class="table-container">
+        <table #table mat-table [dataSource]="flights">
+          <!-- Number Column -->
+          <ng-container matColumnDef="nb">
+            <th mat-header-cell *matHeaderCellDef>{{ 'student.flight.number'| translate }}</th>
+            <td mat-cell *matCellDef="let element"> {{element.number}} </td>
+          </ng-container>
+
+          <!-- Date Column -->
+          <ng-container matColumnDef="date">
+            <th mat-header-cell *matHeaderCellDef>{{ 'student.flight.date'| translate }}</th>
+            <td mat-cell *matCellDef="let element"> {{ element.date | date:'dd.MM.yyyy'}} </td>
+          </ng-container>
+
+          <!-- Start Column -->
+          <ng-container matColumnDef="start">
+            <th mat-header-cell *matHeaderCellDef>{{ 'student.flight.start'| translate }}</th>
+            <td mat-cell *matCellDef="let element"> {{element.start?.name}} </td>
+          </ng-container>
+
+          <!-- Landing Column -->
+          <ng-container matColumnDef="landing">
+            <th mat-header-cell *matHeaderCellDef>{{ 'student.flight.landing'| translate }}</th>
+            <td mat-cell *matCellDef="let element"> {{element.landing?.name}} </td>
+          </ng-container>
+
+          <!-- Glider Column -->
+          <ng-container matColumnDef="glider">
+            <th mat-header-cell *matHeaderCellDef>{{ 'student.flight.glider'| translate }}</th>
+            <td mat-cell *matCellDef="let element"> {{element.glider.brand}} {{element.glider.name}} </td>
+          </ng-container>
+
+          <!-- Time Column -->
+          <ng-container matColumnDef="time">
+            <th mat-header-cell *matHeaderCellDef>{{ 'student.flight.time'| translate }}</th>
+            <td mat-cell *matCellDef="let element"> {{element.time?.split(':').slice(0, 2).join(':')}} </td>
+          </ng-container>
+
+          <!-- Km Column -->
+          <ng-container matColumnDef="km">
+            <th mat-header-cell *matHeaderCellDef>{{ 'student.flight.km'| translate }}</th>
+            <td mat-cell *matCellDef="let element"> {{element.km}} </td>
+          </ng-container>
+
+          <!-- Description Column -->
+          <ng-container matColumnDef="description">
+            <th class="description" mat-header-cell *matHeaderCellDef>{{ 'student.flight.description'| translate }}</th>
+            <td class="description" mat-cell *matCellDef="let element"> {{element.description}} </td>
+          </ng-container>
+
+          <!-- Alone Column -->
+          <ng-container matColumnDef="alone">
+            <th class="alone" mat-header-cell *matHeaderCellDef>{{ 'student.flight.alone'| translate }}</th>
+            <td class="alone" mat-cell *matCellDef="let element"><mat-slide-toggle [(ngModel)]="element.shvAlone" color="primary" (change)="changeAloneValue(element)"></mat-slide-toggle></td>
+          </ng-container>
+          
+          <!-- Validation Column -->
+          @if (school?.configuration?.schoolModule?.validateFlights) {
+            <ng-container matColumnDef="validationState">
+              <th class="validation-state" mat-header-cell *matHeaderCellDef>{{ 'student.flight.validationState.label'| translate }}</th>
+              <td class="validation-state" mat-cell *matCellDef="let element">
+                <span [matTooltip]="element.validation?.comment ? element.validation.comment : ''"
+                  [matTooltipDisabled]="!element.validation?.comment">
+                  @if (!element.validation || !element.validation.state || element.validation.state === '') {
+                    {{ 'student.flight.validationState.PENDING'| translate }}
+                  } @else {
+                    {{ 'student.flight.validationState.' + element.validation.state| translate }}
+                  }
+                </span>
+              </td>
+            </ng-container>
+          }
+          @if (school?.configuration?.schoolModule?.validateFlights) {
+            <ng-container matColumnDef="validationButton">
+              <th class="validation-actions" mat-header-cell *matHeaderCellDef>{{ 'student.flight.validationActions'| translate }}</th>
+              <td class="validation-actions" mat-cell *matCellDef="let element">
+                @if (!(showRejectCommentBox && flightToReject === element)) {
+                  <button mat-icon-button (click)="validateFlight(element)"><mat-icon>check</mat-icon></button>
+                  <button mat-icon-button (click)="rejectFlight(element)"><mat-icon>close</mat-icon></button>
+                }
+                <!-- Reject Comment Modal: only show if flightToReject is this element -->
+                @if (showRejectCommentBox && flightToReject === element) {
+                  <div class="modal-overlay">
+                    <div class="modal-box">
+                      <textarea [(ngModel)]="rejectComment" rows="4" placeholder="{{ 'student.flight.validationState.comment' | translate }}"></textarea>
+                      <div class="modal-actions">
+                        <button mat-raised-button color="primary" (click)="submitRejectComment()">{{ 'buttons.done' | translate }}</button>
+                        <button mat-button (click)="closeRejectCommentBox()">{{ 'buttons.cancel' | translate }}</button>
+                      </div>
+                    </div>
+                  </div>
+                }
+              </td>
+            </ng-container>
+          }
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"
+          [ngClass]="{'not-validated-row': school?.configuration?.schoolModule?.validateFlights && !isFlightValidated(row)}"></tr>
+        </table>
+      </div>
+      <mat-paginator #paginator [length]="flightPagerEntity.totalItems" [pageSize]="flightPagerEntity.itemsPerPage"
+        [pageSizeOptions]="[20, 50]" (page)="handleFlightPage($event)">
+      </mat-paginator>
+    </mat-expansion-panel>
+    <mat-expansion-panel class='card'>
+      <mat-expansion-panel-header>
+        <mat-panel-title><h3>{{ 'emergencyContact.title'| translate }}</h3></mat-panel-title>
+      </mat-expansion-panel-header>
+      @if (emergencyContact) {
+        <div class="emergency-contact-details">
+          <div>
+            <label>{{ 'emergencyContact.firstname' | translate }}:</label>
+            <span>{{ emergencyContact.firstname || '-' }}</span>
+          </div>
+          <div>
+            <label>{{ 'emergencyContact.lastname' | translate }}:</label>
+            <span>{{ emergencyContact.lastname || '-' }}</span>
+          </div>
+          <div>
+            <label>{{ 'emergencyContact.phone' | translate }}:</label>
+            <span>{{ emergencyContact.phone || '-' }}</span>
+          </div>
+          <div>
+            <label>{{ 'emergencyContact.additionalInformation' | translate }}:</label>
+            <span>{{ emergencyContact.additionalInformation || '-' }}</span>
+          </div>
+        </div>
+      }
+    </mat-expansion-panel>
+  </div>
+} @else {
+  <p class="no-student-selcted">{{ 'student.noStudentSelected'| translate }}</p>
+}

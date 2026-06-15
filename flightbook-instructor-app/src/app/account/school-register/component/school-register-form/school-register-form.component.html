@@ -1,0 +1,59 @@
+<mat-card>
+  <mat-card-content>
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      @if (registerInvalid) {
+        <mat-error class="registerationError">
+          {{ 'formMessage.schoolExist' | translate }}
+        </mat-error>
+      }
+      <mat-form-field class="full-width-input">
+        <input matInput placeholder="{{ 'school.name'| translate }}" formControlName="name" required>
+        <mat-error>
+          {{ 'formMessage.nameRequired'| translate }}
+        </mat-error>
+      </mat-form-field>
+      <mat-form-field class="full-width-input">
+        <input matInput placeholder="{{ 'school.address'| translate }}" formControlName="address1" required>
+        <mat-error>
+          {{ 'formMessage.addressRequired'| translate }}
+        </mat-error>
+      </mat-form-field>
+      <mat-form-field class="full-width-input">
+        <input matInput placeholder="{{ 'school.address2'| translate }}" formControlName="address2">
+      </mat-form-field>
+      <mat-form-field class="full-width-input plz">
+        <input matInput placeholder="{{ 'school.zip'| translate }}" formControlName="plz" required>
+        <mat-error>
+          {{ 'formMessage.zipRequired'| translate }}
+        </mat-error>
+      </mat-form-field>
+      <mat-form-field class="full-width-input city">
+        <input matInput placeholder="{{ 'school.city'| translate }}" formControlName="city" required>
+        <mat-error>
+          {{ 'formMessage.cityRequired'| translate }}
+        </mat-error>
+      </mat-form-field>
+      <mat-form-field class="full-width-input">
+        <input matInput placeholder="{{ 'school.phone'| translate }}" formControlName="phone" required>
+        <mat-error>
+          {{ 'formMessage.phoneRequired'| translate }}
+        </mat-error>
+      </mat-form-field>
+      <mat-form-field class="full-width-input">
+        <input matInput placeholder="{{ 'school.email'| translate }}" formControlName="email" required>
+        <mat-error>
+          {{ 'formMessage.emailRequired'| translate }}
+        </mat-error>
+      </mat-form-field>
+      <mat-form-field class="full-width-input">
+        <mat-label>{{ 'school.language'| translate }}</mat-label>
+        <mat-select formControlName="language">
+          <mat-option value="fr">{{ 'language.fr' | translate }}</mat-option>
+          <mat-option value="de">{{ 'language.de' | translate }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <button mat-raised-button color="primary" [disabled]="form.invalid">{{ 'school.register'| translate }}</button>
+    </form>
+  </mat-card-content>
+</mat-card>

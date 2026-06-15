@@ -1,0 +1,40 @@
+mat-form-field {
+  width: 100%;
+}
+
+.toggle-row {
+  margin-bottom: 16px;
+}
+
+.options-form {
+  margin-top: 16px;
+  margin-bottom: 16px;
+}
+
+.options-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+
+  mat-label {
+    font-size: 16px;
+    font-weight: 500;
+  }
+}
+
+.option-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+
+  button {
+    flex-shrink: 0;
+  }
+
+  .option-field {
+    flex: 1;
+    margin-bottom: 0;
+  }
+}

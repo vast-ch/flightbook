@@ -1,0 +1,40 @@
+<mat-card>
+  <mat-card-title>{{ 'login.title'| translate }}</mat-card-title>
+  <mat-card-content>
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      @if (loginInvalid) {
+        <mat-error class="loginError">
+          {{ 'formMessage.emailpwdnotcorrect'| translate }}
+        </mat-error>
+      }
+      <mat-form-field class="full-width-input">
+        <mat-label>{{ 'login.email'| translate }}</mat-label>
+        <input matInput placeholder="{{ 'login.email'| translate }}" formControlName="email" required>
+        <mat-error>
+          {{ 'formMessage.invalidEmail'| translate }}
+        </mat-error>
+      </mat-form-field>
+      <mat-form-field class="full-width-input">
+        <mat-label>{{ 'login.password'| translate }}</mat-label>
+        <input matInput type="password" placeholder="{{ 'login.password'| translate }}" formControlName="password" required>
+        <mat-error>
+          {{ 'formMessage.invalidPassword'| translate }}
+        </mat-error>
+      </mat-form-field>
+      <button mat-raised-button color="primary">{{ 'buttons.login'| translate }}</button>
+    </form>
+
+    @if (showLanguage) {
+      <div class="language-list">
+        <a class="register-school" href="/school/register">{{ 'school.register' | translate }}</a>
+        <p>
+          <a (click)="setLanguage('fr')" class="language fr">{{ 'language.fr' | translate }}</a>
+          <a (click)="setLanguage('de')" class="language de">{{ 'language.de' | translate }}</a>
+        </p>
+      </div>
+    }
+    <div class="forgot-password">
+      <p><a (click)="forgotPassword()">{{ 'login.passwordlost' | translate }}</a></p>
+    </div>
+  </mat-card-content>
+</mat-card>

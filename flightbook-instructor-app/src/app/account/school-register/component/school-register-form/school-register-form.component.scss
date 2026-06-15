@@ -1,0 +1,23 @@
+mat-card {
+    max-width: 400px;
+    margin: 2em auto;
+    text-align: center;
+}
+  
+.full-width-input {
+    width: 100%;
+}
+
+.full-width-input.plz {
+    width: 20%;
+}
+
+.full-width-input.city {
+    width: 79%;
+    margin-left: 1%;
+}
+
+.registerationError {
+    margin-top: 15px;
+    margin-bottom: 15px;
+}

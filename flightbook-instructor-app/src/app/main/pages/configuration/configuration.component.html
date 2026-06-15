@@ -1,0 +1,35 @@
+<mat-sidenav-container autosize>
+  <mat-sidenav #sidenav mode="side" opened>
+    <mat-list class="config-list">
+      <mat-list-item class="config-item" (click)="openDetail('team')">
+        <p matLine>{{ 'team.title'| translate }}</p>
+      </mat-list-item>
+      <mat-list-item class="config-item" (click)="openDetail('appointmentType')">
+        <p matLine>{{ 'appointment.appointment'| translate }}</p>
+      </mat-list-item>
+      <mat-list-item class="config-item" (click)="openDetail('schoolSetting')">
+        <p matLine>{{ 'setting.title'| translate }}</p>
+      </mat-list-item>
+      @if (school?.configuration?.tandemModule?.active) {
+        <mat-list-item class="config-item" (click)="openDetail('tandemConfig')">
+          <p matLine>{{ 'tandemConfig.title' | translate }}</p>
+        </mat-list-item>
+      }
+    </mat-list>
+  </mat-sidenav>
+
+  <mat-sidenav-content>
+    @if (type=='team') {
+      <fb-team (backButtonClick)=backButton()></fb-team>
+    }
+    @if (type=='appointmentType') {
+      <fb-appointment-type (backButtonClick)=backButton()></fb-appointment-type>
+    }
+    @if (type=='schoolSetting') {
+      <fb-school-setting (backButtonClick)=backButton()></fb-school-setting>
+    }
+    @if (type=='tandemConfig') {
+      <fb-tandem-config (backButtonClick)=backButton()></fb-tandem-config>
+    }
+  </mat-sidenav-content>
+</mat-sidenav-container>

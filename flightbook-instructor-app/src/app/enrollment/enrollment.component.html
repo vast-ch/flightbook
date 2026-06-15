@@ -1,0 +1,122 @@
+
+@if (loading) {
+  <div class="overlay"></div>
+  <mat-spinner></mat-spinner>
+}
+
+@if (init) {
+  @if (enrollment) {
+    <mat-card>
+      <mat-card-title>{{ 'enrollment.title'| translate }}</mat-card-title>
+      <mat-card-content>
+        <mat-stepper #stepper>
+          @if (enrollment.isUser) {
+            <mat-step>
+              <ng-template matStepLabel>{{ 'login.title'| translate }}</ng-template>
+              <fb-login [loginPageRedirect]="false" [email]="enrollment.email"
+              (loginEvent)="loginEvent($event, stepper)"></fb-login>
+            </mat-step>
+          } @else {
+            <mat-step>
+              <ng-template matStepLabel>{{ 'account.register'| translate }}</ng-template>
+              <fb-user-register [email]="enrollment.email" (loginEvent)="loginEvent($event, stepper)"></fb-user-register>
+            </mat-step>
+          }
+          @if (enrollment.type == 'STUDENT') {
+            <mat-step>
+              <ng-template matStepLabel>{{ 'enrollment.payment'| translate }}</ng-template>
+              <p [innerHtml]="'enrollment.paymentInformation'| translate"></p>
+              <p class="paymentResilation">({{ 'enrollment.paymentResilation'| translate }})</p>
+              <button mat-raised-button color="primary" (click)="getStripeSession()">{{ 'enrollment.paymentButton'| translate }}</button>
+            </mat-step>
+          }
+          @if (enrollment.type == 'TANDEM_PILOT') {
+            <mat-step [optional]="true">
+              <ng-template matStepLabel>{{ 'enrollment.payment'| translate }}</ng-template>
+              <p [innerHtml]="'enrollment.tandemPaymentInformation'| translate"></p>
+              <p class="paymentResilation">({{ 'enrollment.paymentResilation'| translate }})</p>
+              <button mat-raised-button color="primary" (click)="getStripeSession()">{{ 'enrollment.paymentButton'| translate }}</button>
+              <button mat-raised-button (click)="stepper.next()">{{ 'buttons.skip'| translate }}</button>
+            </mat-step>
+          }
+          <mat-step>
+            <ng-template matStepLabel>{{ 'enrollment.accept'| translate }}</ng-template>
+            @if (enrollment.type == 'STUDENT') {
+              <mat-card class="mat-card-stepper">
+                <mat-card-title>{{ 'enrollment.shareFlightbook'| translate }}</mat-card-title>
+                <mat-card-content>
+                  <p>{{ enrollment.school?.name }} {{ 'enrollment.accessFlightbook'| translate }}</p>
+                  <p>{{ 'enrollment.acceptQuestion'| translate }}</p>
+                  <button mat-raised-button color="primary" (click)="validate(stepper)">{{ 'enrollment.accept'| translate }}</button>
+                </mat-card-content>
+              </mat-card>
+            }
+            @if (enrollment.type == 'TEAM_MEMBER') {
+              <mat-card class="mat-card-stepper">
+                <mat-card-title>Team</mat-card-title>
+                <mat-card-content>
+                  <p>{{ enrollment.school?.name }} {{ 'enrollment.addTeam'| translate }}</p>
+                  <p>{{ 'enrollment.acceptQuestion'| translate }}</p>
+                  <button mat-raised-button color="primary" (click)="validate(stepper)">{{ 'enrollment.accept'| translate }}</button>
+                </mat-card-content>
+              </mat-card>
+            }
+            @if (enrollment.type == 'TANDEM_PILOT') {
+              <mat-card class="mat-card-stepper">
+                <mat-card-title>{{ 'enrollment.shareFlightbook'| translate }}</mat-card-title>
+                <mat-card-content>
+                  <p>{{ enrollment.school?.name }} {{ 'enrollment.accessTandemFlights'| translate }}</p>
+                  <p>{{ 'enrollment.acceptQuestion'| translate }}</p>
+                  <button mat-raised-button color="primary" (click)="validate(stepper)">{{ 'enrollment.accept'| translate }}</button>
+                </mat-card-content>
+              </mat-card>
+            }
+          </mat-step>
+          <mat-step>
+            <ng-template matStepLabel>{{ 'enrollment.confirmation'| translate }}</ng-template>
+            <mat-card class="mat-card-stepper">
+              <mat-card-content>
+                @if (enrollment.type == 'STUDENT') {
+                  <div>
+                    <p>{{ enrollment.school?.name }} {{ 'enrollment.hasAccess'| translate }}</p>
+                    <mat-icon class="check-icon">check_circle</mat-icon>
+                    <p><a color="primary" mat-raised-button target="_blank" href="https://m.flightbook.ch">
+                      {{ 'login.title'| translate }}
+                    </a></p>
+                  </div>
+                }
+                @if (enrollment.type == 'TEAM_MEMBER') {
+                  <div>
+                    <p>{{ 'enrollment.inTeam'| translate }} {{ enrollment.school?.name }}.</p>
+                    <mat-icon class="check-icon">check_circle</mat-icon>
+                    <p><a color="primary" mat-raised-button target="_blank" href="https://instructor.flightbook.ch">
+                      {{ 'login.title'| translate }}
+                    </a></p>
+                  </div>
+                }
+                @if (enrollment.type == 'TANDEM_PILOT') {
+                  <div>
+                    <p>{{ enrollment.school?.name }} {{ 'enrollment.hasTandemAccess'| translate }}</p>
+                    <mat-icon class="check-icon">check_circle</mat-icon>
+                    <p><a color="primary" mat-raised-button target="_blank" href="https://m.flightbook.ch">
+                      {{ 'login.title'| translate }}
+                    </a></p>
+                  </div>
+                }
+              </mat-card-content>
+            </mat-card>
+          </mat-step>
+        </mat-stepper>
+      </mat-card-content>
+    </mat-card>
+  } @else {
+    <mat-card class="mat-card-stepper">
+      <mat-card-title>{{ 'error.title'| translate }}</mat-card-title>
+      <mat-card-content>
+        <p>{{ 'enrollment.wrongToken'| translate }}</p>
+        <mat-icon class="error-icon">error</mat-icon>
+      </mat-card-content>
+    </mat-card>
+  }
+}
+

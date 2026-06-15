@@ -1,0 +1,13 @@
+@if (level) {
+  <ul>
+    <li>
+      <app-start-rating [selectedRating]="level.start" (clickRating)="saveLevel($event, 'start')"></app-start-rating><span class="definition">{{ 'controlSheet.level.start' | translate }}</span>
+    </li>
+    <li>
+      <app-start-rating [selectedRating]="level.maneuver" (clickRating)="saveLevel($event, 'maneuver')"></app-start-rating><span class="definition">{{ 'controlSheet.level.maneuver' | translate }}</span>
+    </li>
+    <li>
+      <app-start-rating [selectedRating]="level.landing" (clickRating)="saveLevel($event, 'landing')"></app-start-rating><span class="definition">{{ 'controlSheet.level.landing' | translate }}</span>
+    </li>
+  </ul>
+}

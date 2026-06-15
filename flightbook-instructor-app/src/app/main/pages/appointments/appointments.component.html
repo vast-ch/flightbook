@@ -1,0 +1,173 @@
+<mat-card class="appointment-card">
+  <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" (selectedTabChange)="tabChanged($event)">
+    <mat-tab label="{{ 'appointment.list'| translate }}">
+      <button class="add-button" mat-raised-button extended color="primary" (click)="addAppointment()">
+        <mat-icon>add_circle</mat-icon> {{ 'appointment.new'| translate }}
+      </button>
+      <mat-card-content>
+        <div class="filter-container">
+          <mat-chip-listbox>
+            <mat-chip-option [selected]="currentAppointmentFilter.state === states.ANNOUNCED"
+              (click)="changeState(states.ANNOUNCED)">{{ 'appointment.stateValue.ANNOUNCED'| translate
+            }}</mat-chip-option>
+            <mat-chip-option [selected]="currentAppointmentFilter.state === states.CONFIRMED"
+              (click)="changeState(states.CONFIRMED)">{{ 'appointment.stateValue.CONFIRMED'| translate
+            }}</mat-chip-option>
+            <mat-chip-option [selected]="currentAppointmentFilter.state === states.CANCELED"
+              (click)="changeState(states.CANCELED)">{{ 'appointment.stateValue.CANCELED'| translate
+            }}</mat-chip-option>
+          </mat-chip-listbox>
+
+          @if (showAdvancedFilters) {
+            <mat-form-field>
+              <mat-select (ngModelChange)="changeInstructor($event)"
+                placeholder="{{ 'appointment.instructor' | translate }}"
+                [ngModel]="currentAppointmentFilter.instructorId">
+                <mat-option [value]="null">
+                  {{ 'appointment.allInstructors' | translate }}
+                </mat-option>
+                @for (teamMember of teamMembers; track teamMember.user.id) {
+                  <mat-option [value]="teamMember.user.id">
+                    {{ teamMember.user.firstname }} {{ teamMember.user.lastname }}
+                  </mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+          }
+
+          <button mat-icon-button (click)="toggleAdvancedFilters()" [title]="'appointment.advancedFilters' | translate">
+            <mat-icon>{{ showAdvancedFilters ? 'expand_less' : 'expand_more' }}</mat-icon>
+          </button>
+
+        </div>
+      </mat-card-content>
+
+      <table #table mat-table [dataSource]="appointments">
+        <!-- Action Column -->
+        <ng-container matColumnDef="edit">
+          <th mat-header-cell *matHeaderCellDef></th>
+          <td mat-cell *matCellDef="let element" (click)="editAppointment(element)">
+            <mat-icon>edit</mat-icon>
+          </td>
+        </ng-container>
+
+        <!-- Action Column -->
+        <ng-container matColumnDef="subscription">
+          <th mat-header-cell *matHeaderCellDef></th>
+          <td mat-cell *matCellDef="let element" (click)="subscriptionDetail(element)">
+            <mat-icon>list</mat-icon>
+          </td>
+        </ng-container>
+
+        <!-- Action Column -->
+        <ng-container matColumnDef="list">
+          <th mat-header-cell *matHeaderCellDef></th>
+          <td mat-cell *matCellDef="let element" (click)="printStudentList(element)">
+            <mat-icon>list_alt</mat-icon>
+          </td>
+        </ng-container>
+
+        <!-- Date Column -->
+        <ng-container matColumnDef="scheduling">
+          <th mat-header-cell *matHeaderCellDef>{{ 'appointment.dateTime'| translate }}</th>
+          <td mat-cell *matCellDef="let element"> {{element.scheduling | date:'dd.MM.yyyy HH:mm':'UTC'}} </td>
+        </ng-container>
+
+        <!-- State Column -->
+        <ng-container matColumnDef="state">
+          <th mat-header-cell *matHeaderCellDef>{{ 'appointment.state' | translate }}</th>
+          <td mat-cell *matCellDef="let element">
+                        <mat-chip [ngClass]="{
+                            'canceled-chip': element.state === states.CANCELED,
+                            'confirmed-chip': element.state === states.CONFIRMED
+                        }">
+              {{ 'appointment.stateValue.' + element.state| translate }}
+            </mat-chip>
+          </td>
+        </ng-container>
+
+        <!-- MeetingPoint Column -->
+        <ng-container matColumnDef="meetingPoint">
+          <th mat-header-cell *matHeaderCellDef>{{ 'appointment.meetingPoint' | translate }}</th>
+          <td mat-cell *matCellDef="let element"> {{ element.meetingPoint || "-" }} </td>
+        </ng-container>
+
+        <!-- Instructor Column -->
+        <ng-container matColumnDef="instructor">
+          <th mat-header-cell *matHeaderCellDef>{{ 'appointment.instructor' | translate }}</th>
+          <td mat-cell *matCellDef="let element">
+            @if (element.instructor) {
+              {{ element.instructor?.firstname }} {{ element.instructor?.lastname }}
+            }
+            @if (!element.instructor) {
+              -
+            }
+          </td>
+        </ng-container>
+
+        <!-- TakeOffCoordinator Column -->
+        <ng-container matColumnDef="takeOffCoordinator">
+          <th mat-header-cell *matHeaderCellDef>{{ 'appointment.takeOffCoordinator' | translate }}</th>
+          <td mat-cell *matCellDef="let element">
+            @if (element.takeOffCoordinator) {
+              {{ element.takeOffCoordinator?.firstname || "-"
+              }} {{
+              element.takeOffCoordinator?.lastname }}
+            }
+            @if (!element.takeOffCoordinator) {
+              {{ element.takeOffCoordinatorText || "-"
+              }}
+            }
+          </td>
+        </ng-container>
+
+        <!-- Registrations Column -->
+        <ng-container matColumnDef="countSubscription">
+          <th mat-header-cell *matHeaderCellDef>{{ 'appointment.registrations' | translate }}</th>
+          <td mat-cell *matCellDef="let element"> {{ element.countSubscription }}@if (element.maxPeople) {
+            <span
+            >/{{ element.maxPeople }}</span>
+          }</td>
+        </ng-container>
+
+        <!-- Guest Column -->
+        <ng-container matColumnDef="countGuestSubscription">
+          <th mat-header-cell *matHeaderCellDef>{{ 'appointment.guestRegistrations' | translate }}</th>
+          <td mat-cell *matCellDef="let element"> {{ (element.countGuestSubscription > 0) ?
+          element.countGuestSubscription : "-"}}</td>
+        </ng-container>
+
+        <!-- Waitinglist Column -->
+        <ng-container matColumnDef="countWaitinglist">
+          <th mat-header-cell *matHeaderCellDef>{{ 'appointment.waitingList' | translate }}</th>
+          <td mat-cell *matCellDef="let element"> {{ (element.countWaitingList > 0) ? element.countWaitingList
+          : "-"}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="type">
+          <th mat-header-cell *matHeaderCellDef>{{ 'appointment.type' | translate }}</th>
+          <td mat-cell *matCellDef="let element"> {{ (element.type) ? element.type.name : "-" }} </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+      <mat-paginator #paginator [length]="pagerEntity.totalItems" [pageSize]="pagerEntity.itemsPerPage"
+        [pageSizeOptions]="[10, 20, 50]" (page)="handlePage($event)">
+      </mat-paginator>
+    </mat-tab>
+    @if (appointmentTypes.length > 0) {
+      <mat-tab label="{{ 'appointment.calendar'| translate }}">
+        <ng-template matTabContent>
+          <div #draggableEvents id="draggable-events">
+            @for (type of appointmentTypes; track type) {
+              <div class="draggable-event-item"
+              [ngStyle]="{'background-color': type.color, 'border-color': type.color}">{{ type.name }}</div>
+            }
+          </div>
+          <full-calendar #calendar [options]="calendarOptions"></full-calendar>
+        </ng-template>
+      </mat-tab>
+    }
+  </mat-tab-group>
+</mat-card>

@@ -1,0 +1,32 @@
+mat-form-field {
+    width: 100%;
+}
+
+.addNoteForm{
+    margin-top: 10px;
+}
+
+.noteDate {
+    width: 200px;
+    margin-right: 5px;
+}
+
+.icon-list {
+    margin-top: 7px;
+    float: right;
+}
+
+.icon-list mat-icon {
+    cursor: pointer;
+}
+
+.remove-note {
+    margin-left: 15px;
+}
+
+.noteList {
+    height: auto;
+}
+.noteText {
+    white-space:pre-wrap;
+}

@@ -1,0 +1,52 @@
+@if (!student?.isArchived) {
+  <button class="add-button" mat-raised-button extended color="primary" (click)="addNote()">
+    <mat-icon>add_circle</mat-icon> {{ 'studentNote.addNote'| translate }}
+  </button>
+}
+
+@if (displayAddNote) {
+  <div class="addNoteForm" [formGroup]="form">
+    <mat-dialog-content>
+      <mat-form-field class="noteDate">
+        <mat-label>{{ 'studentNote.date'| translate }}</mat-label>
+        <input matInput [matDatepicker]="picker" formControlName="date">
+        <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+      </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>{{ 'studentNote.noteTitle'| translate }}</mat-label>
+        <input matInput placeholder="{{ 'studentNote.noteTitle'| translate }}" type="text" formControlName="title"/>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>{{ 'studentNote.comment'| translate }}</mat-label>
+        <textarea matInput cdkTextareaAutosize cdkAutosizeMinRows="5" placeholder="{{ 'studentNote.comment'| translate }}"
+        formControlName="text"></textarea>
+      </mat-form-field>
+    </mat-dialog-content>
+    <mat-dialog-actions align="end">
+      <button mat-raised-button (click)="cancelAddNote()">{{ 'buttons.cancel'| translate }}</button>
+      <button mat-raised-button color="primary" (click)="saveNote()" [disabled]="form.invalid">{{ 'buttons.save'| translate }}</button>
+    </mat-dialog-actions>
+  </div>
+}
+
+<mat-list>
+  @for (note of notes; track note; let last = $last) {
+    <mat-list-item class="noteList">
+      <span matListItemTitle>{{ note.date | date:'dd.MM.yyyy' }} {{ note.title }}
+        @if (!student?.isArchived) {
+          <div class="icon-list">
+            <mat-icon class="edit-note" (click)="editNote(note)">edit</mat-icon>
+            <mat-icon color="warn" class="remove-note" (click)="removeNote(note)">delete_forever</mat-icon>
+          </div>
+        }
+      </span>
+      <p class="noteText" matListItemLine>{{ note.text }}</p>
+    </mat-list-item>
+    @if (!last) {
+      <mat-divider></mat-divider>
+    }
+  }
+</mat-list>
+<mat-paginator #paginator [length]="notesPagerEntity.totalItems" [pageSize]="notesPagerEntity.itemsPerPage" [pageSizeOptions]="[5, 10, 20, 50]" (page)="handleNotePage($event)">
+</mat-paginator>

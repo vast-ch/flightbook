@@ -1,0 +1,18 @@
+<h1 mat-dialog-title>{{ 'student.flight.paymentState.label' | translate }}</h1>
+<mat-dialog-content>
+  @if (data.paymentState === 'PAID') {
+    <mat-form-field appearance="fill">
+      <mat-label>{{ 'student.flight.paymentState.amount' | translate }}</mat-label>
+      <input matInput type="number" [(ngModel)]="paymentAmount" placeholder="0.00">
+    </mat-form-field>
+  }
+  <mat-form-field appearance="fill">
+    <mat-label>{{ 'student.flight.paymentState.comment' | translate }}</mat-label>
+    <textarea matInput [(ngModel)]="paymentComment" rows="4" placeholder="{{ 'student.flight.paymentState.comment' | translate }}"></textarea>
+  </mat-form-field>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-raised-button (click)="onCancel()">{{ 'buttons.cancel' | translate }}</button>
+  <button mat-raised-button color="primary" (click)="onSave()">{{ 'buttons.save' | translate }}</button>
+</mat-dialog-actions>

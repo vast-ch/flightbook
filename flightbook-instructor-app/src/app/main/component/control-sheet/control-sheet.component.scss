@@ -1,0 +1,22 @@
+ul {
+    display: inline-block;
+}
+
+ul li {
+    list-style-type: none;
+    float: left;
+    width: 365px;
+}
+
+.definition {
+    margin-left: 20px;
+}
+
+app-start-rating {
+    display: inline-block;
+}
+
+.exam-date-field {
+    display: block;
+    max-width: 248px;
+}

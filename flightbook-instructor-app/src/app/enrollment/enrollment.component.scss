@@ -1,0 +1,56 @@
+mat-card {
+    max-width: 1100px;
+    margin: 2em auto;
+    text-align: center;
+}
+
+.mat-card-stepper {
+    max-width: 432px;
+    margin: 2em auto;
+    text-align: center;
+}
+
+mat-spinner {
+    margin:10% auto;
+}
+
+::ng-deep .mat-horizontal-stepper-header{
+    pointer-events: none !important;
+}
+
+.check-icon {
+    margin-top: 20px;
+    margin-bottom: 20px !important;
+    transform: scale(3);
+    color: #48c600;
+}
+
+.error-icon {
+    margin-top: 20px;
+    margin-bottom: 20px !important;
+    transform: scale(3);
+    color: #ff4961;
+}
+
+mat-spinner {
+    position: absolute;
+    top: 20%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 3;
+}
+
+.overlay {
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    position: absolute;
+    z-index: 2;
+    backdrop-filter: blur(1px);
+    background-color: rgb(1 1 1 / 60%);
+}
+
+.paymentResilation{
+    font-size: 11px;
+}

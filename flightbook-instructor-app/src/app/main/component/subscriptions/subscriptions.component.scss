@@ -1,0 +1,22 @@
+.no-subscriptions {
+    padding: 24px;
+}
+
+h1 {
+    padding: 0;
+    margin-bottom: 0px;
+}
+
+h1::before {
+    height: 0;
+}
+
+.item-value {
+    margin-top: 0px;
+    margin-bottom: 10px;
+}
+
+.subscription-item {
+    display: flex;
+    align-items: center;
+}
