@@ -1,0 +1,41 @@
+.upload-btn {
+    margin-right: 10px;
+}
+
+input[type="file"] {
+    display: none;
+}
+
+.fileName {
+    vertical-align: -webkit-baseline-middle;
+}
+
+ion-card {
+    font-size: 1.1em;
+    margin-top: 12px;
+}
+ion-card label {
+    display: inline-block;
+    width: 180px;
+}
+ion-card .title {
+    font-weight: bold;
+    line-height: 0;
+    margin: 20px 0 20px 0;
+    font-size: 1.1em;
+}
+.card-content-md {
+    padding-top: 0;
+}
+
+.content p {
+    color: var(--ion-text-color-step-600, #666666) !important;
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 14px;
+    line-height: 20px;
+    text-overflow: inherit;
+    overflow: inherit;
+}

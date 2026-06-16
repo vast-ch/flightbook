@@ -1,0 +1,93 @@
+<ion-header>
+  <ion-toolbar color='primary'>
+    <ion-title>{{ 'appointment.appointments' | translate }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="close()"><ion-icon name="close"></ion-icon></ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="ion-padding">
+  <ion-item>
+    <ion-label color="primary" position="stacked">{{ 'appointment.subscription' | translate }}</ion-label>
+    <ion-toggle class="subscription" disabled="{{ isDisabled() }}" [(ngModel)]="isSubscribed" (click)="subscribe()" color="primary"></ion-toggle>
+  </ion-item>
+  <ion-item>
+    <ion-label color="primary" position="stacked">{{ 'appointment.state' | translate }}</ion-label>
+    <p class="item-value">{{ 'appointment.stateValue.' + appointment.state| translate }}</p>
+  </ion-item>
+  <ion-item>
+    <ion-label color="primary" position="stacked">{{ 'appointment.dateTime' | translate }}</ion-label>
+    @if(school.timezone) {
+      <p class="item-value">{{ appointment.scheduling | date:'EE dd.MM.yyyy HH:mm':school.timezone:currentLang }}</p>
+    } @else {
+      <p class="item-value">{{ appointment.scheduling | date:'EE dd.MM.yyyy HH:mm':'UTC':currentLang }}</p>
+    }
+  </ion-item>
+  @if(appointment.deadline){
+    <ion-item>
+      <ion-label color="primary" position="stacked">{{ 'appointment.deadline' | translate }}</ion-label>
+      @if(school.timezone) {
+        <p class="item-value">{{ appointment.deadline | date:'EE dd.MM.yyyy HH:mm':school.timezone:currentLang }}</p>
+      } @else {
+        <p class="item-value">{{ appointment.deadline | date:'EE dd.MM.yyyy HH:mm':'UTC':currentLang }}</p>
+      }
+    </ion-item>
+  }
+  
+  @if (appointment.type) {
+    <ion-item>
+      <ion-label color="primary" position="stacked">{{ 'appointment.type' | translate }}</ion-label>
+      <p class="item-value">{{ appointment.type?.name }}</p>
+    </ion-item>
+  }
+  <ion-item>
+    <ion-label color="primary" position="stacked">{{ 'appointment.meetingPoint' | translate }}</ion-label>
+    <p class="item-value">{{ appointment.meetingPoint }}</p>
+  </ion-item>
+  <ion-item>
+    <ion-label color="primary" position="stacked">{{ 'appointment.instructor' | translate }}</ion-label>
+    <p class="item-value">{{ appointment.instructor?.firstname }} {{ appointment.instructor?.lastname }}</p>
+  </ion-item>
+  @if (appointment.takeOffCoordinator) {
+    <ion-item>
+      <ion-label color="primary" position="stacked">{{ 'appointment.takeOffCoordinator' | translate }}</ion-label>
+      <p class="item-value">{{ appointment.takeOffCoordinator?.firstname }} {{ appointment.takeOffCoordinator?.lastname }}</p>
+    </ion-item>
+  } @else {
+    <ion-item>
+      <ion-label color="primary" position="stacked">{{ 'appointment.takeOffCoordinator' | translate }}</ion-label>
+      <p class="item-value">{{ appointment.takeOffCoordinatorText }}</p>
+    </ion-item>
+  }
+  <ion-item>
+    <ion-label color="primary" position="stacked">{{ 'appointment.description' | translate }}</ion-label>
+    <p class="item-value description">{{ appointment.description }}</p>
+  </ion-item>
+  <ion-item>
+    <ion-label color="primary" position="stacked">
+      @if (appointment.maxPeople) {
+        <span>{{ appointment.countSubscription }}/{{ appointment.maxPeople }} </span>
+      }
+      {{ 'appointment.subscriptions' | translate }}
+    </ion-label>
+    <p class="item-value subscriptions">
+      @for (subscription of subscribed; track subscription.id) {
+        <span class="subscription-item">
+          {{ subscription.user.firstname }} {{ subscription.user.lastname }} @if (subscription?.student?.isTandem) {<ion-icon name="people-outline"></ion-icon>}
+        </span>
+      }
+    </p>
+  </ion-item>
+  @if (waitingList.length > 0) {
+    <ion-item>
+      <ion-label color="primary" position="stacked">{{ 'appointment.waitingList' | translate }}</ion-label>
+      <p class="item-value subscriptions">
+        @for (subscription of waitingList; track subscription.id) {
+          <span class="subscription-item">
+            {{ subscription.user.firstname }} {{ subscription.user.lastname }}  @if (subscription?.student?.isTandem) {<ion-icon name="people-outline"></ion-icon>}
+          </span>
+        }
+      </p>
+    </ion-item>
+  }
+</ion-content>

@@ -1,0 +1,84 @@
+<ion-header>
+  <ion-toolbar color='primary'>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>{{ 'groupname.glider' | translate }} 
+      @if (filtered()) {
+        <span>({{ 'groupname.filtered' | translate }})</span>
+      }
+    </ion-title>
+    <ion-buttons slot="primary">
+      <ion-button class="submit-button" [routerLink]="['/gliders/add']">
+        <ion-icon name="add"></ion-icon>
+      </ion-button>
+      <ion-button (click)="openFilter()">
+        <ion-icon name="filter-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="no-padding">
+  @if (gliders().length > 0) {
+    <ion-item class="export-buttons">
+      <ion-grid>
+        <ion-row>
+          <ion-col>
+            <ion-button (click)="xlsxExport()">Xlsx Export</ion-button>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </ion-item>
+  }
+  <ion-list>
+    @for (glider of gliders(); track glider.id) {
+      @let timeParts = (glider.time || "0" | hoursFormat)?.split(':');
+      <ion-item button detail="false" (click)="itemTapped($event, glider)">
+        <ion-grid>
+          <ion-row class="ion-align-items-center">
+            <ion-col>
+              <div class="glider-name">
+                <ion-icon [name]="glider.tandem ? 'people-outline' : 'person-outline'"></ion-icon>
+                <span>{{ glider.brand }} {{ glider.name }}</span>
+              </div>
+              <ion-row class="glider-stats ion-align-items-center">
+                <ion-col size="4">
+                  <ion-icon name="checkmark-done-outline"></ion-icon>
+                  <span>
+                    @if (glider.checks && glider.checks.length > 0) {
+                      {{ glider.checks[0].date | date:'dd.MM.yyyy' }}
+                    } @else {
+                      -
+                    }
+                  </span>
+                </ion-col>
+                <ion-col size="3" class="stat-icon">
+                  <ion-icon name="stats-chart-outline"></ion-icon> {{ glider.nbFlights }}
+                </ion-col>
+                <ion-col size="3" class="time-icon">
+                  <ion-icon name="time-outline"></ion-icon> {{ timeParts ? timeParts[0]+':'+timeParts[1] : '-' }}
+                </ion-col>
+                <ion-col size="2" class="archive-icon">
+                  @if (glider.archived) {
+                    <ion-icon name="archive-outline"></ion-icon>
+                  }
+                </ion-col>
+              </ion-row>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-item>
+    }
+    @empty {
+      <ion-item lines="none">
+        <ion-label class="ion-text-center">{{ 'emptylist' | translate }}</ion-label>
+      </ion-item>
+    }
+  </ion-list>
+
+  <ion-infinite-scroll threshold="100px" (ionInfinite)="loadData($event)">
+    <ion-infinite-scroll-content loadingSpinner="bubbles" loadingText="{{ 'loading.loading' | translate }}">
+    </ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+</ion-content>

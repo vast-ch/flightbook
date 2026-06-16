@@ -1,0 +1,13 @@
+<ion-header>
+  <ion-toolbar color='primary'>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref='gliders'></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ 'groupname.glider' | translate }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <glider-form [glider]=glider (saveGlider)="saveGlider($event)"></glider-form>
+  <ion-button [disabled]="deleteDisabled" class="delete" expand="block" color="danger" (click)="delete()" >{{ 'buttons.delete' | translate }}</ion-button>
+</ion-content>

@@ -1,0 +1,7 @@
+{
+  "name": "Flightbook",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}

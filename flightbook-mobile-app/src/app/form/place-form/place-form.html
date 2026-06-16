@@ -1,0 +1,20 @@
+<form #form="ngForm" (ngSubmit)="saveElement(form)">
+  <ion-item>
+    <ion-input label="{{ 'place.name' | translate }} *" labelPlacement="stacked" required clearInput [(ngModel)]="place.name" type="text" name="name"></ion-input>
+  </ion-item>
+  <ion-item>
+    <ion-input label="{{ 'place.altitude' | translate }}" labelPlacement="stacked" clearInput [(ngModel)]="place.altitude" type="number" name="altitude"></ion-input>
+  </ion-item>
+  <ion-item>
+    <ion-select label="{{ 'place.country' | translate }}" labelPlacement="stacked" [(ngModel)]="place.country" name="country" okText="{{ 'buttons.done' | translate }}" cancelText="{{ 'buttons.clear' | translate }}" (ionCancel)="clearCountry()">
+      @for (country of countries; track country.code) {
+        <ion-select-option value="{{ country.code }}">{{ country.name[this.lang] }}</ion-select-option>
+      }     
+    </ion-select>
+  </ion-item>
+  <ion-item>
+    <ion-textarea label="{{ 'place.notes' | translate }}" labelPlacement="stacked" rows="4" type="text" [(ngModel)]="place.notes" name="notes"></ion-textarea>
+  </ion-item>
+  <fb-place-map [place]="place" [placeName]="place?.name"></fb-place-map>
+  <ion-button expand="block" type="submit" >{{ 'buttons.save' | translate }}</ion-button>
+</form>

@@ -1,0 +1,32 @@
+{
+	"appId": "ch.flightbook",
+	"appName": "Flightbook",
+	"webDir": "www/browser",
+	"cordova": {},
+	"plugins": {
+		"SplashScreen": {
+			"launchAutoHide": false,
+			"showSpinner": false,
+			"splashFullScreen": true
+		},
+		"Keyboard": {
+			"resizeOnFullScreen": true
+		}
+	},
+	"ios": {
+		"scheme": "Flightbook"
+	},
+	"packageClassList": [
+		"FileOpenerPlugin",
+		"NativeMarketPlugin",
+		"AppPlugin",
+		"CAPBrowserPlugin",
+		"FilesystemPlugin",
+		"HapticsPlugin",
+		"KeyboardPlugin",
+		"PushNotificationsPlugin",
+		"SplashScreenPlugin",
+		"StatusBarPlugin",
+		"FilePickerPlugin"
+	]
+}

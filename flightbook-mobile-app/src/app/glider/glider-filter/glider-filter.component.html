@@ -1,0 +1,34 @@
+<ion-header>
+  <ion-toolbar color='primary'>
+    <ion-title>{{ 'buttons.filter' | translate }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <form (ngSubmit)="filterElement()">
+    <ion-item>
+      <ion-input label="{{ 'glider.brand' | translate }}" labelPlacement="stacked" type="text" [(ngModel)]="filter.brand" name="brand"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-input label="{{ 'glider.name' | translate }}" labelPlacement="stacked" type="text" [(ngModel)]="filter.name" name="name"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-select label="{{ 'glider.type' | translate }}" labelPlacement="stacked" [(ngModel)]="filter.type" name="type" okText="{{ 'buttons.done' | translate }}"
+        cancelText="{{ 'buttons.cancel' | translate }}">
+        <ion-select-option value="">{{ 'glider.all' | translate }}</ion-select-option>
+        <ion-select-option value="0">{{ 'glider.solo' | translate }}</ion-select-option>
+        <ion-select-option value="1">{{ 'glider.tandem' | translate }}</ion-select-option>
+      </ion-select>
+    </ion-item>
+    <ion-item>
+      <ion-select label="{{ 'glider.archived' | translate }}" labelPlacement="stacked" [(ngModel)]="filter.archived" name="archived" okText="{{ 'buttons.done' | translate }}"
+        cancelText="{{ 'buttons.cancel' | translate }}">
+        <ion-select-option value="">{{ 'glider.all' | translate }}</ion-select-option>
+        <ion-select-option value="1">{{ 'buttons.yes' | translate }}</ion-select-option>
+        <ion-select-option value="0">{{ 'buttons.no' | translate }}</ion-select-option>
+      </ion-select>
+    </ion-item>
+    <ion-button type="button" (click)="clearFilter()">{{ 'buttons.clear' | translate }}</ion-button>
+    <ion-button type="submit">{{ 'buttons.filter' | translate }}</ion-button>
+  </form>
+</ion-content>

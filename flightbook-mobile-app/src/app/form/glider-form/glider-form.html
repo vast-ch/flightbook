@@ -1,0 +1,63 @@
+<form #form="ngForm" (ngSubmit)="saveElement(form)">
+  <ion-item id="buyDateInput">
+    <ion-input label="{{ 'glider.buydate' | translate }}" labelPlacement="stacked" value="{{ glider.buyDate | date:'dd.MM.yyyy' }}"></ion-input>
+  </ion-item>
+  <ion-item>
+    <ion-input label="{{ 'glider.brand' | translate }} *" labelPlacement="stacked" required clearInput [(ngModel)]="glider.brand" type="text" name="brand"></ion-input>
+  </ion-item>
+  <ion-item>
+    <ion-input label="{{ 'glider.name' | translate }} *" labelPlacement="stacked" required [(ngModel)]="glider.name" type="text" name="name"></ion-input>
+  </ion-item>
+  <ion-item>
+    <ion-input label="{{ 'glider.color' | translate }}" labelPlacement="stacked" [(ngModel)]="glider.color" type="text" name="color"></ion-input>
+  </ion-item>
+  <ion-item>
+    <ion-label color="primary" position="stacked">{{ 'glider.tandem' | translate }}</ion-label>
+    <ion-toggle [(ngModel)]="glider.tandem" name="tandem"></ion-toggle>
+  </ion-item>
+  @if (displayArchived) {
+    <ion-item>
+      <ion-label color="primary" position="stacked">{{ 'glider.archive' | translate }}</ion-label>
+      <ion-toggle [(ngModel)]="glider.archived" name="archived"></ion-toggle>
+    </ion-item>
+  }
+  <ion-item>
+    <ion-textarea label="{{ 'glider.note' | translate }}" labelPlacement="stacked" [(ngModel)]="glider.note" name="note" autocomplete="on" autocorrect="on" auto-grow="true"></ion-textarea>
+  </ion-item>
+  <div class="checks-wrapper">
+    <div class="checks-header">
+      <ion-button size="small" shape="round" id="addCheckButton" (click)="gliderCheckAddButton()">
+        <ion-icon slot="icon-only" name="add"></ion-icon>
+      </ion-button>
+      <ion-label lines="none">{{ 'glider.check.title' | translate }}</ion-label>
+    </div>
+    <ion-list>
+      @for (check of glider.checks; track check) {
+        <ion-item-sliding>
+          <ion-item button detail (click)="manageCheckModal(check, 'edit')">
+            <ion-label>
+              <h3>{{ check.date | date:'dd.MM.yyyy' }}</h3>
+              <p style="white-space: pre-wrap;">{{ check.result }}</p>
+            </ion-label>
+          </ion-item>
+          <ion-item-options side="end">
+            <ion-item-option color="danger" (click)="deleteCheckItem(check)">
+              <ion-icon slot="icon-only" name="trash"></ion-icon>
+            </ion-item-option>
+          </ion-item-options>
+      </ion-item-sliding>
+      }
+    </ion-list>
+  </div>
+  <ion-button expand="block" type="submit">{{ 'buttons.save' | translate }}</ion-button>
+</form>
+
+<ion-modal class="dateModal" trigger='buyDateInput'>
+  <ng-template>
+    <ion-content>
+        <ion-datetime size="cover" presentation="date" [preferWheel]="true" locale="{{ language }}" [showDefaultButtons]="true"
+          doneText="{{ 'buttons.done' | translate }}" cancelText="{{ 'buttons.cancel' | translate }}" (ionChange)="changeBuyDate($event)">
+        </ion-datetime>
+    </ion-content>
+  </ng-template>
+</ion-modal>

@@ -1,0 +1,93 @@
+<ion-header>
+  <ion-toolbar color='primary'>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>{{ 'groupname.flight' | translate }}
+      @if (filtered()) {
+        <span>({{ 'groupname.filtered' | translate }})</span>
+      } 
+    </ion-title>
+    <ion-buttons slot="primary">
+      <ion-button class="submit-button" (click)="openAddFlight()">
+        <ion-icon name="add"></ion-icon>
+      </ion-button>
+      <ion-button (click)="openFilter()">
+        <ion-icon name="filter-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="no-padding">
+  @if (flights()?.length > 0) {
+    <ion-item class="export-buttons">
+      <ion-grid>
+        <ion-row>
+          <ion-col>
+            <ion-button (click)="xlsxExport()">Xlsx Export</ion-button>
+          </ion-col>
+          <ion-col offset-4>
+            <ion-button (click)="pdfExport()">Pdf Export</ion-button>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </ion-item>
+  }
+  
+  <ion-list>
+    @for (flight of flights(); track flight.id) {
+      <ion-item-sliding [className]="flight.validation?.state === FlightValidationState.VALIDATED 
+      ? 'validated' 
+      : (flight.validation?.state === FlightValidationState.REJECTED 
+          ? 'rejected' 
+          : '')">
+        <ion-item button detail="false" (click)="itemTapped($event, flight)">
+          <ion-grid>
+            <ion-row class="ion-align-items-start">
+              <ion-col size="3" class="flight-meta">
+                <div class="flight-number">{{ flight.number }}
+                  @if(flight.igc) {
+                    <div class="flight-igc"><ion-icon name="attach-outline"></ion-icon></div>
+                  }
+                </div>
+                <div class="flight-date">{{ flight.date | date:'dd.MM.yyyy' }}</div>
+              </ion-col>
+              <ion-col size="9" class="flight-details">
+                @if (!flight.start?.name && !flight.landing?.name) {
+                  <div class="location">-</div>
+                } @else {
+                  <div class="location"><nxt-flag country="{{ flight.start?.country}}" size="xs"></nxt-flag>{{ flight.start?.name || "-" }}<ion-icon name="arrow-forward-outline"></ion-icon> <nxt-flag country="{{ flight.landing?.country}}" size="xs"></nxt-flag>{{ flight.landing?.name || "-" }}</div>
+                }
+                <div class="glider">@if(flight.glider.tandem) {<ion-icon name="people-outline"></ion-icon>} @else {<ion-icon name="person-outline"></ion-icon>} {{ flight.glider.brand }} {{ flight.glider.name }}</div>
+                <ion-row class="flight-stats">
+                  <ion-col size="5">
+                    <ion-icon name="arrow-forward-outline"></ion-icon> {{ flight.km || "-" }} km
+                  </ion-col>
+                  <ion-col size="7">
+                    <ion-icon name="time-outline"></ion-icon> {{ flight.time?.substring(0, 5) || "-" }}
+                  </ion-col>
+                </ion-row>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+        </ion-item>
+        <ion-item-options side="end">
+          <ion-item-option color="danger" (click)="deleteItem(flight)">
+            <ion-icon slot="icon-only" name="trash"></ion-icon>
+          </ion-item-option>
+        </ion-item-options>
+      </ion-item-sliding>
+    }
+    @empty {
+      <ion-item lines="none">
+        <ion-label class="ion-text-center">{{ 'emptylist' | translate }}</ion-label>
+      </ion-item>
+    }
+  </ion-list>
+
+  <ion-infinite-scroll threshold="100px" (ionInfinite)="loadData($event)">
+    <ion-infinite-scroll-content loadingSpinner="bubbles" loadingText="{{ 'loading.loading' | translate }}">
+    </ion-infinite-scroll-content>
+  </ion-infinite-scroll>  
+</ion-content>

@@ -1,0 +1,19 @@
+{
+	"appId": "ch.flightbook",
+	"appName": "Flightbook",
+	"webDir": "www/browser",
+	"cordova": {},
+	"plugins": {
+		"SplashScreen": {
+			"launchAutoHide": false,
+			"showSpinner": false,
+			"splashFullScreen": true
+		},
+		"Keyboard": {
+			"resizeOnFullScreen": true
+		}
+	},
+	"ios": {
+		"scheme": "Flightbook"
+	}
+}

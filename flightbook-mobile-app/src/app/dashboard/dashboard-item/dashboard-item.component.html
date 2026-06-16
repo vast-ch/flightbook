@@ -1,0 +1,72 @@
+<div class="square">
+    <div class="content">
+        <div class="table">
+            <!-- Add Flight card -->
+            @if (type === 'addFlight') {
+                <ion-card class="dashboard-item">
+                    <div class="body">
+                        @if (icon) {
+                            <ion-icon [name]="icon"></ion-icon>
+                        }
+                    </div>
+                    <div class="title">{{ label | translate }}</div>
+                </ion-card>
+            }
+
+            <!-- Statistics card -->
+            @if (type === 'statistics') {
+                <ion-card class="dashboard-item">
+                    <div class="body">
+                        @if (icon) {
+                            <ion-icon [name]="icon"></ion-icon>
+                        }
+                        @if (flightStatistics$ | async; as stats) {
+                            @if (stats && stats.length > 0) {
+                                <div class="statistic-tile">
+                                    <div class="body">{{stats[0]?.nbFlights || 0}}</div>
+                                </div>
+                            }
+                        }
+                    </div>
+                    <div class="title">{{ label | translate }}</div>
+                </ion-card>
+            }
+
+            <!-- Last Flight card -->
+            @if (type === 'lastFlight') {
+                <ion-card class="dashboard-item">
+                    <div class="body">
+                        @if (icon) {
+                            <ion-icon [name]="icon"></ion-icon>
+                        }
+                    </div>
+                    @if (flights().length > 0) {
+                        <div class="title">
+                            <div>{{ 'dashboard.lastflight' | translate }}</div>
+                        </div>
+                    } @else {
+                        <div class="title">
+                            {{ 'dashboard.noflights' | translate}}
+                        </div>
+                    }
+                </ion-card>
+            }
+            <!-- <ion-card class="dashboard-item"
+                      *ngIf="{
+                      flights: flights().length > 0,
+                      flightStatistics: flightStatistics$ | async}
+                      as observables">
+                <div class="body">
+                    <ion-icon *ngIf=icon [name]="icon"></ion-icon>
+                    <div class="statistic-tile" *ngIf="isStatistic && observables.flightStatistics">
+                        <div class="body">{{observables.flightStatistics[0].nbFlights}}</div>
+                    </div>
+                </div>
+                <div class="title">{{ label | translate }}</div>
+                <div class="title" *ngIf="flights()">
+                    <div *ngIf="flights()[0]?.date; else noFlights">{{ 'dashboard.lastflight' | translate }}</div>
+                </div>
+            </ion-card> -->
+        </div>
+    </div>
+</div>
