@@ -9,8 +9,17 @@ export function initLanguageDetection() {
   try {
     const currentPath = window.location.pathname;
     const currentHash = window.location.hash;
+    const searchParams = new URLSearchParams(window.location.search);
+    const langParam = searchParams.get('lang');
     const isFirstVisit = !localStorage.getItem('flightbook-visited');
     const storedLang = localStorage.getItem('flightbook-lang');
+
+    // Handle legacy ?lang=fr query parameter
+    if (langParam === 'fr' && !currentPath.startsWith('/fr')) {
+      const targetPath = currentPath === '/' ? '/fr' : `/fr${currentPath}`;
+      window.location.href = `${targetPath}${currentHash}`;
+      return;
+    }
 
     // Mark as visited
     if (isFirstVisit) {
