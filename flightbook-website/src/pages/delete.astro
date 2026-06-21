@@ -1,0 +1,138 @@
+---
+import Layout from '~/layouts/PageLayout.astro';
+
+const metadata = {
+  title: 'Delete Your Flightbook Account',
+  description: 'Learn how to delete your Flightbook account and understand our data deletion policy',
+  robots: {
+    index: true,
+    follow: true,
+  },
+};
+---
+
+<Layout metadata={metadata}>
+  <section class="px-4 py-16 sm:px-6 mx-auto lg:px-8 lg:py-20 max-w-4xl">
+    <h1 class="text-4xl md:text-5xl font-bold leading-tighter tracking-tighter mb-8 font-heading">Account Deletion</h1>
+
+    <div class="prose prose-lg dark:prose-invert max-w-none">
+      <p>This page explains how to delete your Flightbook account and what happens to your data when you do.</p>
+
+      <h2>How to Delete Your Account</h2>
+
+      <p>You can delete your Flightbook account directly from within the mobile app by following these steps:</p>
+
+      <ol>
+        <li>Open the Flightbook mobile app</li>
+        <li>Navigate to <strong>Account</strong></li>
+        <li>Select <strong>Account Data</strong></li>
+        <li>Tap <strong>Delete Account</strong></li>
+        <li>Confirm your deletion request</li>
+      </ol>
+
+      <p>Alternatively, you can access the account settings directly:</p>
+
+      <p class="my-6">
+        <a
+          href="https://m.flightbook.ch/settings"
+          class="inline-block px-6 py-3 text-white bg-primary rounded-lg hover:bg-primary-dark transition-colors font-semibold"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Go to Account Settings
+        </a>
+      </p>
+
+      <h2>What Happens When You Delete Your Account</h2>
+
+      <h3>Immediate Account Deactivation</h3>
+
+      <p>When you confirm account deletion, your account is <strong>immediately deactivated</strong>:</p>
+
+      <ul>
+        <li>You will no longer be able to log in or use your account</li>
+        <li>All app functionality associated with your account will be inaccessible</li>
+        <li>Your account cannot be used for any purpose</li>
+        <li>The deactivation is immediate and irreversible without contacting support</li>
+      </ul>
+
+      <h3>Data Retention and Deletion Timeline</h3>
+
+      <p>
+        While your account is immediately deactivated, your data follows a specific deletion timeline to allow for
+        account recovery if you change your mind:
+      </p>
+
+      <ul>
+        <li>
+          <strong>Days 1-30:</strong> Your data is retained solely for account recovery purposes. If you contact our
+          support team within this 30-day period, we can restore your account and data. During this time, your data is
+          not used for any other purpose.
+        </li>
+        <li>
+          <strong>After 30 days:</strong> All your data is <strong>permanently and irrevocably deleted</strong> from
+          our systems. This includes your personal information, flight logs, lesson history, and all account details.
+          Account recovery will no longer be possible.
+        </li>
+      </ul>
+
+      <p>
+        <strong>Important:</strong> This 30-day data retention period is provided solely to enable account recovery and
+        complies with our legitimate interest in preventing accidental data loss. After 30 days, the deletion is final
+        and cannot be undone.
+      </p>
+
+      <h2>Data Retention Policy</h2>
+
+      <p>Our data retention practices for deleted accounts:</p>
+
+      <ul>
+        <li>
+          <strong>During the 30-day grace period:</strong> Your data is retained in our systems solely to allow account recovery
+          if you request it. The data is not used for any other purpose.
+        </li>
+        <li>
+          <strong>After 30 days:</strong> All personal data, including email address, flight logs, lesson records, instructor
+          information, and any other account-related data is permanently deleted from our databases.
+        </li>
+      </ul>
+
+      <p>
+        This is true account deletion, not temporary deactivation or account freezing. Once deleted, your account is
+        removed from our active systems immediately.
+      </p>
+
+      <h2>Before You Delete</h2>
+
+      <p>Please consider the following before deleting your account:</p>
+
+      <ul>
+        <li>Make sure you have exported or saved any flight logs or data you wish to keep</li>
+        <li>Inform any instructors or flight schools you work with about your account deletion</li>
+        <li>Cancel any active subscriptions or bookings</li>
+        <li>Remember that after 30 days, all data will be permanently lost</li>
+      </ul>
+
+      <h2>Need Help?</h2>
+
+      <p>
+        If you have questions about account deletion, need assistance with the deletion process, or wish to recover your
+        account within the 30-day grace period, please contact us:
+      </p>
+
+      <ul>
+        <li>Email: <a href="mailto:yannick.lagger@flightbook.ch">yannick.lagger@flightbook.ch</a></li>
+      </ul>
+
+      <p>Our support team will respond to your inquiry as quickly as possible.</p>
+
+      <h2>Privacy Policy</h2>
+
+      <p>
+        For more information about how we handle your data, please review our <a href="/privacy-policy"
+          >Privacy Policy</a
+        >.
+      </p>
+    </div>
+  </section>
+</Layout>
