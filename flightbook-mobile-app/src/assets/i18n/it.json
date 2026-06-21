@@ -200,7 +200,7 @@
     "message": {
         "infotitle": "Informazione",
         "warning": "Attenzione",
-        "deleteAccount": "Sei sicuro di voler cancellare il tuo account?<br><br>Il tuo account sarà disabilitato e dopo 90 giorni completamente cancellato.",
+        "deleteAccount": "Sei sicuro di voler cancellare il tuo account?<br><br>Il tuo account sarà immediatamente disabilitato e definitivamente cancellato dopo 30 giorni.",
         "noglidertitle": "Nessuna vela trovata",
         "browser": "Siamo dispiaciuti ma questa applicazione è momentaneamente supportata solo dai seguenti Browser: Chrome, Safari",
         "noglider": "Prima di poter aggiungere un volo dovete aggiungere una vela",

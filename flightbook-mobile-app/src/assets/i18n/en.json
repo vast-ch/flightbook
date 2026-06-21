@@ -200,7 +200,7 @@
     "message": {
         "infotitle": "Information",
         "warning": "Warning",
-        "deleteAccount": "Are you shure that you want to delete your account?<br><br>Your account will be disabled and after 90 days completely deleted.",
+        "deleteAccount": "Are you sure you want to delete your account?<br><br>Your account will be immediately disabled and permanently deleted after 30 days.",
         "noglidertitle": "No glider found",
         "browser": "We are sorry but actually this application is only supported by WebKit browser (Chrome, Safari)",
         "noglider": "Before you can add a flight please add a glider",
