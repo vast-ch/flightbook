@@ -21,9 +21,10 @@ export class NavigationService {
   }
 
   back(): void {
-    this.history.pop();
+    this.history.pop(); // Remove current page
     if (this.history.length > 0 && this.previsousIsNotRegister()) {
-      this.location.back();
+      const previousUrl = this.history[this.history.length - 1];
+      this.router.navigateByUrl(previousUrl);
     } else {
       this.router.navigateByUrl('/');
     }
