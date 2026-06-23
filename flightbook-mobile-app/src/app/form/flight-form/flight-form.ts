@@ -179,6 +179,11 @@ export class FlightFormComponent implements OnInit, OnChanges {
         this.flight.tandemSchoolData.schoolCustomValues = [];
     }
 
+    onTandemSchoolChange() {
+        this.flight.tandemSchoolData.schoolCustomValues = [];
+        this.initializeCustomValues();
+    }
+
     compareSchools(school1: School, school2: School): boolean {
         return school1 && school2 ? school1.id === school2.id : school1 === school2;
     }

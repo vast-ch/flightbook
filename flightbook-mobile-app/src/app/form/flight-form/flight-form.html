@@ -8,7 +8,7 @@
     @if (flight.glider?.tandem && tandemSchools && tandemSchools.length > 0 && flight.tandemSchoolData) {
       <ion-item class="error-item">
           <ion-select label="{{ 'flight.tandemSchool' | translate }}" labelPlacement="stacked" [(ngModel)]="flight.tandemSchoolData.tandemSchool" name="school"
-            [compareWith]="compareSchools" okText="{{ 'buttons.done' | translate }}" cancelText="{{ 'buttons.clear' | translate }}" (ionCancel)="clearSchoolButton()">
+            [compareWith]="compareSchools" okText="{{ 'buttons.done' | translate }}" cancelText="{{ 'buttons.clear' | translate }}" (ionCancel)="clearSchoolButton()" (ionChange)="onTandemSchoolChange()">
             @for (school of tandemSchools; track school.id) {
               <ion-select-option [value]="school">{{ school.name }}</ion-select-option>
             }
