@@ -27,3 +27,8 @@
 
 /* Dark Mode */
 @import '@ionic/angular/css/palettes/dark.system.css';
+
+/* Android edge-to-edge support */
+.md ion-menu ion-content {
+  --padding-bottom: env(safe-area-inset-bottom);
+}

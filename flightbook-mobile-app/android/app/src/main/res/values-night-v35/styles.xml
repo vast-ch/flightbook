@@ -6,7 +6,8 @@
         <item name="windowNoTitle">true</item>
         <item name="android:background">@null</item>
         <item name="android:statusBarColor">@color/colorPrimaryDark</item>
-        <!-- Android 15 specific edge-to-edge attributes -->
-        <item name="android:windowOptOutEdgeToEdgeEnforcement">true</item>
+        <!-- Ensure proper layout with 3-button navigation -->
+        <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
+        <item name="android:enforceNavigationBarContrast">true</item>
     </style>
 </resources>
