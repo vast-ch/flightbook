@@ -152,4 +152,20 @@ export class AppointmentRepository extends Repository<Appointment> {
     private orderGuestSubscriptionById(subscriptions: GuestSubscription[]): GuestSubscription[] {
         return subscriptions.sort((a: GuestSubscription, b: GuestSubscription) => a.id - b.id);
     }
+
+    async getAppointmentsByStudentAndDateRange(studentUserId: number, schoolId: number, fromDate: string, toDate: string): Promise<Appointment[]> {
+        const appointments = await this.createQueryBuilder('appointment')
+            .leftJoinAndSelect('appointment.subscriptions', 'subscription')
+            .leftJoinAndSelect('subscription.user', 'user')
+            .leftJoinAndSelect('appointment.instructor', 'instructor')
+            .leftJoinAndSelect('appointment.school', 'school')
+            .where('school.id = :schoolId', { schoolId })
+            .andWhere('user.id = :studentUserId', { studentUserId })
+            .andWhere('DATE(appointment.scheduling) >= :fromDate', { fromDate })
+            .andWhere('DATE(appointment.scheduling) <= :toDate', { toDate })
+            .orderBy('appointment.scheduling', 'ASC')
+            .getMany();
+        
+        return appointments;
+    }
 }

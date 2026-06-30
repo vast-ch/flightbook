@@ -184,7 +184,57 @@ export class StudentFacade {
             query["glider-type"] = 1;
         }
 
-        return await this.flightFacade.getFlightsPager({ userId: student.user.id }, query);
+        const flightsPager = await this.flightFacade.getFlightsPager({ userId: student.user.id }, query);
+        
+        // Enrich flights with appointment instructor information
+        if (flightsPager.entity && flightsPager.entity.length > 0) {
+            const flights = flightsPager.entity;
+            
+            // Find date range of flights
+            const flightDates = flights.map(f => f.date).filter(d => d);
+            if (flightDates.length > 0) {
+                const minDate = flightDates.reduce((min, date) => date < min ? date : min);
+                const maxDate = flightDates.reduce((max, date) => date > max ? date : max);
+                
+                // Batch query appointments for the student in the date range
+                const appointments = await this.appointmentRepository.getAppointmentsByStudentAndDateRange(
+                    student.user.id,
+                    student.school.id,
+                    minDate,
+                    maxDate
+                );
+                
+                // Create a map of date -> appointment for efficient lookup
+                const appointmentsByDate = new Map<string, any>();
+                appointments.forEach(appointment => {
+                    const appointmentDate = appointment.scheduling.toISOString().substring(0, 10);
+                    // Only store first appointment for each date (already ordered by scheduling ASC)
+                    if (!appointmentsByDate.has(appointmentDate)) {
+                        appointmentsByDate.set(appointmentDate, appointment);
+                    }
+                });
+                
+                // Enrich each flight with instructor information
+                flights.forEach(flight => {
+                    const appointment = appointmentsByDate.get(flight.date);
+                    if (appointment && appointment.instructor) {
+                        // Create UserReadDto with only firstname and lastname
+                        flight.appointmentInstructor = {
+                            email: appointment.instructor.email,
+                            firstname: appointment.instructor.firstname,
+                            lastname: appointment.instructor.lastname,
+                            phone: appointment.instructor.phone,
+                            loginType: appointment.instructor.loginType,
+                            flights: []
+                        };
+                    } else {
+                        flight.appointmentInstructor = null;
+                    }
+                });
+            }
+        }
+        
+        return flightsPager;
     }
 
     async updateStudentFlight(studentId: number, flightId: number, flightDto: FlightDto): Promise<FlightDto> {

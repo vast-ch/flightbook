@@ -104,6 +104,7 @@
             "km": "Km",
             "description": "Description",
             "diff": "Diff.",
+            "instructor": "Instructeur",
             "alone": "Seul",
             "maneuver": "Manoeuvre",
             "validationState": {

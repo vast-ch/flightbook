@@ -7,6 +7,8 @@ import { FlightDto } from '../../src/flight/interface/flight-dto';
 import { plainToClass } from 'class-transformer';
 import { removeIds } from '../utils/snapshot-utils';
 import { FlightValidationState } from '../../src/flight/flight-validation-state';
+import { Subscription } from '../../src/training/subscription/subscription.entity';
+import { AppointmentBuilderTest } from '../utils/appointment-builder-test';
 
 describe('Flights (e2e)', () => {
   const testInstance = new BaseE2ETest();
@@ -316,6 +318,18 @@ describe('Instructor Flight (e2e)', () => {
     // given
     const keycloakToken = JwtTestHelper.createKeycloakToken({ sub: schoolTestData.instructorUser.id, email: schoolTestData.instructorUser.email });
 
+    // Create appointment on 2025-01-01 (matching first two flights)
+    const appointment = new AppointmentBuilderTest(schoolTestData.testSchool, schoolTestData.instructorUser)
+      .setScheduling(new Date('2025-01-01T09:00:00'))
+      .build();
+    const savedAppointment = await testInstance.appointmentRepository.save(appointment);
+
+    // Subscribe student to the appointment
+    const subscription = new Subscription();
+    subscription.user = schoolTestData.studentUser;
+    subscription.appointment = savedAppointment;
+    await testInstance.subscriptionRepository.save(subscription);
+
     //when
     return request(testInstance.app.getHttpServer())
       .get(`/instructor/students/${schoolTestData.student.id}/flights`)
@@ -329,6 +343,19 @@ describe('Instructor Flight (e2e)', () => {
         assertFlight(response.body.entity[1], storedFlights[2]);
         assertFlight(response.body.entity[2], storedFlights[1]);
         assertFlight(response.body.entity[3], storedFlights[0]);
+        
+        // Flight on 2025-01-03 - no appointment, should be null
+        expect(response.body.entity[0].appointmentInstructor).toBeNull();
+        
+        // Flight on 2025-01-02 - no appointment, should be null
+        expect(response.body.entity[1].appointmentInstructor).toBeNull();
+        
+        // Flights on 2025-01-01 (both) - have appointment with instructor
+        expect(response.body.entity[2].appointmentInstructor.firstname).toBe(schoolTestData.instructorUser.firstname);
+        expect(response.body.entity[2].appointmentInstructor.lastname).toBe(schoolTestData.instructorUser.lastname);
+        
+        expect(response.body.entity[3].appointmentInstructor.firstname).toBe(schoolTestData.instructorUser.firstname);
+        expect(response.body.entity[3].appointmentInstructor.lastname).toBe(schoolTestData.instructorUser.lastname);
       });
   });
 

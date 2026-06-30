@@ -2,6 +2,7 @@ import { Place } from './place'
 import { Glider } from './glider'
 import { FlightValidation } from './flight-validation';
 import { TandemSchoolDataDto } from './tandem-school-data';
+import { User } from './user';
 
 export class Flight {
     id: number | undefined;
@@ -18,4 +19,5 @@ export class Flight {
     shvAlone?: boolean;
     validation?: FlightValidation;
     tandemSchoolData?: TandemSchoolDataDto;
+    appointmentInstructor?: User;
 }

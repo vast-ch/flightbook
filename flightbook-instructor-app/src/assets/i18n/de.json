@@ -104,6 +104,7 @@
             "km": "Km",
             "description": "Beschreibung",
             "diff": "Diff.",
+            "instructor": "Fluglehrer*in",
             "alone": "Allein",
             "maneuver": "Manöver",
             "validationState": {

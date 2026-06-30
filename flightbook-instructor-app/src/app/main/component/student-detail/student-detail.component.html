@@ -113,6 +113,18 @@
             <td class="description" mat-cell *matCellDef="let element"> {{element.description}} </td>
           </ng-container>
 
+          <!-- Instructor Column -->
+          <ng-container matColumnDef="instructor">
+            <th class="instructor" mat-header-cell *matHeaderCellDef>{{ 'student.flight.instructor'| translate }}</th>
+            <td class="instructor" mat-cell *matCellDef="let element">
+              @if (element.appointmentInstructor) {
+                {{element.appointmentInstructor.firstname.charAt(0)}}. {{element.appointmentInstructor.lastname}}
+              } @else {
+                -
+              }
+            </td>
+          </ng-container>
+
           <!-- Alone Column -->
           <ng-container matColumnDef="alone">
             <th class="alone" mat-header-cell *matHeaderCellDef>{{ 'student.flight.alone'| translate }}</th>

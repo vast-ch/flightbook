@@ -39,7 +39,7 @@ export class StudentDetailComponent implements OnInit, OnChanges, OnDestroy {
   flightPagerEntity = new PagerEntity<Flight[]>;
   @ViewChild('paginator') paginator: MatPaginator | undefined;
 
-  displayedColumns: string[] = ['nb', 'date', 'start', 'landing', 'glider', 'time', 'km', 'description', 'alone'];
+  displayedColumns: string[] = ['nb', 'date', 'start', 'landing', 'glider', 'time', 'km', 'description', 'instructor', 'alone'];
   emergencyContact: EmergencyContact = new EmergencyContact();
   @ViewChild('table', { read: ElementRef }) table: ElementRef | undefined;
   unsubscribe$ = new Subject<void>();
@@ -84,7 +84,7 @@ export class StudentDetailComponent implements OnInit, OnChanges, OnDestroy {
     // Update displayedColumns when school changes
     if (changes['school'] && changes['school'].currentValue) {
       // Reset to base columns first to avoid duplicates
-      this.displayedColumns = ['nb', 'date', 'start', 'landing', 'glider', 'time', 'km', 'description', 'alone'];
+      this.displayedColumns = ['nb', 'date', 'start', 'landing', 'glider', 'time', 'km', 'description', 'instructor', 'alone'];
       
       // Add validation column if needed
       if (changes['school'].currentValue.configuration?.schoolModule?.validateFlights) {
