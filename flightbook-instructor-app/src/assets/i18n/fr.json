@@ -137,7 +137,8 @@
             "firstname": "Prénom",
             "lastname": "Nom",
             "nbFlightsAsc": "Nombre de vols (ascendant)",
-            "nbFlightsDesc": "Nombre de vols (descendant)"
+            "nbFlightsDesc": "Nombre de vols (descendant)",
+            "countNotValidatedFlights": "Nombre de vols non validés"
         }
     },
     "tandemPilot": {

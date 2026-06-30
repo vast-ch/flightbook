@@ -186,6 +186,8 @@ export class StudentsComponent implements OnInit, OnDestroy {
         return (a.statistic?.nbFlights || 0) - (b.statistic?.nbFlights || 0);
       } else if (sortBy === 'nbFlightsDesc') {
         return (b.statistic?.nbFlights || 0) - (a.statistic?.nbFlights || 0);
+      } else if (sortBy === 'countNotValidatedFlights') {
+        return (b.countNotValidatedFlights || 0) - (a.countNotValidatedFlights || 0);
       }
       return 0;
     });

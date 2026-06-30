@@ -24,6 +24,11 @@
             <mat-option value="nbFlightsDesc">
               {{ 'student.sort.nbFlightsDesc' | translate }}
             </mat-option>
+            @if(school?.configuration?.schoolModule?.validateFlights){
+              <mat-option value="countNotValidatedFlights">
+                {{ 'student.sort.countNotValidatedFlights' | translate }}
+              </mat-option>
+            }
           </mat-select>
         </mat-form-field>
         @for (student of students; track student) {
