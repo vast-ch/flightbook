@@ -10,7 +10,7 @@
   },
   "hero": {
     "title": "Flightbook",
-    "subtitle": "Le carnet de vol numérique pour parapente et deltaplane",
+    "subtitle": "Le carnet de vol numérique pour parapente et deltaplane - approuvé FSVL",
     "ios": "iOS",
     "android": "Android",
     "subscribePremium": "S'abonner à Flightbook Premium"
@@ -100,10 +100,39 @@
     "brand": "Flightbook",
     "switchLanguage": "Deutsch"
   },
+  "faq": {
+    "title": "Questions fréquemment posées",
+    "questions": [
+      {
+        "question": "Flightbook est-il approuvé pour les examens FSVL?",
+        "answer": "Oui, Flightbook est officiellement approuvé pour les examens FSVL. Vous pouvez exporter votre carnet de vol directement depuis l'application au format PDF et le présenter lors de l'examen."
+      },
+      {
+        "question": "Flightbook fonctionne-t-il pour le parapente et le deltaplane?",
+        "answer": "Oui, Flightbook convient aussi bien aux pilotes de parapente qu'aux pilotes de deltaplane. Vous pouvez gérer tous vos vols, équipements et statistiques."
+      },
+      {
+        "question": "Puis-je télécharger mes fichiers IGC?",
+        "answer": "Oui, vous pouvez télécharger des fichiers IGC directement depuis votre vario ou tracker GPS et visualiser et analyser vos vols."
+      },
+      {
+        "question": "Flightbook existe-t-il pour iOS et Android?",
+        "answer": "Oui, Flightbook est disponible en tant qu'application native pour iOS (iPhone/iPad) et Android. Vous pouvez télécharger l'application gratuitement sur l'App Store ou Google Play Store."
+      },
+      {
+        "question": "Qu'est-ce que Flightbook Schools?",
+        "answer": "Flightbook Schools est une solution gratuite pour les écoles de vol. Les instructeurs peuvent suivre la progression de leurs élèves, gérer les cours et créer des fiches de contrôle individuelles. Les rendez-vous peuvent être créés directement, les élèves reçoivent des notifications push et peuvent s'inscrire aux rendez-vous. Cela permet aux instructeurs d'avoir une vue d'ensemble parfaite des élèves participants."
+      },
+      {
+        "question": "Comment puis-je commencer en tant qu'école de vol?",
+        "answer": "C'est très simple :<ol style='margin-top: 1rem; margin-bottom: 1rem; padding-left: 1.5rem; list-style-type: decimal;'><li style='margin-bottom: 0.5rem; display: list-item;'>Créez votre école de vol</li><li style='margin-bottom: 0.5rem; display: list-item;'>Ajoutez vos élèves</li><li style='margin-bottom: 0.5rem; display: list-item;'>Commencez!</li></ol><a href='https://instructor.flightbook.ch/school/register' target='_blank' class='inline-block px-6 py-3 text-white bg-primary rounded-lg hover:bg-primary/90 transition-colors font-semibold'>Créer une école de vol</a>"
+      }
+    ]
+  },
   "meta": {
-    "title": "Flightbook - Ton carnet de vols numérique",
-    "description": "Gère tes vols dans une application iOS et Android. Cette application peut être utilisée pour les formations et est autorisée lors des examens de la FSVL.",
-    "ogTitle": "Flightbook - Ton carnet de vols numérique",
-    "ogDescription": "Gère tes vols dans une application iOS et Android. Cette application peut être utilisée pour les formations et est autorisée lors des examens de la FSVL."
+    "title": "Carnet de vol parapente - approuvé FSVL | Flightbook",
+    "description": "Carnet de vol numérique pour parapente pour iOS et Android - approuvé FSVL. Gérez vos vols, parapentes et statistiques. Pour pilotes, tandem et écoles de vol. Commencez gratuitement!",
+    "ogTitle": "Carnet de vol parapente - approuvé FSVL | Flightbook",
+    "ogDescription": "Carnet de vol numérique pour parapente pour iOS et Android - approuvé FSVL. Gérez vos vols, parapentes et statistiques. Pour pilotes, tandem et écoles de vol."
   }
 }

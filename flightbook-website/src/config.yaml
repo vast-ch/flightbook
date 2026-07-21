@@ -9,9 +9,9 @@ site:
 # Default SEO metadata
 metadata:
   title:
-    default: Flightbook
+    default: Gleitschirm Flugbuch - SHV zugelassen | Flightbook
     template: '%s — Flightbook'
-  description: 'Verwalte deine Flüge in einer iOS und Android App. Diese App kann für Schulungen verwendet werden und ist an den SHV Prüfungen zugelassen.'
+  description: 'Digitales Gleitschirm Flugbuch für iOS und Android - SHV zugelassen. Verwalte deine Flüge, Gleitschirme und Statistiken. Für Piloten, Tandem und Flugschulen.'
   robots:
     index: true
     follow: true

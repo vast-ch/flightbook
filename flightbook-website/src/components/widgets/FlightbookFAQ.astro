@@ -1,0 +1,59 @@
+---
+import WidgetWrapper from '~/components/ui/WidgetWrapper.astro';
+import Headline from '~/components/ui/Headline.astro';
+
+interface FAQ {
+  question: string;
+  answer: string;
+}
+
+interface Props {
+  title?: string;
+  faqs: FAQ[];
+}
+
+const { title = 'Häufig gestellte Fragen', faqs = [] } = Astro.props;
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((faq) => ({
+    '@type': 'Question',
+    name: faq.question,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: faq.answer,
+    },
+  })),
+};
+---
+
+<WidgetWrapper id="faq">
+  <Headline title={title} tagline="" />
+  <div class="max-w-4xl mx-auto">
+    <div class="space-y-4">
+      {
+        faqs.map((faq, index) => (
+          <details class="group border border-gray-200 dark:border-gray-700 rounded-lg p-6 hover:border-primary transition-colors">
+            <summary class="flex justify-between items-center cursor-pointer list-none">
+              <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{faq.question}</h3>
+              <span class="ml-4 flex-shrink-0 text-primary group-open:rotate-180 transition-transform">
+                <svg
+                  class="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </span>
+            </summary>
+            <div class="mt-4 text-gray-600 dark:text-gray-400 leading-relaxed prose prose-sm dark:prose-invert max-w-none" set:html={faq.answer} />
+          </details>
+        ))
+      }
+    </div>
+  </div>
+  <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+</WidgetWrapper>

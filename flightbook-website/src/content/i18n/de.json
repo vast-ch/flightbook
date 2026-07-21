@@ -10,7 +10,7 @@
   },
   "hero": {
     "title": "Flightbook",
-    "subtitle": "Das digitale Flugbuch für Gleitschirm und Delta",
+    "subtitle": "Das digitale Gleitschirm Flugbuch für Gleitschirm und Delta - SHV zugelassen",
     "ios": "iOS",
     "android": "Android",
     "subscribePremium": "Flightbook Premium abonnieren"
@@ -100,10 +100,39 @@
     "brand": "Flightbook",
     "switchLanguage": "Français"
   },
+  "faq": {
+    "title": "Häufig gestellte Fragen",
+    "questions": [
+      {
+        "question": "Ist Flightbook an SHV-Prüfungen zugelassen?",
+        "answer": "Ja, Flightbook ist offiziell an SHV-Prüfungen zugelassen. Du kannst dein Flugbuch direkt aus der App als PDF exportieren und bei der Prüfung vorweisen."
+      },
+      {
+        "question": "Funktioniert Flightbook für Gleitschirm und Delta?",
+        "answer": "Ja, Flightbook ist sowohl für Gleitschirm- als auch für Deltapiloten geeignet. Du kannst alle deine Flüge, Geräte und Statistiken verwalten."
+      },
+      {
+        "question": "Kann ich meine IGC-Dateien hochladen?",
+        "answer": "Ja, du kannst IGC-Dateien direkt von deinem Vario oder GPS-Tracker hochladen und deine Flüge visualisieren und analysieren."
+      },
+      {
+        "question": "Gibt es Flightbook für iOS und Android?",
+        "answer": "Ja, Flightbook ist als native App für iOS (iPhone/iPad) und Android verfügbar. Du kannst die App kostenlos im App Store oder Google Play Store herunterladen."
+      },
+      {
+        "question": "Was ist Flightbook Schools?",
+        "answer": "Flightbook Schools ist eine kostenlose Lösung für Flugschulen. Fluglehrer können den Lernfortschritt ihrer Schüler verfolgen, Kurse verwalten und individuelle Kontrollblätter erstellen. Termine können direkt erstellt werden, Schüler erhalten Push-Benachrichtigungen und können sich für Termine anmelden. So haben Fluglehrer jederzeit einen perfekten Überblick über die teilnehmenden Schüler."
+      },
+      {
+        "question": "Wie kann ich als Flugschule anfangen?",
+        "answer": "Der Einstieg ist ganz einfach:<ol style='margin-top: 1rem; margin-bottom: 1rem; padding-left: 1.5rem; list-style-type: decimal;'><li style='margin-bottom: 0.5rem; display: list-item;'>Erstelle deine Flugschule</li><li style='margin-bottom: 0.5rem; display: list-item;'>Füge deine Schüler hinzu</li><li style='margin-bottom: 0.5rem; display: list-item;'>Lege los!</li></ol><a href='https://instructor.flightbook.ch/school/register' target='_blank' class='inline-block px-6 py-3 text-white bg-primary rounded-lg hover:bg-primary/90 transition-colors font-semibold'>Flugschule erstellen</a>"
+      }
+    ]
+  },
   "meta": {
-    "title": "Flightbook - Dein digitales Flugbuch",
-    "description": "Verwalte deine Flüge in einer iOS und Android App. Diese App kann für Schulungen verwendet werden und ist an den SHV Prüfungen zugelassen.",
-    "ogTitle": "Flightbook - Dein digitales Flugbuch",
-    "ogDescription": "Verwalte deine Flüge in einer iOS und Android App. Diese App kann für Schulungen verwendet werden und ist an den SHV Prüfungen zugelassen."
+    "title": "Gleitschirm Flugbuch - SHV zugelassen | Flightbook",
+    "description": "Digitales Gleitschirm Flugbuch für iOS und Android - SHV zugelassen. Verwalte deine Flüge, Gleitschirme und Statistiken. Für Piloten, Tandem und Flugschulen. Jetzt kostenlos starten!",
+    "ogTitle": "Gleitschirm Flugbuch - SHV zugelassen | Flightbook",
+    "ogDescription": "Digitales Gleitschirm Flugbuch für iOS und Android - SHV zugelassen. Verwalte deine Flüge, Gleitschirme und Statistiken. Für Piloten, Tandem und Flugschulen."
   }
 }

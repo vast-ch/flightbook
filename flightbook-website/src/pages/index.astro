@@ -4,6 +4,7 @@ import FlightbookHero from '~/components/widgets/FlightbookHero.astro';
 import FlightbookPricing from '~/components/widgets/FlightbookPricing.astro';
 import FlightbookPremiumFeatures from '~/components/widgets/FlightbookPremiumFeatures.astro';
 import FlightbookSchoolsFeatures from '~/components/widgets/FlightbookSchoolsFeatures.astro';
+import FlightbookFAQ from '~/components/widgets/FlightbookFAQ.astro';
 import { getTranslations } from '~/utils/i18n';
 
 const t = getTranslations('de');
@@ -78,6 +79,8 @@ const pricingPlans = [
   <FlightbookPremiumFeatures title={t.premium.title} features={t.premium.features} cta={t.premium.cta} />
 
   <FlightbookSchoolsFeatures title={t.schools.title} features={t.schools.features} cta={t.schools.cta} />
+
+  <FlightbookFAQ title={t.faq.title} faqs={t.faq.questions} />
 </Layout>
 
 <script>

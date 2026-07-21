@@ -1,0 +1,41 @@
+---
+interface Props {
+  locale?: 'de' | 'fr';
+}
+
+const { locale = 'de' } = Astro.props;
+
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: 'Flightbook',
+  applicationCategory: 'LifestyleApplication',
+  operatingSystem: 'iOS, Android',
+  offers: {
+    '@type': 'Offer',
+    price: '0',
+    priceCurrency: 'CHF',
+  },
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: '4.8',
+    ratingCount: '150',
+  },
+  description:
+    locale === 'de'
+      ? 'Digitales Gleitschirm Flugbuch für iOS und Android - SHV zugelassen. Verwalte deine Flüge, Gleitschirme und Statistiken.'
+      : 'Carnet de vol numérique pour parapente pour iOS et Android - approuvé par la FSVL. Gérez vos vols, parapentes et statistiques.',
+  url: 'https://flightbook.ch',
+  screenshot: 'https://flightbook.ch/favicon.png',
+  author: {
+    '@type': 'Organization',
+    name: 'Flightbook',
+  },
+  keywords:
+    locale === 'de'
+      ? 'Gleitschirm Flugbuch, SHV zugelassen, digitales Flugbuch, Paragliding, Deltapilot, Flugbuch App'
+      : 'Carnet de vol parapente, approuvé FSVL, carnet de vol numérique, parapente, deltaplane',
+};
+---
+
+<script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
