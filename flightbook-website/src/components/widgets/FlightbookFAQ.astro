@@ -14,6 +14,14 @@ interface Props {
 
 const { title = 'Häufig gestellte Fragen', faqs = [] } = Astro.props;
 
+// Strip HTML tags from answers for structured data
+const stripHtml = (html: string) => {
+  return html
+    .replace(/<[^>]*>/g, ' ') // Remove HTML tags
+    .replace(/\s+/g, ' ') // Normalize whitespace
+    .trim();
+};
+
 const faqSchema = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -22,7 +30,7 @@ const faqSchema = {
     name: faq.question,
     acceptedAnswer: {
       '@type': 'Answer',
-      text: faq.answer,
+      text: stripHtml(faq.answer),
     },
   })),
 };
