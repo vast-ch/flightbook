@@ -111,6 +111,14 @@
   --fb-success-border: #bfe0cc;
   --fb-success-text: #186340;
 
+  --fb-danger-bg: #fdeeec;
+  --fb-danger-border: #f3c7c1;
+  --fb-danger-text: #8e241a;
+
+  /* Ground for the autocomplete list nested inside a form card */
+  --fb-sunken: #f7fbfe;
+  --fb-placeholder: #7e8fa0;
+
   --fb-radius: 12px;
   --fb-radius-sm: 9px;
   --fb-gutter: 18px;
@@ -184,6 +192,234 @@
   border-radius: var(--fb-radius);
   font-size: 12px;
   line-height: 1.55;
+  color: var(--fb-text-body);
+  text-wrap: pretty;
+}
+
+/*
+ * Flush card — same shell as .fb-card but with no padding, so stacked rows can
+ * own their own spacing and run edge to edge. `overflow: hidden` keeps nested
+ * rows clipped to the rounded corners.
+ */
+.fb-card--flush {
+  background: var(--fb-surface);
+  border: 1px solid var(--fb-border);
+  border-radius: var(--fb-radius);
+  overflow: hidden;
+}
+
+/*
+ * Form row: fixed label column + flexible value.
+ *
+ * Deliberately CSS rather than a component. Angular's NgModel resolves its
+ * ControlContainer with @Host(), which does not cross a component boundary, so
+ * an <fb-form-row> owning the input would silently stop registering with
+ * NgForm. Keeping this as classes lets the Ionic controls stay direct
+ * descendants of the <form>.
+ */
+.fb-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 17px;
+  width: 100%;
+  margin: 0;
+  background: transparent;
+  text-align: left;
+  box-sizing: border-box;
+
+  /*
+   * Separator between siblings only. Never `border-bottom` + `:last-child`:
+   * Angular's @if/@for leave comment anchor nodes behind, and the adjacent
+   * sibling combinator structurally cannot produce a trailing border.
+   */
+  & + .fb-row {
+    border-top: 1px solid var(--fb-hairline);
+  }
+}
+
+.fb-row__label {
+  flex: 0 0 76px;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.3;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--fb-text-secondary);
+}
+
+.fb-row__value {
+  flex: 1;
+  min-width: 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--fb-text);
+
+  &.is-placeholder {
+    font-weight: 400;
+    color: var(--fb-placeholder);
+  }
+}
+
+.fb-row__chevron {
+  flex: none;
+  font-size: 13px;
+  color: var(--fb-text-muted);
+}
+
+/*
+ * Opener row — a row that launches a picker. Rendered as a native <button>,
+ * which inside a <form> defaults to type="submit"; it MUST carry
+ * type="button" or tapping it saves the flight.
+ */
+button.fb-row {
+  appearance: none;
+  border: 0;
+  border-radius: 0;
+  font: inherit;
+  cursor: pointer;
+}
+
+/* Label above value — for the auto-grow textarea and other tall controls */
+.fb-row--stack {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+
+  .fb-row__label {
+    flex: none;
+  }
+}
+
+/* Toggle sits hard right, label takes the slack */
+.fb-row--toggle {
+  .fb-row__label {
+    flex: 1;
+    text-transform: none;
+    font-size: 14px;
+    letter-spacing: 0;
+    color: var(--fb-text);
+  }
+}
+
+/* Square outlined icon button, used in page headers */
+.icon-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  flex: none;
+  border: 1px solid var(--fb-border);
+  border-radius: var(--fb-radius-sm);
+  background: var(--fb-surface);
+  cursor: pointer;
+
+  ion-icon {
+    font-size: 17px;
+    color: var(--fb-text-body);
+  }
+}
+
+/*
+ * Full-screen form chrome — a static surface header, a padded body on the page
+ * background, and a sticky action footer. Shared by flight add and edit.
+ */
+.form-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: calc(env(safe-area-inset-top) + 12px) var(--fb-gutter) 12px;
+  background: var(--fb-surface);
+  border-bottom: 1px solid var(--fb-border);
+}
+
+.form-header__title {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--fb-text);
+}
+
+.form-header__meta {
+  flex: 1;
+  min-width: 0;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--fb-text-secondary);
+}
+
+.form-body {
+  padding: 16px var(--fb-gutter) 18px;
+}
+
+.form-divider {
+  margin: 14px 0 12px;
+  text-align: center;
+  font-size: 11.5px;
+  color: var(--fb-text-secondary);
+}
+
+.form-footer {
+  background: var(--fb-surface);
+  border-top: 1px solid var(--fb-border);
+  padding: 10px var(--fb-gutter) 12px;
+
+  ion-button {
+    --border-radius: 10px;
+    --box-shadow: none;
+    height: 50px;
+    margin: 0;
+    font-size: 14.5px;
+    font-weight: 600;
+    text-transform: none;
+  }
+}
+
+/*
+ * Status banner — used for read-only flight validation and tandem payment.
+ * Left edge carries the state colour.
+ */
+.fb-banner {
+  border-radius: var(--fb-radius);
+  padding: 13px 15px;
+  border: 1px solid transparent;
+  border-left-width: 3px;
+
+  &--success {
+    background: var(--fb-success-bg);
+    border-color: var(--fb-success-border);
+    border-left-color: var(--ion-color-success);
+  }
+
+  &--danger {
+    background: var(--fb-danger-bg);
+    border-color: var(--fb-danger-border);
+    border-left-color: var(--ion-color-danger);
+  }
+}
+
+.fb-banner__title {
+  font-size: 13px;
+  font-weight: 600;
+
+  .fb-banner--success & {
+    color: var(--fb-success-text);
+  }
+  .fb-banner--danger & {
+    color: var(--fb-danger-text);
+  }
+}
+
+.fb-banner__text {
+  margin-top: 6px;
+  font-size: 12px;
+  line-height: 1.5;
   color: var(--fb-text-body);
   text-wrap: pretty;
 }

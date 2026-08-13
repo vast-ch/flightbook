@@ -1,5 +1,5 @@
-import { Component, OnInit, OnDestroy, ViewChild, AfterViewInit, Signal } from '@angular/core';
-import { NavController, ModalController, LoadingController, AlertController, IonHeader, IonToolbar, IonButtons, IonMenuButton, IonTitle, IonButton, IonIcon, IonContent, IonItem, IonGrid, IonRow, IonCol, IonList, IonInfiniteScroll, IonInfiniteScrollContent, IonLabel, IonItemSliding, IonItemOptions, IonItemOption } from '@ionic/angular/standalone';
+import { Component, OnInit, OnDestroy, ViewChild, Signal, computed, signal } from '@angular/core';
+import { NavController, ModalController, LoadingController, AlertController, ActionSheetController, IonContent, IonItem, IonList, IonInfiniteScroll, IonInfiniteScrollContent, IonIcon, IonItemSliding, IonItemOptions, IonItemOption } from '@ionic/angular/standalone';
 import { Subject, firstValueFrom } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { FlightFilterComponent } from 'src/app/form/flight-filter/flight-filter.component';
@@ -18,15 +18,13 @@ import { DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
 import { FlagsModule } from 'nxt-flags';
 import { addIcons } from "ionicons";
-import { 
+import {
     add,
     filterOutline,
     trash,
-    timeOutline,
-    peopleOutline,
-    personOutline,
     attachOutline,
-    arrowForwardOutline
+    cloudUploadOutline,
+    shareOutline
 } from "ionicons/icons";
 import { PaymentService } from 'src/app/shared/services/payment.service';
 import { FlightValidationState } from '../shared/flight-validation-state';
@@ -40,19 +38,9 @@ import { FlightStore } from '../shared/flight.store';
         FlagsModule,
         DatePipe,
         TranslateModule,
-        IonHeader,
-        IonToolbar,
-        IonButtons,
-        IonMenuButton,
-        IonTitle,
-        IonButton,
-        IonIcon,
         IonContent,
+        IonIcon,
         IonItem,
-        IonGrid,
-        IonRow,
-        IonCol,
-        IonLabel,
         IonList,
         IonItemOptions,
         IonItemOption,
@@ -61,7 +49,7 @@ import { FlightStore } from '../shared/flight.store';
         IonInfiniteScrollContent
     ]
 })
-export class FlightListPage implements OnInit, OnDestroy, AfterViewInit {
+export class FlightListPage implements OnInit, OnDestroy {
     @ViewChild(IonInfiniteScroll) infiniteScroll: IonInfiniteScroll;
     @ViewChild(IonContent) content: IonContent;
     unsubscribe$ = new Subject<void>();
@@ -69,11 +57,53 @@ export class FlightListPage implements OnInit, OnDestroy, AfterViewInit {
     public flights = this.flightStore.flights;
     public loading = this.flightStore.loading;
     public error = this.flightStore.error;
-    
+
     public FlightValidationState = FlightValidationState;
-    
+
+    /** All-time totals for the header eyebrow, deliberately unfiltered. */
+    private totals = signal<FlightStatistic | null>(null);
+
+    /**
+     * True once a page comes back short, i.e. everything is loaded. Gates the
+     * end-of-list hint so it can't claim "that's your whole logbook" while
+     * infinite scroll still has pages to fetch.
+     */
+    public listComplete = signal(false);
+
+    public totalFlights = computed(() => this.totals()?.nbFlights ?? 0);
+    public totalAirtime = computed(() => {
+        // The API returns `time` as a string of seconds.
+        const seconds = Number(this.totals()?.time ?? 0);
+        const h = Math.floor(seconds / 3600);
+        const m = Math.floor((seconds % 3600) / 60);
+        return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+    });
+
+    /**
+     * Flights grouped by month for the sectioned list. The store already sorts
+     * date-DESC, so a single pass preserves order across infinite-scroll
+     * appends without re-sorting.
+     */
+    public groupedFlights = computed(() => {
+        const groups: { key: string; date: string; flights: Flight[] }[] = [];
+        for (const flight of this.flights()) {
+            const key = (flight.date ?? '').substring(0, 7); // YYYY-MM
+            const last = groups[groups.length - 1];
+            if (last && last.key === key) {
+                last.flights.push(flight);
+            } else {
+                groups.push({ key, date: flight.date, flights: [flight] });
+            }
+        }
+        return groups;
+    });
+
     get filtered(): Signal<boolean> {
         return this.flightStore.filtered;
+    }
+
+    get currentLang(): string {
+        return this.translate.currentLang;
     }
 
     constructor(
@@ -88,16 +118,16 @@ export class FlightListPage implements OnInit, OnDestroy, AfterViewInit {
         private xlsxExportService: XlsxExportService,
         private pdfExportService: PdfExportService,
         private paymentService: PaymentService,
+        private actionSheetCtrl: ActionSheetController,
         private router: Router
     ) {
-        addIcons({ add,
+        addIcons({
+            add,
             filterOutline,
             trash,
-            timeOutline,
-            peopleOutline,
-            personOutline,
             attachOutline,
-            arrowForwardOutline
+            cloudUploadOutline,
+            shareOutline
         });
     }
 
@@ -105,6 +135,7 @@ export class FlightListPage implements OnInit, OnDestroy, AfterViewInit {
         if (this.flights().length === 0) {
             this.initialDataLoad();
         }
+        this.loadTotals();
     }
 
     private async initialDataLoad() {
@@ -120,23 +151,26 @@ export class FlightListPage implements OnInit, OnDestroy, AfterViewInit {
             .pipe(takeUntil(this.unsubscribe$))
             .subscribe({
                 next: async (res: Flight[]) => {
-                    // @hack for hide export item
-                    setTimeout(async () => {
-                        await this.content.scrollToPoint(0, 54);
-                        await loading.dismiss();
-                    }, 1);
+                    this.listComplete.set(res.length < this.flightStore.defaultLimit);
+                    await loading.dismiss();
                 },
-                error: async (error: any) => {
+                error: async () => {
                     await loading.dismiss();
                 }
             });
     }
 
-    ngOnInit() {
+    /** applyFilter: false - the header always reports all-time totals. */
+    private loadTotals() {
+        this.flightStore.getStatistics('global', false)
+            .pipe(takeUntil(this.unsubscribe$))
+            .subscribe({
+                next: (res: FlightStatistic[]) => this.totals.set(res?.[0] ?? null),
+                error: () => { /* header totals are non-critical */ }
+            });
     }
 
-    ngAfterViewInit() {
-        this.content.scrollToPoint(0, 54);
+    ngOnInit() {
     }
 
     ngOnDestroy() {
@@ -155,6 +189,7 @@ export class FlightListPage implements OnInit, OnDestroy, AfterViewInit {
                 event.target.complete();
                 if (res.length < this.flightStore.defaultLimit) {
                     event.target.disabled = true;
+                    this.listComplete.set(true);
                 }
             },
             error: () => {
@@ -193,15 +228,24 @@ export class FlightListPage implements OnInit, OnDestroy, AfterViewInit {
             }
         });
 
-        this.modalOnDidDismiss(modal);
-
         return await modal.present();
     }
 
-    async modalOnDidDismiss(modal: HTMLIonModalElement) {
-        modal.onDidDismiss().then((resp: any) => {
-            this.content.scrollToPoint(0, 54);
+    openImport() {
+        this.router.navigate(['imports/igc']);
+    }
+
+    /** Export lives in the header now, so it needs its own picker. */
+    async openExport() {
+        const sheet = await this.actionSheetCtrl.create({
+            header: this.translate.instant('buttons.export'),
+            buttons: [
+                { text: 'XLSX', handler: () => { this.xlsxExport(); } },
+                { text: 'PDF', handler: () => { this.pdfExport(); } },
+                { text: this.translate.instant('buttons.cancel'), role: 'cancel' }
+            ]
         });
+        await sheet.present();
     }
 
     async xlsxExport() {

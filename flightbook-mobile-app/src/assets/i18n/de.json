@@ -46,7 +46,8 @@
         "dabsTomorrow": "DABS Schweiz morgen",
         "emergencyContacts": "Notfallkontakt",
         "pasengerConfirmations": "Bestätigungen",
-        "logFlight": "Flug erfassen"
+        "logFlight": "Flug erfassen",
+        "export": "Export"
     },
     "login": {
         "email": "E-Mail",
@@ -140,7 +141,12 @@
             "all": "Alle",
             "VALIDATED": "Validiert",
             "REJECTED": "Abgelehnt"
-        }
+        },
+        "importIgc": "IGC-Datei importieren",
+        "importIgcHint": "Füllt Datum, Strecke, Zeit und Distanz",
+        "placeFlightCount": "{{count}} Flüge",
+        "placeFlightCountOne": "1 Flug",
+        "orByHand": "oder von Hand erfassen"
     },
     "statistics": {
         "nbflight": "Anzahl Flüge",
@@ -681,5 +687,9 @@
         "fromShv": "Vom SHV",
         "emptyLogbook": "Das ist bisher dein ganzes Flugbuch. Importiere IGC-Dateien, um frühere Flüge zu ergänzen — ",
         "importFromDevice": "Vom Gerät importieren"
+    },
+    "flightlist": {
+        "summary": "{{count}} Flüge · {{airtime}}",
+        "backfillHint": "Das ist bisher dein ganzes Flugbuch. Importiere IGC-Dateien, um frühere Flüge zu ergänzen — "
     }
 }

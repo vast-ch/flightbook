@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, Input } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, Input, ViewChild } from '@angular/core';
 import Feature from 'ol/Feature';
 import IGC from 'ol/format/IGC';
 import Map from 'ol/Map';
@@ -27,6 +27,11 @@ import { IonRange, IonCard } from "@ionic/angular/standalone";
     ]
 })
 export class IgcMapComponent implements AfterViewInit {
+
+    // Guarded by @if (igcFileValue) in the template, so it only resolves once a
+    // track exists - which is also what keeps OpenLayers from sizing itself
+    // against a 0x0 container.
+    @ViewChild('mapEl') mapEl: ElementRef<HTMLDivElement>;
 
     igcFileValue: string;
     inputValue = 0;
@@ -185,7 +190,9 @@ export class IgcMapComponent implements AfterViewInit {
                 this.vectorLayer
             ],
             controls: [attributionControl],
-            target: 'map',
+            // Element ref rather than the id "map": PlaceMapComponent uses the
+            // same id, so a shared id would bind whichever map rendered first.
+            target: this.mapEl.nativeElement,
             view: new View(),
         });
 

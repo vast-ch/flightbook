@@ -1,17 +1,62 @@
-.autocomplete-list {
-    margin-bottom: -8px;
-}
-ion-icon {
-    float: right;
-    font-size: 23px;
-}
-ion-list {
-    padding-top: 0;
-}
-.value-list {
-    width: 97%;
-}
-.ios.value-list {
-    width: 93%;
+:host {
+  display: block;
 }
 
+/* Sunken ground so the suggestions read as nested inside the form card */
+.suggestions {
+  background: var(--fb-sunken);
+  border-top: 1px solid var(--fb-hairline);
+}
+
+.suggestion {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  margin: 0;
+  /* Left padding lines the suggestions up with the row's value column */
+  padding: 11px 17px 11px 93px;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+
+  & + .suggestion {
+    border-top: 1px solid #edf3f9;
+  }
+}
+
+.suggestion__name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
+  color: var(--fb-text);
+
+  b {
+    font-weight: 600;
+  }
+}
+
+.suggestion__count {
+  flex: none;
+  font-size: 11px;
+  color: var(--fb-text-secondary);
+}
+
+.suggestion--close {
+  color: var(--fb-text-secondary);
+
+  ion-icon {
+    flex: none;
+    font-size: 15px;
+  }
+
+  .suggestion__name {
+    font-size: 12.5px;
+    color: var(--fb-text-secondary);
+  }
+}

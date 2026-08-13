@@ -46,7 +46,8 @@
         "dabsTomorrow": "DABS Swiss tomorrow",
         "emergencyContacts": "Emergency Contacts",
         "pasengerConfirmations": "Confirmations",
-        "logFlight": "Log a flight"
+        "logFlight": "Log a flight",
+        "export": "Export"
     },
     "login": {
         "email": "E-Mail",
@@ -140,7 +141,12 @@
             "all": "All",
             "VALIDATED": "Validated",
             "REJECTED": "Rejected"
-        }
+        },
+        "importIgc": "Import IGC file",
+        "importIgcHint": "Fills date, route, time and distance",
+        "placeFlightCount": "{{count}} flights",
+        "placeFlightCountOne": "1 flight",
+        "orByHand": "or enter it by hand"
     },
     "statistics": {
         "nbflight": "Number of flights",
@@ -681,5 +687,9 @@
         "fromShv": "From the SHV",
         "emptyLogbook": "That's your whole logbook so far. Import IGC files to backfill earlier flights — ",
         "importFromDevice": "Import from device"
+    },
+    "flightlist": {
+        "summary": "{{count}} flights · {{airtime}}",
+        "backfillHint": "That's your whole logbook so far. Import IGC files to backfill earlier flights — "
     }
 }

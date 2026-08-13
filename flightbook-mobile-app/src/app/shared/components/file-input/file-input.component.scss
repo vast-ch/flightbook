@@ -1,6 +1,47 @@
 input[type="file"] {
   display: none;
 }
+
+/* appearance="card" — the redesigned import call-to-action */
+.import-card {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  width: 100%;
+  margin: 0;
+  padding: 15px 17px;
+  border: 1px solid var(--fb-accent);
+  border-radius: var(--fb-radius);
+  background: var(--fb-accent-soft);
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+}
+
+.import-card__icon {
+  flex: none;
+  font-size: 20px;
+  color: var(--ion-color-primary);
+}
+
+.import-card__text {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.import-card__title {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ion-color-tertiary);
+}
+
+.import-card__hint {
+  font-size: 11.5px;
+  color: #37698c;
+  text-wrap: pretty;
+}
 .custom-file-upload {
   display: inline-block;
   padding: 6px 12px;

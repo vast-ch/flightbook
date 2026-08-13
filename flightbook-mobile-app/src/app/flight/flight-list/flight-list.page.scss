@@ -1,125 +1,172 @@
-ion-list {
-  padding-top: 0;
+// ---- Header -------------------------------------------------------------
+.list-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  padding: calc(env(safe-area-inset-top) + 14px) var(--fb-gutter) 14px;
+  background: var(--fb-surface);
+  border-bottom: 1px solid var(--fb-border);
 }
 
-ion-item {
+.list-header__eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.list-header__chip {
+  padding: 2px 7px;
+  border-radius: 5px;
+  background: var(--fb-accent-soft);
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ion-color-primary);
+}
+
+.list-header__title {
+  margin: 8px 0 0;
+  font-size: 26px;
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+  color: var(--fb-text);
+}
+
+.list-header__actions {
+  display: flex;
+  gap: 8px;
+  flex: none;
+}
+
+// .icon-button lives in theme/tokens.scss - shared with the form headers.
+
+// ---- Month sections -----------------------------------------------------
+.month-heading {
+  padding: 14px var(--fb-gutter) 8px;
+}
+
+.month-block {
+  padding: 0;
+  margin: 0;
+  background: var(--fb-surface);
+  border-top: 1px solid var(--fb-border);
+  border-bottom: 1px solid var(--fb-border);
+}
+
+// ---- Row ----------------------------------------------------------------
+.flight-row {
   --padding-start: 0;
   --inner-padding-end: 0;
+  --background: var(--fb-surface);
+  --min-height: 0;
+
+  // Separator between siblings only, so the last row in a month block never
+  // doubles up with the block's own bottom border.
+  ion-item-sliding + ion-item-sliding & {
+    border-top: 1px solid var(--fb-hairline);
+  }
 }
 
-ion-grid {
+.flight-row__inner {
+  display: flex;
+  gap: 14px;
   width: 100%;
+  padding: 15px var(--fb-gutter);
+}
+
+.flight-row__date {
+  flex: none;
+  width: 36px;
+}
+
+.flight-row__day {
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--fb-text);
+}
+
+.flight-row__month {
   margin-top: 5px;
-  margin-bottom: 5px;
+  font-size: 9px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--fb-text-muted);
 }
 
-.flight-meta {
-  color: var(--ion-color-medium-shade);
-  text-align: left;
-  padding-left: 5px;
-  font-size: 0.9em;
-
-  .flight-number {
-    color: var(--ion-color-dark-shade);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 80px;
-
-    .flight-igc {
-      margin-right: 5px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-  }
-
-  // Special case for iOS
-  &:host-context(.ios) .flight-number .flight-igc {
-    margin-right: 0px;
-  }
-
-  .flight-date {
-    white-space: nowrap;
-    width: 80px;
-  }
+.flight-row__main {
+  flex: 1;
+  min-width: 0;
 }
 
-.flight-details {
-  font-size: 0.9em;
+.flight-row__top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 
-  .location,
-  .glider {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+.flight-row__route {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--fb-text);
+}
+
+.flight-row__igc {
+  flex: none;
+  font-size: 13px;
+  color: var(--fb-text-muted);
+}
+
+.flight-row__dot {
+  flex: none;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  // Default: no validation object. Neutral, not an error.
+  background: var(--ion-color-warning);
+
+  &.is-validated {
+    background: var(--ion-color-success);
   }
 
-  .location {
-    color: var(--ion-color-primary);
-
-    ion-icon[name="arrow-forward-outline"] {
-      font-size: 0.7em;
-      margin-left: 3px;
-      margin-right: 3px;
-    }
-
-    nxt-flag {
-      margin-right: 3px;
-    }
-  }
-
-  .glider {
-    color: var(--ion-color-medium-shade);
-    display: flex;
-    align-items: center;
-
-    ion-icon {
-      margin-right: 4px;
-    }
+  &.is-rejected {
+    background: var(--ion-color-danger);
   }
 }
 
-.flight-stats {
-  font-size: 0.8em;
-  color: var(--ion-color-dark-shade);
+.flight-row__meta {
+  display: flex;
+  gap: 14px;
+  margin-top: 7px;
+  font-size: 11.5px;
+  color: var(--fb-text-secondary);
 
-  ion-col {
-    display: flex;
-    align-items: center;
-  }
-
-  ion-icon {
-    margin-right: 4px;
-    font-size: 1.1em;
-  }
-
-  ion-icon[name="arrow-forward-outline"] {
-    font-size: 0.9em;
+  .is-muted {
+    color: #78829b;
   }
 }
 
-.export-buttons ion-button {
-  width: 100%;
-  height: 36px;
+.flight-row__glider {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--fb-text-muted);
 }
 
-ion-grid,
-ion-col {
-  padding-top: 0;
-  padding-bottom: 0;
-}
-
-ion-item {
-  --min-height: 48px;
-}
-
-ion-item-sliding.validated ion-item {
-  --background: var(--fb-success-bg) !important;
-  background: var(--fb-success-bg) !important;
-}
-
-ion-item-sliding.rejected ion-item {
-  --background: #fdeeec !important;
-  background: #fdeeec !important;
+// ---- Empty / footnote ---------------------------------------------------
+.list-empty,
+.list-footnote {
+  margin: 16px var(--fb-gutter);
 }

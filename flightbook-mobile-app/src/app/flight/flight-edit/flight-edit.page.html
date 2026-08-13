@@ -1,19 +1,39 @@
-<ion-header>
-  <ion-toolbar color='primary'>
-    <ion-buttons slot="start">
-      <ion-back-button defaultHref='flights'></ion-back-button>
-    </ion-buttons>
-    <ion-title>{{ 'groupname.flight' | translate }}</ion-title>
-  </ion-toolbar>
-</ion-header>
+<div class="form-header">
+  <button type="button" class="icon-button" (click)="back()" [attr.aria-label]="'buttons.back' | translate">
+    <ion-icon name="chevron-back" aria-hidden="true"></ion-icon>
+  </button>
+  <div class="form-header__meta">
+    @if (flight?.number) {
+      {{ 'flight.number' | translate }} {{ flight.number }} &middot;
+    }
+    {{ flight?.date | date:'dd.MM.yyyy' }}
+  </div>
+</div>
 
-<ion-content class="ion-padding">
-  @if (flight && !flight.igc) {
-    <fb-file-input (onFilesSelectEvent)="onFilesSelectEvent($event)"></fb-file-input>
-  }
-  <flight-form [flight]=flight [gliders]=gliders [schools]=schools [tandemSchools]="tandemSchools()" [igcFile]=igcFile [hideSaveButton]="flight.tandemSchoolData?.paymentState == TandemSchoolPaymentState.PAID" (saveFlight)="saveFlight($event)"></flight-form>
-  <ion-button class="copy" expand="block" (click)="copy()" >{{ 'buttons.copy' | translate }}</ion-button>
-  @if (flight.validation?.state !== FlightValidationState.VALIDATED && flight.tandemSchoolData?.paymentState !== TandemSchoolPaymentState.PAID) {
-    <ion-button class="delete" expand="block" color="danger" (click)="delete()" >{{ 'buttons.delete' | translate }}</ion-button>
-  }
+<ion-content>
+  <div class="form-body">
+    @if (flight && !flight.igc) {
+      <fb-file-input appearance="card" (onFilesSelectEvent)="onFilesSelectEvent($event)"></fb-file-input>
+      <div class="form-divider">{{ 'flight.orByHand' | translate }}</div>
+    }
+
+    <flight-form [flight]=flight [gliders]=gliders [schools]=schools [tandemSchools]="tandemSchools()" [igcFile]=igcFile (saveFlight)="saveFlight($event)"></flight-form>
+
+    <div class="secondary-actions">
+      <ion-button expand="block" fill="outline" (click)="copy()">{{ 'buttons.copy' | translate }}</ion-button>
+      @if (flight.validation?.state !== FlightValidationState.VALIDATED && flight.tandemSchoolData?.paymentState !== TandemSchoolPaymentState.PAID) {
+        <ion-button expand="block" fill="clear" color="danger" (click)="delete()">{{ 'buttons.delete' | translate }}</ion-button>
+      }
+    </div>
+  </div>
 </ion-content>
+
+<!--
+  Hidden entirely when the flight is already paid - the inverse of the old
+  hideSaveButton input. An empty footer bar would be worse than none.
+-->
+@if (flight?.tandemSchoolData?.paymentState !== TandemSchoolPaymentState.PAID) {
+  <ion-footer class="form-footer">
+    <ion-button expand="block" type="submit" form="flightForm">{{ 'buttons.save' | translate }}</ion-button>
+  </ion-footer>
+}

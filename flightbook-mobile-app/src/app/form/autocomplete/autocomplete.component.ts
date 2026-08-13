@@ -1,9 +1,13 @@
 import { Component, OnInit, Input, Output, EventEmitter, ElementRef, OnChanges } from '@angular/core';
+import { forkJoin, of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 import { Place } from 'src/app/place/shared/place.model';
 import { PlaceStore } from 'src/app/place/shared/place.store';
+import { FlightStore } from 'src/app/flight/shared/flight.store';
 import { addIcons } from "ionicons";
 import { close } from "ionicons/icons";
-import { IonIcon, IonList, IonItem } from "@ionic/angular/standalone";
+import { IonIcon } from "@ionic/angular/standalone";
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
     selector: 'autocomplete',
@@ -14,8 +18,7 @@ import { IonIcon, IonList, IonItem } from "@ionic/angular/standalone";
     },
     imports: [
         IonIcon,
-        IonList,
-        IonItem
+        TranslateModule
     ]
 })
 export class AutocompleteComponent implements OnInit, OnChanges {
@@ -24,11 +27,20 @@ export class AutocompleteComponent implements OnInit, OnChanges {
     @Output()
     setInputValue = new EventEmitter<Place>();
 
-
     show: boolean;
     listElement: Place[];
 
-    constructor(private placeStore: PlaceStore, private eRef: ElementRef) {
+    /**
+     * Flights-per-place, keyed by place id. Cached for the lifetime of the
+     * component so retyping the same prefix doesn't refetch counts.
+     */
+    flightCounts: { [placeId: number]: number } = {};
+
+    constructor(
+        private placeStore: PlaceStore,
+        private flightStore: FlightStore,
+        private eRef: ElementRef
+    ) {
         this.search = null;
         this.show = false;
         addIcons({ close });
@@ -48,6 +60,9 @@ export class AutocompleteComponent implements OnInit, OnChanges {
                 if (res && res.length > 0) {
                     this.show = true;
                     this.listElement = res;
+                    // Fired after the list renders, so names appear immediately
+                    // and counts fill in when they arrive.
+                    this.loadFlightCounts(res);
                 } else {
                     this.show = false;
                 }
@@ -57,6 +72,16 @@ export class AutocompleteComponent implements OnInit, OnChanges {
         }
     }
 
+    /** Splits a place name so the matched prefix can be emphasised. */
+    matchedPrefix(name: string): string {
+        const len = this.search?.length ?? 0;
+        return len && name.toLowerCase().startsWith(this.search.toLowerCase()) ? name.substring(0, len) : '';
+    }
+
+    matchedRest(name: string): string {
+        return name.substring(this.matchedPrefix(name).length);
+    }
+
     setValue(value: any) {
         this.show = false;
         this.setInputValue.emit(value);
@@ -64,5 +89,26 @@ export class AutocompleteComponent implements OnInit, OnChanges {
 
     closeList() {
         this.show = false;
+    }
+
+    private loadFlightCounts(places: Place[]) {
+        const missing = places.filter(place => place.id != null && this.flightCounts[place.id] === undefined);
+        if (missing.length === 0) {
+            return;
+        }
+
+        forkJoin(
+            missing.map(place =>
+                this.flightStore.nbFlightsByPlaceId(place.id).pipe(
+                    // The API returns nbFlights as a string.
+                    map(resp => ({ id: place.id, count: Number(resp?.nbFlights ?? 0) })),
+                    catchError(() => of({ id: place.id, count: 0 }))
+                )
+            )
+        ).subscribe(results => {
+            for (const result of results) {
+                this.flightCounts[result.id] = result.count;
+            }
+        });
     }
 }
