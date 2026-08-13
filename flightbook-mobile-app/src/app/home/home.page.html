@@ -1,0 +1,158 @@
+<div class="home-header">
+  <div class="home-header__brand">
+    <img src="assets/icons/icon-192x192.png" alt="Flightbook" class="home-header__logo" />
+    <span class="home-header__wordmark">Flightbook</span>
+  </div>
+  <button class="home-header__avatar" type="button" (click)="openSettings()"
+          [attr.aria-label]="'buttons.accountData' | translate">
+    {{ initials() }}
+  </button>
+</div>
+
+<ion-content>
+
+  <!-- All-time totals -->
+  <div class="stat-strip">
+    <div class="stat-strip__cell fb-stat">
+      <div class="fb-stat__value">
+        @if (loaded()) {
+          {{ globalStats()?.nbFlights ?? 0 }}
+        } @else {
+          <ion-skeleton-text animated class="stat-skeleton"></ion-skeleton-text>
+        }
+      </div>
+      <div class="fb-stat__label">{{ 'tabs.flights' | translate }}</div>
+    </div>
+
+    <div class="stat-strip__cell fb-stat">
+      <div class="fb-stat__value">
+        @if (loaded()) {
+          {{ airtime().value }}<span class="fb-stat__unit">{{ airtime().unit }}</span>
+        } @else {
+          <ion-skeleton-text animated class="stat-skeleton"></ion-skeleton-text>
+        }
+      </div>
+      <div class="fb-stat__label">{{ 'home.airtime' | translate }}</div>
+    </div>
+
+    <div class="stat-strip__cell fb-stat">
+      <div class="fb-stat__value">
+        @if (loaded()) {
+          {{ distance().value }}<span class="fb-stat__unit">{{ distance().unit }}</span>
+        } @else {
+          <ion-skeleton-text animated class="stat-skeleton"></ion-skeleton-text>
+        }
+      </div>
+      <div class="fb-stat__label">{{ 'home.distance' | translate }}</div>
+    </div>
+  </div>
+
+  <div class="home-body">
+
+    <!-- Next school appointment. Only pilots enrolled in a school have one. -->
+    @if (nextAppointment(); as next) {
+      <div class="fb-card next-flight" (click)="openAppointment()">
+        <div class="next-flight__top">
+          <span class="next-flight__eyebrow">{{ 'home.nextFlight' | translate }}</span>
+          <span class="next-flight__when">
+            @if (next.daysUntil === 0) {
+              {{ 'home.today' | translate }}
+            } @else if (next.daysUntil === 1) {
+              {{ 'home.tomorrow' | translate }}
+            } @else {
+              {{ 'home.inDays' | translate:{ days: next.daysUntil } }}
+            }
+          </span>
+        </div>
+        <div class="next-flight__date">
+          <span class="next-flight__day">
+            {{ next.appointment.scheduling | date:'EE dd MMM':next.school.timezone }}
+          </span>
+          <span class="next-flight__time">
+            {{ next.appointment.scheduling | date:'HH:mm':next.school.timezone }}
+          </span>
+        </div>
+        @if (next.appointment.meetingPoint) {
+          <div class="next-flight__place fb-divider">
+            <span class="next-flight__place-name">{{ next.appointment.meetingPoint }}</span>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Training progress, for pilots with a control sheet -->
+    @if (trainingProgress(); as progress) {
+      <div class="fb-card training" (click)="openControlSheet()">
+        <div class="training__top">
+          <span class="training__title">{{ 'home.trainingProgress' | translate }}</span>
+          <span class="training__count">
+            {{ 'home.flightsOf' | translate:{ done: licenceProgress().flights, total: licenceProgress().required } }}
+          </span>
+        </div>
+        <div class="training__track">
+          <div class="training__fill" [style.width.%]="licenceProgress().percent"></div>
+        </div>
+        <div class="training__caption">
+          {{ 'home.skillsRated' | translate:{ rated: progress.ratedSkills, total: progress.totalSkills } }}
+        </div>
+      </div>
+    }
+
+    <!-- Activity -->
+    <div class="section-head">
+      <span class="fb-section-label">{{ 'home.activity' | translate }}</span>
+      <span class="fb-section-action" (click)="openStatistics()">{{ 'home.allStatistics' | translate }}</span>
+    </div>
+
+    @if (globalStats()?.nbFlights) {
+      <div class="fb-card activity" (click)="openStatistics()">
+        <div class="activity__head">
+          <span class="activity__title">{{ 'home.flightsPerMonth' | translate }}</span>
+          <span class="activity__legend">
+            <i class="activity__swatch activity__swatch--bar"></i>{{ 'tabs.flights' | translate }}
+          </span>
+          <span class="activity__legend">
+            <i class="activity__swatch activity__swatch--line"></i>{{ 'home.airtime' | translate }}
+          </span>
+        </div>
+
+        <fb-activity-chart [statistics]="monthlyStats()"></fb-activity-chart>
+
+        @if (activitySummary(); as summary) {
+          <div class="activity__footer fb-divider">
+            <div class="fb-stat">
+              <div class="fb-stat__value activity__footer-value">{{ summary.bestMonthFlights }}</div>
+              <div class="fb-stat__label">{{ 'home.bestMonth' | translate }}</div>
+            </div>
+            <div class="fb-stat">
+              <div class="fb-stat__value activity__footer-value">{{ toHoursMinutes(summary.bestMonthTime) }}</div>
+              <div class="fb-stat__label">{{ summary.bestMonthLabel }}</div>
+            </div>
+            <div class="fb-stat">
+              <div class="fb-stat__value activity__footer-value">{{ toHoursMinutes(summary.averageTime) }}</div>
+              <div class="fb-stat__label">{{ 'home.average' | translate }}</div>
+            </div>
+          </div>
+        }
+      </div>
+    } @else if (loaded()) {
+      <div class="fb-empty-hint">
+        {{ 'home.emptyLogbook' | translate }}
+        <span class="fb-section-action" (click)="openImport()">{{ 'home.importFromDevice' | translate }}</span>
+      </div>
+    }
+
+    <!-- Latest news -->
+    @if (latestNews(); as news) {
+      <div class="section-head section-head--single">
+        <span class="fb-section-label">{{ 'home.fromShv' | translate }}</span>
+      </div>
+      <div class="fb-card news">
+        <div class="news__title">{{ news.title }}</div>
+        <div class="news__text" [innerHTML]="news.text"></div>
+        <div class="news__date">{{ news.date | date:'dd.MM.yyyy' }}</div>
+      </div>
+    }
+
+  </div>
+</ion-content>

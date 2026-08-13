@@ -45,7 +45,8 @@
         "dabsToday": "DABS Schweiz heute",
         "dabsTomorrow": "DABS Schweiz morgen",
         "emergencyContacts": "Notfallkontakt",
-        "pasengerConfirmations": "Bestätigungen"
+        "pasengerConfirmations": "Bestätigungen",
+        "logFlight": "Flug erfassen"
     },
     "login": {
         "email": "E-Mail",
@@ -327,7 +328,7 @@
                 "title": "Aufzieh- und Laufübungen",
                 "content": "<h2>Ziel:</h2> <p>Der Schüler ist in der Lage, den Schirm erfolgreich aufzuziehen und anschließend über eine vorgegebene Strecke mit gefülltem Schirm kontrolliert zu laufen.</p> <h2>Inhalt:</h2> <p>Startposition des Schülers: Bremsgriffe und vordere Tragegurte liegen in den Händen, die hinteren Tragegurte über den Armen. Die Armstellung ist dabei abhängig vom Schirmtyp und individuellen Vorlieben. Der Schüler steht auf der Längsachse so vor dem Schirm, dass die vorderen Leinen locker durchhängen.</p> <p>Er läuft entschlossen an. Das Gerät wird mit der Masse des ganzen Körpers aufgezogen und nicht mit den Armen, Kaum kommt Zug auf die Fangleinen, machen die Arme eine viertelkreisrunde Bewegung bis in die Vertikale. Bei den meisten Schirmen zieht der Schirm die Arme hoch, nicht umgekehrt. Ist die Kalotte über dem Piloten, werden die Tragegurte losgelassen. Über die Bremsen wird ein Überholen des Schirms beim Kontrollblick verhindert. Der Pilot läuft nun mit angemessenem Bremseinsatz. Am Ende zieht er die Bremsen voll durch und läuft noch einige Schritte weiter, damit der Schirm hinter oder seitlich von ihm herunterfällt.</p> <p>Achtung: Piloten mit Schulterproblemen können die Arme zum Aufziehen des Schirms auch vor dem Körper halten.</p> <h2>Fehler:</h2> <ul> <li>Zu langsames Loslaufen: Schirm steigt nicht über den Schüler.</li> <li>Aufziehen des Schirms mit den Händen anstatt mit dem ganzen Körper: Schirm füllt möglicherweise schlecht oder steigt eventuell seitwärts hoch. Dadurch die Masse des Körpers nicht ausgenützt wird, fehlt oft die zum Aufziehen des Schirms nötige Energie.</li> <li>Zu schwungvolles Aufziehen mit Armen über die Vertikale hinaus nach vorne gestreckt: Einklappen.</li> <li>Sich Festklammern an den vorderen Gurten nach dem Aufziehen: Frontklapper.</li> <li>Nicht konsequentes unter die Mitte Laufen: seitliches Ausbrechen.</li> <li>Kappe steigt nicht vollständig in die Vertikale (nasser, alter, eher großer Schirm, ungünstige Startverhältnisse, geringe Pilotenmasse). Tipp: A-Leinenschlösser umklappen.</li> <li>Keine progressive Geschwindigkeitszunahme, die dem Schirm Zeit lässt, sich zu füllen</li> </ul>",
                 "order": 2
-                        },
+            },
             "slalom": {
                 "video": null,
                 "title": "Slalomlauf",
@@ -655,5 +656,30 @@
     "school": {
         "leaveSchool": "\"{{schoolName}}\" verlassen",
         "leaveSchoolConfirm": "Möchten Sie \"{{schoolName}}\" wirklich verlassen?"
+    },
+    "tabs": {
+        "home": "Start",
+        "flights": "Flüge",
+        "stats": "Statistik",
+        "more": "Mehr"
+    },
+    "home": {
+        "airtime": "Flugzeit",
+        "distance": "Distanz",
+        "nextFlight": "Nächster Flug",
+        "today": "heute",
+        "tomorrow": "morgen",
+        "inDays": "in {{days}} Tagen",
+        "trainingProgress": "Ausbildungsstand",
+        "flightsOf": "{{done}} / {{total}} Flüge",
+        "skillsRated": "{{rated}} von {{total}} Punkten bewertet",
+        "activity": "Aktivität",
+        "allStatistics": "Alle Statistiken",
+        "flightsPerMonth": "Flüge pro Monat",
+        "bestMonth": "Bester Monat",
+        "average": "Ø",
+        "fromShv": "Vom SHV",
+        "emptyLogbook": "Das ist bisher dein ganzes Flugbuch. Importiere IGC-Dateien, um frühere Flüge zu ergänzen — ",
+        "importFromDevice": "Vom Gerät importieren"
     }
 }

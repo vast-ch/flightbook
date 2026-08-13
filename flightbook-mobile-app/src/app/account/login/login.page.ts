@@ -118,8 +118,8 @@ export class LoginPage implements OnInit, OnDestroy {
                     this.loginData.email = null;
                     this.loginData.password = null;
                     if (Capacitor.isNativePlatform()) {
-                        // For native, navigate to news page
-                        this.router.navigate([`news`], { replaceUrl: true });
+                        // For native, navigate to home page
+                        this.router.navigate([`home`], { replaceUrl: true });
                     } else {
                         // For web, navigate to home page
                         this.navigationService.back();

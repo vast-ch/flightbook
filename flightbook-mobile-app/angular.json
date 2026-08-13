@@ -41,6 +41,9 @@
                                 "input": "src/global.scss"
                             },
                             {
+                                "input": "src/theme/tokens.scss"
+                            },
+                            {
                                 "input": "src/theme/variables.scss"
                             },
                             {

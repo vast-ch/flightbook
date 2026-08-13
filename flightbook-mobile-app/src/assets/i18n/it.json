@@ -4,7 +4,7 @@
         "fr": "Francese",
         "de": "Tedesco",
         "en": "Inglese",
-	    "it": "Italiano"
+        "it": "Italiano"
     },
     "country": {
         "switzerland": "Svizzera",
@@ -45,7 +45,8 @@
         "dabsToday": "DABS Svizzera oggi",
         "dabsTomorrow": "DABS Svizzera domani",
         "emergencyContacts": "Contatto di emergenza",
-        "pasengerConfirmations": "Conferme"
+        "pasengerConfirmations": "Conferme",
+        "logFlight": "Registra un volo"
     },
     "login": {
         "email": "E-Mail",
@@ -145,7 +146,7 @@
         "nbflight": "Numero di voli",
         "flighthour": "Ore di volo",
         "average": "Media",
-        "price" : "Entrate",
+        "price": "Entrate",
         "longset": "Volo più lungo",
         "nbStartplaces": "No. decollo",
         "nbLandingplaces": "No. atterraggio",
@@ -655,5 +656,30 @@
     "school": {
         "leaveSchool": "Lasciare \"{{schoolName}}\"",
         "leaveSchoolConfirm": "Vuoi davvero lasciare \"{{schoolName}}\"?"
+    },
+    "tabs": {
+        "home": "Start",
+        "flights": "Voli",
+        "stats": "Statistiche",
+        "more": "Altro"
+    },
+    "home": {
+        "airtime": "Tempo di volo",
+        "distance": "Distanza",
+        "nextFlight": "Prossimo volo",
+        "today": "oggi",
+        "tomorrow": "domani",
+        "inDays": "tra {{days}} giorni",
+        "trainingProgress": "Avanzamento formazione",
+        "flightsOf": "{{done}} / {{total}} voli",
+        "skillsRated": "{{rated}} di {{total}} punti valutati",
+        "activity": "Attività",
+        "allStatistics": "Tutte le statistiche",
+        "flightsPerMonth": "Voli al mese",
+        "bestMonth": "Mese migliore",
+        "average": "Media",
+        "fromShv": "Dalla FSVL",
+        "emptyLogbook": "Questo è tutto il tuo libro di volo finora. Importa file IGC per aggiungere voli precedenti — ",
+        "importFromDevice": "Importa dal dispositivo"
     }
 }

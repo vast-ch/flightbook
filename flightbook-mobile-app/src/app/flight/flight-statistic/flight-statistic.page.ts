@@ -129,7 +129,7 @@ export class FlightStatisticPage implements OnInit, OnDestroy {
         this.nbFlightBarChartData = {
             labels: labels,
             datasets: [
-                { data: data, label: this.translate.instant('statistics.nbflight'), borderColor: "rgb(0, 84, 233)", borderWidth: 3, borderSkipped: true, hoverBackgroundColor: "rgb(0, 84, 233)", barPercentage: 1, categoryPercentage: 0.95 }
+                { data: data, label: this.translate.instant('statistics.nbflight'), borderColor: "#45b1fd", borderWidth: 3, borderSkipped: true, hoverBackgroundColor: "#45b1fd", barPercentage: 1, categoryPercentage: 0.95 }
             ]
         };
 
@@ -144,7 +144,7 @@ export class FlightStatisticPage implements OnInit, OnDestroy {
         this.incomeBarChartData = {
             labels: incomeLabels,
             datasets: [
-                { data: incomeData, label: this.translate.instant('statistics.price'), borderColor: "rgb(0, 84, 233)", borderWidth: 3, borderSkipped: true, hoverBackgroundColor: "rgb(0, 84, 233)", barPercentage: 1, categoryPercentage: 0.95 }
+                { data: incomeData, label: this.translate.instant('statistics.price'), borderColor: "#45b1fd", borderWidth: 3, borderSkipped: true, hoverBackgroundColor: "#45b1fd", barPercentage: 1, categoryPercentage: 0.95 }
             ]
         };
 
@@ -161,8 +161,8 @@ export class FlightStatisticPage implements OnInit, OnDestroy {
         this.averageLineChartData = {
             labels: lineLabels,
             datasets: [
-                { data: timeData, label: this.translate.instant('statistics.flighthour'), borderColor: "rgb(0, 84, 233)", pointBackgroundColor: "rgb(0, 84, 233)", pointHoverBorderColor: "rgb(0, 84, 233)" },
-                { yAxisID: 'y1', data: averageData, label: this.translate.instant('statistics.average'), borderColor: "rgb(143,187,255)", pointBackgroundColor: "rgb(143,187,255)", pointHoverBorderColor: "rgb(143,187,255)" }
+                { data: timeData, label: this.translate.instant('statistics.flighthour'), borderColor: "#45b1fd", pointBackgroundColor: "#45b1fd", pointHoverBorderColor: "#45b1fd" },
+                { yAxisID: 'y1', data: averageData, label: this.translate.instant('statistics.average'), borderColor: "#a7dafe", pointBackgroundColor: "#a7dafe", pointHoverBorderColor: "#a7dafe" }
             ]
         };
     }

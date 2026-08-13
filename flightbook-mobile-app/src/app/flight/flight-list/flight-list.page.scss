@@ -115,24 +115,11 @@ ion-item {
 }
 
 ion-item-sliding.validated ion-item {
-  --background: #e6f9e6 !important;
-  /* light green */
-  background: #e6f9e6 !important;
+  --background: var(--fb-success-bg) !important;
+  background: var(--fb-success-bg) !important;
 }
 
 ion-item-sliding.rejected ion-item {
-  --background: #ffe5e5 !important;
-  /* light red */
-  background: #ffe5e5 !important;
-}
-
-// Dark mode styles
-@media (prefers-color-scheme: dark) {
-  .flight-meta .flight-number {
-    color: var(--ion-color-medium-shade);
-  }
-
-  .flight-stats {
-    color: var(--ion-color-medium-shade);
-  }
+  --background: #fdeeec !important;
+  background: #fdeeec !important;
 }

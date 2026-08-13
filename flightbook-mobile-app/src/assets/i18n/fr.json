@@ -45,7 +45,8 @@
         "dabsToday": "DABS Suisse aujourd'hui",
         "dabsTomorrow": "DABS Suisse demain",
         "emergencyContacts": "Contacts d'urgence",
-        "pasengerConfirmations": "Confirmations"
+        "pasengerConfirmations": "Confirmations",
+        "logFlight": "Enregistrer un vol"
     },
     "login": {
         "email": "E-Mail",
@@ -655,5 +656,30 @@
     "school": {
         "leaveSchool": "Quitter \"{{schoolName}}\"",
         "leaveSchoolConfirm": "Voulez-vous vraiment quitter \"{{schoolName}}\"?"
+    },
+    "tabs": {
+        "home": "Accueil",
+        "flights": "Vols",
+        "stats": "Statistiques",
+        "more": "Plus"
+    },
+    "home": {
+        "airtime": "Temps de vol",
+        "distance": "Distance",
+        "nextFlight": "Prochain vol",
+        "today": "aujourd'hui",
+        "tomorrow": "demain",
+        "inDays": "dans {{days}} jours",
+        "trainingProgress": "Progression de la formation",
+        "flightsOf": "{{done}} / {{total}} vols",
+        "skillsRated": "{{rated}} sur {{total}} points évalués",
+        "activity": "Activité",
+        "allStatistics": "Toutes les statistiques",
+        "flightsPerMonth": "Vols par mois",
+        "bestMonth": "Meilleur mois",
+        "average": "Moy.",
+        "fromShv": "De la FSVL",
+        "emptyLogbook": "C'est tout ton carnet de vol pour l'instant. Importe des fichiers IGC pour ajouter des vols antérieurs — ",
+        "importFromDevice": "Importer depuis l'appareil"
     }
 }

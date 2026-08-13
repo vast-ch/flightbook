@@ -1,0 +1,189 @@
+/*
+ * Flightbook design tokens
+ * ----------------------------------------------------------------------------
+ * Single source of truth for the redesign palette. Ionic's own `--ion-color-*`
+ * roles are mapped here so that existing `color="primary"` / `color="danger"`
+ * usages across the app pick up the new palette for free; the `--fb-*` tokens
+ * cover the surfaces and text tiers Ionic has no role for.
+ *
+ * Light-only by design: the OS dark palette is intentionally not imported.
+ */
+
+:root {
+  /* ---- Ionic roles ---- */
+
+  /* primary — links, active tab, primary actions */
+  --ion-color-primary: #0b76c2;
+  --ion-color-primary-rgb: 11, 118, 194;
+  --ion-color-primary-contrast: #ffffff;
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-shade: #095c99;
+  --ion-color-primary-tint: #2489d0;
+
+  /* secondary — the bright accent: FAB, progress fill, chart bars */
+  --ion-color-secondary: #45b1fd;
+  --ion-color-secondary-rgb: 69, 177, 253;
+  --ion-color-secondary-contrast: #ffffff;
+  --ion-color-secondary-contrast-rgb: 255, 255, 255;
+  --ion-color-secondary-shade: #3d9cdf;
+  --ion-color-secondary-tint: #58b9fd;
+
+  --ion-color-tertiary: #0a5e9b;
+  --ion-color-tertiary-rgb: 10, 94, 155;
+  --ion-color-tertiary-contrast: #ffffff;
+  --ion-color-tertiary-contrast-rgb: 255, 255, 255;
+  --ion-color-tertiary-shade: #095388;
+  --ion-color-tertiary-tint: #236ea5;
+
+  --ion-color-success: #2f7a4f;
+  --ion-color-success-rgb: 47, 122, 79;
+  --ion-color-success-contrast: #ffffff;
+  --ion-color-success-contrast-rgb: 255, 255, 255;
+  --ion-color-success-shade: #296b46;
+  --ion-color-success-tint: #448761;
+
+  --ion-color-warning: #b4801a;
+  --ion-color-warning-rgb: 180, 128, 26;
+  --ion-color-warning-contrast: #ffffff;
+  --ion-color-warning-contrast-rgb: 255, 255, 255;
+  --ion-color-warning-shade: #9e7117;
+  --ion-color-warning-tint: #bc8d31;
+
+  --ion-color-danger: #c0392b;
+  --ion-color-danger-rgb: 192, 57, 43;
+  --ion-color-danger-contrast: #ffffff;
+  --ion-color-danger-contrast-rgb: 255, 255, 255;
+  --ion-color-danger-shade: #a93226;
+  --ion-color-danger-tint: #c94d40;
+
+  --ion-color-medium: #5b7284;
+  --ion-color-medium-rgb: 91, 114, 132;
+  --ion-color-medium-contrast: #ffffff;
+  --ion-color-medium-contrast-rgb: 255, 255, 255;
+  --ion-color-medium-shade: #506474;
+  --ion-color-medium-tint: #6b8090;
+
+  --ion-color-light: #f2f7fb;
+  --ion-color-light-rgb: 242, 247, 251;
+  --ion-color-light-contrast: #10293c;
+  --ion-color-light-contrast-rgb: 16, 41, 60;
+  --ion-color-light-shade: #d5d9dd;
+  --ion-color-light-tint: #f3f8fb;
+
+  --ion-color-dark: #10293c;
+  --ion-color-dark-rgb: 16, 41, 60;
+  --ion-color-dark-contrast: #ffffff;
+  --ion-color-dark-contrast-rgb: 255, 255, 255;
+  --ion-color-dark-shade: #0e2435;
+  --ion-color-dark-tint: #293e50;
+
+  /* ---- Global surfaces + type ---- */
+  --ion-background-color: #f2f7fb;
+  --ion-background-color-rgb: 242, 247, 251;
+  --ion-text-color: #10293c;
+  --ion-text-color-rgb: 16, 41, 60;
+
+  --ion-font-family: 'Sora', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+
+  /* Ionic paints toolbars/cards from these; keep them on the surface colour */
+  --ion-toolbar-background: #ffffff;
+  --ion-toolbar-color: #10293c;
+  --ion-item-background: #ffffff;
+  --ion-card-background: #ffffff;
+
+  /* ---- Flightbook tokens (no Ionic equivalent) ---- */
+  --fb-surface: #ffffff;
+  --fb-bg: #f2f7fb;
+  --fb-border: #dce8f1;
+  --fb-hairline: #e7f0f7;
+  --fb-track: #e1ecf4;
+
+  --fb-accent: #45b1fd;
+  --fb-accent-weak: #a7dafe;
+  --fb-accent-soft: #e9f6ff;
+
+  --fb-text: #10293c;
+  --fb-text-body: #37556b;
+  --fb-text-secondary: #5b7284;
+  --fb-text-muted: #6c8394;
+
+  --fb-success-bg: #f1f9f4;
+  --fb-success-border: #bfe0cc;
+  --fb-success-text: #186340;
+
+  --fb-radius: 12px;
+  --fb-radius-sm: 9px;
+  --fb-gutter: 18px;
+}
+
+/*
+ * Shared primitives
+ * ----------------------------------------------------------------------------
+ * Used by the home screen and intended for the remaining redesigned screens.
+ */
+
+.fb-card {
+  background: var(--fb-surface);
+  border: 1px solid var(--fb-border);
+  border-radius: var(--fb-radius);
+  padding: 16px 18px;
+}
+
+/* Small uppercase label that opens a section */
+.fb-section-label {
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--fb-text-secondary);
+}
+
+/* Inline "see all" style action next to a section label */
+.fb-section-action {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--ion-color-primary);
+  cursor: pointer;
+}
+
+/* A big number with its caption underneath */
+.fb-stat {
+  .fb-stat__value {
+    font-size: 22px;
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: var(--fb-text);
+
+    .fb-stat__unit {
+      font-size: 13px;
+      color: var(--fb-text-secondary);
+    }
+  }
+
+  .fb-stat__label {
+    margin-top: 9px;
+    font-size: 9.5px;
+    font-weight: 500;
+    line-height: 1.2;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--fb-text-secondary);
+  }
+}
+
+.fb-divider {
+  border-top: 1px solid var(--fb-hairline);
+}
+
+/* Dashed hint block used for empty states */
+.fb-empty-hint {
+  padding: 15px 17px;
+  border: 1px dashed #c3ddee;
+  border-radius: var(--fb-radius);
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--fb-text-body);
+  text-wrap: pretty;
+}

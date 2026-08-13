@@ -20,7 +20,7 @@ export class BarChartComponent implements OnInit, OnChanges, AfterViewInit {
   barChartPlugins: any = [DataLabelsPlugin];
 
   public barChartOptions: ChartConfiguration['options'] = {
-    backgroundColor: 'rgb(0, 84, 233)',
+    backgroundColor: '#45b1fd',
     responsive: true,
     maintainAspectRatio: false,
     // We use these empty structures as placeholders for dynamic theming.
@@ -33,8 +33,8 @@ export class BarChartComponent implements OnInit, OnChanges, AfterViewInit {
         callbacks: {
           labelColor: (context) => {
             return {
-              borderColor: 'rgb(0, 84, 233)',
-              backgroundColor: 'rgb(0, 84, 233)',
+              borderColor: '#45b1fd',
+              backgroundColor: '#45b1fd',
             };
           },
         }

@@ -22,7 +22,7 @@ export class LineChartComponent implements OnInit, OnChanges, AfterViewInit {
 
   public lineChartOptions: ChartConfiguration['options'] = {
     backgroundColor(context,  options) {
-      return (context.dataset.yAxisID === 'y1') ? 'rgb(143,187,255)' : 'rgb(0, 84, 233)'; 
+      return (context.dataset.yAxisID === 'y1') ? '#a7dafe' : '#45b1fd'; 
     },
     responsive: true,
     maintainAspectRatio: false,
@@ -49,7 +49,7 @@ export class LineChartComponent implements OnInit, OnChanges, AfterViewInit {
           display: false
         },
         ticks: {
-          color: 'rgb(143,187,255)',
+          color: '#a7dafe',
           callback: label => (label === 0) ? '00:00' : new HoursFormatPipe().transform(label).slice(0, -3)
         },
       },
@@ -61,8 +61,8 @@ export class LineChartComponent implements OnInit, OnChanges, AfterViewInit {
           label: (tooltipItem) => (tooltipItem.raw === 0) ? '00:00:00' : new HoursFormatPipe().transform(tooltipItem.raw),
           labelColor: (context) => {
             return {
-              borderColor: (context.dataset.yAxisID === 'y1') ? 'rgb(143,187,255)' : 'rgb(0, 84, 233)',
-              backgroundColor: (context.dataset.yAxisID === 'y1') ? 'rgb(143,187,255)' : 'rgb(0, 84, 233)'
+              borderColor: (context.dataset.yAxisID === 'y1') ? '#a7dafe' : '#45b1fd',
+              backgroundColor: (context.dataset.yAxisID === 'y1') ? '#a7dafe' : '#45b1fd'
             };
           }
         }

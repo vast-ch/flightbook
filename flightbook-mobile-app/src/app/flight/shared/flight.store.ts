@@ -110,10 +110,15 @@ export class FlightStore {
     );
   }
   
-  getStatistics(type: string): Observable<FlightStatistic[]> {
-    let params: HttpParams = this.createFilterParams();
+  /**
+   * @param applyFilter pass false to ignore the shared flight-list filter.
+   * The dashboard needs all-time totals regardless of what the user last
+   * filtered the flight list by.
+   */
+  getStatistics(type: string, applyFilter: boolean = true): Observable<FlightStatistic[]> {
+    let params: HttpParams = applyFilter ? this.createFilterParams() : new HttpParams();
     params = params.append('type', type);
-    
+
     return this.http.get<FlightStatistic[]>(`${environment.baseUrl}/v2/flights/statistic`, { params });
   }
   

@@ -1,16 +1,5 @@
-@media (prefers-color-scheme: dark) {
-  :root {
-    ion-select::part(text) {
-      color: var(--ion-color-primary-contrast);
-    }
-
-    /* @TODO -> can be removed in an upcoming ionic version */
-    --ion-color-primary-contrast: #ffffff;
-    --ion-color-primary-contrast-rgb: 255, 255, 255;
-    --ion-color-danger-contrast: #ffffff;
-    --ion-color-danger-contrast-rgb: 255, 255, 255;
-  }
-}
+// Palette and shared primitives live in ./tokens.scss (loaded before this file).
+// The app is light-only for now, so the former prefers-color-scheme block is gone.
 
 // ------ custom css ------
 .ios ion-content {
