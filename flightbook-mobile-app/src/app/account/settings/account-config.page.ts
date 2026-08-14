@@ -1,6 +1,6 @@
 import { Component, effect, OnDestroy, OnInit } from '@angular/core';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
-import { AlertController, LoadingController, NavController, IonHeader, IonToolbar, IonButtons, IonMenuButton, IonTitle, IonContent, IonItem, IonInput, IonButton, IonCard, IonCardContent, IonText, IonLabel, IonToggle, IonIcon, IonList, IonItemSliding, IonItemOptions, IonItemOption, IonModal, IonDatetime, ModalController, IonReorderGroup, IonReorder, ReorderEndCustomEvent } from '@ionic/angular/standalone';
+import { AlertController, LoadingController, NavController, IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonContent, IonItem, IonButton, IonLabel, IonIcon, IonList, IonItemSliding, IonItemOptions, IonItemOption, ModalController, IonReorderGroup, IonReorder, ReorderEndCustomEvent } from '@ionic/angular/standalone';
 import HttpStatusCode from '../../shared/util/HttpStatusCode';
 import { User } from 'src/app/account/shared/user.model';
 import { AccountService } from '../shared/account.service';
@@ -15,13 +15,13 @@ import { LinkComponent } from '../shared/components/link/link.component';
     selector: 'app-account-config',
     templateUrl: './account-config.page.html',
     styleUrls: ['./account-config.page.scss'],
-    imports: [IonReorder, IonReorderGroup, IonItemOption, IonItemOptions, IonItemSliding, IonList, IonIcon, IonToggle, IonLabel,
+    imports: [IonReorder, IonReorderGroup, IonItemOption, IonItemOptions, IonItemSliding, IonList, IonIcon, IonLabel,
         FormsModule,
         TranslateModule,
         IonHeader,
         IonToolbar,
         IonButtons,
-        IonMenuButton,
+        IonBackButton,
         IonTitle,
         IonContent,
         IonItem,

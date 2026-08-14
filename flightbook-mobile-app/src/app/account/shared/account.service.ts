@@ -67,6 +67,10 @@ export class AccountService {
   updateUser(user: User): Observable<User> {
     return this.http.put<User>(`${environment.baseUrl}/users`, user).pipe(
       map((response: any) => {
+        // Normalise here too, not just in currentUser(): the settings page binds
+        // straight to user.config.notifications.email.appointment, which would
+        // throw if the server omitted any level of that path.
+        this.initializeUserConfig(response);
         this.currentUser$.set(response);
         return response;
       })
@@ -138,7 +142,6 @@ export class AccountService {
           }
           if (!user.config.preparation) {
               user.config.preparation = {
-                  dabsLinkDisabled: false,
                   links: []
               };
           }

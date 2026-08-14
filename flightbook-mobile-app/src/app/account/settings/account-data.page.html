@@ -1,94 +1,272 @@
-<ion-header>
-  <ion-toolbar color='primary'>
-    <ion-buttons slot="start">
-      <ion-menu-button></ion-menu-button>
-    </ion-buttons>
-    <ion-title>{{ 'buttons.accountData' | translate }}</ion-title>
-  </ion-toolbar>
-</ion-header>
+<div class="form-header">
+  <button type="button" class="icon-button" (click)="close()"
+          [attr.aria-label]="'buttons.back' | translate">
+    <ion-icon name="chevron-back" aria-hidden="true"></ion-icon>
+  </button>
+  <h1 class="form-header__title">{{ 'groupname.account' | translate }}</h1>
+</div>
 
-<ion-content class="ion-padding">
-  @if (user) {
-    <form #form="ngForm" (ngSubmit)="saveSettings()">
-    <ion-item class="error-item">
-      <ion-input label="{{ 'account.firstname' | translate }}" labelPlacement="stacked" [(ngModel)]="user.firstname" #firstname="ngModel" required name="firstname" type="text"></ion-input>
-      @if (firstname.invalid && (firstname.dirty || firstname.touched)) {
-        <ion-text color="danger" class="error-text">{{ 'message.required' | translate }}</ion-text>
-      }
-    </ion-item>
-    <ion-item class="error-item">
-      <ion-input label="{{ 'account.lastname' | translate }}" labelPlacement="stacked" [(ngModel)]="user.lastname" #lastname="ngModel" required name="lastname" type="text"></ion-input>
-      @if (lastname.invalid && (lastname.dirty || lastname.touched)) {
-        <ion-text color="danger" class="error-text">{{ 'message.required' | translate }}</ion-text>
-      }
-    </ion-item>
-    <ion-item class="error-item">
-      <ion-input label="{{ 'login.email' | translate }}" labelPlacement="stacked" [(ngModel)]="user.email" #email="ngModel" required email name="email" type="email"></ion-input>
-      @if (email.invalid && (email.dirty || email.touched)) {
-        <ion-text color="danger" class="error-text">
-          @if (email.errors?.['required']) {
-            {{ 'message.required' | translate }}
-          } @else if (email.errors?.['email']) {
-            {{ 'message.invalidEmail' | translate }}
+<ion-content>
+  <div class="form-body">
+    @if (user) {
+
+      <!-- Profile -->
+      <div class="profile">
+        <div class="profile__avatar" aria-hidden="true">{{ initials }}</div>
+        <div class="profile__text">
+          <div class="profile__name">{{ user.firstname }} {{ user.lastname }}</div>
+          <div class="profile__email">{{ user.email }}</div>
+        </div>
+        <span class="profile__badge">
+          {{ (isPremium ? 'account.premium' : 'account.free') | translate }}
+        </span>
+      </div>
+
+      <!--
+        Profile and emergency contact are two endpoints but one intent, so they
+        share the Save button below them. Password is a separate action with its
+        own button further down.
+      -->
+      <form id="accountForm" #accountForm="ngForm" (ngSubmit)="saveChanges()">
+
+        <div class="fb-section-label account-section-label">{{ 'account.myData' | translate }}</div>
+        <div class="fb-card--flush">
+          <div class="fb-row">
+            <span class="fb-row__label" id="lbl-firstname">{{ 'account.firstname' | translate }} *</span>
+            <span class="fb-row__value">
+              <ion-input [(ngModel)]="user.firstname" #firstname="ngModel" name="firstname"
+                         required type="text" autocomplete="given-name"
+                         aria-labelledby="lbl-firstname"></ion-input>
+              @if (firstname.invalid && (firstname.dirty || firstname.touched)) {
+                <span class="fb-field__error">{{ 'message.required' | translate }}</span>
+              }
+            </span>
+          </div>
+
+          <div class="fb-row">
+            <span class="fb-row__label" id="lbl-lastname">{{ 'account.lastname' | translate }} *</span>
+            <span class="fb-row__value">
+              <ion-input [(ngModel)]="user.lastname" #lastname="ngModel" name="lastname"
+                         required type="text" autocomplete="family-name"
+                         aria-labelledby="lbl-lastname"></ion-input>
+              @if (lastname.invalid && (lastname.dirty || lastname.touched)) {
+                <span class="fb-field__error">{{ 'message.required' | translate }}</span>
+              }
+            </span>
+          </div>
+
+          <div class="fb-row">
+            <span class="fb-row__label" id="lbl-email">{{ 'login.email' | translate }} *</span>
+            <span class="fb-row__value">
+              <ion-input [(ngModel)]="user.email" #email="ngModel" name="email"
+                         required email type="email" inputmode="email" autocomplete="email"
+                         aria-labelledby="lbl-email"></ion-input>
+              @if (email.invalid && (email.dirty || email.touched)) {
+                <span class="fb-field__error">
+                  @if (email.errors?.['required']) {
+                    {{ 'message.required' | translate }}
+                  } @else if (email.errors?.['email']) {
+                    {{ 'message.invalidEmail' | translate }}
+                  }
+                </span>
+              }
+            </span>
+          </div>
+
+          <!-- Stacked: the prefix select plus the number will not fit beside a label column -->
+          <div class="fb-row fb-row--stack account-phone">
+            <span class="fb-row__label">
+              {{ 'account.phone' | translate }}
+              <span class="fb-field__optional">{{ 'account.optional' | translate }}</span>
+            </span>
+            <span class="fb-row__value">
+              <fb-phone-number [(ngModel)]="user.phone" name="phone"></fb-phone-number>
+            </span>
+          </div>
+        </div>
+
+        <div class="fb-section-label account-section-label">{{ 'account.emergencyContact' | translate }}</div>
+        <div class="fb-card--flush">
+          <div class="fb-row">
+            <span class="fb-row__label" id="lbl-ec-firstname">{{ 'account.firstname' | translate }}</span>
+            <span class="fb-row__value">
+              <ion-input [(ngModel)]="emergencyContact.firstname" name="emergencyFirstname"
+                         type="text" aria-labelledby="lbl-ec-firstname"></ion-input>
+            </span>
+          </div>
+
+          <div class="fb-row">
+            <span class="fb-row__label" id="lbl-ec-lastname">{{ 'account.lastname' | translate }}</span>
+            <span class="fb-row__value">
+              <ion-input [(ngModel)]="emergencyContact.lastname" name="emergencyLastname"
+                         type="text" aria-labelledby="lbl-ec-lastname"></ion-input>
+            </span>
+          </div>
+
+          <div class="fb-row fb-row--stack account-phone">
+            <span class="fb-row__label">{{ 'account.phone' | translate }}</span>
+            <span class="fb-row__value">
+              <fb-phone-number [(ngModel)]="emergencyContact.phone" name="emergencyPhone"></fb-phone-number>
+            </span>
+          </div>
+
+          <div class="fb-row fb-row--stack">
+            <span class="fb-row__label" id="lbl-ec-note">{{ 'emergencyContact.additionalInformation' | translate }}</span>
+            <span class="fb-row__value">
+              <ion-textarea [(ngModel)]="emergencyContact.additionalInformation" name="emergencyNote"
+                            auto-grow="true" autocapitalize="sentences"
+                            aria-labelledby="lbl-ec-note"></ion-textarea>
+            </span>
+          </div>
+        </div>
+
+        <!-- Lives on user.config, so the same Save button persists it -->
+        <div class="fb-section-label account-section-label">{{ 'account.notifications' | translate }}</div>
+        <div class="fb-card--flush">
+          <div class="fb-row fb-row--toggle">
+            <span class="fb-row__label">{{ 'account.configuration.appointmentEmailNotification' | translate }}</span>
+            <ion-toggle [(ngModel)]="user.config.notifications.email.appointment"
+                        name="appointmentEmailNotification"
+                        [attr.aria-label]="'account.configuration.appointmentEmailNotification' | translate"></ion-toggle>
+          </div>
+        </div>
+
+        <div class="account-actions">
+          <ion-button expand="block" type="submit" [disabled]="accountForm.invalid">
+            {{ 'account.saveChanges' | translate }}
+          </ion-button>
+        </div>
+      </form>
+
+      <!-- Password: its own endpoint, so its own form and button -->
+      <form #passwordForm="ngForm" (ngSubmit)="changePassword()">
+        <div class="fb-section-label account-section-label">{{ 'login.password' | translate }}</div>
+        <div class="fb-card--flush">
+          <div class="fb-row">
+            <span class="fb-row__label" id="lbl-pwd-old">{{ 'login.oldpassword' | translate }}</span>
+            <span class="fb-row__value">
+              <ion-input [(ngModel)]="pwd.oldPassword" name="oldPassword"
+                         [type]="showOldPassword ? 'text' : 'password'"
+                         autocomplete="current-password"
+                         aria-labelledby="lbl-pwd-old"></ion-input>
+            </span>
+            <!-- Hand-rolled: ion-input-password-toggle is shadow DOM with a
+                 hardcoded English aria-label (same reasoning as register) -->
+            <button type="button" class="account-reveal" (click)="showOldPassword = !showOldPassword"
+                    [attr.aria-label]="(showOldPassword ? 'login.hidePassword' : 'login.showPassword') | translate"
+                    [attr.aria-pressed]="showOldPassword">
+              <ion-icon [name]="showOldPassword ? 'eye-off-outline' : 'eye-outline'" aria-hidden="true"></ion-icon>
+            </button>
+          </div>
+
+          <div class="fb-row">
+            <span class="fb-row__label" id="lbl-pwd-new">{{ 'login.newpassword' | translate }}</span>
+            <span class="fb-row__value">
+              <ion-input [(ngModel)]="pwd.newPassword" name="newPassword"
+                         [type]="showNewPassword ? 'text' : 'password'"
+                         autocomplete="new-password"
+                         aria-labelledby="lbl-pwd-new"></ion-input>
+            </span>
+            <button type="button" class="account-reveal" (click)="showNewPassword = !showNewPassword"
+                    [attr.aria-label]="(showNewPassword ? 'login.hidePassword' : 'login.showPassword') | translate"
+                    [attr.aria-pressed]="showNewPassword">
+              <ion-icon [name]="showNewPassword ? 'eye-off-outline' : 'eye-outline'" aria-hidden="true"></ion-icon>
+            </button>
+          </div>
+
+          <div class="fb-row">
+            <span class="fb-row__label" id="lbl-pwd-repeat">{{ 'login.confirmpassword' | translate }}</span>
+            <span class="fb-row__value">
+              <ion-input [(ngModel)]="pwd.newPassword2" name="newPassword2"
+                         [type]="showRepeatPassword ? 'text' : 'password'"
+                         autocomplete="new-password"
+                         aria-labelledby="lbl-pwd-repeat"></ion-input>
+            </span>
+            <button type="button" class="account-reveal" (click)="showRepeatPassword = !showRepeatPassword"
+                    [attr.aria-label]="(showRepeatPassword ? 'login.hidePassword' : 'login.showPassword') | translate"
+                    [attr.aria-pressed]="showRepeatPassword">
+              <ion-icon [name]="showRepeatPassword ? 'eye-off-outline' : 'eye-outline'" aria-hidden="true"></ion-icon>
+            </button>
+          </div>
+        </div>
+
+        <div class="account-actions">
+          <ion-button expand="block" fill="outline" type="submit">
+            {{ 'account.changePassword' | translate }}
+          </ion-button>
+        </div>
+      </form>
+
+      <!-- Language -->
+      <div class="fb-section-label account-section-label">{{ 'login.language' | translate }}</div>
+      <div class="fb-segments" role="group" [attr.aria-label]="'login.language' | translate">
+        @for (lang of languages; track lang) {
+          <button type="button" class="fb-segments__item" [class.is-active]="currentLang === lang"
+                  [attr.aria-pressed]="currentLang === lang" (click)="setLanguage(lang)">
+            {{ 'language.' + lang | translate }}
+          </button>
+        }
+      </div>
+
+      <!-- Subscription -->
+      @if (showUpsell) {
+        <div class="premium">
+          <div class="premium__title">{{ 'payment.freeTitle' | translate }}</div>
+          <div class="premium__body">
+            {{ (canSubscribe ? 'payment.freeBody' : 'payment.nativeHint') | translate }}
+          </div>
+          <ul class="premium__features">
+            <li class="premium__feature">
+              <ion-icon name="checkmark" aria-hidden="true"></ion-icon>
+              <span>{{ 'payment.feature1' | translate }}</span>
+            </li>
+            <li class="premium__feature">
+              <ion-icon name="checkmark" aria-hidden="true"></ion-icon>
+              <span>{{ 'payment.feature2' | translate }}</span>
+            </li>
+            <li class="premium__feature">
+              <ion-icon name="checkmark" aria-hidden="true"></ion-icon>
+              <span>{{ 'payment.feature3' | translate }}</span>
+            </li>
+          </ul>
+          @if (canSubscribe) {
+            <button type="button" class="premium__cta" (click)="getStripeSession()">
+              {{ 'buttons.subscribe' | translate }}
+            </button>
           }
-        </ion-text>
+        </div>
+      } @else {
+        <div class="fb-banner fb-banner--success account-banner">
+          <div class="fb-banner__title">{{ 'account.premium' | translate }}</div>
+          <div class="fb-banner__text">
+            @if (paymentStatus?.state === 'CANCELED') {
+              {{ 'payment.canceled' | translate: { date: paymentStatus.expires_date | date:'dd.MM.yyyy HH:mm':'UTC' } }}
+            } @else {
+              {{ 'payment.information' | translate: { date: paymentStatus.expires_date | date:'dd.MM.yyyy HH:mm':'UTC' } }}
+            }
+          </div>
+        </div>
+        @if (!isNative && paymentStatus?.state === 'ACTIVE') {
+          <div class="account-actions">
+            <ion-button expand="block" fill="outline" color="danger" (click)="cancelSubscription()">
+              {{ 'buttons.cancelSubscription' | translate }}
+            </ion-button>
+          </div>
+        }
       }
-    </ion-item>
-    <ion-item class="phone-number">
-      <fb-phone-number [(ngModel)]="user.phone" name="phone"></fb-phone-number>
-    </ion-item>
-    <ion-button expand="block" [disabled]="form.invalid" type="submit">{{ 'buttons.save' | translate }}</ion-button>
-    </form>
-  }
 
-  <div class="payment-container">
-    @if (paymentStatus) {
-      <ion-card class="validity">
-        @if (!paymentStatus.active && !isNative) {
-          <ion-card-content>
-            <div [innerHtml]="'payment.noSubscription' | translate"></div>
-          </ion-card-content>
-        }
-        @if (paymentStatus.active && !isNative && paymentStatus.state == 'EXEMPTED') {
-          <ion-card-content>
-            <div [innerHtml]="'payment.noSubscription' | translate"></div>
-          </ion-card-content>
-        }
-        @if (!paymentStatus.active && isNative) {
-          <ion-card-content>
-            <div [innerHtml]="'payment.nativeNoSubscription' | translate"></div>
-          </ion-card-content>
-        }
-        @if (paymentStatus.active && paymentStatus.state == 'ACTIVE') {
-          <ion-card-content>
-            {{ 'payment.information' | translate: { date: paymentStatus.expires_date | date:'dd.MM.yyyy HH:mm':'UTC'} }}
-          </ion-card-content>
-        }
-        @if (paymentStatus.active && paymentStatus.state == 'CANCELED') {
-          <ion-card-content>
-            {{ 'payment.canceled' | translate: { date: paymentStatus.expires_date | date:'dd.MM.yyyy HH:mm':'UTC'} }}
-          </ion-card-content>
-        }
-        @if (paymentStatus.active && paymentStatus.state == 'ACTIVE') {
-          <ion-button expand="block" color="danger" (click)="cancelSubscription()">{{ 'buttons.cancelSubscription' | translate }}</ion-button>
-        }
-      </ion-card>
-    }
+      <button type="button" class="account-logout" (click)="logout()">
+        {{ 'buttons.logout' | translate }}
+      </button>
 
-    @if ((!paymentStatus?.active && !isNative) || (paymentStatus?.active && !isNative && paymentStatus.state == 'EXEMPTED')) {
-      <ion-button expand="block" (click)="getStripeSession()">{{ 'buttons.subscribe' | translate }}</ion-button>
+      <div class="secondary-actions">
+        <ion-button expand="block" fill="clear" color="danger" (click)="deleteAccount()">
+          {{ 'account.deleteAccount' | translate }}
+        </ion-button>
+      </div>
+
+      <!-- Brand name is a product name, not a translated string -->
+      <div class="account-footer">Flightbook {{ appVersion }}</div>
     }
   </div>
-
-  <div class="language-list">
-    <p>
-      <a (click)="setLanguage('fr')" class="language">{{ 'language.fr' | translate }}</a>
-      <a (click)="setLanguage('de')" class="language">{{ 'language.de' | translate }}</a>
-      <a (click)="setLanguage('en')" class="language">{{ 'language.en' | translate }}</a>
-      <a (click)="setLanguage('it')" class="language">{{ 'language.it' | translate }}</a>
-    </p>
-  </div>
-
-  <p class="delete-account"><a (click)="deleteAccount()">Delete account</a></p>
-
 </ion-content>

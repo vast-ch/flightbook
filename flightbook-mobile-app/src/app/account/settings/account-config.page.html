@@ -1,7 +1,7 @@
 <ion-header>
   <ion-toolbar color='primary'>
     <ion-buttons slot="start">
-      <ion-menu-button></ion-menu-button>
+      <ion-back-button defaultHref="more"></ion-back-button>
     </ion-buttons>
     <ion-title>{{ 'buttons.configuration' | translate }}</ion-title>
   </ion-toolbar>
@@ -10,14 +10,6 @@
 <ion-content class="ion-padding">
   @if (user) {
     <form #form="ngForm" (ngSubmit)="saveSettings()">
-      <ion-item>
-        <div class="toggle-wrapper-custom">
-          <ion-label color="primary" position="stacked">{{ 'account.configuration.dabsLinkDisabled' | translate
-            }}</ion-label>
-          <ion-toggle [(ngModel)]="user.config.preparation.dabsLinkDisabled" name="dabsLinkDisabled"></ion-toggle>
-        </div>
-      </ion-item>
-
       <div class="links-wrapper">
         <div class="links-header">
           <ion-button size="small" shape="round" (click)="linkAddButton()">
@@ -47,14 +39,6 @@
           </ion-reorder-group>
         </ion-list>
       </div>
-
-      <ion-item>
-        <div class="toggle-wrapper-custom">
-          <ion-label color="primary" position="stacked">{{ 'account.configuration.appointmentEmailNotification' | translate
-            }}</ion-label>
-          <ion-toggle [(ngModel)]="user.config.notifications.email.appointment" name="appointmentEmailNotification"></ion-toggle>
-        </div>
-      </ion-item>
 
       <ion-button expand="block" type="submit">{{ 'buttons.save' | translate }}</ion-button>
     </form>

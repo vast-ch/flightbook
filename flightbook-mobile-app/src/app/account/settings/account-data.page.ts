@@ -1,21 +1,28 @@
-import { Component, effect, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, effect } from '@angular/core';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
-import { AlertController, LoadingController, MenuController, NavController, IonHeader, IonToolbar, IonButtons, IonMenuButton, IonTitle, IonContent, IonItem, IonInput, IonButton, IonCard, IonCardContent, IonText } from '@ionic/angular/standalone';
+import { AlertController, LoadingController, NavController, IonContent, IonButton, IonIcon, IonInput, IonTextarea, IonToggle } from '@ionic/angular/standalone';
 import HttpStatusCode from '../../shared/util/HttpStatusCode';
 import { User } from 'src/app/account/shared/user.model';
 import { AccountService } from '../shared/account.service';
-import { FlightStore } from 'src/app/flight/shared/flight.store';
-import { GliderStore } from 'src/app/glider/shared/glider.store';
-import { PlaceStore } from 'src/app/place/shared/place.store';
 import { firstValueFrom, Subject, takeUntil } from 'rxjs';
 import { PaymentService } from 'src/app/shared/services/payment.service';
+import { SessionService } from 'src/app/shared/services/session.service';
+import { LanguageService } from 'src/app/shared/services/language.service';
 import { PaymentStatus } from '../shared/paymentStatus.model';
+import { SchoolService } from 'src/app/school/shared/school.service';
+import { EmergencyContact } from 'src/app/school/shared/emergency-contact.model';
 import { Capacitor } from '@capacitor/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import moment from 'moment';
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { addIcons } from 'ionicons';
+import { chevronBack, eyeOutline, eyeOffOutline, checkmark } from 'ionicons/icons';
+import { environment } from 'src/environments/environment';
 import { PhoneNumberComponent } from 'src/app/shared/components/phone-number/phone-number.component';
+
+/** The four languages the app ships strings for. */
+const LANGUAGES = ['fr', 'de', 'en', 'it'];
 
 @Component({
     selector: 'app-account-data',
@@ -25,41 +32,50 @@ import { PhoneNumberComponent } from 'src/app/shared/components/phone-number/pho
         FormsModule,
         DatePipe,
         TranslateModule,
-        IonHeader,
-        IonToolbar,
-        IonButtons,
-        IonMenuButton,
-        IonTitle,
         IonContent,
-        IonItem,
-        IonInput,
         IonButton,
-        IonCard,
-        IonCardContent,
-        IonText,
+        IonIcon,
+        IonInput,
+        IonTextarea,
+        IonToggle,
         PhoneNumberComponent
     ]
 })
 export class AccountDataPage implements OnInit, OnDestroy {
     unsubscribe$ = new Subject<void>();
+
     user: User;
+    /** The API is a list, the UI a singleton; the id keeps POST an upsert. */
+    emergencyContact = new EmergencyContact();
     paymentStatus: PaymentStatus;
     isNative: boolean;
+    appVersion = environment.appVersion;
+
+    public readonly languages = LANGUAGES;
+
+    /** Password is its own action, so it keeps its own model and reveal state. */
+    pwd = { oldPassword: '', newPassword: '', newPassword2: '' };
+    showOldPassword = false;
+    showNewPassword = false;
+    showRepeatPassword = false;
 
     constructor(
         private translate: TranslateService,
         private accountService: AccountService,
+        private schoolService: SchoolService,
+        private sessionService: SessionService,
+        private languageService: LanguageService,
         private alertController: AlertController,
         private loadingCtrl: LoadingController,
-        private flightStore: FlightStore,
-        private gliderStore: GliderStore,
-        private placeStore: PlaceStore,
-        private menuCtrl: MenuController,
         public navCtrl: NavController,
+        private router: Router,
         private paymentService: PaymentService,
         private route: ActivatedRoute
     ) {
         this.isNative = Capacitor.isNativePlatform();
+        addIcons({ 'chevron-back': chevronBack, 'eye-outline': eyeOutline, 'eye-off-outline': eyeOffOutline, checkmark });
+
+        // Deep clone: edits must not touch the signal until a save succeeds.
         effect(() => {
             this.user = structuredClone(this.accountService.currentUser$());
         });
@@ -68,13 +84,149 @@ export class AccountDataPage implements OnInit, OnDestroy {
             this.paymentStatus = paymentStatus;
         });
 
-        const paymentStatus = this.route.snapshot.paramMap.get('payment');
-        if (paymentStatus == "success") {
+        if (this.route.snapshot.paramMap.get('payment') === 'success') {
             this.paymentSuccess();
         }
     }
 
     ngOnInit() {
+        this.loadEmergencyContact();
+    }
+
+    ngOnDestroy() {
+        this.unsubscribe$.next();
+        this.unsubscribe$.complete();
+    }
+
+    // ---- View state -----------------------------------------------------
+
+    get currentLang(): string {
+        return this.languageService.lang();
+    }
+
+    get initials(): string {
+        if (!this.user) {
+            return '';
+        }
+        return `${this.user.firstname?.charAt(0) ?? ''}${this.user.lastname?.charAt(0) ?? ''}`.toUpperCase();
+    }
+
+    /** EXEMPTED is entitled but not paying, so it reads as Free here. */
+    get isPremium(): boolean {
+        return !!this.paymentStatus?.active && this.paymentStatus?.state !== 'EXEMPTED';
+    }
+
+    /** Stripe checkout is web-only; native builds have no purchase path. */
+    get canSubscribe(): boolean {
+        return !this.isNative && !this.isPremium;
+    }
+
+    get showUpsell(): boolean {
+        return !this.isPremium;
+    }
+
+    // ---- Actions --------------------------------------------------------
+
+    close() {
+        this.navCtrl.navigateBack('more');
+    }
+
+    private loadEmergencyContact() {
+        this.schoolService.getEmergencyContacts().pipe(takeUntil(this.unsubscribe$)).subscribe({
+            next: (contacts: EmergencyContact[]) => {
+                if (contacts?.length > 0) {
+                    this.emergencyContact = contacts[0];
+                }
+            }
+        });
+    }
+
+    /**
+     * Saves the profile and the emergency contact. Two endpoints, so each
+     * reports its own failure rather than one aborting the other.
+     */
+    async saveChanges() {
+        const loading = await this.loadingCtrl.create({
+            message: this.translate.instant('loading.saveaccount')
+        });
+        await loading.present();
+
+        let userError: any = null;
+        try {
+            await firstValueFrom(this.accountService.updateUser(this.user));
+        } catch (error) {
+            userError = error;
+        }
+
+        let contactError: any = null;
+        if (this.hasEmergencyContactInput()) {
+            try {
+                this.emergencyContact = await firstValueFrom(
+                    this.schoolService.postEmergencyContact(this.emergencyContact)
+                );
+            } catch (error) {
+                contactError = error;
+            }
+        }
+
+        await loading.dismiss();
+
+        if (userError) {
+            const message = userError.status === HttpStatusCode.CONFLICT
+                ? this.translate.instant('message.userExist')
+                : this.translate.instant('message.error');
+            await this.alert(this.translate.instant('message.infotitle'), message);
+            return;
+        }
+
+        if (contactError) {
+            await this.alert(this.translate.instant('message.infotitle'), this.translate.instant('message.error'));
+        }
+    }
+
+    /** An untouched emergency-contact block must not create an empty record. */
+    private hasEmergencyContactInput(): boolean {
+        const contact = this.emergencyContact;
+        return !!(contact?.id || contact?.firstname || contact?.lastname || contact?.phone || contact?.additionalInformation);
+    }
+
+    async changePassword() {
+        const { oldPassword, newPassword, newPassword2 } = this.pwd;
+
+        if (!oldPassword || !newPassword || !newPassword2) {
+            await this.alert(this.translate.instant('message.errortitle'), this.translate.instant('message.mendatoryFields'));
+            return;
+        }
+
+        if (newPassword !== newPassword2) {
+            await this.alert(this.translate.instant('login.password'), this.translate.instant('message.pwdNotSame'));
+            return;
+        }
+
+        const loading = await this.loadingCtrl.create({
+            message: this.translate.instant('loading.saveaccount')
+        });
+        await loading.present();
+
+        this.accountService.updatePassword(this.pwd).pipe(takeUntil(this.unsubscribe$)).subscribe({
+            next: async () => {
+                await loading.dismiss();
+                this.pwd = { oldPassword: '', newPassword: '', newPassword2: '' };
+                await this.alert(this.translate.instant('login.password'), this.translate.instant('message.passwordchanged'));
+            },
+            error: async (error: any) => {
+                await loading.dismiss();
+                const message = error.status === HttpStatusCode.FORBIDDEN
+                    ? this.translate.instant('message.pwdWrong')
+                    : this.translate.instant('message.error');
+                await this.alert(this.translate.instant('login.password'), message);
+            }
+        });
+    }
+
+    setLanguage(lang: string) {
+        localStorage.setItem('language', lang);
+        this.translate.use(lang);
     }
 
     async paymentSuccess() {
@@ -91,38 +243,21 @@ export class AccountDataPage implements OnInit, OnDestroy {
         await alert.present();
     }
 
-    async saveSettings() {
-        let loading = await this.loadingCtrl.create({
-            message: this.translate.instant('loading.saveaccount')
-        });
-        await loading.present();
-
-        this.accountService.updateUser(this.user).pipe(takeUntil(this.unsubscribe$)).subscribe({
-            next: async (resp: User) => {
-                await loading.dismiss();
-            },
-            error: async (error: any) => {
-                await loading.dismiss();
-                if (error.status === HttpStatusCode.CONFLICT) {
-                    const alert = await this.alertController.create({
-                        header: this.translate.instant('message.infotitle'),
-                        message: this.translate.instant('message.userExist'),
-                        buttons: [this.translate.instant('buttons.done')]
-                    });
-                    await alert.present();
-                }
-            }
-        })
-    }
-
     async getStripeSession() {
-        let loading = await this.loadingCtrl.create({
+        const loading = await this.loadingCtrl.create({
             message: this.translate.instant('loading.loading')
         });
         await loading.present();
 
-        const session = await firstValueFrom(this.accountService.getStripeSession());
-        window.open(session.url, '_self');
+        try {
+            const session = await firstValueFrom(this.accountService.getStripeSession());
+            window.open(session.url, '_self');
+        } catch {
+            await this.alert(this.translate.instant('message.infotitle'), this.translate.instant('message.error'));
+        } finally {
+            // Previously left spinning, which stranded the page on a failure.
+            await loading.dismiss();
+        }
     }
 
     async cancelSubscription() {
@@ -134,33 +269,33 @@ export class AccountDataPage implements OnInit, OnDestroy {
                     text: this.translate.instant('buttons.yes'),
                     handler: async () => {
                         const loading = await this.loadingCtrl.create({
-                            message: this.translate.instant('loading.login')
+                            message: this.translate.instant('loading.loading')
                         });
                         await loading.present();
 
                         this.accountService.cancelPaymentSubscription().pipe(takeUntil(this.unsubscribe$)).subscribe({
-                            next: (res: any) => {
+                            next: () => {
                                 this.paymentStatus.state = 'CANCELED';
                                 loading.dismiss();
                             },
-                            error: (res: any) => {
+                            error: () => {
                                 loading.dismiss();
                             }
                         });
                     }
                 },
-                {
-                    text: this.translate.instant('buttons.no')
-                }
+                { text: this.translate.instant('buttons.no') }
             ]
         });
 
         await alert.present();
     }
 
-    setLanguage(lang: string) {
-        localStorage.setItem('language', lang);
-        this.translate.use(lang)
+    async logout() {
+        this.sessionService.logout().pipe(takeUntil(this.unsubscribe$)).subscribe({
+            next: () => this.router.navigate(['login'], { replaceUrl: true }),
+            error: () => this.router.navigate(['login'], { replaceUrl: true })
+        });
     }
 
     async deleteAccount() {
@@ -172,29 +307,26 @@ export class AccountDataPage implements OnInit, OnDestroy {
                     text: this.translate.instant('buttons.yes'),
                     handler: async () => {
                         this.accountService.deleteUser().pipe(takeUntil(this.unsubscribe$)).subscribe({
-                            next: (res: any) => {
-                                this.menuCtrl.enable(false);
-                                this.flightStore.clearFlights();
-                                this.gliderStore.clearGliders();
-                                this.placeStore.clearPlaces();
-                                localStorage.removeItem('access_token');
-                                localStorage.removeItem('refresh_token');
+                            next: () => {
+                                this.sessionService.clearLocalSession();
                                 this.navCtrl.navigateRoot('login');
                             }
-                        })
+                        });
                     }
                 },
-                {
-                    text: this.translate.instant('buttons.no')
-                }
+                { text: this.translate.instant('buttons.no') }
             ]
         });
 
         await alert.present();
     }
 
-    ngOnDestroy() {
-        this.unsubscribe$.next();
-        this.unsubscribe$.complete();
+    private async alert(header: string, message: string) {
+        const alert = await this.alertController.create({
+            header,
+            message,
+            buttons: [this.translate.instant('buttons.done')]
+        });
+        await alert.present();
     }
 }
