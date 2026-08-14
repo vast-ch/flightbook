@@ -81,8 +81,11 @@ export class MorePage implements OnDestroy {
         this.schoolService.getSchools();
 
         if (this.controlSheet() === null) {
-            this.schoolService.getControlSheet().pipe(takeUntil(this.unsubscribe$)).subscribe((controlSheet: ControlSheet) => {
-                this.controlSheet.set(!!controlSheet);
+            this.schoolService.getControlSheet().pipe(takeUntil(this.unsubscribe$)).subscribe({
+                next: (controlSheet: ControlSheet) => this.controlSheet.set(!!controlSheet),
+                // A user without a school has no sheet; record that instead of
+                // leaving an unhandled error and retrying on every tab visit.
+                error: () => this.controlSheet.set(false)
             });
         }
     }
