@@ -8,6 +8,7 @@ import { ControlSheetDetailsComponent } from '../shared/components/control-sheet
 import { NxgTransalteSortPipe } from 'src/app/shared/pipes/nxg-transalte-sort.pipe';
 import { DatePipe } from '@angular/common';
 import { StarRatingComponent } from '../../shared/components/star-rating/star-rating.component';
+import { AvatarButtonComponent } from 'src/app/shared/components/avatar-button/avatar-button.component';
 import { HomeStore } from 'src/app/home/shared/home.store';
 import { addIcons } from 'ionicons';
 import { chevronBack, chevronDown, chevronForward, chevronUp, checkmark } from 'ionicons/icons';
@@ -22,6 +23,7 @@ type SkillRow = { key: string, value: number };
     templateUrl: './control-sheet.page.html',
     styleUrls: ['./control-sheet.page.scss'],
     imports: [
+        AvatarButtonComponent,
         DatePipe,
         IonDatetime,
         StarRatingComponent,

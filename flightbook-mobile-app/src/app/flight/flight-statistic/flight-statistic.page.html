@@ -1,7 +1,5 @@
 <!-- Surface strip rather than an ion-toolbar; the page lives in the tab shell -->
 <div class="stat-header">
-  <fb-avatar-button></fb-avatar-button>
-
   <div class="stat-header__text">
   <div class="fb-section-label">
     @if (period() === ALL_TIME) {
@@ -15,6 +13,8 @@
   </div>
   <h1 class="stat-header__title">{{ 'groupname.statistics' | translate }}</h1>
   </div>
+
+  <fb-avatar-button></fb-avatar-button>
 </div>
 
 <ion-content class="no-padding">

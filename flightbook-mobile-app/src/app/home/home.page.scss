@@ -4,10 +4,26 @@
 .home-header {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 11px;
   padding: calc(env(safe-area-inset-top) + 14px) 20px 14px;
   background: var(--fb-surface);
   border-bottom: 1px solid var(--fb-border);
+}
+
+.home-header__brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-width: 0;
+}
+
+.home-header__logo {
+  display: block;
+  flex: none;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--fb-radius-sm);
 }
 
 .home-header__wordmark {
