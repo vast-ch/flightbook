@@ -10,16 +10,16 @@
 
       <form id="loginForm" #form="ngForm" (ngSubmit)="login(form)">
         <div class="fb-card--flush credentials">
-          <div class="credentials__row">
-            <label class="credentials__label" for="loginEmail">{{ 'login.email' | translate }}</label>
+          <div class="fb-field">
+            <label class="fb-field__label" for="loginEmail">{{ 'login.email' | translate }}</label>
             <ion-input id="loginEmail" [(ngModel)]="loginData.email" name="email" required
                        type="email" inputmode="email" autocomplete="email"
                        enterkeyhint="next"></ion-input>
           </div>
 
-          <div class="credentials__row credentials__row--password">
-            <div class="credentials__field">
-              <label class="credentials__label" for="loginPassword">{{ 'login.password' | translate }}</label>
+          <div class="fb-field fb-field--split">
+            <div class="fb-field__main">
+              <label class="fb-field__label" for="loginPassword">{{ 'login.password' | translate }}</label>
               <ion-input id="loginPassword" [(ngModel)]="loginData.password" name="password" required
                          [type]="showPassword ? 'text' : 'password'"
                          autocomplete="current-password" enterkeyhint="go"></ion-input>

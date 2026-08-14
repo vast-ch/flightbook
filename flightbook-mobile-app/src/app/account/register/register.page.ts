@@ -1,5 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { MenuController, LoadingController, AlertController, IonInputPasswordToggle, IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonContent, IonItem, IonInput, IonButton, IonText } from '@ionic/angular/standalone';
+import { MenuController, LoadingController, AlertController, IonContent, IonFooter, IonIcon, IonInput, IonButton } from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import { arrowBack, eyeOutline, eyeOffOutline } from 'ionicons/icons';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { Router } from '@angular/router';
@@ -17,23 +19,18 @@ import { PhoneNumberComponent } from 'src/app/shared/components/phone-number/pho
     imports: [
         FormsModule,
         TranslateModule,
-        IonHeader,
-        IonToolbar,
-        IonButtons,
-        IonBackButton,
-        IonTitle,
         IonContent,
-        IonItem,
+        IonFooter,
+        IonIcon,
         IonInput,
-        IonInputPasswordToggle,
         IonButton,
-        IonText,
         PhoneNumberComponent
     ]
 })
 export class RegisterPage implements OnInit, OnDestroy {
     unsubscribe$ = new Subject<void>();
     registerData: User;
+    showPassword = false;
 
     constructor(
         private router: Router,
@@ -45,6 +42,7 @@ export class RegisterPage implements OnInit, OnDestroy {
     ) {
         this.menuCtrl.enable(false);
         this.registerData = new User();
+        addIcons({ arrowBack, eyeOutline, eyeOffOutline });
     }
 
     ngOnInit() {
@@ -53,6 +51,14 @@ export class RegisterPage implements OnInit, OnDestroy {
     ngOnDestroy() {
         this.unsubscribe$.next();
         this.unsubscribe$.complete();
+    }
+
+    togglePassword() {
+        this.showPassword = !this.showPassword;
+    }
+
+    close() {
+        this.router.navigate(['/login']);
     }
 
     async saveRegister(registerForm: any) {

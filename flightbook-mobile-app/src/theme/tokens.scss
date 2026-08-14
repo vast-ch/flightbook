@@ -392,6 +392,85 @@ button.fb-row {
 }
 
 /*
+ * Stacked-label field rows — a micro-label above the value, as opposed to
+ * .fb-row's side labels. Used by the signed-out screens, where every row is a
+ * free-text entry and a side label would leave no room for the value.
+ *
+ * Sits inside a .fb-card--flush. Global rather than component-scoped because
+ * login and register share it; ion-input is scoped (not shadow) DOM, so its
+ * .native-input is reachable from here without ::ng-deep.
+ */
+.fb-field {
+  padding: 13px 16px;
+
+  /* Adjacency, not :last-child — @if/@for leave comment anchors behind. */
+  & + .fb-field {
+    border-top: 1px solid var(--fb-hairline);
+  }
+}
+
+/* A row with a trailing control (a reveal toggle, a unit). */
+.fb-field--split {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.fb-field__main {
+  flex: 1;
+  min-width: 0;
+}
+
+.fb-field__label {
+  display: block;
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--fb-text-secondary);
+}
+
+/* The row owns the padding, so the input contributes none of its own. */
+.fb-field ion-input {
+  --padding-start: 0;
+  --padding-end: 0;
+  --padding-top: 0;
+  --padding-bottom: 0;
+  --background: transparent;
+  /* MD draws a focus/valid underline the card's hairlines already stand in for,
+     and its green "valid" state reads as a warning here. */
+  --highlight-height: 0;
+  margin-top: 7px;
+  min-height: 0;
+  font-size: 14.5px;
+  font-weight: 500;
+  color: var(--fb-text);
+
+  .native-wrapper {
+    min-height: 0;
+  }
+
+  .native-input {
+    padding: 0;
+    min-height: 0;
+  }
+
+  .native-input::placeholder {
+    color: var(--fb-placeholder);
+    opacity: 1;
+  }
+}
+
+.fb-field__error {
+  display: block;
+  margin-top: 6px;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--ion-color-danger);
+}
+
+/*
  * Status banner — used for read-only flight validation and tandem payment.
  * Left edge carries the state colour.
  */

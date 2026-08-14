@@ -1,50 +1,88 @@
-<ion-header>
-  <ion-toolbar color='primary'>
-    <ion-buttons slot="start">
-      <ion-back-button defaultHref='login'></ion-back-button>
-    </ion-buttons>
-    <ion-title>{{ 'account.register' | translate }}</ion-title>
-  </ion-toolbar>
-</ion-header>
+<div class="form-header">
+  <button type="button" class="icon-button" (click)="close()" [attr.aria-label]="'buttons.cancel' | translate">
+    <ion-icon name="arrow-back" aria-hidden="true"></ion-icon>
+  </button>
+  <h1 class="form-header__title">{{ 'account.register' | translate }}</h1>
+</div>
 
+<ion-content>
+  <div class="form-body">
+    <form id="registerForm" #form="ngForm" (ngSubmit)="saveRegister(form)">
+      <div class="fb-card--flush">
 
-<ion-content class="ion-padding">
-  <form #form="ngForm" (ngSubmit)="saveRegister(form)">
-    <ion-item class="error-item">
-      <ion-input [(ngModel)]="registerData.firstname" #firstname="ngModel" required name="firstname" type="text" label="{{ 'account.firstname' | translate }}*" labelPlacement="stacked"></ion-input>
-      @if (firstname.invalid && (firstname.dirty || firstname.touched)) {
-        <ion-text color="danger" class="error-text">{{ 'message.required' | translate }}</ion-text>
-      }
-    </ion-item>
-    <ion-item class="error-item">
-      <ion-input [(ngModel)]="registerData.lastname" #lastname="ngModel" required name="lastname" type="text" label="{{ 'account.lastname' | translate }}*" labelPlacement="stacked"></ion-input>
-      @if (lastname.invalid && (lastname.dirty || lastname.touched)) {
-        <ion-text color="danger" class="error-text">{{ 'message.required' | translate }}</ion-text>
-      }
-    </ion-item>
-    <ion-item class="error-item">
-      <ion-input  [(ngModel)]="registerData.email" #email="ngModel" required email name="email" type="email" label="{{ 'login.email' | translate }}*" labelPlacement="stacked"></ion-input>
-      @if (email.invalid && (email.dirty || email.touched)) {
-        <ion-text color="danger" class="error-text">
-          @if (email.errors?.['required']) {
-            {{ 'message.required' | translate }}
-          } @else if (email.errors?.['email']) {
-            {{ 'message.invalidEmail' | translate }}
+        <div class="fb-field">
+          <label class="fb-field__label" for="regFirstname">{{ 'account.firstname' | translate }}</label>
+          <ion-input id="regFirstname" [(ngModel)]="registerData.firstname" #firstname="ngModel"
+                     name="firstname" required type="text"
+                     autocomplete="given-name" enterkeyhint="next"></ion-input>
+          @if (firstname.invalid && (firstname.dirty || firstname.touched)) {
+            <span class="fb-field__error">{{ 'message.required' | translate }}</span>
           }
-        </ion-text>
-      }
-    </ion-item>
-    <ion-item>
-      <fb-phone-number [(ngModel)]="registerData.phone" name="phone"></fb-phone-number>
-    </ion-item>
-    <ion-item class="error-item">
-      <ion-input [(ngModel)]="registerData.password" #password="ngModel" required name="password" type="password" label="{{ 'login.password' | translate }}*" labelPlacement="stacked">
-        <ion-input-password-toggle slot="end"></ion-input-password-toggle>
-      </ion-input>
-      @if (password.invalid && (password.dirty || password.touched)) {
-        <ion-text color="danger" class="error-text">{{ 'message.required' | translate }}</ion-text>
-      }
-    </ion-item>
-    <ion-button expand="block" [disabled]="form.invalid" type="submit" >{{ 'buttons.save' | translate }}</ion-button>
-  </form>
+        </div>
+
+        <div class="fb-field">
+          <label class="fb-field__label" for="regLastname">{{ 'account.lastname' | translate }}</label>
+          <ion-input id="regLastname" [(ngModel)]="registerData.lastname" #lastname="ngModel"
+                     name="lastname" required type="text"
+                     autocomplete="family-name" enterkeyhint="next"></ion-input>
+          @if (lastname.invalid && (lastname.dirty || lastname.touched)) {
+            <span class="fb-field__error">{{ 'message.required' | translate }}</span>
+          }
+        </div>
+
+        <div class="fb-field">
+          <label class="fb-field__label" for="regEmail">{{ 'login.email' | translate }}</label>
+          <ion-input id="regEmail" [(ngModel)]="registerData.email" #email="ngModel"
+                     name="email" required email type="email"
+                     inputmode="email" autocomplete="email" enterkeyhint="next"></ion-input>
+          @if (email.invalid && (email.dirty || email.touched)) {
+            <span class="fb-field__error">
+              @if (email.errors?.['required']) {
+                {{ 'message.required' | translate }}
+              } @else if (email.errors?.['email']) {
+                {{ 'message.invalidEmail' | translate }}
+              }
+            </span>
+          }
+        </div>
+
+        <!-- The only optional field, so it says so rather than leaving the
+             other four to carry an asterisk each. -->
+        <div class="fb-field fb-field--phone">
+          <span class="fb-field__label">
+            {{ 'account.phone' | translate }}
+            <span class="fb-field__optional">{{ 'account.optional' | translate }}</span>
+          </span>
+          <fb-phone-number [(ngModel)]="registerData.phone" name="phone"></fb-phone-number>
+        </div>
+
+        <div class="fb-field fb-field--split">
+          <div class="fb-field__main">
+            <label class="fb-field__label" for="regPassword">{{ 'login.password' | translate }}</label>
+            <ion-input id="regPassword" [(ngModel)]="registerData.password" #password="ngModel"
+                       name="password" required
+                       [type]="showPassword ? 'text' : 'password'"
+                       autocomplete="new-password" enterkeyhint="go"></ion-input>
+            @if (password.invalid && (password.dirty || password.touched)) {
+              <span class="fb-field__error">{{ 'message.required' | translate }}</span>
+            }
+          </div>
+          <!-- Same reasoning as login: ion-input-password-toggle is shadow DOM
+               with no exposed parts and a hardcoded English aria-label. -->
+          <button type="button" class="register__reveal" (click)="togglePassword()"
+                  [attr.aria-label]="(showPassword ? 'login.hidePassword' : 'login.showPassword') | translate"
+                  [attr.aria-pressed]="showPassword">
+            <ion-icon [name]="showPassword ? 'eye-off-outline' : 'eye-outline'" aria-hidden="true"></ion-icon>
+          </button>
+        </div>
+
+      </div>
+    </form>
+  </div>
 </ion-content>
+
+<ion-footer class="form-footer">
+  <ion-button expand="block" type="submit" form="registerForm">
+    {{ 'account.register' | translate }}
+  </ion-button>
+</ion-footer>

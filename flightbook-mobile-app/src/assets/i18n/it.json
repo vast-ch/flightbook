@@ -68,6 +68,7 @@
         "firstname": "Nome",
         "lastname": "Cognome",
         "phone": "Telefono",
+        "optional": "facoltativo",
         "prefix": "Prefisso",
         "verification": "Verifica dell'account",
         "configuration": {
