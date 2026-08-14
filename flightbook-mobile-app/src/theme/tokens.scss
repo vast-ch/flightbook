@@ -119,6 +119,16 @@
   --fb-sunken: #f7fbfe;
   --fb-placeholder: #7e8fa0;
 
+  /*
+   * Inverted surface, for cards that deliberately break out of the light page
+   * (the cumulative-airtime card on Statistics). Defined as tokens so the next
+   * dark surface matches instead of inventing its own rgba values.
+   */
+  --fb-inverse-surface: #10293c;
+  --fb-inverse-text: #ffffff;
+  --fb-inverse-text-muted: rgba(255, 255, 255, 0.55);
+  --fb-inverse-hairline: rgba(255, 255, 255, 0.14);
+
   --fb-radius: 12px;
   --fb-radius-sm: 9px;
   --fb-gutter: 18px;

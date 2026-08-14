@@ -174,11 +174,20 @@
         "totalDistance": "Total distance",
         "bestDistance": "Best distance",
         "unknownCountry": "Unknown",
-        "type": {
-            "monthly": "Monthly view",
-            "yearly": "Yearly view",
-            "weekly": "Weekly view"
-        }
+        "allTime": "All time",
+        "since": "since {{date}}",
+        "period": "Period",
+        "flightActivity": "Flight activity",
+        "everyDay": "Every day since you started",
+        "flyingDays": "{{days}} flying days in {{weeks}} weeks",
+        "less": "Less",
+        "more": "More",
+        "cumulativeAirtime": "Cumulative airtime",
+        "personalBests": "Personal bests",
+        "longestDistance": "Longest distance",
+        "longestAirtime": "Longest airtime",
+        "placesFlown": "Places flown",
+        "startLanding": "start / landing"
     },
     "import": {
         "flights": "Flights",

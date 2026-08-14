@@ -107,8 +107,9 @@ export class ActivityChartComponent {
             airtime: { display: false, beginAtZero: true, position: 'right' }
         },
         plugins: {
+            // chartjs-plugin-datalabels is no longer loaded, so there is
+            // nothing to switch off here.
             legend: { display: false },
-            datalabels: { display: false },
             tooltip: {
                 backgroundColor: '#10293c',
                 padding: 8,

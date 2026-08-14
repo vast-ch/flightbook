@@ -40,13 +40,18 @@ export class FlightStore {
   public filtered = computed(() => this.isFiltered());
   constructor() {}
   
-  getFlights({ limit = null, offset = null, store = true, clearStore = false }: 
-    { limit?: number, offset?: number, store?: boolean, clearStore?: boolean } = {}): Observable<Flight[]> {
-    
+  /**
+   * @param applyFilter pass false to ignore the shared flight-list filter -
+   * the statistics page reports all-time figures regardless of what the user
+   * last filtered the list by, and has no filter control of its own.
+   */
+  getFlights({ limit = null, offset = null, store = true, clearStore = false, applyFilter = true }:
+    { limit?: number, offset?: number, store?: boolean, clearStore?: boolean, applyFilter?: boolean } = {}): Observable<Flight[]> {
+
     this.state.update(state => ({ ...state, loading: true }));
-    
+
     // Create params
-    let params: HttpParams = this.createFilterParams();
+    let params: HttpParams = applyFilter ? this.createFilterParams() : new HttpParams();
     if (limit) {
       params = params.append('limit', limit.toString());
     }

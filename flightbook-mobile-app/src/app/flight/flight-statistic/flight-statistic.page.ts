@@ -1,174 +1,79 @@
-import { Component, OnInit, OnDestroy, Signal } from '@angular/core';
-import { Subject, firstValueFrom } from 'rxjs';
-import { ModalController, LoadingController, IonHeader, IonToolbar, IonButtons, IonMenuButton, IonTitle, IonButton, IonIcon, IonContent, IonCard, IonCardContent, IonSelect, IonSelectOption } from '@ionic/angular/standalone';
-import { FlightFilterComponent } from '../../form/flight-filter/flight-filter.component';
+import { Component, OnDestroy, computed, inject } from '@angular/core';
+import { Router } from '@angular/router';
+import { DatePipe, DecimalPipe } from '@angular/common';
+import { MenuController, IonContent, IonSkeletonText } from '@ionic/angular/standalone';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
-import { FlightStatistic } from '../shared/flightStatistic.model';
-import { FlightStore } from '../shared/flight.store';
-import { Chart, ChartData } from 'chart.js';
-
-import zoomPlugin from "chartjs-plugin-zoom";
-import { DecimalPipe } from '@angular/common';
-import { BarChartComponent } from '../../charts/bar-chart/bar-chart.component';
-import { LineChartComponent } from '../../charts/line-chart/line-chart.component';
-import { HoursFormatPipe } from '../../shared/pipes/hours-format.pipe';
-import { addIcons } from "ionicons";
-import { filterOutline } from "ionicons/icons";
-
-Chart.register(zoomPlugin);
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { ALL_TIME, StatisticPeriod, StatisticStore } from './shared/statistic.store';
+import { ActivityHeatmapComponent } from './components/activity-heatmap/activity-heatmap.component';
+import { CumulativeChartComponent } from './components/cumulative-chart/cumulative-chart.component';
 
 @Component({
     selector: 'app-flight-statistic',
     templateUrl: './flight-statistic.page.html',
     styleUrls: ['./flight-statistic.page.scss'],
     imports: [
-        BarChartComponent,
-        LineChartComponent,
+        DatePipe,
         DecimalPipe,
         TranslateModule,
-        HoursFormatPipe,
-        IonHeader,
-        IonToolbar,
-        IonButtons,
-        IonMenuButton,
-        IonTitle,
-        IonButton,
-        IonIcon,
+        ActivityHeatmapComponent,
+        CumulativeChartComponent,
         IonContent,
-        IonCard,
-        IonCardContent,
-        IonSelect,
-        IonSelectOption
+        IonSkeletonText
     ]
 })
-export class FlightStatisticPage implements OnInit, OnDestroy {
-    unsubscribe$ = new Subject<void>();
-    statistics: FlightStatistic;
-    statisticsList: FlightStatistic[];
-    graphType: string;
+export class FlightStatisticPage implements OnDestroy {
+    private unsubscribe$ = new Subject<void>();
 
-    nbFlightBarChartData: ChartData<'bar'> = {
-        labels: [],
-        datasets: [
-            { data: [] }
-        ]
-    };
+    private store = inject(StatisticStore);
+    private translate = inject(TranslateService);
+    private router = inject(Router);
+    private menuCtrl = inject(MenuController);
 
-    incomeBarChartData: ChartData<'bar'> = {
-        labels: [],
-        datasets: [
-            { data: [] }
-        ]
-    };
+    public readonly ALL_TIME = ALL_TIME;
 
-    averageLineChartData: ChartData<'line'> = {
-        labels: [],
-        datasets: [
-            { data: [] }
-        ]
-    };
+    public loaded = this.store.loaded;
+    public hasFlights = this.store.hasFlights;
+    public period = this.store.period;
+    public years = this.store.years;
+    public headline = this.store.headline;
+    public heatmap = this.store.heatmap;
+    public flyingDays = this.store.flyingDays;
+    public weekCount = this.store.weekCount;
+    public cumulative = this.store.cumulative;
+    public bests = this.store.bests;
+    public firstFlightDate = this.store.firstFlightDate;
 
-    get filtered(): Signal<boolean> {
-        return this.flightStore.filtered;
+    /** Total airtime for the selected period, as HH:mm. */
+    public totalAirtime = computed(() => this.toHoursMinutes(this.headline().airtime));
+
+    /**
+     * Airtime and average as value + unit, so the unit can be styled smaller.
+     * Minutes below an hour, hours above - matching the home stat strip.
+     */
+    public airtimeParts = computed(() => this.splitDuration(this.headline().airtime));
+    public averageParts = computed(() => this.splitDuration(this.headline().average));
+
+    public distanceParts = computed(() => {
+        const km = this.headline().distance;
+        return { value: km >= 100 ? km.toFixed(0) : km.toFixed(1), unit: 'km' };
+    });
+
+    get currentLang(): string {
+        return this.translate.currentLang;
     }
 
-    constructor(
-        private flightStore: FlightStore,
-        private modalCtrl: ModalController,
-        private translate: TranslateService,
-        private loadingCtrl: LoadingController
-    ) {
-        this.graphType = 'yearly';
-
-        this.statistics = new FlightStatistic();
-        this.statisticsList = [];
-        addIcons({ filterOutline });
+    constructor() {
+        this.menuCtrl.enable(true);
     }
 
-    private async dataLoad() {
-        const loading = await this.loadingCtrl.create({
-            message: this.translate.instant('loading.loading')
-        });
-
-        try {
-            const promiseList = [];
-            promiseList.push(firstValueFrom(this.flightStore.getStatistics('global')));
-            promiseList.push(firstValueFrom(this.flightStore.getStatistics(this.graphType)));
-            const data = await Promise.all(promiseList);
-            this.statistics = (data[0] as FlightStatistic[])[0];
-            this.statisticsList = data[1] as FlightStatistic[];
-            this.prepareData();
-        } catch (exception: any) {
-            await loading.dismiss();
+    ionViewWillEnter() {
+        // Loaded once per session: everything below is derived, so switching
+        // period costs no requests.
+        if (!this.loaded()) {
+            this.store.load().pipe(takeUntil(this.unsubscribe$)).subscribe();
         }
-    }
-
-    private async graphDataLoad() {
-        const loading = await this.loadingCtrl.create({
-            message: this.translate.instant('loading.loading')
-        });
-
-        try {
-            const data = await firstValueFrom(this.flightStore.getStatistics(this.graphType));
-            this.statisticsList = data;
-            this.prepareData();
-        } catch (exception: any) {
-            await loading.dismiss();
-        }
-    }
-
-    prepareData() {
-        // Nb flight data
-        const data: any = [];
-        const labels: any = [];
-        this.statisticsList.forEach((element: FlightStatistic) => {
-            labels.push(element.type == 'monthly' ? `${element.month} ${element.year}` : element.year)
-            data.push(element.nbFlights);
-        });
-
-        this.nbFlightBarChartData = {
-            labels: labels,
-            datasets: [
-                { data: data, label: this.translate.instant('statistics.nbflight'), borderColor: "#45b1fd", borderWidth: 3, borderSkipped: true, hoverBackgroundColor: "#45b1fd", barPercentage: 1, categoryPercentage: 0.95 }
-            ]
-        };
-
-        // Income data
-        const incomeData: any = [];
-        const incomeLabels: any = [];
-        this.statisticsList.forEach((element: FlightStatistic) => {
-            incomeLabels.push(element.type == 'monthly' ? `${element.month} ${element.year}` : element.year)
-            incomeData.push(element.income);
-        });
-
-        this.incomeBarChartData = {
-            labels: incomeLabels,
-            datasets: [
-                { data: incomeData, label: this.translate.instant('statistics.price'), borderColor: "#45b1fd", borderWidth: 3, borderSkipped: true, hoverBackgroundColor: "#45b1fd", barPercentage: 1, categoryPercentage: 0.95 }
-            ]
-        };
-
-        // Average time
-        const timeData: any = [];
-        const averageData: any = [];
-        const lineLabels: any = [];
-        this.statisticsList.forEach((element: FlightStatistic) => {
-            lineLabels.push(element.type == 'monthly' ? `${element.month} ${element.year}` : element.year)
-            timeData.push(element.time);
-            averageData.push(element.average);
-        });
-
-        this.averageLineChartData = {
-            labels: lineLabels,
-            datasets: [
-                { data: timeData, label: this.translate.instant('statistics.flighthour'), borderColor: "#45b1fd", pointBackgroundColor: "#45b1fd", pointHoverBorderColor: "#45b1fd" },
-                { yAxisID: 'y1', data: averageData, label: this.translate.instant('statistics.average'), borderColor: "#a7dafe", pointBackgroundColor: "#a7dafe", pointHoverBorderColor: "#a7dafe" }
-            ]
-        };
-    }
-
-    ngOnInit() {
-        this.dataLoad();
     }
 
     ngOnDestroy() {
@@ -176,31 +81,27 @@ export class FlightStatisticPage implements OnInit, OnDestroy {
         this.unsubscribe$.complete();
     }
 
-    async openFilter() {
-        const modal = await this.modalCtrl.create({
-            component: FlightFilterComponent,
-            cssClass: 'flight-filter-class',
-            componentProps: {
-                type: 'FlightStatisticPage',
-                graphType: this.graphType
-            }
-        });
-
-        this.modalOnDidDismiss(modal);
-        return await modal.present();
+    selectPeriod(period: StatisticPeriod) {
+        this.period.set(period);
     }
 
-    async modalOnDidDismiss(modal: HTMLIonModalElement) {
-        modal.onDidDismiss().then((resp: any) => {
-            this.statisticsList.splice(0, this.statisticsList.length);
-            this.statisticsList = resp.data.graphData;
-            this.statistics = resp.data.statistics;
-            this.prepareData();
-        });
+    openImport() {
+        this.router.navigate(['imports/igc']);
     }
 
-    async changeGraphType(event: CustomEvent) {
-        this.graphType = event.detail.value;
-        this.graphDataLoad();
+    /** Seconds to HH:mm. */
+    toHoursMinutes(seconds: number): string {
+        const total = Math.max(0, Math.floor(Number(seconds ?? 0)));
+        const h = Math.floor(total / 3600);
+        const m = Math.floor((total % 3600) / 60);
+        return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+    }
+
+    private splitDuration(seconds: number): { value: string; unit: string } {
+        const total = Math.max(0, Math.floor(Number(seconds ?? 0)));
+        if (total < 3600) {
+            return { value: `${Math.round(total / 60)}`, unit: 'min' };
+        }
+        return { value: (total / 3600).toFixed(1), unit: 'h' };
     }
 }

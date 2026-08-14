@@ -174,11 +174,20 @@
         "totalDistance": "Distance totale",
         "bestDistance": "Meilleure distance",
         "unknownCountry": "Inconnu",
-        "type": {
-            "monthly": "Vue annuelle",
-            "yearly": "Vue mensuelle",
-            "weekly": "Vue hebdomadaire"
-        }
+        "allTime": "Total",
+        "since": "depuis le {{date}}",
+        "period": "Période",
+        "flightActivity": "Activité de vol",
+        "everyDay": "Chaque jour depuis tes débuts",
+        "flyingDays": "{{days}} jours de vol en {{weeks}} semaines",
+        "less": "Moins",
+        "more": "Plus",
+        "cumulativeAirtime": "Temps de vol cumulé",
+        "personalBests": "Records personnels",
+        "longestDistance": "Plus longue distance",
+        "longestAirtime": "Plus long vol",
+        "placesFlown": "Lieux survolés",
+        "startLanding": "décollage / atterrissage"
     },
     "import": {
         "flights": "Vols",
