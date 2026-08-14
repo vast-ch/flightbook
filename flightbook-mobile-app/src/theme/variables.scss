@@ -17,6 +17,17 @@ ion-modal.dateModal {
   --background: transparent;
 }
 
+// Legacy control styling for the screens still on ion-item + labelPlacement:
+// flight-filter, imports/data, appointment-filter, passenger-confirmation-form,
+// phone-number, glider-select, link and control-sheet. The redesigned forms opt
+// out by scoping their own rules under .fb-row in tokens.scss, which outranks
+// these on specificity. Do not delete until the list above is empty - grep
+// before assuming it is.
+//
+// phone-number stays because it is restyled from the outside (see the
+// ::ng-deep blocks in register.page.scss and account-data.page.scss) rather
+// than converted; link stays because account-config still opens that modal.
+
 // Label color
 .label-text-wrapper {
   color: var(--ion-color-primary) !important;

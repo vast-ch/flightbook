@@ -71,8 +71,15 @@
         "optional": "facoltativo",
         "prefix": "Prefisso",
         "verification": "Verifica dell'account",
+        "myData": "I miei dati",
+        "notifications": "Notifiche",
+        "emergencyContact": "Contatto di emergenza",
+        "saveChanges": "Salva le modifiche",
+        "changePassword": "Cambia password",
+        "deleteAccount": "Elimina l'account",
+        "free": "Free",
+        "premium": "Premium",
         "configuration": {
-            "dabsLinkDisabled": "Disattivare i link DABS",
             "link": "Link",
             "label": "Label",
             "url": "URL",
@@ -87,7 +94,9 @@
         "country": "Paese",
         "notes": "Note",
         "coordinates": "Coordinate",
-        "override": "Si desidera sostituire l'altitudine e il paese con i dati della mappa?"
+        "override": "Si desidera sostituire l'altitudine e il paese con i dati della mappa?",
+        "new": "Nuovo luogo",
+        "mapHint": "Tocca due volte la mappa per posizionare il segnaposto. Altitudine e paese vengono compilati da lì."
     },
     "glider": {
         "buydate": "Data d’aquisto",
@@ -101,6 +110,7 @@
         "archived": "Archiviato",
         "archive": "Archivio ?",
         "note": "Note",
+        "new": "Nuova vela",
         "check": {
             "title": "Controllo",
             "date": "Data",
@@ -245,7 +255,7 @@
         "emailEnter": "Inserire il proprio E-Mail Adresse!",
         "pwdSend": "Una nuova password verrà spedita!",
         "userExist": "Questo indirizzo e-mail è già utilizzato!",
-        "pwdNotSame": "Le password sono le stesse!",
+        "pwdNotSame": "Le password non sono le stesse!",
         "settingChanged": "Le impostazioni sono state salvate!",
         "placeExist": "Ce lieu existe déjà!",
         "error": "Si è verificato un errore. Si prega di riprovare più tardi o inviare una e-mail a: yannick.lagger@flightbook.ch",
@@ -341,6 +351,12 @@
     },
     "controlSheet": {
         "title": "Scheda di controllo",
+        "subtitle": "Requisiti della licenza e valutazioni degli istruttori",
+        "flights": "Voli",
+        "soloRequired": "Almeno uno richiesto",
+        "skills": "Competenze",
+        "rated": "{{rated}} di {{total}} valutate",
+        "notScheduled": "Non programmato",
         "exam": {
             "title": "Esami",
             "theory": "Teoria superata il",
@@ -652,6 +668,12 @@
     "payment": {
         "nativeNoSubscription": "<p>Stai utilizzando attualmente Flightbook Free.</p><p>Visita flightbook.ch per ulteriori informazioni.</p>",
         "noSubscription": "<p>Stai utilizzando Flightbook Free.</p><p>Per 12CHF all'anno, potete passare a Flightbook Premium!</p><ul><li>Aggiungere un numero illimitato di voli</li><li>Aggiungere un numero illimitato di conferme passeggeri</li><li>Sostiene il progetto</li></ul>",
+        "freeTitle": "Stai utilizzando Flightbook Free",
+        "freeBody": "Per 12 CHF all'anno puoi passare a Flightbook Premium.",
+        "nativeHint": "Visita flightbook.ch per ulteriori informazioni.",
+        "feature1": "Numero illimitato di voli",
+        "feature2": "Numero illimitato di conferme passeggeri",
+        "feature3": "Sostiene il progetto",
         "thanks": "Grazie mille per il vostro sostegno!",
         "information": "L'abbonamento sarà rinnovato automaticamente alla {{ date }}. Verranno addebitati CHF 12.00/anno.",
         "canceled": "L'abbonamento è stato annullato. Hai ancora accesso a tutte le funzioni fino a {{ date }}.",
@@ -694,6 +716,20 @@
         "stats": "Statistiche",
         "more": "Altro"
     },
+    "more": {
+        "equipment": "La tua attrezzatura",
+        "importExport": "Importa & esporta",
+        "passengerConfirmations": "Conferme passeggeri",
+        "dabs": "DABS Svizzera",
+        "today": "Oggi",
+        "tomorrow": "Domani",
+        "shvApp": "App meteo FSVL",
+        "importIgc": "Importa più file IGC",
+        "importData": "Importa dati del libretto",
+        "export": "Esporta in XLSX, CSV o PDF",
+        "accountSettings": "Account & impostazioni",
+        "accountSettingsHint": "I tuoi dati, contatto di emergenza, password, lingua"
+    },
     "home": {
         "airtime": "Tempo di volo",
         "distance": "Distanza",
@@ -719,5 +755,16 @@
     "flightlist": {
         "summary": "{{count}} voli · {{airtime}}",
         "backfillHint": "Questo è tutto il tuo libro di volo finora. Importa file IGC per aggiungere voli precedenti — "
+    },
+    "addSheet": {
+        "flightHint": "Importa un file IGC o inseriscilo a mano",
+        "tandem": "Conferma tandem",
+        "tandemHint": "Briefing passeggero e firma"
+    },
+    "gliderlist": {
+        "summary": "{{count}} vele"
+    },
+    "placelist": {
+        "summary": "{{count}} luoghi"
     }
 }

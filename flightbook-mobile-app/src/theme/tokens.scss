@@ -132,6 +132,10 @@
   --fb-radius: 12px;
   --fb-radius-sm: 9px;
   --fb-gutter: 18px;
+
+  /* Star rating (control sheet) */
+  --fb-star: #e8b33a;
+  --fb-star-empty: #d5e5ef;
 }
 
 /*
@@ -310,6 +314,285 @@ button.fb-row {
     letter-spacing: 0;
     color: var(--fb-text);
   }
+}
+
+/*
+ * Marks a row whose value is an ion-select. Deliberately carries no layout of
+ * its own: the `.fb-row ion-select { width: 100% }` rule below already fills
+ * the value column, and adding more here would restyle the shipped flight form
+ * for no gain. Kept as a semantic hook for select-specific tweaks.
+ */
+
+/* The textarea row stacks, so its value column must span the full width */
+.fb-row--stack .fb-row__value {
+  width: 100%;
+}
+
+/*
+ * Ionic controls inside .fb-row.
+ *
+ * The row owns padding and height, so the controls have to stop contributing
+ * their own. These live here rather than in a component stylesheet because all
+ * three redesigned forms (flight, glider, place) need them identically; being
+ * in this global sheet also means no ::ng-deep is required to pierce Ionic's
+ * scoped styles. The `.fb-row` class ahead of each element keeps these winning
+ * over the bare `ion-select` rules in theme/variables.scss, which loads later.
+ */
+.fb-row {
+  ion-input,
+  ion-textarea {
+    --padding-start: 0;
+    --padding-end: 0;
+    --padding-top: 0;
+    --padding-bottom: 0;
+    --background: transparent;
+    min-height: 0;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--fb-text);
+
+    .native-wrapper,
+    .textarea-wrapper {
+      min-height: 0;
+    }
+
+    .native-input,
+    .native-textarea {
+      padding: 0;
+      min-height: 0;
+    }
+  }
+
+  ion-input .native-input::placeholder,
+  ion-textarea .native-textarea::placeholder {
+    color: var(--fb-placeholder);
+    opacity: 1;
+  }
+
+  ion-select {
+    --padding-start: 0;
+    --padding-end: 0;
+    min-height: 0;
+    width: 100%;
+    color: var(--fb-text);
+
+    &::part(text) {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--fb-text);
+    }
+
+    &::part(placeholder) {
+      color: var(--fb-placeholder);
+    }
+
+    &::part(icon) {
+      color: var(--fb-text-muted);
+      opacity: 1;
+    }
+  }
+
+  ion-toggle {
+    flex: none;
+    padding: 0;
+    --track-background-checked: var(--ion-color-primary);
+  }
+
+  /* fb-glider-select wraps an ion-select; make it fill the value column */
+  fb-glider-select {
+    display: block;
+    width: 100%;
+  }
+}
+
+/*
+ * ---- List page chrome ---------------------------------------------------
+ * The static surface strip above ion-content on a list page: an eyebrow line
+ * over a large title, with icon actions pinned to the right. Shared by the
+ * flight, glider and place lists.
+ */
+.list-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  padding: calc(env(safe-area-inset-top) + 14px) var(--fb-gutter) 14px;
+  background: var(--fb-surface);
+  border-bottom: 1px solid var(--fb-border);
+}
+
+/* Wraps eyebrow + title so the actions can sit opposite them */
+.list-header__text {
+  flex: 1;
+  min-width: 0;
+}
+
+.list-header__eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Small pill, e.g. "filtered" */
+.list-header__chip {
+  padding: 2px 7px;
+  border-radius: 5px;
+  background: var(--fb-accent-soft);
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ion-color-primary);
+}
+
+.list-header__title {
+  margin: 8px 0 0;
+  font-size: 26px;
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+  color: var(--fb-text);
+}
+
+.list-header__actions {
+  display: flex;
+  gap: 8px;
+  flex: none;
+}
+
+/* The header aligns to flex-end for the title baseline; the avatar centres */
+.list-header .fb-avatar-button {
+  align-self: center;
+}
+
+/*
+ * Full-bleed block of rows. The design draws list rows edge to edge on a white
+ * band with hairline separators, not as an inset rounded card - that treatment
+ * (.fb-card--flush) is for forms and settings.
+ */
+.list-block {
+  padding: 0;
+  margin: 0;
+  background: var(--fb-surface);
+  border-top: 1px solid var(--fb-border);
+  border-bottom: 1px solid var(--fb-border);
+}
+
+/* Dashed hint blocks sitting in the page gutter */
+.list-empty,
+.list-footnote {
+  margin: 16px var(--fb-gutter);
+}
+
+/*
+ * Destructive / secondary actions at the foot of a form body, below the fields
+ * but above the sticky save footer. Shared by the flight, glider and place
+ * edit pages.
+ */
+.secondary-actions {
+  margin-top: 22px;
+
+  ion-button {
+    --border-radius: 10px;
+    --box-shadow: none;
+    height: 46px;
+    margin: 0 0 8px;
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: none;
+  }
+}
+
+/*
+ * Bottom-sheet modal shell (the tab bar's add sheet). Lives here rather than in
+ * tabs.page.scss because Ionic renders modals at the app root, outside any
+ * component's style scope. align-items pins the auto-height content to the
+ * bottom edge; the backdrop tint is the design's own.
+ */
+.fb-add-sheet {
+  --width: 100%;
+  --height: auto;
+  --border-radius: 18px 18px 0 0;
+  --background: var(--fb-bg);
+  --box-shadow: 0 -8px 28px rgba(16, 41, 60, 0.18);
+  --backdrop-opacity: 1;
+
+  align-items: flex-end;
+
+  &::part(backdrop) {
+    background: rgba(16, 41, 60, 0.4);
+  }
+}
+
+/*
+ * Segmented control: a bordered, rounded strip of equal-width buttons with one
+ * active. Shared by the statistics period picker and the account language
+ * switcher. Separators use adjacency so the first item never gets a left edge.
+ */
+/*
+ * Control-sheet rating sheet. Global for the same reason as .fb-add-sheet:
+ * Ionic renders modals at the app root, outside component style scope.
+ */
+.sheet-star-modal {
+  --background: var(--fb-bg);
+  --backdrop-opacity: 1;
+
+  &::part(backdrop) {
+    background: rgba(16, 41, 60, 0.4);
+  }
+}
+
+.fb-segments {
+  display: flex;
+  border: 1px solid var(--fb-border);
+  border-radius: var(--fb-radius-sm);
+  overflow: hidden;
+  background: var(--fb-surface);
+}
+
+.fb-segments__item {
+  flex: 1;
+  padding: 10px 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--fb-text-body);
+  text-align: center;
+  cursor: pointer;
+
+  & + .fb-segments__item {
+    border-left: 1px solid var(--fb-border);
+  }
+
+  &.is-active {
+    background: var(--ion-color-primary);
+    color: var(--ion-color-primary-contrast);
+    font-weight: 600;
+  }
+}
+
+/*
+ * Round initials button linking to the Account screen. Sits as the leading
+ * element in every main-tab header (Home, Flights, Stats, More), so it is here
+ * rather than duplicated four times.
+ */
+.fb-avatar-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid var(--fb-border);
+  border-radius: 50%;
+  background: transparent;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--fb-text-secondary);
+  cursor: pointer;
 }
 
 /* Square outlined icon button, used in page headers */

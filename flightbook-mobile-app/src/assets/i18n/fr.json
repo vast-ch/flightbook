@@ -71,8 +71,15 @@
         "optional": "facultatif",
         "prefix": "Préfixe",
         "verification": "Vérification du compte",
+        "myData": "Mes données",
+        "notifications": "Notifications",
+        "emergencyContact": "Contact d'urgence",
+        "saveChanges": "Enregistrer les modifications",
+        "changePassword": "Changer le mot de passe",
+        "deleteAccount": "Supprimer le compte",
+        "free": "Free",
+        "premium": "Premium",
         "configuration": {
-            "dabsLinkDisabled": "Désactiver les liens DABS",
             "link": "Lien",
             "label": "Label",
             "url": "URL",
@@ -87,7 +94,9 @@
         "country": "Pays",
         "notes": "Notes",
         "coordinates": "Coordonnées",
-        "override": "Voulez-vous remplacer l'altitude et le pays par les données de la carte?"
+        "override": "Voulez-vous remplacer l'altitude et le pays par les données de la carte?",
+        "new": "Nouveau lieu",
+        "mapHint": "Double-tape sur la carte pour placer le marqueur. L'altitude et le pays en sont déduits."
     },
     "glider": {
         "buydate": "Date d'achat",
@@ -101,6 +110,7 @@
         "archived": "Archivé",
         "archive": "Archiver ?",
         "note": "Notes",
+        "new": "Nouvelle aile",
         "check": {
             "title": "Contrôle",
             "date": "Date",
@@ -341,6 +351,12 @@
     },
     "controlSheet": {
         "title": "Fiche de contrôle",
+        "subtitle": "Exigences de licence et évaluations des instructeurs",
+        "flights": "Vols",
+        "soloRequired": "Au moins un requis",
+        "skills": "Compétences",
+        "rated": "{{rated}} sur {{total}} évaluées",
+        "notScheduled": "Non planifié",
         "exam": {
             "title": "Examens",
             "theory": "Théorie réussie le",
@@ -652,6 +668,12 @@
     "payment": {
         "nativeNoSubscription": "<p>Tu utilises actuellement Flightbook Free.</p><p>Visite flightbook.ch pour plus d'informations.</p>",
         "noSubscription": "<p>Tu utilises actuellement Flightbook Free.</p><p>Pour 12CHF par an, tu peux passer à Flightbook Premium!</p><ul><li>Ajouter un nombre illimité de vols</li><li>Ajouter un nombre illimité de confirmations passager</li><li>Soutient le projet</li></ul>",
+        "freeTitle": "Tu utilises Flightbook Free",
+        "freeBody": "Pour 12 CHF par an, tu peux passer à Flightbook Premium.",
+        "nativeHint": "Visite flightbook.ch pour plus d'informations.",
+        "feature1": "Nombre illimité de vols",
+        "feature2": "Nombre illimité de confirmations passager",
+        "feature3": "Soutient le projet",
         "thanks": "Merci beaucoup pour ton soutien!",
         "information": "Votre abonnement sera automatiquement renouvelé le {{ date }}. Vous serez débité d'un montant de CHF 12.00/année",
         "canceled": "Votre abonnement a été résilié. Vous disposez encore de l'ensemble des fonctionnalités jusqu'au {{ date }}.",
@@ -694,6 +716,20 @@
         "stats": "Statistiques",
         "more": "Plus"
     },
+    "more": {
+        "equipment": "Ton matériel",
+        "importExport": "Import & export",
+        "passengerConfirmations": "Confirmations passagers",
+        "dabs": "DABS Suisse",
+        "today": "Aujourd'hui",
+        "tomorrow": "Demain",
+        "shvApp": "App météo FSVL",
+        "importIgc": "Importer plusieurs fichiers IGC",
+        "importData": "Importer des données de carnet",
+        "export": "Exporter en XLSX, CSV ou PDF",
+        "accountSettings": "Compte & paramètres",
+        "accountSettingsHint": "Tes données, contact d'urgence, mot de passe, langue"
+    },
     "home": {
         "airtime": "Temps de vol",
         "distance": "Distance",
@@ -719,5 +755,16 @@
     "flightlist": {
         "summary": "{{count}} vols · {{airtime}}",
         "backfillHint": "C'est tout ton carnet de vol pour l'instant. Importe des fichiers IGC pour ajouter des vols antérieurs — "
+    },
+    "addSheet": {
+        "flightHint": "Importe un fichier IGC ou saisis-le à la main",
+        "tandem": "Confirmation tandem",
+        "tandemHint": "Briefing passager et signature"
+    },
+    "gliderlist": {
+        "summary": "{{count}} ailes"
+    },
+    "placelist": {
+        "summary": "{{count}} lieux"
     }
 }

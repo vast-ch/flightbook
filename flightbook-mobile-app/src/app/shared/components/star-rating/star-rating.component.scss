@@ -1,32 +1,26 @@
+// Colours come from --fb-star / --fb-star-empty in theme/tokens.scss.
+// fb-star-rating has no consumer outside the control sheet, so these are safe
+// to change in one place.
 .star {
-    margin: 0px 0px;
-    color: #a9a5a5;
     display: inline-block;
+    margin: 0;
+    color: var(--fb-star-empty);
     cursor: pointer;
-    transition: all .3s;
+    transition: all 0.3s;
     transform: scale(1);
 }
 
-
-.star {
-    mat-icon {
-        width: 22px;
-        height: 22px;
-    }
-}
-
 .star-gold {
-    color: orange;
+    color: var(--fb-star);
 }
 
-/* make all stars orange */
+/* Preview: hovering lights up everything to the left of the cursor */
 .star-rating-animation:hover .star-hover {
-    color: orange;
+    color: var(--fb-star);
 }
 
-/* make all stars right from selected gray */
-.star-rating-animation .star-hover:hover~.star-hover {
-    color: #ddd;
+.star-rating-animation .star-hover:hover ~ .star-hover {
+    color: var(--fb-star-empty);
 }
 
 .star-rating-animation .star-hover:hover {

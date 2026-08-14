@@ -1,13 +1,2 @@
-.secondary-actions {
-    margin-top: 22px;
-
-    ion-button {
-        --border-radius: 10px;
-        --box-shadow: none;
-        height: 46px;
-        margin: 0 0 8px;
-        font-size: 14px;
-        font-weight: 600;
-        text-transform: none;
-    }
-}
+// .secondary-actions lives in theme/tokens.scss - shared with the glider and
+// place edit pages.

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { NgClass } from '@angular/common';
 import { IonIcon } from "@ionic/angular/standalone";
 import { addIcons } from "ionicons";
@@ -10,7 +10,7 @@ import { star } from "ionicons/icons";
     styleUrls: ['./star-rating.component.scss'],
     imports: [NgClass, IonIcon]
 })
-export class StarRatingComponent {
+export class StarRatingComponent implements OnInit, OnChanges {
     @Input()
     selectedRating: number | undefined;
 
@@ -46,6 +46,17 @@ export class StarRatingComponent {
             }
         ]
         this.displayStars(this.selectedRating || 0);
+    }
+
+    /**
+     * ngOnInit alone left the stars stale whenever the parent pushed a new
+     * rating into an already-created component - which is exactly what happens
+     * when a control-sheet row is re-rated.
+     */
+    ngOnChanges(changes: SimpleChanges): void {
+        if (changes['selectedRating'] && this.stars) {
+            this.displayStars(this.selectedRating || 0);
+        }
     }
 
     displayStars(value: number): void {
