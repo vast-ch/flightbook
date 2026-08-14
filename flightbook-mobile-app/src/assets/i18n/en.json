@@ -692,8 +692,6 @@
         "tomorrow": "tomorrow",
         "inDays": "in {{days}} days",
         "trainingProgress": "Training progress",
-        "flightsOf": "{{done}} / {{total}} flights",
-        "skillsRated": "{{rated}} of {{total}} skills rated",
         "activity": "Activity",
         "allStatistics": "All statistics",
         "flightsPerMonth": "Flights per month",
@@ -701,7 +699,12 @@
         "average": "Avg",
         "fromShv": "From the SHV",
         "emptyLogbook": "That's your whole logbook so far. Import IGC files to backfill earlier flights — ",
-        "importFromDevice": "Import from device"
+        "importFromDevice": "Import from device",
+        "ofTotal": "of {{total}}",
+        "ofTotalRated": "of {{total}} rated",
+        "soloFlight": "Solo flight (SHGPA)",
+        "requirementOpen": "Open",
+        "requirementDone": "Done"
     },
     "flightlist": {
         "summary": "{{count}} flights · {{airtime}}",

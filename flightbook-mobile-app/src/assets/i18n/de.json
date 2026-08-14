@@ -692,8 +692,6 @@
         "tomorrow": "morgen",
         "inDays": "in {{days}} Tagen",
         "trainingProgress": "Ausbildungsstand",
-        "flightsOf": "{{done}} / {{total}} Flüge",
-        "skillsRated": "{{rated}} von {{total}} Punkten bewertet",
         "activity": "Aktivität",
         "allStatistics": "Alle Statistiken",
         "flightsPerMonth": "Flüge pro Monat",
@@ -701,7 +699,12 @@
         "average": "Ø",
         "fromShv": "Vom SHV",
         "emptyLogbook": "Das ist bisher dein ganzes Flugbuch. Importiere IGC-Dateien, um frühere Flüge zu ergänzen — ",
-        "importFromDevice": "Vom Gerät importieren"
+        "importFromDevice": "Vom Gerät importieren",
+        "ofTotal": "von {{total}}",
+        "ofTotalRated": "von {{total}} bewertet",
+        "soloFlight": "Alleinflug (SHV)",
+        "requirementOpen": "Offen",
+        "requirementDone": "Erfüllt"
     },
     "flightlist": {
         "summary": "{{count}} Flüge · {{airtime}}",

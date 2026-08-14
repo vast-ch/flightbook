@@ -36,6 +36,7 @@ export interface HomeState {
     monthlyStats: FlightStatistic[];
     nextAppointment: UpcomingAppointment | null;
     controlSheet: ControlSheet | null;
+    schools: School[];
     loaded: boolean;
 }
 
@@ -51,6 +52,7 @@ export class HomeStore {
         monthlyStats: [],
         nextAppointment: null,
         controlSheet: null,
+        schools: [],
         loaded: false
     });
 
@@ -85,8 +87,25 @@ export class HomeStore {
 
         return total === 0
             ? null
-            : { ratedSkills: rated, totalSkills: total, schoolName: this.state().nextAppointment?.school?.name ?? null };
+            // The school comes from the enrolment, not from whether there
+            // happens to be an upcoming appointment.
+            : { ratedSkills: rated, totalSkills: total, schoolName: this.state().schools?.[0]?.name ?? null };
     });
+
+    /** Percentage of control-sheet skills rated, for the progress bar. */
+    public controlSheetPercent = computed(() => {
+        const progress = this.trainingProgress();
+        if (!progress || progress.totalSkills === 0) {
+            return 0;
+        }
+        return Math.min(100, Math.round((progress.ratedSkills / progress.totalSkills) * 100));
+    });
+
+    /**
+     * The SHV/SHGPA solo flight requirement: at least one flight logged as
+     * flown alone. nbFlightsAlone is already in the API response.
+     */
+    public soloFlightDone = computed(() => (this.state().globalStats?.nbFlightsAlone ?? 0) > 0);
 
     /** Flights logged so far, against the licence requirement. */
     public licenceProgress = computed(() => {
@@ -109,13 +128,16 @@ export class HomeStore {
             this.schoolService.getControlSheet().pipe(catchError(() => of(null)));
         const nextAppointment$: Observable<UpcomingAppointment | null> =
             this.loadNextAppointment().pipe(catchError(() => of(null)));
+        const schools$: Observable<School[]> =
+            from(this.schoolService.getSchools()).pipe(catchError(() => of([] as School[])));
 
-        return forkJoin([global$, monthly$, controlSheet$, nextAppointment$]).pipe(
-            map(([global, monthly, controlSheet, nextAppointment]): HomeState => ({
+        return forkJoin([global$, monthly$, controlSheet$, nextAppointment$, schools$]).pipe(
+            map(([global, monthly, controlSheet, nextAppointment, schools]): HomeState => ({
                 globalStats: global?.[0] ?? null,
                 monthlyStats: monthly ?? [],
                 nextAppointment,
                 controlSheet,
+                schools: schools ?? [],
                 loaded: true
             })),
             tap(state => this.state.set(state))
@@ -174,6 +196,7 @@ export class HomeStore {
             monthlyStats: [],
             nextAppointment: null,
             controlSheet: null,
+            schools: [],
             loaded: false
         });
     }

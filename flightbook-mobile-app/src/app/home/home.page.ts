@@ -1,7 +1,9 @@
 import { Component, OnDestroy, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
-import { MenuController, IonContent, IonSkeletonText } from '@ionic/angular/standalone';
+import { MenuController, IonContent, IonSkeletonText, IonIcon } from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import { chevronForward, checkmark } from 'ionicons/icons';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -25,7 +27,8 @@ setTimeout(() => {
         TranslateModule,
         ActivityChartComponent,
         IonContent,
-        IonSkeletonText
+        IonSkeletonText,
+        IonIcon
     ]
 })
 export class HomePage implements OnDestroy {
@@ -44,6 +47,8 @@ export class HomePage implements OnDestroy {
     public nextAppointment = this.homeStore.nextAppointment;
     public trainingProgress = this.homeStore.trainingProgress;
     public licenceProgress = this.homeStore.licenceProgress;
+    public controlSheetPercent = this.homeStore.controlSheetPercent;
+    public soloFlightDone = this.homeStore.soloFlightDone;
 
     public latestNews = computed(() => this.newsStore.news()[0] ?? null);
 
@@ -92,6 +97,7 @@ export class HomePage implements OnDestroy {
 
     constructor() {
         this.menuCtrl.enable(true);
+        addIcons({ chevronForward, checkmark });
     }
 
     /** Seconds to HH:mm - the chart footer format from the design. */

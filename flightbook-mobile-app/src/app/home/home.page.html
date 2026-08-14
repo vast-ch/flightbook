@@ -82,18 +82,52 @@
 
     <!-- Training progress, for pilots with a control sheet -->
     @if (trainingProgress(); as progress) {
-      <div class="fb-card training" (click)="openControlSheet()">
-        <div class="training__top">
-          <span class="training__title">{{ 'home.trainingProgress' | translate }}</span>
-          <span class="training__count">
-            {{ 'home.flightsOf' | translate:{ done: licenceProgress().flights, total: licenceProgress().required } }}
+      <div class="fb-card--flush training" (click)="openControlSheet()">
+        <div class="training__body">
+          <div class="training__top">
+            <span class="training__title">{{ 'home.trainingProgress' | translate }}</span>
+            @if (progress.schoolName) {
+              <span class="training__school">{{ progress.schoolName }}</span>
+            }
+            <ion-icon class="training__chevron" name="chevron-forward" aria-hidden="true"></ion-icon>
+          </div>
+
+          <!-- Licence flight count -->
+          <div class="training__metric">
+            <span class="training__label">{{ 'tabs.flights' | translate }}</span>
+            <span class="training__value">{{ licenceProgress().flights }}</span>
+            <span class="training__of">
+              {{ 'home.ofTotal' | translate:{ total: licenceProgress().required } }}
+            </span>
+          </div>
+          <div class="training__track">
+            <div class="training__fill" [style.width.%]="licenceProgress().percent"></div>
+          </div>
+
+          <!-- Control sheet skills -->
+          <div class="training__metric">
+            <span class="training__label">{{ 'buttons.controlSheet' | translate }}</span>
+            <span class="training__value">{{ progress.ratedSkills }}</span>
+            <span class="training__of">
+              {{ 'home.ofTotalRated' | translate:{ total: progress.totalSkills } }}
+            </span>
+          </div>
+          <div class="training__track">
+            <div class="training__fill" [style.width.%]="controlSheetPercent()"></div>
+          </div>
+        </div>
+
+        <!-- SHV solo-flight requirement -->
+        <div class="training__requirement">
+          <span class="training__check" [class.is-done]="soloFlightDone()">
+            @if (soloFlightDone()) {
+              <ion-icon name="checkmark" aria-hidden="true"></ion-icon>
+            }
           </span>
-        </div>
-        <div class="training__track">
-          <div class="training__fill" [style.width.%]="licenceProgress().percent"></div>
-        </div>
-        <div class="training__caption">
-          {{ 'home.skillsRated' | translate:{ rated: progress.ratedSkills, total: progress.totalSkills } }}
+          <span class="training__requirement-name">{{ 'home.soloFlight' | translate }}</span>
+          <span class="training__requirement-state" [class.is-done]="soloFlightDone()">
+            {{ (soloFlightDone() ? 'home.requirementDone' : 'home.requirementOpen') | translate }}
+          </span>
         </div>
       </div>
     }
