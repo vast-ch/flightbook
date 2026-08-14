@@ -1,6 +1,7 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { forkJoin, of, Observable } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
+import { LanguageService } from 'src/app/shared/services/language.service';
 import { FlightStore } from '../../shared/flight.store';
 import { FlightStatistic } from '../../shared/flightStatistic.model';
 import { Flight } from '../../shared/flight.model';
@@ -60,6 +61,7 @@ function timeToSeconds(time?: string): number {
 })
 export class StatisticStore {
     private flightStore = inject(FlightStore);
+    private languageService = inject(LanguageService);
 
     private state = signal<StatisticState>({
         global: null,
@@ -176,6 +178,8 @@ export class StatisticStore {
 
     /** Running airtime total per month, for the cumulative chart. */
     public cumulative = computed<CumulativePoint[]>(() => {
+        // Read as a signal so the axis labels re-render on a language switch.
+        const lang = this.languageService.lang();
         const period = this.period();
         const rows = this.state().monthly
             .filter(row => period === ALL_TIME || row.year === period)
@@ -187,7 +191,7 @@ export class StatisticStore {
             // month arrives zero-padded as a string.
             const date = new Date(Number(row.year), Number(row.month) - 1, 1);
             return {
-                label: date.toLocaleDateString(undefined, { month: 'short', year: 'numeric' }),
+                label: date.toLocaleDateString(lang, { month: 'short', year: 'numeric' }),
                 seconds: running
             };
         });

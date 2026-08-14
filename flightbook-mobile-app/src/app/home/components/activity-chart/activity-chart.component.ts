@@ -1,7 +1,8 @@
-import { Component, Input, computed, signal } from '@angular/core';
+import { Component, Input, computed, inject, signal } from '@angular/core';
 import { ChartConfiguration, ChartData } from 'chart.js';
 import { NgChartsModule } from 'ng2-charts';
 import { FlightStatistic } from '../../../flight/shared/flightStatistic.model';
+import { LanguageService } from '../../../shared/services/language.service';
 
 const MONTHS_SHOWN = 12;
 
@@ -25,6 +26,8 @@ export interface MonthColumn {
 })
 export class ActivityChartComponent {
 
+    private languageService = inject(LanguageService);
+
     private monthly = signal<FlightStatistic[]>([]);
 
     @Input() set statistics(value: FlightStatistic[]) {
@@ -33,6 +36,8 @@ export class ActivityChartComponent {
 
     /** Trailing 12 months, oldest first, gaps filled with zeroes. */
     private series = computed(() => {
+        // Read as a signal so the month names re-render on a language switch.
+        const lang = this.languageService.lang();
         const rows = this.monthly();
         const byKey = new Map<string, FlightStatistic>();
         for (const row of rows) {
@@ -46,8 +51,8 @@ export class ActivityChartComponent {
             const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
             const row = byKey.get(`${d.getFullYear()}-${d.getMonth() + 1}`);
             out.push({
-                label: d.toLocaleDateString(undefined, { month: 'short', year: 'numeric' }),
-                initial: d.toLocaleDateString(undefined, { month: 'narrow' }),
+                label: d.toLocaleDateString(lang, { month: 'short', year: 'numeric' }),
+                initial: d.toLocaleDateString(lang, { month: 'narrow' }),
                 nbFlights: row?.nbFlights ?? 0,
                 hours: row ? Number(row.time ?? 0) / 3600 : 0
             });

@@ -1,4 +1,5 @@
-import { Component, ElementRef, Input, ViewChild, computed, effect, signal } from '@angular/core';
+import { Component, ElementRef, Input, ViewChild, computed, effect, inject, signal } from '@angular/core';
+import { LanguageService } from 'src/app/shared/services/language.service';
 import { HeatmapDay } from '../../shared/statistic.store';
 
 export interface HeatmapCell {
@@ -22,18 +23,22 @@ export class ActivityHeatmapComponent {
 
     @ViewChild('scroller') scroller?: ElementRef<HTMLDivElement>;
 
+    private languageService = inject(LanguageService);
+
     private source = signal<HeatmapDay[]>([]);
 
     @Input() set days(value: HeatmapDay[]) {
         this.source.set(value ?? []);
     }
 
-    public cells = computed<HeatmapCell[]>(() =>
-        this.source().map(day => ({
+    public cells = computed<HeatmapCell[]>(() => {
+        // Read as a signal so the tooltips re-render on a language switch.
+        const lang = this.languageService.lang();
+        return this.source().map(day => ({
             level: day.flights === 0 ? 0 : (day.flights === 1 ? 1 : 2),
-            title: `${day.date.toLocaleDateString()} — ${day.flights}`
-        }))
-    );
+            title: `${day.date.toLocaleDateString(lang)} — ${day.flights}`
+        } as HeatmapCell));
+    });
 
     constructor() {
         // Open on the most recent weeks. Scrolled to the oldest, a long logbook
