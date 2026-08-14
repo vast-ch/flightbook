@@ -7,9 +7,14 @@
     </ion-toolbar>
 </ion-header>
 <ion-content class="ion-padding">
-    @if ((('controlSheet.' + type + '.' + key + '.video') | translate) != 'controlSheet.' + type + '.' + key + '.video') {
+    <!--
+        Test the resolved value, not the key. Every `video` entry is present but
+        null for 42 of the 48 skills, so the old key comparison was always true
+        and rendered an <iframe src="null">.
+    -->
+    @if (videoUrl(); as url) {
         <div class="video-container">
-            <iframe [src]="getSafeUrl(('controlSheet.' + type + '.' + key + '.video') | translate)" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+            <iframe [src]="getSafeUrl(url)" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
         </div>
     }
     <div class="content" [innerHTML]="('controlSheet.' + type + '.' + key + '.content') | translate"></div>

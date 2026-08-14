@@ -1,112 +1,168 @@
-<ion-header>
-  <ion-toolbar color='primary'>
-    <ion-buttons slot="start">
-      <ion-menu-button></ion-menu-button>
-    </ion-buttons>
-    <ion-title>{{ 'controlSheet.title' | translate }}</ion-title>
-  </ion-toolbar>
-</ion-header>
+<!-- The school name is the header meta; "Control sheet" is the body's own title -->
+<div class="form-header">
+  <button type="button" class="icon-button" (click)="close()"
+          [attr.aria-label]="'buttons.back' | translate">
+    <ion-icon name="chevron-back" aria-hidden="true"></ion-icon>
+  </button>
+  <span class="form-header__meta">{{ schoolName() }}</span>
+</div>
 
-<ion-content class="no-padding">
-  <ion-accordion-group [multiple]="true" [value]="['theory', 'trainingHill', 'altitudeFlight', 'exam']">
-    <ion-accordion value="theory">
-      <ion-item slot="header" color="light">
-        <ion-label>{{ 'controlSheet.theory.title' | translate }}</ion-label>
-      </ion-item>
-      <ion-list slot="content">
-        @for (item of orderedTheory; track item) {
-          @if (item.key != 'id') {
-            <ion-item>
-              @if (controlSheet.userCanEdit) {
-                <ion-button class="star-button" fill="clear" (click)="openRateAlert($event, item.value, 'controlSheet.theory.' + item.key, 'theory', item.key)"><fb-star-rating [edit]="false" [selectedRating]="item.value"></fb-star-rating></ion-button>
-              } @else {
-                <fb-star-rating [edit]="false" [selectedRating]="item.value"></fb-star-rating>
-              }
-              <span class="definition">{{ ('controlSheet.theory.' + item.key) | translate }}</span>
-            </ion-item>
+<ion-content>
+  <div class="form-body">
+    <h1 class="sheet-title">{{ 'controlSheet.title' | translate }}</h1>
+    <p class="sheet-subtitle">{{ 'controlSheet.subtitle' | translate }}</p>
+
+    <!-- Licence requirements: flight count and the SHGPA solo flight -->
+    <div class="fb-card--flush">
+      <div class="sheet-metric">
+        <div class="sheet-metric__top">
+          <span class="sheet-metric__label">{{ 'controlSheet.flights' | translate }}</span>
+          <span class="sheet-metric__value">{{ licenceProgress().flights }}</span>
+          <span class="sheet-metric__of">
+            {{ 'home.ofTotal' | translate:{ total: licenceProgress().required } }}
+          </span>
+        </div>
+        <div class="sheet-track">
+          <div class="sheet-track__fill" [style.width.%]="licenceProgress().percent"></div>
+        </div>
+      </div>
+
+      <div class="sheet-requirement">
+        <span class="sheet-check" [class.is-done]="soloFlightDone()">
+          @if (soloFlightDone()) {
+            <ion-icon name="checkmark" aria-hidden="true"></ion-icon>
           }
+        </span>
+        <span class="sheet-requirement__text">
+          <span class="sheet-requirement__name">{{ 'home.soloFlight' | translate }}</span>
+          <span class="sheet-requirement__hint">{{ 'controlSheet.soloRequired' | translate }}</span>
+        </span>
+        <span class="sheet-requirement__state" [class.is-done]="soloFlightDone()">
+          {{ (soloFlightDone() ? 'home.requirementDone' : 'home.requirementOpen') | translate }}
+        </span>
+      </div>
+    </div>
+
+    @if (controlSheet) {
+      <!-- Skills -->
+      <div class="sheet-section-head">
+        <span class="fb-section-label">{{ 'controlSheet.skills' | translate }}</span>
+        @if (trainingProgress(); as progress) {
+          <span class="sheet-section-head__count">
+            {{ 'controlSheet.rated' | translate:{ rated: progress.ratedSkills, total: progress.totalSkills } }}
+          </span>
         }
-      </ion-list>
-    </ion-accordion>
-    <ion-accordion value="trainingHill">
-      <ion-item slot="header" color="light">
-        <ion-label>{{ 'controlSheet.trainingHill.title' | translate }}</ion-label>
-      </ion-item>
-      <ion-list slot="content">
-        @for (item of orderedTrainingHill; track item) {
-          @if (item.key != 'id') {
-            <ion-item button (click)="openDetail('trainingHill',item.key)">
-              @if (controlSheet.userCanEdit) {
-                <ion-button class="star-button" fill="clear" (click)="openRateAlert($event, item.value, 'controlSheet.trainingHill.' + item.key + '.title', 'trainingHill', item.key)"><fb-star-rating [edit]="false" [selectedRating]="item.value"></fb-star-rating></ion-button>
-              } @else {
-                <fb-star-rating [edit]="false" [selectedRating]="item.value"></fb-star-rating>
+      </div>
+
+      @for (group of groups; track group) {
+        <div class="sheet-group" [class.is-expanded]="isExpanded(group)">
+          <!-- Collapsed shows a progress bar; expanded shows the rows instead -->
+          <button type="button" class="sheet-group__header" (click)="toggleGroup(group)"
+                  [attr.aria-expanded]="isExpanded(group)">
+            <span class="sheet-group__text">
+              <span class="sheet-group__title">
+                {{ ('controlSheet.' + group + '.title') | translate }}
+              </span>
+              @if (!isExpanded(group)) {
+                <span class="sheet-track sheet-track--group">
+                  <span class="sheet-track__fill" [style.width.%]="groupPercent(group)"></span>
+                </span>
               }
-              <span class="definition">{{ ('controlSheet.trainingHill.' + item.key + '.title') | translate }}</span>
-            </ion-item>
+            </span>
+            <span class="sheet-group__count">{{ ratedCount(group) }} / {{ totalCount(group) }}</span>
+            <ion-icon class="fb-row__chevron"
+                      [name]="isExpanded(group) ? 'chevron-up' : 'chevron-down'"
+                      aria-hidden="true"></ion-icon>
+          </button>
+
+          @if (isExpanded(group)) {
+            @for (row of rows(group); track row.key) {
+              <div class="sheet-skill" [class.is-tappable]="hasDetail(group)"
+                   (click)="openDetail(group, row.key)">
+                <span class="sheet-skill__name">{{ labelKey(group, row.key) | translate }}</span>
+                <span class="sheet-skill__stars" [class.is-editable]="canEdit"
+                      (click)="openRateAlert($event, row.value, group, row.key)">
+                  <fb-star-rating [edit]="false" [selectedRating]="row.value"></fb-star-rating>
+                </span>
+              </div>
+            }
           }
-        }
-      </ion-list>
-    </ion-accordion>
-    <ion-accordion value="altitudeFlight">
-      <ion-item slot="header" color="light">
-        <ion-label>{{ 'controlSheet.altitudeFlight.title' | translate }}</ion-label>
-      </ion-item>
-      <ion-list slot="content">
-        @for (item of orderedAltitudeFlight; track item) {
-          @if (item.key != 'id') {
-            <ion-item button (click)="openDetail('altitudeFlight',item.key)">
-              @if (controlSheet.userCanEdit) {
-                <ion-button class="star-button" fill="clear" (click)="openRateAlert($event, item.value, 'controlSheet.altitudeFlight.' + item.key + '.title', 'altitudeFlight', item.key)"><fb-star-rating [edit]="false" [selectedRating]="item.value" ></fb-star-rating></ion-button>
-              } @else {
-                <fb-star-rating [edit]="false" [selectedRating]="item.value"></fb-star-rating>
-              }
-              <span class="definition">{{ ('controlSheet.altitudeFlight.' + item.key + '.title') | translate }}</span>
-            </ion-item>
+        </div>
+      }
+
+      <!-- Final exams -->
+      <div class="fb-section-label sheet-exams-label">{{ 'controlSheet.exam.title' | translate }}</div>
+      <div class="fb-card--flush">
+        <button type="button" id="theoryDateInput" class="fb-row sheet-exam" [disabled]="!canEdit">
+          <span class="sheet-exam__label">{{ 'controlSheet.exam.theory' | translate }}</span>
+          <span class="sheet-exam__value" [class.is-placeholder]="!controlSheet.passTheoryExam">
+            @if (controlSheet.passTheoryExam) {
+              {{ controlSheet.passTheoryExam | date:'dd.MM.yyyy':undefined:language }}
+            } @else {
+              {{ 'controlSheet.notScheduled' | translate }}
+            }
+          </span>
+        </button>
+
+        <button type="button" id="practiceDateInput" class="fb-row sheet-exam" [disabled]="!canEdit">
+          <span class="sheet-exam__label">{{ 'controlSheet.exam.practice' | translate }}</span>
+          <span class="sheet-exam__value" [class.is-placeholder]="!controlSheet.passPracticeExam">
+            @if (controlSheet.passPracticeExam) {
+              {{ controlSheet.passPracticeExam | date:'dd.MM.yyyy':undefined:language }}
+            } @else {
+              {{ 'controlSheet.notScheduled' | translate }}
+            }
+          </span>
+        </button>
+      </div>
+
+      @if (canEdit && (controlSheet.passTheoryExam || controlSheet.passPracticeExam)) {
+        <div class="secondary-actions sheet-clear">
+          @if (controlSheet.passTheoryExam) {
+            <button type="button" class="sheet-clear__link" (click)="clearDate('theoryExam')">
+              {{ 'buttons.clear' | translate }} · {{ 'controlSheet.exam.theory' | translate }}
+            </button>
           }
-        }
-      </ion-list>
-    </ion-accordion>
-    <ion-accordion value="exam">
-      <ion-item slot="header" color="light">
-        <ion-label>{{ 'controlSheet.exam.title' | translate }}</ion-label>
-      </ion-item>
-      <ion-list slot="content">
-        <ion-item id="theoryDateInput">
-          <ion-input label="{{ 'controlSheet.exam.theory' | translate }}:" labelPlacement="stacked" value="{{ controlSheet?.passTheoryExam | date:'dd.MM.yyyy' }}" ></ion-input>
-        </ion-item>
-        <ion-item id="practiceDateInput">
-          <ion-input label="{{ 'controlSheet.exam.practice' | translate }}:" labelPlacement="stacked" value="{{ controlSheet?.passPracticeExam | date:'dd.MM.yyyy' }}" ></ion-input>
-        </ion-item>
-      </ion-list>
-    </ion-accordion>
-  </ion-accordion-group>
+          @if (controlSheet.passPracticeExam) {
+            <button type="button" class="sheet-clear__link" (click)="clearDate('practiceExam')">
+              {{ 'buttons.clear' | translate }} · {{ 'controlSheet.exam.practice' | translate }}
+            </button>
+          }
+        </div>
+      }
+    }
+  </div>
 </ion-content>
 
-<ion-modal #starModal [initialBreakpoint]="0.15" [breakpoints]="[0, 0.25, 0.5, 0.75]">
+<!-- Rating sheet, opened from a skill's stars -->
+<ion-modal #starModal class="sheet-star-modal" [initialBreakpoint]="0.28" [breakpoints]="[0, 0.28, 0.5]">
   <ng-template>
-    <ion-content class="startRatingModal">
-      <h2>{{ starRating.translationKey | translate }}</h2>
-      <fb-star-rating [edit]="true" [selectedRating]="starRating.currentValue" (selectEvent)="saveRating($event)"></fb-star-rating>
-    </ion-content>
+    <div class="star-sheet">
+      <div class="star-sheet__grabber" aria-hidden="true"></div>
+      <h2 class="star-sheet__title">{{ starRating.translationKey | translate }}</h2>
+      <fb-star-rating class="star-sheet__stars" [edit]="true"
+                      [selectedRating]="starRating.currentValue"
+                      (selectEvent)="saveRating($event)"></fb-star-rating>
+    </div>
   </ng-template>
 </ion-modal>
 
-<ion-modal class="dateModal" trigger='theoryDateInput'>
+<!--
+  Cancel genuinely cancels now. Clearing a date is a separate action below the
+  card, so backing out of the picker no longer wipes the value.
+-->
+<ion-modal class="dateModal" trigger="theoryDateInput">
   <ng-template>
-    <ion-content>
-      <ion-datetime size="cover" presentation="date" [preferWheel]="true" [value]="theoryExamDate" (ionChange)="onTheoryDateChange($event)" locale="{{ language }}" [showDefaultButtons]="true"
-          doneText="{{ 'buttons.done' | translate }}" cancelText="{{ 'buttons.clear' | translate }}" (ionCancel)="clearDateButton('theoryExam')">
-        </ion-datetime>
-    </ion-content>
+    <ion-datetime size="cover" presentation="date" [preferWheel]="true" [value]="theoryExamDate"
+      (ionChange)="onTheoryDateChange($event)" locale="{{ language }}" [showDefaultButtons]="true"
+      doneText="{{ 'buttons.done' | translate }}" cancelText="{{ 'buttons.cancel' | translate }}"></ion-datetime>
   </ng-template>
 </ion-modal>
 
-<ion-modal class="dateModal" trigger='practiceDateInput'>
+<ion-modal class="dateModal" trigger="practiceDateInput">
   <ng-template>
-    <ion-content>
-      <ion-datetime size="cover" presentation="date" [preferWheel]="true" [value]="practiceExamDate" (ionChange)="onPracticeDateChange($event)" locale="{{ language }}" [showDefaultButtons]="true"
-          doneText="{{ 'buttons.done' | translate }}" cancelText="{{ 'buttons.clear' | translate }}" (ionCancel)="clearDateButton('practiceExam')">
-        </ion-datetime>
-    </ion-content>
+    <ion-datetime size="cover" presentation="date" [preferWheel]="true" [value]="practiceExamDate"
+      (ionChange)="onPracticeDateChange($event)" locale="{{ language }}" [showDefaultButtons]="true"
+      doneText="{{ 'buttons.done' | translate }}" cancelText="{{ 'buttons.cancel' | translate }}"></ion-datetime>
   </ng-template>
 </ion-modal>

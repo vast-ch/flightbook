@@ -17,10 +17,9 @@
     height: 100%;
 }
 
-h2 {
-    margin-bottom: 9px;
-}
-
+// The bare `h2 { margin-bottom: 9px }` that used to live here leaked to every
+// h2 in the app, because this component has encapsulation disabled. .content h2
+// below already sets its own margins, so it was redundant as well as harmful.
 .content h2 {
     margin-left: 0;
     margin-right: 0;
