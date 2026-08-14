@@ -728,7 +728,14 @@
         "understandRisks": "I am aware that the flight involves risks (e.g. falling during take-off or landing).",
         "canUseData": "I agree to receive offers and news by email.",
         "tandemSchool": "Tandem operator",
-        "open": "Open"
+        "open": "Open",
+        "passenger": "Passenger",
+        "signedCount": "{{count}} signed",
+        "stepDetails": "Details",
+        "stepSign": "Sign",
+        "confirmPoints": "I confirm the points above",
+        "continueToSignature": "Continue to signature",
+        "hint": "Confirmations are kept as proof of the passenger briefing."
     },
     "school": {
         "leaveSchool": "Leave \"{{schoolName}}\"",

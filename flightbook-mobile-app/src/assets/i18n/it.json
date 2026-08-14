@@ -728,7 +728,14 @@
         "understandRisks": "Sono consapevole dei rischi associati al volo (ad es. caduta in fase di decollo o atterraggio).",
         "canUseData": "Accetto di ricevere offerte e novità via e-mail.",
         "tandemSchool": "Azienda biplace",
-        "open": "Aprire"
+        "open": "Aprire",
+        "passenger": "Passeggero",
+        "signedCount": "{{count}} firmate",
+        "stepDetails": "Dati",
+        "stepSign": "Firma",
+        "confirmPoints": "Confermo i punti sopra",
+        "continueToSignature": "Continua alla firma",
+        "hint": "Le conferme servono come prova del briefing del passeggero."
     },
     "school": {
         "leaveSchool": "Lasciare \"{{schoolName}}\"",

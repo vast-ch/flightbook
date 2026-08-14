@@ -1,53 +1,70 @@
-<ion-header>
-  <ion-toolbar color='primary'>
-    <ion-buttons slot="start">
-      <ion-back-button defaultHref="more"></ion-back-button>
-    </ion-buttons>
-    <ion-title>{{ 'buttons.pasengerConfirmations' | translate }} 
-      @if (filtered) {
-        <span>({{ 'groupname.filtered' | translate }})</span>
-      }
-    </ion-title>
-    <ion-buttons slot="primary">
-      <ion-button class="submit-button" (click)="openAddPassengerConfirmation()">
-        <ion-icon name="add"></ion-icon>
-      </ion-button>
-      <!-- <ion-button (click)="openFilter()">
-        <ion-icon name="filter-outline"></ion-icon>
-      </ion-button> -->
-    </ion-buttons>
-  </ion-toolbar>
-</ion-header>
+<!-- Surface strip rather than an ion-toolbar; the add action is the design's blue square -->
+<div class="list-header">
+  <button type="button" class="icon-button" (click)="close()"
+          [attr.aria-label]="'buttons.back' | translate">
+    <ion-icon name="chevron-back" aria-hidden="true"></ion-icon>
+  </button>
+
+  <div class="list-header__text">
+    <div class="list-header__eyebrow">
+      <span class="fb-section-label">
+        {{ 'passengerConfirmation.signedCount' | translate:{ count: passengerConfirmations().length } }}
+      </span>
+    </div>
+    <h1 class="list-header__title">{{ 'buttons.pasengerConfirmations' | translate }}</h1>
+  </div>
+
+  <button type="button" class="confirm-add" (click)="openAddPassengerConfirmation()"
+          [attr.aria-label]="'buttons.add' | translate">
+    <ion-icon name="add" aria-hidden="true"></ion-icon>
+  </button>
+</div>
 
 <ion-content class="no-padding">
-  <ion-list>
-    @if (passengerConfirmations?.length > 0) {
-      <ion-item class="export-buttons">
-        <ion-grid>
-          <ion-row>
-            <ion-col>
-              <ion-button (click)="xlsxExport()">Xlsx Export</ion-button>
-            </ion-col>
-          </ion-row>
-        </ion-grid>
-      </ion-item>
-    }
+  @for (group of groupedConfirmations(); track group.key) {
+    <div class="month-heading fb-section-label">
+      {{ group.date | date:'LLLL yyyy':undefined:currentLang }}
+    </div>
 
-    @for (passengerConfirmation of passengerConfirmations; track passengerConfirmation.id) {
-      <ion-item button detail (click)="itemTapped($event, passengerConfirmation)">
-        <p class="passengerConfirmationRow">
-          <span class="date">{{ passengerConfirmation.date | date:'dd.MM.yyyy'}}</span>
-          <span class="passengerName">{{ passengerConfirmation.firstname}} {{passengerConfirmation.lastname}}</span>
-        </p>
-        <ion-icon item-end></ion-icon>
-      </ion-item>
-    }
-    @empty {
-      <ion-item lines="none">
-        <ion-label class="ion-text-center">{{ 'emptylist' | translate }}</ion-label>
-      </ion-item>
-    }
-  </ion-list>
+    <div class="list-block">
+      @for (confirmation of group.confirmations; track confirmation.id) {
+        <button type="button" class="confirm-row" (click)="itemTapped(confirmation)">
+          <span class="fb-avatar-initials is-self" aria-hidden="true">{{ initials(confirmation) }}</span>
+
+          <span class="confirm-row__text">
+            <span class="confirm-row__name">{{ confirmation.firstname }} {{ confirmation.lastname }}</span>
+            <!--
+              The design's third item is the language the passenger signed in,
+              which is not stored. The operator is, and is worth as much here.
+            -->
+            <span class="confirm-row__meta">
+              {{ confirmation.date | date:'dd.MM.yyyy':undefined:currentLang }}
+              @if (confirmation.place) {
+                &middot; {{ confirmation.place }}
+              }
+              @if (confirmation.tandemSchool?.name) {
+                &middot; {{ confirmation.tandemSchool.name }}
+              }
+            </span>
+          </span>
+
+          <!-- Signed is the only state a stored confirmation can be in -->
+          @if (confirmation.validated) {
+            <ion-icon name="checkmark" class="confirm-row__check" aria-hidden="true"></ion-icon>
+          }
+        </button>
+      }
+    </div>
+  } @empty {
+    <div class="list-empty fb-empty-hint">{{ 'emptylist' | translate }}</div>
+  }
+
+  @if (passengerConfirmations().length > 0) {
+    <div class="confirm-hint">
+      {{ 'passengerConfirmation.hint' | translate }}
+      <span class="fb-section-action" (click)="xlsxExport()">{{ 'buttons.export' | translate }}</span>
+    </div>
+  }
 
   <ion-infinite-scroll threshold="100px" (ionInfinite)="loadData($event)">
     <ion-infinite-scroll-content loadingSpinner="bubbles" loadingText="{{ 'loading.loading' | translate }}">

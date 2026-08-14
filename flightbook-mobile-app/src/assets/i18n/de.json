@@ -728,7 +728,14 @@
         "understandRisks": "Ich bin mir bewusst, dass der Flug mit Risiken verbunden ist (bspw. Sturz beim Start oder Landung).",
         "canUseData": "Ich bin damit einverstanden, Angebote und Neuigkeiten per E-Mail zu erhalten.",
         "tandemSchool": "Tandemunternehmen",
-        "open": "Öffnen"
+        "open": "Öffnen",
+        "passenger": "Passagier",
+        "signedCount": "{{count}} signiert",
+        "stepDetails": "Angaben",
+        "stepSign": "Signieren",
+        "confirmPoints": "Ich bestätige die obigen Punkte",
+        "continueToSignature": "Weiter zur Signatur",
+        "hint": "Bestätigungen dienen als Nachweis der Passagier-Instruktion."
     },
     "school": {
         "leaveSchool": "\"{{schoolName}}\" verlassen",

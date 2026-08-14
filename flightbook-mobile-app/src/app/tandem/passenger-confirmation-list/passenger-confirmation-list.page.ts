@@ -1,11 +1,11 @@
 import { DatePipe } from '@angular/common';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, computed, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { ModalController, LoadingController, IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonButton, IonIcon, IonContent, IonItem, IonList, IonInfiniteScroll, IonInfiniteScrollContent, IonLabel, AlertController, IonGrid, IonRow, IonCol } from '@ionic/angular/standalone';
+import { ModalController, LoadingController, NavController, IonIcon, IonContent, IonInfiniteScroll, IonInfiniteScrollContent, AlertController } from '@ionic/angular/standalone';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { firstValueFrom, Subject, takeUntil } from 'rxjs';
 import { addIcons } from "ionicons";
-import { add, filterOutline } from 'ionicons/icons';
+import { add, checkmark, chevronBack } from 'ionicons/icons';
 import { PassengerConfirmationFormComponent } from '../shared/components/passenger-confirmation-form/passenger-confirmation-form.component';
 import { TandemService } from '../shared/tandem.service';
 import { PassengerConfirmation } from '../shared/domain/passenger-confirmation.model';
@@ -23,20 +23,8 @@ import { TandemSchoolService } from 'src/app/school/shared/tandem-school.service
   imports: [
     TranslateModule,
     DatePipe,
-    IonHeader,
-    IonToolbar,
-    IonButtons,
-    IonBackButton,
-    IonTitle,
-    IonButton,
     IonIcon,
     IonContent,
-    IonItem,
-    IonLabel,
-    IonList,
-    IonGrid,
-    IonRow,
-    IonCol,
     IonInfiniteScroll,
     IonInfiniteScrollContent
   ]
@@ -44,13 +32,33 @@ import { TandemSchoolService } from 'src/app/school/shared/tandem-school.service
 export class PassengerConfirmationListPage implements OnInit, OnDestroy {
 
   unsubscribe$ = new Subject<void>();
-  passengerConfirmations: PassengerConfirmation[] = [];
-  filtered: boolean;
+  passengerConfirmations = signal<PassengerConfirmation[]>([]);
   schools = this.tandemSchoolService.schools;
+  currentLang: string;
+
+  /**
+   * Grouped by month, as the design lists them. A single pass keeps the order
+   * the endpoint returned, so infinite-scroll appends land in the right group.
+   */
+  public groupedConfirmations = computed(() => {
+    const groups: { key: string; date: Date; confirmations: PassengerConfirmation[] }[] = [];
+    for (const confirmation of this.passengerConfirmations()) {
+      const date = new Date(confirmation.date);
+      const key = `${date.getFullYear()}-${date.getMonth()}`;
+      const last = groups[groups.length - 1];
+      if (last && last.key === key) {
+        last.confirmations.push(confirmation);
+      } else {
+        groups.push({ key, date, confirmations: [confirmation] });
+      }
+    }
+    return groups;
+  });
 
   constructor(
     private route: ActivatedRoute,
     private modalCtrl: ModalController,
+    private navCtrl: NavController,
     private tandemService: TandemService,
     private loadingCtrl: LoadingController,
     private alertController: AlertController,
@@ -59,7 +67,8 @@ export class PassengerConfirmationListPage implements OnInit, OnDestroy {
     private xlsxExportService: XlsxExportService,
     private tandemSchoolService: TandemSchoolService
   ) {
-    addIcons({ filterOutline, add });
+    this.currentLang = this.translate.currentLang;
+    addIcons({ add, checkmark, 'chevron-back': chevronBack });
   }
 
   async ngOnInit() {
@@ -78,10 +87,18 @@ export class PassengerConfirmationListPage implements OnInit, OnDestroy {
     this.unsubscribe$.complete();
   }
 
+  close() {
+    this.navCtrl.navigateBack('more');
+  }
+
+  initials(confirmation: PassengerConfirmation): string {
+    return `${confirmation.firstname?.charAt(0) ?? ''}${confirmation.lastname?.charAt(0) ?? ''}`.toUpperCase();
+  }
+
   async openAddPassengerConfirmation() {
     if (
-      (!this.paymentService.getPaymentStatusValue()?.active && this.passengerConfirmations.length >= 10) ||
-      (this.paymentService.getPaymentStatusValue()?.active && this.paymentService.getPaymentStatusValue()?.state == 'EXEMPTED' && this.passengerConfirmations.length >= 10)
+      (!this.paymentService.getPaymentStatusValue()?.active && this.passengerConfirmations().length >= 10) ||
+      (this.paymentService.getPaymentStatusValue()?.active && this.paymentService.getPaymentStatusValue()?.state == 'EXEMPTED' && this.passengerConfirmations().length >= 10)
     ) {
       const alert = await this.alertController.create({
         header: this.translate.instant('message.infotitle'),
@@ -93,8 +110,8 @@ export class PassengerConfirmationListPage implements OnInit, OnDestroy {
       await alert.present();
       return;
     } else if (
-      (!this.paymentService.getPaymentStatusValue()?.active && this.passengerConfirmations.length == 0) ||
-      (this.paymentService.getPaymentStatusValue()?.active && this.paymentService.getPaymentStatusValue()?.state == 'EXEMPTED' && this.passengerConfirmations.length == 0)
+      (!this.paymentService.getPaymentStatusValue()?.active && this.passengerConfirmations().length == 0) ||
+      (this.paymentService.getPaymentStatusValue()?.active && this.paymentService.getPaymentStatusValue()?.state == 'EXEMPTED' && this.passengerConfirmations().length == 0)
     ) {
       const alert = await this.alertController.create({
         header: this.translate.instant('message.infotitle'),
@@ -125,11 +142,7 @@ export class PassengerConfirmationListPage implements OnInit, OnDestroy {
     this.translate.use(localStorage.getItem('language') || navigator.language.split('-')[0]);
   }
 
-  async openFilter() {
-
-  }
-
-  async itemTapped(event: MouseEvent, passengerConfirmation: PassengerConfirmation) {
+  async itemTapped(passengerConfirmation: PassengerConfirmation) {
     const modal = await this.modalCtrl.create({
       component: PassengerConfirmationFormComponent,
       cssClass: 'passenger-confirmation-form-class',
@@ -155,9 +168,9 @@ export class PassengerConfirmationListPage implements OnInit, OnDestroy {
     await loading.present();
 
     try {
-      this.passengerConfirmations = await firstValueFrom(
+      this.passengerConfirmations.set(await firstValueFrom(
         this.tandemService.getPassengerConfirmations({ limit: this.tandemService.defaultLimit })
-      );
+      ));
     } catch (error) {
       console.error('Error loading passenger confirmations', error);
     } finally {
@@ -168,7 +181,7 @@ export class PassengerConfirmationListPage implements OnInit, OnDestroy {
   loadData(event: any) {
     this.tandemService.getPassengerConfirmations({
       limit: this.tandemService.defaultLimit,
-      offset: this.passengerConfirmations.length
+      offset: this.passengerConfirmations().length
     })
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe((res: PassengerConfirmation[]) => {
@@ -176,7 +189,7 @@ export class PassengerConfirmationListPage implements OnInit, OnDestroy {
         if (res.length < this.tandemService.defaultLimit) {
           event.target.disabled = true;
         }
-        this.passengerConfirmations.push(...res);
+        this.passengerConfirmations.update(current => [...current, ...res]);
       });
   }
 
