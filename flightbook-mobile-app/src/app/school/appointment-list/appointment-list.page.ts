@@ -61,6 +61,9 @@ export class AppointmentListPage implements OnInit, OnDestroy {
     /** True once a page came back short, which is the only way we know the total. */
     private listComplete = signal<boolean>(false);
 
+    /** Rows the server has handed over, which is what its offset counts. */
+    private fetchedCount = 0;
+
     public loadedCount = computed(() =>
         this.listComplete() && this.scope() === 'upcoming' ? this.appointments().length : 0
     );
@@ -161,6 +164,7 @@ export class AppointmentListPage implements OnInit, OnDestroy {
         this.scope.set(scope);
         this.appointments.set([]);
         this.listComplete.set(false);
+        this.fetchedCount = 0;
         this.initialDataLoad();
     }
 
@@ -196,6 +200,7 @@ export class AppointmentListPage implements OnInit, OnDestroy {
             this.schoolService.getAppointments({ limit: this.schoolService.defaultLimit }, this.schoolId, this.scope())
         );
 
+        this.fetchedCount = rawAppointments.length;
         this.listComplete.set(rawAppointments.length < this.schoolService.defaultLimit);
 
         // Enrich appointments with computed state
@@ -335,11 +340,16 @@ export class AppointmentListPage implements OnInit, OnDestroy {
     loadData(event: any) {
         this.schoolService.getAppointments({
             limit: this.schoolService.defaultLimit,
-            offset: this.appointments().length
+            // fetchedCount, not the rendered length: inScope() drops today's
+            // wrong-side appointments, and paging on the shorter list would ask
+            // the server for rows it has already sent - the same appointment
+            // twice, and a duplicate track key with it.
+            offset: this.fetchedCount
         }, this.schoolId, this.scope())
             .pipe(takeUntil(this.unsubscribe$))
             .subscribe((res: Appointment[]) => {
                 event.target.complete();
+                this.fetchedCount += res.length;
                 if (res.length < this.schoolService.defaultLimit) {
                     event.target.disabled = true;
                     this.listComplete.set(true);
