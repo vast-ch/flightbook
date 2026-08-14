@@ -254,6 +254,14 @@
 
 .fb-row__label {
   flex: 0 0 76px;
+  /*
+   * The design's label column is a fixed 76px and carries no mandatory marker.
+   * Ours does, and "Firstname&nbsp;*" is wider than 76px - without min-width: 0
+   * a flex item's automatic minimum size grows it to fit, which would push the
+   * value out of line on mandatory rows only. Zero lets the marker overhang
+   * into the row's 12px gap instead, so every column still lines up.
+   */
+  min-width: 0;
   font-size: 11px;
   font-weight: 500;
   line-height: 1.3;

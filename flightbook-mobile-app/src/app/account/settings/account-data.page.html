@@ -32,7 +32,7 @@
         <div class="fb-section-label account-section-label">{{ 'account.myData' | translate }}</div>
         <div class="fb-card--flush">
           <div class="fb-row">
-            <span class="fb-row__label" id="lbl-firstname">{{ 'account.firstname' | translate }} *</span>
+            <span class="fb-row__label" id="lbl-firstname">{{ 'account.firstname' | translate }}&nbsp;*</span>
             <span class="fb-row__value">
               <ion-input [(ngModel)]="user.firstname" #firstname="ngModel" name="firstname"
                          required type="text" autocomplete="given-name"
@@ -44,7 +44,7 @@
           </div>
 
           <div class="fb-row">
-            <span class="fb-row__label" id="lbl-lastname">{{ 'account.lastname' | translate }} *</span>
+            <span class="fb-row__label" id="lbl-lastname">{{ 'account.lastname' | translate }}&nbsp;*</span>
             <span class="fb-row__value">
               <ion-input [(ngModel)]="user.lastname" #lastname="ngModel" name="lastname"
                          required type="text" autocomplete="family-name"
@@ -56,7 +56,7 @@
           </div>
 
           <div class="fb-row">
-            <span class="fb-row__label" id="lbl-email">{{ 'login.email' | translate }} *</span>
+            <span class="fb-row__label" id="lbl-email">{{ 'login.email' | translate }}&nbsp;*</span>
             <span class="fb-row__value">
               <ion-input [(ngModel)]="user.email" #email="ngModel" name="email"
                          required email type="email" inputmode="email" autocomplete="email"

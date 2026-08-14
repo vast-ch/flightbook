@@ -55,7 +55,7 @@
     <div class="fb-card--flush form-card">
       @if (gliders.length > 0) {
         <div class="fb-row fb-row--select">
-          <span class="fb-row__label">{{ 'flight.glider' | translate }} *</span>
+          <span class="fb-row__label">{{ 'flight.glider' | translate }}&nbsp;*</span>
           <span class="fb-row__value">
             <fb-glider-select label="" labelPlacement="stacked" [flight]="flight" [gliders]="gliders"></fb-glider-select>
           </span>
@@ -81,7 +81,7 @@
 
       <!-- type="button" is mandatory: a bare button inside a form submits it -->
       <button type="button" id="flightDateInput" class="fb-row">
-        <span class="fb-row__label">{{ 'flight.date' | translate }} *</span>
+        <span class="fb-row__label">{{ 'flight.date' | translate }}&nbsp;*</span>
         <span class="fb-row__value">{{ flight.date | date:'dd.MM.yyyy' }}</span>
         <ion-icon class="fb-row__chevron" name="chevron-forward" aria-hidden="true"></ion-icon>
       </button>
