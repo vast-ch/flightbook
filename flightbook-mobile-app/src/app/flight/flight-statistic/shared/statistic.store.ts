@@ -115,7 +115,15 @@ export class StatisticStore {
         };
     });
 
-    /** One entry per day from the first flight (or Jan 1 of the year) to today. */
+    /**
+     * One entry per day: the last 365 days for all-time, the calendar year for
+     * a selected year.
+     *
+     * All-time is windowed rather than run from the first flight because a
+     * pilot flying since 2013 produces ~650 columns - the grid then scrolls
+     * far off-screen and the recent weeks, the only ones anyone reads, are
+     * indistinguishable from the rest.
+     */
     public heatmap = computed<HeatmapDay[]>(() => {
         const flights = this.periodFlights();
         if (flights.length === 0) {
@@ -131,8 +139,20 @@ export class StatisticStore {
 
         const period = this.period();
         const sorted = [...counts.keys()].sort();
-        const start = period === ALL_TIME ? new Date(sorted[0]) : new Date(`${period}-01-01`);
         const today = new Date();
+
+        let start: Date;
+        if (period === ALL_TIME) {
+            // 365 days inclusive of today, but never before the first flight -
+            // a three-month-old logbook should not open on a year of blanks.
+            const window = new Date(today);
+            window.setDate(window.getDate() - 364);
+            const first = new Date(sorted[0]);
+            start = first > window ? first : window;
+        } else {
+            start = new Date(`${period}-01-01`);
+        }
+
         const end = period === ALL_TIME || Number(period) === today.getFullYear()
             ? today
             : new Date(`${period}-12-31`);

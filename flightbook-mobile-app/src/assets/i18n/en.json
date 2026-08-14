@@ -178,7 +178,7 @@
         "since": "since {{date}}",
         "period": "Period",
         "flightActivity": "Flight activity",
-        "everyDay": "Every day since you started",
+        "last12Months": "Last 12 months",
         "flyingDays": "{{days}} flying days in {{weeks}} weeks",
         "less": "Less",
         "more": "More",
