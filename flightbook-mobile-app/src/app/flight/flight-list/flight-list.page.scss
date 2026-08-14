@@ -27,27 +27,8 @@
   padding: 15px var(--fb-gutter);
 }
 
-.flight-row__date {
-  flex: none;
-  width: 36px;
-}
-
-.flight-row__day {
-  font-size: 17px;
-  font-weight: 600;
-  line-height: 1;
-  color: var(--fb-text);
-}
-
-.flight-row__month {
-  margin-top: 5px;
-  font-size: 9px;
-  font-weight: 500;
-  line-height: 1;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--fb-text-muted);
-}
+// The date column is .row-date in theme/tokens.scss - the appointment list draws
+// the same one.
 
 .flight-row__main {
   flex: 1;

@@ -45,9 +45,9 @@
           <ion-item button detail="false" lines="none" class="flight-row"
                     (click)="itemTapped($event, flight)">
             <div class="flight-row__inner">
-              <div class="flight-row__date">
-                <div class="flight-row__day">{{ flight.date | date:'d':undefined:currentLang }}</div>
-                <div class="flight-row__month">{{ flight.date | date:'LLL':undefined:currentLang }}</div>
+              <div class="row-date">
+                <div class="row-date__day">{{ flight.date | date:'d':undefined:currentLang }}</div>
+                <div class="row-date__month">{{ flight.date | date:'LLL':undefined:currentLang }}</div>
               </div>
 
               <div class="flight-row__main">

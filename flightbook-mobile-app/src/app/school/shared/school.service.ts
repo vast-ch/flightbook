@@ -9,6 +9,9 @@ import { School } from './school.model';
 import { ControlSheet } from 'src/app/shared/domain/control-sheet';
 import { EmergencyContact } from './emergency-contact.model';
 
+/** Which side of today an appointment list asks for. */
+export type AppointmentScope = 'upcoming' | 'past';
+
 @Injectable({
   providedIn: 'root'
 })
@@ -36,10 +39,34 @@ export class SchoolService {
     this.schoolsSignal.set(null);
   }
 
-  getAppointments({ limit = null, offset = null}: { limit?: number, offset?: number} = {}, schoolId: number ): Observable<Appointment[]> {
+  getAppointments({ limit = null, offset = null}: { limit?: number, offset?: number} = {}, schoolId: number, scope?: AppointmentScope ): Observable<Appointment[]> {
     let params: HttpParams = this.createFilterParams(limit, offset);
+    params = this.appendScope(params, scope);
 
     return this.http.get<Appointment[]>(`${environment.baseUrl}/student/schools/${schoolId}/appointments`, { params });
+  }
+
+  /**
+   * The Upcoming / Past tabs, expressed with the from/to params the endpoint
+   * already takes. A bound the user set in the filter wins - their filter is the
+   * more specific request - and the scope deliberately does not touch filtered$,
+   * or every plain list would claim to be filtered.
+   *
+   * Note both bounds are date-only, so today satisfies either scope; the page
+   * settles today's appointments against the clock.
+   */
+  private appendScope(params: HttpParams, scope?: AppointmentScope): HttpParams {
+    if (!scope) {
+      return params;
+    }
+    const today = moment().format('YYYY-MM-DD');
+    if (scope === 'upcoming' && !this.filter.from) {
+      return params.append('from', today);
+    }
+    if (scope === 'past' && !this.filter.to) {
+      return params.append('to', today);
+    }
+    return params;
   }
 
   getAppointment(schoolId: number, appointmentId: number ): Observable<Appointment> {

@@ -115,6 +115,10 @@
   --fb-danger-border: #f3c7c1;
   --fb-danger-text: #8e241a;
 
+  /* Amber, for a state that is neither settled nor wrong - e.g. announced */
+  --fb-warning-bg: #fdf3e0;
+  --fb-warning-text: #9a6b12;
+
   /* Ground for the autocomplete list nested inside a form card */
   --fb-sunken: #f7fbfe;
   --fb-placeholder: #7e8fa0;
@@ -490,6 +494,122 @@ button.fb-row {
 .list-empty,
 .list-footnote {
   margin: 16px var(--fb-gutter);
+}
+
+/*
+ * Leading date column of a list row: a large day number over a small uppercase
+ * month. Shared by the flight list and the appointment list, which the design
+ * draws identically.
+ */
+.row-date {
+  flex: none;
+  width: 36px;
+}
+
+.row-date__day {
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--fb-text);
+}
+
+.row-date__month {
+  margin-top: 5px;
+  font-size: 9px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--fb-text-muted);
+}
+
+/*
+ * State pill. The design's greens and reds sit within a shade of the banner
+ * tokens above, so those are reused rather than duplicated; only the amber of
+ * an announced-but-unconfirmed state is new.
+ */
+.fb-status {
+  flex: none;
+  padding: 3px 8px;
+  border-radius: 99px;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+
+  &--CONFIRMED {
+    background: var(--fb-success-bg);
+    color: var(--fb-success-text);
+  }
+
+  &--ANNOUNCED {
+    background: var(--fb-warning-bg);
+    color: var(--fb-warning-text);
+  }
+
+  &--CANCELED {
+    background: var(--fb-danger-bg);
+    color: var(--fb-danger-text);
+  }
+}
+
+/*
+ * Capacity bar - one cell per spot, filled for the taken ones. The list row
+ * draws fixed 7px squares; the detail card sets .spots--wide to stretch the
+ * same cells across the card.
+ */
+.spots {
+  display: flex;
+  gap: 2px;
+  flex: none;
+}
+
+.spots__cell {
+  width: 7px;
+  height: 7px;
+  border-radius: 1px;
+  background: var(--fb-border);
+
+  &.is-taken {
+    background: var(--fb-accent);
+  }
+
+  &.is-full {
+    background: var(--fb-danger-text);
+  }
+}
+
+.spots--wide {
+  gap: 3px;
+  width: 100%;
+
+  .spots__cell {
+    flex: 1;
+    width: auto;
+    height: 5px;
+  }
+}
+
+/* Initials circle for a person in a list, as opposed to the header's own avatar */
+.fb-avatar-initials {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--fb-bg);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--fb-text-secondary);
+
+  /* The current user's own row, which the design tints */
+  &.is-self {
+    background: var(--fb-accent-soft);
+    color: var(--ion-color-primary);
+  }
 }
 
 /*

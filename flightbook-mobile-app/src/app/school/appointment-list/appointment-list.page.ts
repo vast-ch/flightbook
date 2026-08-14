@@ -1,37 +1,34 @@
-import { Component, OnDestroy, OnInit, ViewChild, signal } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild, computed, signal } from '@angular/core';
 import moment from 'moment-timezone';
 import { ActivatedRoute } from '@angular/router';
-import { AlertController, LoadingController, ModalController, NavController, IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonButton, IonIcon, IonContent, IonList, IonItem, IonToggle, IonLabel, IonInfiniteScroll, IonInfiniteScrollContent, IonPopover } from '@ionic/angular/standalone';
+import { AlertController, LoadingController, ModalController, NavController, IonIcon, IonContent, IonList, IonItem, IonToggle, IonLabel, IonInfiniteScroll, IonInfiniteScrollContent, IonPopover } from '@ionic/angular/standalone';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { firstValueFrom, Subject, takeUntil } from 'rxjs';
 import { AccountService } from 'src/app/account/shared/account.service';
 import { User } from 'src/app/account/shared/user.model';
 import { Appointment } from '../shared/appointment.model';
-import { SchoolService } from '../shared/school.service';
+import { AppointmentScope, SchoolService } from '../shared/school.service';
 import { Subscription } from '../shared/subscription.model';
 import { AppointmentDetailsComponent } from '../shared/components/appointment-details/appointment-details.component';
 import { AppointmentFilterComponent } from '../shared/components/appointment-filter/appointment-filter.component';
 import { State } from '../shared/state';
-import { NgClass, DatePipe } from '@angular/common';
+import { SpotCell, freeSpots, isFull, spotCells } from '../shared/spots';
+import { DatePipe } from '@angular/common';
 import { addIcons } from "ionicons";
-import { filterOutline, ellipsisVerticalOutline } from "ionicons/icons";
+import { filterOutline, ellipsisVerticalOutline, chevronBack, timeOutline, checkmark, close } from "ionicons/icons";
 import { FormsModule } from '@angular/forms';
 import { School } from '../shared/school.model';
+
+/** How close a registration deadline has to be to earn the notice at the top. */
+const CLOSING_SOON_HOURS = 24;
 
 @Component({
     selector: 'app-appointment-list',
     templateUrl: './appointment-list.page.html',
     styleUrls: ['./appointment-list.page.scss'],
     imports: [
-        NgClass,
         DatePipe,
         TranslateModule,
-        IonHeader,
-        IonToolbar,
-        IonButtons,
-        IonBackButton,
-        IonTitle,
-        IonButton,
         IonIcon,
         IonContent,
         IonList,
@@ -56,6 +53,54 @@ export class AppointmentListPage implements OnInit, OnDestroy {
     private readonly schoolId: number;
     private appointmentId: number;
 
+    /** Exposed so the template can name the canceled state without a string. */
+    public readonly State = State;
+
+    public scope = signal<AppointmentScope>('upcoming');
+
+    /** True once a page came back short, which is the only way we know the total. */
+    private listComplete = signal<boolean>(false);
+
+    public loadedCount = computed(() =>
+        this.listComplete() && this.scope() === 'upcoming' ? this.appointments().length : 0
+    );
+
+    /**
+     * Appointments grouped by month. A single pass keeps whatever order the
+     * endpoint returned, so infinite-scroll appends land in the right group
+     * without re-sorting a paged list.
+     */
+    public groupedAppointments = computed(() => {
+        const groups: { key: string; scheduling: Date; appointments: Appointment[] }[] = [];
+        for (const appointment of this.appointments()) {
+            const scheduling = new Date(appointment.scheduling);
+            const key = `${scheduling.getFullYear()}-${scheduling.getMonth()}`;
+            const last = groups[groups.length - 1];
+            if (last && last.key === key) {
+                last.appointments.push(appointment);
+            } else {
+                groups.push({ key, scheduling, appointments: [appointment] });
+            }
+        }
+        return groups;
+    });
+
+    /** The soonest deadline falling inside the next day, whatever its position. */
+    public closingSoon = computed<Appointment | null>(() => {
+        if (this.scope() !== 'upcoming') {
+            return null;
+        }
+        const now = Date.now();
+        const limit = now + CLOSING_SOON_HOURS * 60 * 60 * 1000;
+        return this.appointments()
+            .filter(appointment => appointment.state !== State.CANCELED && appointment.deadline)
+            .filter(appointment => {
+                const deadline = new Date(appointment.deadline).getTime();
+                return deadline > now && deadline <= limit;
+            })
+            .sort((a, b) => new Date(a.deadline).getTime() - new Date(b.deadline).getTime())[0] ?? null;
+    });
+
     constructor(
         private activeRoute: ActivatedRoute,
         public navCtrl: NavController,
@@ -74,7 +119,15 @@ export class AppointmentListPage implements OnInit, OnDestroy {
             });
         this.schoolId = +this.activeRoute.snapshot.paramMap.get('id');
         this.appointmentId = +this.activeRoute.snapshot.queryParamMap.get('appointmentId');
-        addIcons({ filterOutline, ellipsisVerticalOutline });
+        addIcons({
+            filterOutline,
+            ellipsisVerticalOutline,
+            'chevron-back': chevronBack,
+            'time-outline': timeOutline,
+            checkmark,
+            close,
+            place: 'assets/custom-ion-icons/place.svg'
+        });
     }
 
     ngOnInit() {}
@@ -90,6 +143,41 @@ export class AppointmentListPage implements OnInit, OnDestroy {
         this.unsubscribe$.complete();
     }
 
+    // ---- View state -----------------------------------------------------
+
+    close() {
+        this.navCtrl.navigateBack('more');
+    }
+
+    /** The school's own timezone if it has one, matching how dates were stored. */
+    get timezone(): string {
+        return this.currentSchool()?.timezone || 'UTC';
+    }
+
+    setScope(scope: AppointmentScope) {
+        if (this.scope() === scope) {
+            return;
+        }
+        this.scope.set(scope);
+        this.appointments.set([]);
+        this.listComplete.set(false);
+        this.initialDataLoad();
+    }
+
+    freeSpots(appointment: Appointment): number {
+        return freeSpots(appointment.countSubscription, appointment.maxPeople);
+    }
+
+    isFull(appointment: Appointment): boolean {
+        return isFull(appointment.countSubscription, appointment.maxPeople);
+    }
+
+    spotCells(appointment: Appointment): SpotCell[] {
+        return spotCells(appointment.countSubscription, appointment.maxPeople);
+    }
+
+    // ---- Data -----------------------------------------------------------
+
     private async initialDataLoad() {
     const loading = await this.loadingCtrl.create({
         message: this.translate.instant('loading.loading')
@@ -100,20 +188,22 @@ export class AppointmentListPage implements OnInit, OnDestroy {
         const schools = await this.schoolService.getSchools();
         const school = schools.find((s: School) => s.id === this.schoolId);
         this.currentSchool.set(school);
-        
+
         const user = await firstValueFrom(this.accountService.currentUser());
         this.currentUser.set(user);
-        
+
         const rawAppointments = await firstValueFrom(
-            this.schoolService.getAppointments({ limit: this.schoolService.defaultLimit }, this.schoolId)
+            this.schoolService.getAppointments({ limit: this.schoolService.defaultLimit }, this.schoolId, this.scope())
         );
-        
+
+        this.listComplete.set(rawAppointments.length < this.schoolService.defaultLimit);
+
         // Enrich appointments with computed state
-        const enrichedAppointments = rawAppointments.map(appointment => 
+        const enrichedAppointments = rawAppointments.map(appointment =>
             this.enrichAppointment(appointment)
         );
-        
-        this.appointments.set(enrichedAppointments);
+
+        this.appointments.set(enrichedAppointments.filter(appointment => this.inScope(appointment)));
 
         // Reset infinite scroll state
         if (this.infiniteScroll) {
@@ -133,6 +223,16 @@ export class AppointmentListPage implements OnInit, OnDestroy {
     }
 }
 
+    /**
+     * from/to are date-only, so today's appointments come back for either tab.
+     * Settle them against the clock here - which is why a page of 20 can render
+     * as fewer.
+     */
+    private inScope(appointment: Appointment): boolean {
+        const scheduling = new Date(appointment.scheduling).getTime();
+        return this.scope() === 'upcoming' ? scheduling >= Date.now() : scheduling < Date.now();
+    }
+
     async itemTapped(appointment: Appointment) {
         const modal = await this.modalCtrl.create({
             component: AppointmentDetailsComponent,
@@ -144,7 +244,7 @@ export class AppointmentListPage implements OnInit, OnDestroy {
         });
         modal.present();
         const resp = await modal.onWillDismiss();
-        if (resp.data.hasChange) {
+        if (resp.data?.hasChange) {
             this.initialDataLoad();
         }
     }
@@ -236,15 +336,18 @@ export class AppointmentListPage implements OnInit, OnDestroy {
         this.schoolService.getAppointments({
             limit: this.schoolService.defaultLimit,
             offset: this.appointments().length
-        }, this.schoolId)
+        }, this.schoolId, this.scope())
             .pipe(takeUntil(this.unsubscribe$))
             .subscribe((res: Appointment[]) => {
                 event.target.complete();
                 if (res.length < this.schoolService.defaultLimit) {
                     event.target.disabled = true;
+                    this.listComplete.set(true);
                 }
-                
-                const enrichedNew = res.map(appointment => this.enrichAppointment(appointment));
+
+                const enrichedNew = res
+                    .map(appointment => this.enrichAppointment(appointment))
+                    .filter(appointment => this.inScope(appointment));
                 this.appointments.update(current => [...current, ...enrichedNew]);
             });
     }
@@ -255,15 +358,19 @@ export class AppointmentListPage implements OnInit, OnDestroy {
         appointment.subscribed = appointment.subscriptions?.some((subscription: Subscription) =>
             subscription.user.email === user?.email
         ) ?? false;
-        
+
         if (this.currentSchool()?.timezone) {
             appointment.scheduling = new Date(moment.utc(appointment.scheduling).tz(this.currentSchool()?.timezone).format('YYYY-MM-DD HH:mm:ss'));
-            appointment.deadline = new Date(moment.utc(appointment.deadline).tz(this.currentSchool()?.timezone).format('YYYY-MM-DD HH:mm:ss'));
+            // Guarded: an appointment with no deadline used to come out of here
+            // holding an Invalid Date, which the detail view would try to render.
+            if (appointment.deadline) {
+                appointment.deadline = new Date(moment.utc(appointment.deadline).tz(this.currentSchool()?.timezone).format('YYYY-MM-DD HH:mm:ss'));
+            }
         }
 
         appointment.toggleDisabled = this.computeToggleDisabled(appointment);
         appointment.lineDisabled = this.computeLineDisabled(appointment, appointment.subscribed);
-        
+
         return appointment;
     }
 
@@ -278,7 +385,7 @@ export class AppointmentListPage implements OnInit, OnDestroy {
         if (new Date(appointment.scheduling).getTime() < new Date().getTime() || appointment.state == State.CANCELED) {
             return true;
         }
-        
+
         if (!subscribed && this.isDeadlinePassed(appointment)) {
             return true;
         }
@@ -296,7 +403,7 @@ export class AppointmentListPage implements OnInit, OnDestroy {
             const nowWithoutTimezone = moment.tz('Europe/Zurich');
             return deadlineWithoutTimezone.isBefore(nowWithoutTimezone);
         }
-        
+
         const deadline = moment(appointment.deadline).tz(this.currentSchool().timezone);
         const now = moment.tz(this.currentSchool().timezone);
         return deadline.isBefore(now);
