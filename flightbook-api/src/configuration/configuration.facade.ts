@@ -13,7 +13,11 @@ export class ConfigurationFacade {
         return {
             url: process.env.MAP_URL || 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
             attributions: process.env.MAP_ATTRIBUTIONS || '<a href="https://www.openstreetmap.org/copyright" target="_blank">© OpenStreetMap contributors</a>',
-            crossOrigin: process.env.MAP_CROSS_ORIGIN || 'anonymous'
+            crossOrigin: process.env.MAP_CROSS_ORIGIN || 'anonymous',
+            // Terrarium-encoded elevation tiles (Tilezen / AWS Open Data) - free,
+            // no key. Consumed by the hillshade shader on the flight track map.
+            terrainUrl: process.env.MAP_TERRAIN_URL || 'https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png',
+            terrainAttributions: process.env.MAP_TERRAIN_ATTRIBUTIONS || '<a href="https://github.com/tilezen/joerd/blob/master/docs/attribution.md" target="_blank">Data sources and attribution</a>'
         };
     }
 

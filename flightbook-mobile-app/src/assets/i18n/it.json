@@ -47,7 +47,9 @@
         "emergencyContacts": "Contatto di emergenza",
         "pasengerConfirmations": "Conferme",
         "logFlight": "Registra un volo",
-        "export": "Esporta"
+        "export": "Esporta",
+        "play": "Riproduci",
+        "pause": "Pausa"
     },
     "login": {
         "email": "E-Mail",
@@ -146,7 +148,16 @@
         "importIgcHint": "Compila data, percorso, tempo e distanza",
         "placeFlightCount": "{{count}} voli",
         "placeFlightCountOne": "1 volo",
-        "orByHand": "oppure inserisci a mano"
+        "orByHand": "oppure inserisci a mano",
+        "vario": {
+            "legendLabel": "Colore traccia: blu discesa, rosso salita",
+            "scrubLabel": "Posizione nel volo",
+            "strongSink": "Forte discesa",
+            "sink": "Discesa",
+            "neutral": "Costante",
+            "climb": "Salita",
+            "strongClimb": "Forte salita"
+        }
     },
     "statistics": {
         "nbflight": "Numero di voli",

@@ -47,7 +47,9 @@
         "emergencyContacts": "Emergency Contacts",
         "pasengerConfirmations": "Confirmations",
         "logFlight": "Log a flight",
-        "export": "Export"
+        "export": "Export",
+        "play": "Play",
+        "pause": "Pause"
     },
     "login": {
         "email": "E-Mail",
@@ -146,7 +148,16 @@
         "importIgcHint": "Fills date, route, time and distance",
         "placeFlightCount": "{{count}} flights",
         "placeFlightCountOne": "1 flight",
-        "orByHand": "or enter it by hand"
+        "orByHand": "or enter it by hand",
+        "vario": {
+            "legendLabel": "Track colour: blue sinking, red climbing",
+            "scrubLabel": "Flight position",
+            "strongSink": "Strong sink",
+            "sink": "Sink",
+            "neutral": "Level",
+            "climb": "Climb",
+            "strongClimb": "Strong climb"
+        }
     },
     "statistics": {
         "nbflight": "Number of flights",

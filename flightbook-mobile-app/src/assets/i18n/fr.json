@@ -47,7 +47,9 @@
         "emergencyContacts": "Contacts d'urgence",
         "pasengerConfirmations": "Confirmations",
         "logFlight": "Enregistrer un vol",
-        "export": "Exporter"
+        "export": "Exporter",
+        "play": "Lire",
+        "pause": "Pause"
     },
     "login": {
         "email": "E-Mail",
@@ -119,6 +121,15 @@
         "override": "Voulez-vous écraser le parapente, la date, les kilomètres et la durée du vol avec les données du fichier IGC?",
         "diff": "Diff.",
         "orByHand": "ou saisir à la main",
+        "vario": {
+            "legendLabel": "Couleur de la trace : bleu descente, rouge montée",
+            "scrubLabel": "Position dans le vol",
+            "strongSink": "Forte descente",
+            "sink": "Descente",
+            "neutral": "Constant",
+            "climb": "Montée",
+            "strongClimb": "Forte montée"
+        },
         "importIgc": "Importer un fichier IGC",
         "importIgcHint": "Remplit la date, le trajet, le temps et la distance",
         "placeFlightCount": "{{count}} vols",

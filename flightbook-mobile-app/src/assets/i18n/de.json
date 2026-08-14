@@ -47,7 +47,9 @@
         "emergencyContacts": "Notfallkontakt",
         "pasengerConfirmations": "Bestätigungen",
         "logFlight": "Flug erfassen",
-        "export": "Export"
+        "export": "Export",
+        "play": "Abspielen",
+        "pause": "Pause"
     },
     "login": {
         "email": "E-Mail",
@@ -146,7 +148,16 @@
         "importIgcHint": "Füllt Datum, Strecke, Zeit und Distanz",
         "placeFlightCount": "{{count}} Flüge",
         "placeFlightCountOne": "1 Flug",
-        "orByHand": "oder von Hand erfassen"
+        "orByHand": "oder von Hand erfassen",
+        "vario": {
+            "legendLabel": "Spurfarbe: blau sinken, rot steigen",
+            "scrubLabel": "Position im Flug",
+            "strongSink": "Starkes Sinken",
+            "sink": "Sinken",
+            "neutral": "Konstant",
+            "climb": "Steigen",
+            "strongClimb": "Starkes Steigen"
+        }
     },
     "statistics": {
         "nbflight": "Anzahl Flüge",
