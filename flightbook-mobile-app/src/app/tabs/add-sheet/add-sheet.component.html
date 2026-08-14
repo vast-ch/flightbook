@@ -1,0 +1,32 @@
+<div class="add-sheet">
+  <!-- Drawn rather than Ionic's own handle, to match the design's size and colour -->
+  <div class="add-sheet__grabber" aria-hidden="true"></div>
+
+  <div class="fb-card--flush" role="group" [attr.aria-label]="'buttons.add' | translate">
+    <button type="button" class="add-sheet__row" (click)="logFlight()">
+      <span class="add-sheet__tile">
+        <ion-icon name="flight" aria-hidden="true"></ion-icon>
+      </span>
+      <span class="add-sheet__text">
+        <span class="add-sheet__title">{{ 'buttons.logFlight' | translate }}</span>
+        <span class="add-sheet__hint">{{ 'addSheet.flightHint' | translate }}</span>
+      </span>
+      <ion-icon class="fb-row__chevron" name="chevron-forward" aria-hidden="true"></ion-icon>
+    </button>
+
+    <button type="button" class="add-sheet__row" (click)="tandemConfirmation()">
+      <span class="add-sheet__tile">
+        <ion-icon name="tandem" aria-hidden="true"></ion-icon>
+      </span>
+      <span class="add-sheet__text">
+        <span class="add-sheet__title">{{ 'addSheet.tandem' | translate }}</span>
+        <span class="add-sheet__hint">{{ 'addSheet.tandemHint' | translate }}</span>
+      </span>
+      <ion-icon class="fb-row__chevron" name="chevron-forward" aria-hidden="true"></ion-icon>
+    </button>
+  </div>
+
+  <button type="button" class="add-sheet__cancel" (click)="dismiss()">
+    {{ 'buttons.cancel' | translate }}
+  </button>
+</div>

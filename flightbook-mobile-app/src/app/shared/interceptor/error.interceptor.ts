@@ -1,7 +1,7 @@
 import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent, HttpContextToken } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { Router } from '@angular/router';
-import { MenuController, AlertController } from '@ionic/angular/standalone';
+import { AlertController } from '@ionic/angular/standalone';
 import { Injectable } from '@angular/core';
 import { catchError } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
@@ -14,7 +14,6 @@ export class HttpErrorInterceptor implements HttpInterceptor {
 
     constructor(
         private router: Router,
-        private menuCtrl: MenuController,
         private alertController: AlertController,
         private translate: TranslateService
     ) { }
@@ -22,7 +21,6 @@ export class HttpErrorInterceptor implements HttpInterceptor {
     intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
         return next.handle(request).pipe(catchError(err => {
             if (err.status === HttpStatusCode.UNAUTHORIZED) {
-                this.menuCtrl.enable(false);
                 this.router.navigate(['login']);
             }
 

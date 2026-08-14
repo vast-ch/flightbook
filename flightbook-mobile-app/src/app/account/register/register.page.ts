@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { MenuController, LoadingController, AlertController, IonContent, IonFooter, IonIcon, IonInput, IonButton } from '@ionic/angular/standalone';
+import { LoadingController, AlertController, IonContent, IonFooter, IonIcon, IonInput, IonButton } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { arrowBack, eyeOutline, eyeOffOutline } from 'ionicons/icons';
 import { Subject } from 'rxjs';
@@ -35,12 +35,10 @@ export class RegisterPage implements OnInit, OnDestroy {
     constructor(
         private router: Router,
         private translate: TranslateService,
-        private menuCtrl: MenuController,
         private accountService: AccountService,
         private loadingCtrl: LoadingController,
         private alertController: AlertController
     ) {
-        this.menuCtrl.enable(false);
         this.registerData = new User();
         addIcons({ arrowBack, eyeOutline, eyeOffOutline });
     }

@@ -1,0 +1,136 @@
+<!-- Surface strip rather than an ion-toolbar; the page lives in the tab shell -->
+<div class="more-header">
+  <fb-avatar-button></fb-avatar-button>
+  <h1 class="more-header__title">{{ 'tabs.more' | translate }}</h1>
+</div>
+
+<ion-content>
+  <div class="more-body">
+
+    <!-- Tandem -->
+    <div class="more-section">
+      <div class="fb-section-label">{{ 'groupname.tandem' | translate }}</div>
+      <div class="fb-card--flush">
+        <button type="button" class="fb-row more-row" (click)="open('passenger-confirmations')">
+          <ion-icon name="tandem" class="more-row__icon" aria-hidden="true"></ion-icon>
+          <span class="more-row__title">{{ 'more.passengerConfirmations' | translate }}</span>
+          <ion-icon name="chevron-forward" class="fb-row__chevron" aria-hidden="true"></ion-icon>
+        </button>
+      </div>
+    </div>
+
+    <!-- Your equipment -->
+    <div class="more-section">
+      <div class="fb-section-label">{{ 'more.equipment' | translate }}</div>
+      <div class="fb-card--flush">
+        <button type="button" class="fb-row more-row" (click)="open('gliders')">
+          <ion-icon name="glider" class="more-row__icon" aria-hidden="true"></ion-icon>
+          <span class="more-row__title">{{ 'groupname.glider' | translate }}</span>
+          <ion-icon name="chevron-forward" class="fb-row__chevron" aria-hidden="true"></ion-icon>
+        </button>
+        <button type="button" class="fb-row more-row" (click)="open('places')">
+          <ion-icon name="place" class="more-row__icon" aria-hidden="true"></ion-icon>
+          <span class="more-row__title">{{ 'groupname.place' | translate }}</span>
+          <ion-icon name="chevron-forward" class="fb-row__chevron" aria-hidden="true"></ion-icon>
+        </button>
+      </div>
+    </div>
+
+    <!--
+      School. Not in the design - emergency contact moved into the Account
+      screen, but the per-school appointment lists and the control sheet did
+      not, and Home only links to a school when there is an upcoming
+      appointment. So these rows stay.
+    -->
+    @if (showSchoolSection()) {
+      <div class="more-section">
+        <div class="fb-section-label">{{ 'groupname.school' | translate }}</div>
+        <div class="fb-card--flush">
+          @for (school of schools(); track school.id) {
+            <button type="button" class="fb-row more-row" (click)="open(['/school', school.id])">
+              <span class="more-row__title">{{ school.name }}</span>
+              <ion-icon name="chevron-forward" class="fb-row__chevron" aria-hidden="true"></ion-icon>
+            </button>
+          }
+          @if (hasControlSheet()) {
+            <button type="button" class="fb-row more-row" (click)="open('control-sheet')">
+              <span class="more-row__title">{{ 'buttons.controlSheet' | translate }}</span>
+              <ion-icon name="chevron-forward" class="fb-row__chevron" aria-hidden="true"></ion-icon>
+            </button>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Before you fly -->
+    <div class="more-section">
+      <div class="fb-section-label">{{ 'groupname.preparation' | translate }}</div>
+      <div class="fb-card--flush">
+        <!-- One row, two destinations: the design shows both days inline -->
+        <div class="fb-row more-row">
+          <span class="more-row__title">{{ 'more.dabs' | translate }}</span>
+          <span class="more-dabs">
+            <button type="button" class="more-dabs__link" (click)="openDabs('today')">
+              {{ 'more.today' | translate }}
+            </button>
+            <span class="more-dabs__sep" aria-hidden="true">·</span>
+            <button type="button" class="more-dabs__link" (click)="openDabs('tomorrow')">
+              {{ 'more.tomorrow' | translate }}
+            </button>
+          </span>
+        </div>
+        <button type="button" class="fb-row more-row" (click)="openShvApp()">
+          <span class="more-row__title">{{ 'more.shvApp' | translate }}</span>
+        </button>
+        @for (link of customLinks(); track $index) {
+          <button type="button" class="fb-row more-row" (click)="openLink(link.url)">
+            <span class="more-row__title">{{ link.label }}</span>
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- Import & export -->
+    <div class="more-section">
+      <div class="fb-section-label">{{ 'more.importExport' | translate }}</div>
+      <div class="fb-card--flush">
+        <button type="button" class="fb-row more-row" (click)="open('imports/igc')">
+          <span class="more-row__title">{{ 'more.importIgc' | translate }}</span>
+          <ion-icon name="chevron-forward" class="fb-row__chevron" aria-hidden="true"></ion-icon>
+        </button>
+        <button type="button" class="fb-row more-row" (click)="open('imports/data')">
+          <span class="more-row__title">{{ 'more.importData' | translate }}</span>
+          <ion-icon name="chevron-forward" class="fb-row__chevron" aria-hidden="true"></ion-icon>
+        </button>
+        <button type="button" class="fb-row more-row" (click)="openExport()">
+          <span class="more-row__title">{{ 'more.export' | translate }}</span>
+          <ion-icon name="chevron-forward" class="fb-row__chevron" aria-hidden="true"></ion-icon>
+        </button>
+      </div>
+    </div>
+
+    <!-- Account -->
+    <div class="more-section">
+      <div class="fb-section-label">{{ 'groupname.account' | translate }}</div>
+      <div class="fb-card--flush">
+        <button type="button" class="fb-row more-row" (click)="open('settings')">
+          <span class="more-row__stack">
+            <span class="more-row__title">{{ 'more.accountSettings' | translate }}</span>
+            <span class="more-row__sub">{{ 'more.accountSettingsHint' | translate }}</span>
+          </span>
+          <ion-icon name="chevron-forward" class="fb-row__chevron" aria-hidden="true"></ion-icon>
+        </button>
+        <button type="button" class="fb-row more-row" (click)="open('settings/configuration')">
+          <span class="more-row__title">{{ 'buttons.configuration' | translate }}</span>
+          <ion-icon name="chevron-forward" class="fb-row__chevron" aria-hidden="true"></ion-icon>
+        </button>
+        <button type="button" class="fb-row more-row more-row--danger" (click)="logout()">
+          <span class="more-row__title">{{ 'buttons.logout' | translate }}</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Brand name is a product name, not a translated string (as in the home header) -->
+    <div class="more-footer">Flightbook {{ appVersion }}</div>
+  </div>
+</ion-content>

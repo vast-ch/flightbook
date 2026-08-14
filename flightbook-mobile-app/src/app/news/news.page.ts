@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { MenuController, LoadingController, AlertController, IonHeader, IonToolbar, IonButtons, IonMenuButton, IonTitle, IonButton, IonIcon, IonContent, IonCard } from '@ionic/angular/standalone';
+import { LoadingController, AlertController, IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonButton, IonIcon, IonContent, IonCard } from '@ionic/angular/standalone';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { Subject, Observable } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -36,7 +36,7 @@ import { TandemService } from '../tandem/shared/tandem.service';
         IonHeader,
         IonToolbar,
         IonButtons,
-        IonMenuButton,
+        IonBackButton,
         IonTitle,
         IonButton,
         IonIcon,
@@ -54,7 +54,6 @@ export class NewsPage implements OnInit, OnDestroy {
     public error = this.newsStore.error;
 
     constructor(
-        private menuCtrl: MenuController,
         private alertController: AlertController,
         private translate: TranslateService,
         private newsStore: NewsStore,
@@ -66,7 +65,6 @@ export class NewsPage implements OnInit, OnDestroy {
         private xlsxExportService: XlsxExportService,
         private paymentService: PaymentService
     ) {
-        this.menuCtrl.enable(true);
 
         this.paymentService.getPaymentStatus().pipe(takeUntil(this.unsubscribe$)).subscribe((paymentStatus: PaymentStatus) => {
             this.paymentStatus = paymentStatus;

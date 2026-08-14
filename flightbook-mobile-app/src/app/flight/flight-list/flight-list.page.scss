@@ -1,59 +1,9 @@
-// ---- Header -------------------------------------------------------------
-.list-header {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 12px;
-  padding: calc(env(safe-area-inset-top) + 14px) var(--fb-gutter) 14px;
-  background: var(--fb-surface);
-  border-bottom: 1px solid var(--fb-border);
-}
-
-.list-header__eyebrow {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.list-header__chip {
-  padding: 2px 7px;
-  border-radius: 5px;
-  background: var(--fb-accent-soft);
-  font-size: 9.5px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--ion-color-primary);
-}
-
-.list-header__title {
-  margin: 8px 0 0;
-  font-size: 26px;
-  font-weight: 600;
-  line-height: 1.05;
-  letter-spacing: -0.025em;
-  color: var(--fb-text);
-}
-
-.list-header__actions {
-  display: flex;
-  gap: 8px;
-  flex: none;
-}
-
-// .icon-button lives in theme/tokens.scss - shared with the form headers.
+// .list-header*, .list-block, .list-empty, .list-footnote and .icon-button all
+// live in theme/tokens.scss - shared with the glider and place lists.
 
 // ---- Month sections -----------------------------------------------------
 .month-heading {
   padding: 14px var(--fb-gutter) 8px;
-}
-
-.month-block {
-  padding: 0;
-  margin: 0;
-  background: var(--fb-surface);
-  border-top: 1px solid var(--fb-border);
-  border-bottom: 1px solid var(--fb-border);
 }
 
 // ---- Row ----------------------------------------------------------------
@@ -165,8 +115,3 @@
   color: var(--fb-text-muted);
 }
 
-// ---- Empty / footnote ---------------------------------------------------
-.list-empty,
-.list-footnote {
-  margin: 16px var(--fb-gutter);
-}

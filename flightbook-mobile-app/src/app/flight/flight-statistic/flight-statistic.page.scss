@@ -1,8 +1,16 @@
 // ---- Header -------------------------------------------------------------
 .stat-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
     padding: calc(env(safe-area-inset-top) + 14px) var(--fb-gutter) 14px;
     background: var(--fb-surface);
     border-bottom: 1px solid var(--fb-border);
+}
+
+.stat-header__text {
+    flex: 1;
+    min-width: 0;
 }
 
 .stat-header__title {
@@ -23,36 +31,8 @@
 }
 
 // ---- Period segments ----------------------------------------------------
-.periods {
-    display: flex;
-    border: 1px solid var(--fb-border);
-    border-radius: var(--fb-radius-sm);
-    overflow: hidden;
-    background: var(--fb-surface);
-}
-
-.periods__item {
-    flex: 1;
-    padding: 10px 0;
-    border: 0;
-    background: transparent;
-    font: inherit;
-    font-size: 12px;
-    font-weight: 500;
-    color: var(--fb-text-body);
-    text-align: center;
-    cursor: pointer;
-
-    & + .periods__item {
-        border-left: 1px solid var(--fb-border);
-    }
-
-    &.is-active {
-        background: var(--ion-color-primary);
-        color: var(--ion-color-primary-contrast);
-        font-weight: 600;
-    }
-}
+// .fb-segments / .fb-segments__item live in theme/tokens.scss - shared with
+// the account language switcher.
 
 // ---- Headline grid ------------------------------------------------------
 .headline {

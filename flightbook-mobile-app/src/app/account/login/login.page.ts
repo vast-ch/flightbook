@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
-import { MenuController, NavController, AlertController, LoadingController, IonContent, IonInput, IonButton, IonIcon } from '@ionic/angular/standalone';
+import { NavController, AlertController, LoadingController, IonContent, IonInput, IonButton, IonIcon } from '@ionic/angular/standalone';
 import { UpperCasePipe } from '@angular/common';
 import { addIcons } from 'ionicons';
 import { eyeOutline, eyeOffOutline } from 'ionicons/icons';
@@ -55,7 +55,6 @@ export class LoginPage implements OnInit, OnDestroy {
 
     constructor(
         private translate: TranslateService,
-        private menuCtrl: MenuController,
         private navCtrl: NavController,
         private accountService: AccountService,
         private newsStore: NewsStore,
@@ -65,7 +64,6 @@ export class LoginPage implements OnInit, OnDestroy {
         private route: ActivatedRoute,
         private router: Router
     ) {
-        this.menuCtrl.enable(false);
         this.defineVersion();
         addIcons({ eyeOutline, eyeOffOutline });
     }
@@ -128,7 +126,6 @@ export class LoginPage implements OnInit, OnDestroy {
                     await loading.dismiss();
                     localStorage.setItem('access_token', resp.access_token);
                     localStorage.setItem('refresh_token', resp.refresh_token);
-                    this.menuCtrl.enable(true);
                     this.loginData.email = null;
                     this.loginData.password = null;
                     if (Capacitor.isNativePlatform()) {

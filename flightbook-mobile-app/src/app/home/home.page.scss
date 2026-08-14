@@ -4,23 +4,10 @@
 .home-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 11px;
   padding: calc(env(safe-area-inset-top) + 14px) 20px 14px;
   background: var(--fb-surface);
   border-bottom: 1px solid var(--fb-border);
-}
-
-.home-header__brand {
-  display: flex;
-  align-items: center;
-  gap: 11px;
-}
-
-.home-header__logo {
-  display: block;
-  width: 34px;
-  height: 34px;
-  border-radius: 9px;
 }
 
 .home-header__wordmark {
@@ -31,16 +18,7 @@
   color: var(--fb-text);
 }
 
-.home-header__avatar {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  border: 1px solid var(--fb-border);
-  background: transparent;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--fb-text-secondary);
-}
+// .fb-avatar-button lives in theme/tokens.scss - shared with the other tabs.
 
 // ---- Stat strip ---------------------------------------------------------
 .stat-strip {

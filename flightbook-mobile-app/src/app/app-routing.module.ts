@@ -51,7 +51,18 @@ const routes: Routes = [
         canActivate: [AuthGuardService]
       },
       {
+        /*
+         * Statistics is a top-level segment, not a child of `flights`: Ionic
+         * derives the selected tab from the first URL segment only, so under
+         * `flights/statistic` the tab bar would always highlight Flights.
+         * Declared before `flights/:id` so the old path can't match as an id.
+         */
         path: 'flights/statistic',
+        redirectTo: 'statistics',
+        pathMatch: 'full'
+      },
+      {
+        path: 'statistics',
         loadChildren: () => import('./flight/flight-statistic/flight-statistic.module').then(m => m.FlightStatisticPageModule),
         canActivate: [AuthGuardService]
       },
@@ -111,11 +122,6 @@ const routes: Routes = [
         canActivate: [AuthGuardService]
       },
       {
-        path: 'password',
-        loadChildren: () => import('./account/password/password.module').then(m => m.PasswordPageModule),
-        canActivate: [AuthGuardService]
-      },
-      {
         path: 'school/:id',
         loadChildren: () => import('./school/appointment-list/appointment-list.module').then(m => m.AppointmentListPageModule),
         canActivate: [AuthGuardService]
@@ -126,13 +132,13 @@ const routes: Routes = [
         canActivate: [AuthGuardService]
       },
       {
-        path: 'emergency-contact',
-        loadChildren: () => import('./school/emergency-contact/emergency-contact.module').then(m => m.EmergencyContactPageModule),
+        path: 'passenger-confirmations',
+        loadChildren: () => import('./tandem/passenger-confirmation-list/passenger-confirmation-list.module').then(m => m.PassengerConfirmationListPageModule),
         canActivate: [AuthGuardService]
       },
       {
-        path: 'passenger-confirmations',
-        loadChildren: () => import('./tandem/passenger-confirmation-list/passenger-confirmation-list.module').then(m => m.PassengerConfirmationListPageModule),
+        path: 'more',
+        loadChildren: () => import('./more/more.module').then(m => m.MorePageModule),
         canActivate: [AuthGuardService]
       }
     ]

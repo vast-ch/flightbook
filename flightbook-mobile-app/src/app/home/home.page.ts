@@ -1,7 +1,7 @@
 import { Component, OnDestroy, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
-import { MenuController, IonContent, IonSkeletonText, IonIcon } from '@ionic/angular/standalone';
+import { IonContent, IonSkeletonText, IonIcon } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { chevronForward, checkmark } from 'ionicons/icons';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
@@ -9,9 +9,10 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { SplashScreen } from '@capacitor/splash-screen';
 import { NewsStore } from '../news/shared/news.store';
-import { AccountService } from '../account/shared/account.service';
+import { LanguageService } from '../shared/services/language.service';
 import { HomeStore } from './shared/home.store';
 import { ActivityChartComponent } from './components/activity-chart/activity-chart.component';
+import { AvatarButtonComponent } from 'src/app/shared/components/avatar-button/avatar-button.component';
 
 // The splash screen stays up until the first screen is ready to paint.
 setTimeout(() => {
@@ -23,6 +24,7 @@ setTimeout(() => {
     templateUrl: './home.page.html',
     styleUrls: ['./home.page.scss'],
     imports: [
+        AvatarButtonComponent,
         DatePipe,
         TranslateModule,
         ActivityChartComponent,
@@ -36,10 +38,14 @@ export class HomePage implements OnDestroy {
 
     private homeStore = inject(HomeStore);
     private newsStore = inject(NewsStore);
-    private accountService = inject(AccountService);
     private translate = inject(TranslateService);
     private router = inject(Router);
-    private menuCtrl = inject(MenuController);
+    private languageService = inject(LanguageService);
+
+    /** Feeds the DatePipe's locale argument, as on the flight list. */
+    get currentLang(): string {
+        return this.languageService.lang();
+    }
 
     public loaded = this.homeStore.loaded;
     public globalStats = this.homeStore.globalStats;
@@ -51,14 +57,6 @@ export class HomePage implements OnDestroy {
     public soloFlightDone = this.homeStore.soloFlightDone;
 
     public latestNews = computed(() => this.newsStore.news()[0] ?? null);
-
-    public initials = computed(() => {
-        const user = this.accountService.currentUser$();
-        if (!user) {
-            return '';
-        }
-        return `${user.firstname?.charAt(0) ?? ''}${user.lastname?.charAt(0) ?? ''}`.toUpperCase();
-    });
 
     /**
      * Airtime for the headline strip: minutes while under an hour, then hours
@@ -90,13 +88,12 @@ export class HomePage implements OnDestroy {
             bestMonthFlights: best.nbFlights,
             bestMonthTime: Number(best.time ?? 0),
             // The design labels this column with the month itself, not a caption.
-            bestMonthLabel: bestDate.toLocaleDateString(undefined, { month: 'long' }),
+            bestMonthLabel: bestDate.toLocaleDateString(this.languageService.lang(), { month: 'long' }),
             averageTime: Math.round(totalTime / rows.length)
         };
     });
 
     constructor() {
-        this.menuCtrl.enable(true);
         addIcons({ chevronForward, checkmark });
     }
 
@@ -127,7 +124,7 @@ export class HomePage implements OnDestroy {
     }
 
     openStatistics() {
-        this.router.navigate(['flights/statistic']);
+        this.router.navigate(['statistics']);
     }
 
     openControlSheet() {
@@ -145,7 +142,4 @@ export class HomePage implements OnDestroy {
         this.router.navigate(['imports/igc']);
     }
 
-    openSettings() {
-        this.router.navigate(['settings']);
-    }
 }

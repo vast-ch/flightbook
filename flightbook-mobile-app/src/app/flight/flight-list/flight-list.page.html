@@ -3,6 +3,8 @@
   static strip with a large title, and navigation is handled by the tab bar.
 -->
 <div class="list-header">
+  <fb-avatar-button></fb-avatar-button>
+
   <div class="list-header__text">
     <div class="list-header__eyebrow">
       <span class="fb-section-label">
@@ -38,7 +40,7 @@
       {{ group.date | date:'LLLL yyyy':undefined:currentLang }}
     </div>
 
-    <ion-list class="month-block">
+    <ion-list class="list-block">
       @for (flight of group.flights; track flight.id) {
         <ion-item-sliding>
           <ion-item button detail="false" lines="none" class="flight-row"

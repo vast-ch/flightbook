@@ -63,6 +63,6 @@ export class DashboardContainerComponent implements OnInit {
   }
 
   async openStatistics() {
-    this.router.navigate([`flights/statistic`]);
+    this.router.navigate([`statistics`]);
   }
 }

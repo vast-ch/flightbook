@@ -1,5 +1,4 @@
 import { NgModule } from '@angular/core';
-import { MenuItemComponent } from './components/menu-item/menu-item.component';
 import { TranslateModule } from '@ngx-translate/core';
 import { FileInputComponent } from './components/file-input/file-input.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -15,7 +14,6 @@ import { UpdatePromptComponent } from './components/update-prompt/update-prompt.
 
 @NgModule({
     exports: [
-        MenuItemComponent,
         FileInputComponent,
         IgcMapComponent,
         PlaceMapComponent,
@@ -31,7 +29,6 @@ import { UpdatePromptComponent } from './components/update-prompt/update-prompt.
         FormsModule,
         CommonModule,
         ReactiveFormsModule,
-        MenuItemComponent,
         FileInputComponent,
         IgcMapComponent,
         PlaceMapComponent,

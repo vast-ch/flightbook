@@ -36,7 +36,4 @@
  * token set in theme/tokens.scss when dark mode gets designed.
  */
 
-/* Android edge-to-edge support */
-.md ion-menu ion-content {
-  --padding-bottom: env(safe-area-inset-bottom);
-}
+/* The Android edge-to-edge rule for ion-menu went with the side menu. */

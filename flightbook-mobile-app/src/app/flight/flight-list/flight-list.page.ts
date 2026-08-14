@@ -1,19 +1,12 @@
 import { Component, OnInit, OnDestroy, ViewChild, Signal, computed, signal } from '@angular/core';
-import { NavController, ModalController, LoadingController, AlertController, ActionSheetController, IonContent, IonItem, IonList, IonInfiniteScroll, IonInfiniteScrollContent, IonIcon, IonItemSliding, IonItemOptions, IonItemOption } from '@ionic/angular/standalone';
-import { Subject, firstValueFrom } from 'rxjs';
+import { NavController, ModalController, LoadingController, AlertController, IonContent, IonItem, IonList, IonInfiniteScroll, IonInfiniteScrollContent, IonIcon, IonItemSliding, IonItemOptions, IonItemOption } from '@ionic/angular/standalone';
+import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { FlightFilterComponent } from 'src/app/form/flight-filter/flight-filter.component';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
-import { TCreatedPdf } from 'pdfmake/build/pdfmake';
-import { FileOpener } from '@capacitor-community/file-opener';
-import { Capacitor } from '@capacitor/core';
-import { Filesystem, Directory } from '@capacitor/filesystem';
-import { XlsxExportService } from '../../shared/services/xlsx-export.service';
-import { PdfExportService } from 'src/app/shared/services/pdf-export.service';
+import { FlightExportService } from 'src/app/shared/services/flight-export.service';
 import { Flight } from '../shared/flight.model';
-import { AccountService } from 'src/app/account/shared/account.service';
 import { FlightStatistic } from '../shared/flightStatistic.model';
-import { SchoolService } from 'src/app/school/shared/school.service';
 import { DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
 import { FlagsModule } from 'nxt-flags';
@@ -29,12 +22,14 @@ import {
 import { PaymentService } from 'src/app/shared/services/payment.service';
 import { FlightValidationState } from '../shared/flight-validation-state';
 import { FlightStore } from '../shared/flight.store';
+import { AvatarButtonComponent } from 'src/app/shared/components/avatar-button/avatar-button.component';
 
 @Component({
     selector: 'app-flight-list',
     templateUrl: './flight-list.page.html',
     styleUrls: ['./flight-list.page.scss'],
     imports: [
+        AvatarButtonComponent,
         FlagsModule,
         DatePipe,
         TranslateModule,
@@ -109,16 +104,12 @@ export class FlightListPage implements OnInit, OnDestroy {
     constructor(
         public navCtrl: NavController,
         private flightStore: FlightStore,
-        private accountService: AccountService,
-        private schoolService: SchoolService,
         private modalCtrl: ModalController,
         private alertController: AlertController,
         private translate: TranslateService,
         private loadingCtrl: LoadingController,
-        private xlsxExportService: XlsxExportService,
-        private pdfExportService: PdfExportService,
+        private flightExportService: FlightExportService,
         private paymentService: PaymentService,
-        private actionSheetCtrl: ActionSheetController,
         private router: Router
     ) {
         addIcons({
@@ -236,121 +227,8 @@ export class FlightListPage implements OnInit, OnDestroy {
     }
 
     /** Export lives in the header now, so it needs its own picker. */
-    async openExport() {
-        const sheet = await this.actionSheetCtrl.create({
-            header: this.translate.instant('buttons.export'),
-            buttons: [
-                { text: 'XLSX', handler: () => { this.xlsxExport(); } },
-                { text: 'PDF', handler: () => { this.pdfExport(); } },
-                { text: this.translate.instant('buttons.cancel'), role: 'cancel' }
-            ]
-        });
-        await sheet.present();
-    }
-
-    async xlsxExport() {
-        const loading = await this.loadingCtrl.create({
-            message: this.translate.instant('loading.loading')
-        });
-        await loading.present();
-        this.flightStore.getFlights({ store: false }).pipe(takeUntil(this.unsubscribe$)).subscribe(async (res: Flight[]) => {
-            res = res.sort((a: Flight, b: Flight) => b.number - a.number);
-            if (Capacitor.isNativePlatform()) {
-                try {
-                    const data: any = await this.xlsxExportService.generateFlightsXlsxFile(res, { bookType: 'xlsx', type: 'base64' });
-                    const path = `xlsx/flights_export.xlsx`;
-
-                    const result = await Filesystem.writeFile({
-                        path,
-                        data,
-                        directory: Directory.External,
-                        recursive: true
-                    });
-
-                    await loading.dismiss();
-
-                    try {
-                        await FileOpener.open({
-                            filePath: result.uri,
-                            contentType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-                        });
-                    } catch (error) {
-                        if (Capacitor.getPlatform() == "android") {
-                            const alert = await this.alertController.create({
-                                header: this.translate.instant('message.infotitle'),
-                                message: this.translate.instant('message.downloadExcel'),
-                                buttons: [this.translate.instant('buttons.done')]
-                            });
-                            await alert.present();
-                        } else {
-                            throw error;
-                        }
-                    }
-                } catch (e) {
-                    await loading.dismiss();
-                    const alert = await this.alertController.create({
-                        header: this.translate.instant('message.infotitle'),
-                        message: this.translate.instant('message.generationError'),
-                        buttons: [this.translate.instant('buttons.done')]
-                    });
-                    await alert.present();
-                }
-            } else {
-                const data: any = await this.xlsxExportService.generateFlightsXlsxFile(res, { bookType: 'xlsx', type: 'array' });
-                await loading.dismiss();
-                this.xlsxExportService.saveExcelFile(data, `flights_export_${Date.now()}.xlsx`);
-            }
-        }, async (error: any) => {
-            await loading.dismiss();
-        });
-    }
-
-    async pdfExport() {
-        const loading = await this.loadingCtrl.create({
-            message: this.translate.instant('loading.loading')
-        });
-        await loading.present();
-        const res = <FlightStatistic[]>await firstValueFrom(this.flightStore.getStatistics("global"));
-        const stat = res[0];
-        this.flightStore.getFlights({ store: false }).pipe(takeUntil(this.unsubscribe$)).subscribe(async (res: Flight[]) => {
-            res = res.sort((a: Flight, b: Flight) => b.number - a.number);
-            res.reverse();
-            const user = await firstValueFrom(this.accountService.currentUser());
-            const schools = await this.schoolService.getSchools();
-            const pdfObj: TCreatedPdf = await this.pdfExportService.generatePdf(res, stat, user, schools.length !== 0, 'https://m.flightbook.ch');
-            if (Capacitor.isNativePlatform()) {
-                pdfObj.getBase64(async (data) => {
-                    try {
-                        const path = `pdf/flightbook.pdf`;
-
-                        const result = await Filesystem.writeFile({
-                            path,
-                            data,
-                            directory: Directory.External,
-                            recursive: true
-                        });
-                        await loading.dismiss();
-                        await FileOpener.open({
-                            filePath: result.uri,
-                            contentType: 'application/pdf'
-                        });
-                    } catch (e) {
-                        loading.dismiss();
-                        const alert = await this.alertController.create({
-                            header: this.translate.instant('message.infotitle'),
-                            message: e,
-                            buttons: [this.translate.instant('buttons.done')]
-                        });
-                        await alert.present();
-                    }
-                });
-            } else {
-                await loading.dismiss();
-                pdfObj.download(`flightbook_${Date.now()}.pdf`);
-            }
-        }, async (error: any) => {
-            await loading.dismiss();
-        });
+    openExport() {
+        this.flightExportService.openExport();
     }
 
     async openAddFlight() {

@@ -1,12 +1,6 @@
 <div class="home-header">
-  <div class="home-header__brand">
-    <img src="assets/icons/icon-192x192.png" alt="Flightbook" class="home-header__logo" />
-    <span class="home-header__wordmark">Flightbook</span>
-  </div>
-  <button class="home-header__avatar" type="button" (click)="openSettings()"
-          [attr.aria-label]="'buttons.accountData' | translate">
-    {{ initials() }}
-  </button>
+  <fb-avatar-button></fb-avatar-button>
+  <span class="home-header__wordmark">Flightbook</span>
 </div>
 
 <ion-content>
@@ -66,7 +60,7 @@
         </div>
         <div class="next-flight__date">
           <span class="next-flight__day">
-            {{ next.appointment.scheduling | date:'EE dd MMM':next.school.timezone }}
+            {{ next.appointment.scheduling | date:'EE dd MMM':next.school.timezone:currentLang }}
           </span>
           <span class="next-flight__time">
             {{ next.appointment.scheduling | date:'HH:mm':next.school.timezone }}

@@ -1,6 +1,7 @@
 import { DatePipe } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ModalController, LoadingController, IonHeader, IonToolbar, IonButtons, IonMenuButton, IonTitle, IonButton, IonIcon, IonContent, IonItem, IonList, IonInfiniteScroll, IonInfiniteScrollContent, IonLabel, AlertController, IonGrid, IonRow, IonCol } from '@ionic/angular/standalone';
+import { ActivatedRoute } from '@angular/router';
+import { ModalController, LoadingController, IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonButton, IonIcon, IonContent, IonItem, IonList, IonInfiniteScroll, IonInfiniteScrollContent, IonLabel, AlertController, IonGrid, IonRow, IonCol } from '@ionic/angular/standalone';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { firstValueFrom, Subject, takeUntil } from 'rxjs';
 import { addIcons } from "ionicons";
@@ -25,7 +26,7 @@ import { TandemSchoolService } from 'src/app/school/shared/tandem-school.service
     IonHeader,
     IonToolbar,
     IonButtons,
-    IonMenuButton,
+    IonBackButton,
     IonTitle,
     IonButton,
     IonIcon,
@@ -48,6 +49,7 @@ export class PassengerConfirmationListPage implements OnInit, OnDestroy {
   schools = this.tandemSchoolService.schools;
 
   constructor(
+    private route: ActivatedRoute,
     private modalCtrl: ModalController,
     private tandemService: TandemService,
     private loadingCtrl: LoadingController,
@@ -62,7 +64,13 @@ export class PassengerConfirmationListPage implements OnInit, OnDestroy {
 
   async ngOnInit() {
     await this.tandemSchoolService.getSchools();
-    this.initialDataLoad();
+    await this.initialDataLoad();
+
+    // Arriving from the tab bar's add sheet. Opened only after the load above,
+    // because the quota checks read passengerConfirmations and schools().
+    if (this.route.snapshot.queryParamMap.get('new') === '1') {
+      this.openAddPassengerConfirmation();
+    }
   }
 
   ngOnDestroy() {

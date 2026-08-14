@@ -47,9 +47,3 @@ ion-tab-button {
     }
   }
 }
-
-// This button opens the side menu instead of routing, so Ionic never marks it
-// selected - keep it visually consistent with the other inactive tabs.
-.fb-tab-button--more {
-  --color-selected: var(--fb-text-muted);
-}

@@ -1,19 +1,21 @@
 import { Component, OnDestroy, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { DatePipe, DecimalPipe } from '@angular/common';
-import { MenuController, IonContent, IonSkeletonText } from '@ionic/angular/standalone';
+import { IonContent, IonSkeletonText } from '@ionic/angular/standalone';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { ALL_TIME, StatisticPeriod, StatisticStore } from './shared/statistic.store';
 import { ActivityHeatmapComponent } from './components/activity-heatmap/activity-heatmap.component';
 import { CumulativeChartComponent } from './components/cumulative-chart/cumulative-chart.component';
+import { AvatarButtonComponent } from 'src/app/shared/components/avatar-button/avatar-button.component';
 
 @Component({
     selector: 'app-flight-statistic',
     templateUrl: './flight-statistic.page.html',
     styleUrls: ['./flight-statistic.page.scss'],
     imports: [
+        AvatarButtonComponent,
         DatePipe,
         DecimalPipe,
         TranslateModule,
@@ -29,7 +31,6 @@ export class FlightStatisticPage implements OnDestroy {
     private store = inject(StatisticStore);
     private translate = inject(TranslateService);
     private router = inject(Router);
-    private menuCtrl = inject(MenuController);
 
     public readonly ALL_TIME = ALL_TIME;
 
@@ -65,7 +66,6 @@ export class FlightStatisticPage implements OnDestroy {
     }
 
     constructor() {
-        this.menuCtrl.enable(true);
     }
 
     ionViewWillEnter() {
