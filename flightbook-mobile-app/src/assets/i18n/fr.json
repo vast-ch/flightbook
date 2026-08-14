@@ -57,7 +57,11 @@
         "oldpassword": "Ancien mot de passe",
         "newpassword": "Nouveau mot de passe",
         "confirmpassword": "Confirmez mot de passe",
-        "passwordlost": "Mot de passe oublié ?"
+        "passwordlost": "Mot de passe oublié ?",
+        "tagline": "Ton carnet de vol parapente",
+        "language": "Langue",
+        "showPassword": "Afficher le mot de passe",
+        "hidePassword": "Masquer le mot de passe"
     },
     "account": {
         "register": "Inscription",

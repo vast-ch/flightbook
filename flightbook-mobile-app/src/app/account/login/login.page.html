@@ -1,31 +1,70 @@
-<ion-content class="ion-padding">
-  <form id="loginForm" #form="ngForm" (ngSubmit)="login(form)">
-    <ion-item>
-      <ion-input autocomplete="email" required name="email" type="email" placeholder="{{ 'login.email' | translate }}" (change)="changeEmail($event)" [value]="loginData.email"></ion-input>
-    </ion-item>
-    <ion-item>
-      <ion-input autocomplete="current-password" required name="password" type="password" placeholder="{{ 'login.password' | translate }}" (change)="changePassword($event)" [value]="loginData.password">
-        <ion-input-password-toggle slot="end"></ion-input-password-toggle>
-      </ion-input>
-    </ion-item>
-    <ion-button class="submit-button" expand="block" type="submit" >{{ 'buttons.login' | translate }}</ion-button>
-  </form>
-  <ion-button expand="block" (click)="register()" >{{ 'buttons.createAccount' | translate }}</ion-button>
+<ion-content class="login-content">
+  <div class="login">
 
-  <div class="language-list">
-    <p>
-      <a (click)="setLanguage('fr')" class="language">{{ 'language.fr' | translate }}</a>
-      <a (click)="setLanguage('de')" class="language">{{ 'language.de' | translate }}</a>
-      <a (click)="setLanguage('en')" class="language">{{ 'language.en' | translate }}</a>
-      <a (click)="setLanguage('it')" class="language">{{ 'language.it' | translate }}</a>
-    </p>
-  </div>
+    <div class="login__body">
+      <div class="brand">
+        <img src="assets/icons/icon-512x512.png" alt="Flightbook" class="brand__mark" />
+        <h1 class="brand__name">Flightbook</h1>
+        <p class="brand__tagline">{{ 'login.tagline' | translate }}</p>
+      </div>
 
-  <div class="forgot-password">
-    <p><a (click)="forgotPassword()">{{ 'login.passwordlost' | translate }}</a></p>
+      <form id="loginForm" #form="ngForm" (ngSubmit)="login(form)">
+        <div class="fb-card--flush credentials">
+          <div class="credentials__row">
+            <label class="credentials__label" for="loginEmail">{{ 'login.email' | translate }}</label>
+            <ion-input id="loginEmail" [(ngModel)]="loginData.email" name="email" required
+                       type="email" inputmode="email" autocomplete="email"
+                       enterkeyhint="next"></ion-input>
+          </div>
+
+          <div class="credentials__row credentials__row--password">
+            <div class="credentials__field">
+              <label class="credentials__label" for="loginPassword">{{ 'login.password' | translate }}</label>
+              <ion-input id="loginPassword" [(ngModel)]="loginData.password" name="password" required
+                         [type]="showPassword ? 'text' : 'password'"
+                         autocomplete="current-password" enterkeyhint="go"></ion-input>
+            </div>
+            <!--
+              Own toggle rather than ion-input-password-toggle: that control is
+              shadow DOM with no exposed parts, so its 48px round button cannot
+              be resized to the design, and its aria-label is hardcoded English.
+            -->
+            <button type="button" class="credentials__reveal" (click)="togglePassword()"
+                    [attr.aria-label]="(showPassword ? 'login.hidePassword' : 'login.showPassword') | translate"
+                    [attr.aria-pressed]="showPassword">
+              <ion-icon [name]="showPassword ? 'eye-off-outline' : 'eye-outline'" aria-hidden="true"></ion-icon>
+            </button>
+          </div>
+        </div>
+
+        <ion-button class="login__primary" expand="block" type="submit">
+          {{ 'buttons.login' | translate }}
+        </ion-button>
+      </form>
+
+      <ion-button class="login__secondary" expand="block" fill="outline" (click)="register()">
+        {{ 'buttons.createAccount' | translate }}
+      </ion-button>
+
+      <button type="button" class="login__forgot" (click)="forgotPassword()">
+        {{ 'login.passwordlost' | translate }}
+      </button>
+    </div>
+
+    <div class="login__footer">
+      <!-- Active language is finally visible; the old link row gave no indication -->
+      <div class="languages" role="group" [attr.aria-label]="'login.language' | translate">
+        @for (lang of languages; track lang) {
+          <button type="button" class="languages__item"
+                  [class.is-active]="lang === currentLang"
+                  [attr.aria-pressed]="lang === currentLang"
+                  (click)="setLanguage(lang)">
+            {{ lang | uppercase }}
+          </button>
+        }
+      </div>
+      <p class="login__version">Flightbook {{ version }}</p>
+    </div>
+
   </div>
 </ion-content>
-
-<ion-footer mode="ios">
-  <p class="version">{{ 'version' | translate }}: {{version}}</p>
-</ion-footer>

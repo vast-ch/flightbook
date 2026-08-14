@@ -57,7 +57,11 @@
         "oldpassword": "Old password",
         "newpassword": "New password",
         "confirmpassword": "Confirm password",
-        "passwordlost": "Forgot your password?"
+        "passwordlost": "Forgot your password?",
+        "tagline": "Your paragliding logbook",
+        "language": "Language",
+        "showPassword": "Show password",
+        "hidePassword": "Hide password"
     },
     "account": {
         "register": "Register",

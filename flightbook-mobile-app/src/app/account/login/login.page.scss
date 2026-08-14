@@ -1,25 +1,218 @@
-.language-list, .forgot-password {
+// The signed-out screen sits on white, not the app's page background.
+.login-content {
+    --background: var(--fb-surface);
+}
+
+.login {
+    display: flex;
+    flex-direction: column;
+    // Fills the viewport so the footer can sit at the bottom, but still scrolls
+    // when the keyboard shrinks the visual viewport.
+    min-height: 100%;
+    box-sizing: border-box;
+}
+
+.login__body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 24px 26px;
+}
+
+// ---- Brand --------------------------------------------------------------
+.brand {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     text-align: center;
 }
 
-.language {
-    margin-right: 1em;
+.brand__mark {
+    display: block;
+    width: 76px;
+    height: 76px;
+    border-radius: 20px;
+}
+
+.brand__name {
+    margin: 18px 0 0;
+    font-size: 26px;
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: -0.025em;
+    color: var(--fb-text);
+}
+
+.brand__tagline {
+    margin: 8px 0 0;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--fb-text-secondary);
+    text-wrap: pretty;
+}
+
+// ---- Credentials --------------------------------------------------------
+.credentials {
+    margin-top: 34px;
+}
+
+// Stacked label above the value, unlike the flight form's side-label rows.
+.credentials__row {
+    padding: 13px 16px;
+
+    & + .credentials__row {
+        border-top: 1px solid var(--fb-hairline);
+    }
+}
+
+.credentials__row--password {
+    display: flex;
+    align-items: flex-end;
+    gap: 12px;
+}
+
+.credentials__field {
+    flex: 1;
+    min-width: 0;
+}
+
+.credentials__label {
+    display: block;
+    font-size: 10px;
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--fb-text-secondary);
+}
+
+// The row owns the padding, so the input contributes none of its own.
+:host ::ng-deep .credentials__row {
+    ion-input {
+        --padding-start: 0;
+        --padding-end: 0;
+        --padding-top: 0;
+        --padding-bottom: 0;
+        --background: transparent;
+        margin-top: 7px;
+        min-height: 0;
+        font-size: 14.5px;
+        font-weight: 500;
+        color: var(--fb-text);
+
+        .native-wrapper {
+            min-height: 0;
+        }
+
+        .native-input {
+            padding: 0;
+            min-height: 0;
+        }
+
+        .native-input::placeholder {
+            color: var(--fb-placeholder);
+            opacity: 1;
+        }
+    }
+
+}
+
+.credentials__reveal {
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 0;
+    background: transparent;
     cursor: pointer;
+
+    ion-icon {
+        font-size: 19px;
+        color: var(--fb-text-muted);
+    }
 }
 
-.forgot-password {
-    cursor: pointer;
+// ---- Actions ------------------------------------------------------------
+.login__primary,
+.login__secondary {
+    --border-radius: 10px;
+    --box-shadow: none;
+    height: 52px;
+    font-size: 15px;
+    font-weight: 600;
+    text-transform: none;
 }
 
-#loginForm {
-    margin-top: 2em;
+.login__primary {
+    margin: 14px 0 0;
 }
 
-.submit-button {
-    margin-top: 15px;
+.login__secondary {
+    // Accent outline with primary text, per the design.
+    --border-color: var(--fb-accent);
+    --border-width: 1px;
+    --background: var(--fb-surface);
+    --color: var(--ion-color-primary);
+    margin: 9px 0 0;
 }
 
-.version {
+.login__forgot {
+    display: block;
+    width: 100%;
+    margin-top: 20px;
+    padding: 4px 0;
+    border: 0;
+    background: transparent;
+    font: inherit;
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--ion-color-primary);
     text-align: center;
-    color: rgb(115, 115, 115);
+    cursor: pointer;
+}
+
+// ---- Footer -------------------------------------------------------------
+.login__footer {
+    flex: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    padding: 0 26px 30px;
+}
+
+.languages {
+    display: flex;
+    border: 1px solid var(--fb-border);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.languages__item {
+    padding: 7px 13px;
+    border: 0;
+    background: var(--fb-surface);
+    font: inherit;
+    font-size: 11.5px;
+    font-weight: 500;
+    color: var(--fb-text-body);
+    cursor: pointer;
+
+    & + .languages__item {
+        border-left: 1px solid var(--fb-border);
+    }
+
+    &.is-active {
+        background: var(--ion-color-primary);
+        color: var(--ion-color-primary-contrast);
+        font-weight: 600;
+    }
+}
+
+.login__version {
+    margin: 0;
+    font-size: 11px;
+    color: var(--fb-text-muted);
 }

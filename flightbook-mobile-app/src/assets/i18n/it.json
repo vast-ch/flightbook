@@ -57,7 +57,11 @@
         "oldpassword": "Vecchia Passwort",
         "newpassword": "Nuova Passwort",
         "confirmpassword": "Conferma Passwort",
-        "passwordlost": "Passwort dimenticata?"
+        "passwordlost": "Passwort dimenticata?",
+        "tagline": "Il tuo libro di volo in parapendio",
+        "language": "Lingua",
+        "showPassword": "Mostra password",
+        "hidePassword": "Nascondi password"
     },
     "account": {
         "register": "Iscriviti",

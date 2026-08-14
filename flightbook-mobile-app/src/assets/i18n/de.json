@@ -57,7 +57,11 @@
         "oldpassword": "Altes Passwort",
         "newpassword": "Neues Passwort",
         "confirmpassword": "Passwort bestätigen",
-        "passwordlost": "Passwort vergessen?"
+        "passwordlost": "Passwort vergessen?",
+        "tagline": "Dein Gleitschirm-Flugbuch",
+        "language": "Sprache",
+        "showPassword": "Passwort anzeigen",
+        "hidePassword": "Passwort verbergen"
     },
     "account": {
         "register": "Registrieren",
