@@ -44,11 +44,26 @@
     -->
     @if (showSchoolSection()) {
       <div class="more-section">
-        <div class="fb-section-label">{{ 'groupname.school' | translate }}</div>
+        <!-- The school's own name is the section's subject, so it carries the weight -->
+        <div class="fb-section-label">
+          {{ 'groupname.school' | translate }}@if (schoolLabel(); as name) {
+            <strong class="more-section__name">{{ name }}</strong>
+          }
+        </div>
         <div class="fb-card--flush">
           @for (school of schools(); track school.id) {
             <button type="button" class="fb-row more-row" (click)="open(['/school', school.id])">
-              <span class="more-row__title">{{ school.name }}</span>
+              <!--
+                One school is named in the section label, so the row says what it
+                opens. Several stay named, or the rows would be indistinguishable.
+              -->
+              <span class="more-row__title">
+                @if (schoolLabel()) {
+                  {{ 'appointment.appointments' | translate }}
+                } @else {
+                  {{ school.name }}
+                }
+              </span>
               <ion-icon name="chevron-forward" class="fb-row__chevron" aria-hidden="true"></ion-icon>
             </button>
           }

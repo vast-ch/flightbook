@@ -38,6 +38,16 @@
   margin-bottom: 14px;
 }
 
+// The label is already 600 and 10px, where 700 alone is all but invisible - the
+// darker colour is what actually reads as emphasis at this size. The gap is a
+// margin rather than a space in the template, so whitespace collapsing in the
+// @if block cannot swallow it.
+.more-section__name {
+  margin-left: 0.4em;
+  font-weight: 700;
+  color: var(--fb-text);
+}
+
 // ---- Rows ---------------------------------------------------------------
 // Geometry comes from the shared .fb-row primitive; these are the
 // navigation-row specifics the form-oriented .fb-row__label can't give.

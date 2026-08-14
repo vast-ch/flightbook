@@ -22,6 +22,9 @@ const DABS_URLS = {
     tomorrow: 'https://www.skybriefing.com/o/dabs?tomorrow'
 };
 
+/** Leading "flight school" in the languages the app ships, plus the English word. */
+const SCHOOL_WORD = /^(flugschule|flight\s+school|paragliding\s+school|school|[ée]cole(\s+de\s+parapente)?|scuola(\s+di\s+parapendio)?)\s+/i;
+
 const SHV_APP_URLS = {
     ios: 'https://apps.apple.com/us/app/shv-fsvl/id6761252391',
     other: 'https://play.google.com/store/apps/details?id=ch.shv_fsvl'
@@ -61,6 +64,28 @@ export class MorePage implements OnDestroy {
     public showSchoolSection = computed(() =>
         (this.schools()?.length ?? 0) > 0 || this.hasControlSheet()
     );
+
+    /**
+     * The name for the section label, or null when it cannot stand for the whole
+     * section - which is any case other than exactly one school.
+     */
+    public schoolLabel = computed<string | null>(() => {
+        const schools = this.schools() ?? [];
+        return schools.length === 1 ? this.withoutSchoolWord(schools[0].name) : null;
+    });
+
+    /**
+     * Schools are commonly registered as "Flugschule Schmid", and the label
+     * already says School - so drop the leading school word rather than read
+     * "School Flugschule Schmid". Anything unrecognised is left whole.
+     */
+    private withoutSchoolWord(name: string | undefined): string | null {
+        if (!name) {
+            return null;
+        }
+        const trimmed = name.trim().replace(SCHOOL_WORD, '');
+        return trimmed.length > 0 ? trimmed : name.trim();
+    }
 
     private preparation = computed(() => this.accountService.currentUser$()?.config?.preparation);
 
