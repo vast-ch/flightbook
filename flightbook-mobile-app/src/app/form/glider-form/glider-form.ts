@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
-import { AlertController, IonItem, IonInput, IonLabel, IonToggle, IonTextarea, IonButton, IonModal, IonContent, IonDatetime, IonList, IonItemSliding, IonItemOptions, IonItemOption, IonIcon, IonToolbar, IonButtons, IonTitle, IonHeader, IonMenuButton, ModalController, IonApp } from '@ionic/angular/standalone';
+import { AlertController, IonItem, IonInput, IonToggle, IonTextarea, IonModal, IonContent, IonDatetime, IonList, IonItemSliding, IonItemOptions, IonItemOption, IonIcon, ModalController } from '@ionic/angular/standalone';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { Glider, GliderCheck } from 'src/app/glider/shared/glider.model';
 import { FormsModule } from '@angular/forms';
@@ -12,7 +12,7 @@ import { CheckComponent } from './check/check.component';
     selector: 'glider-form',
     templateUrl: 'glider-form.html',
     styleUrls: ['glider-form.scss'],
-    imports: [FormsModule, DatePipe, TranslateModule, IonItem, IonInput, IonLabel, IonToggle, IonTextarea, IonButton, IonModal, IonContent, IonDatetime, IonList, IonItemSliding, IonItemOptions, IonItemOption, IonIcon]
+    imports: [FormsModule, DatePipe, TranslateModule, IonItem, IonInput, IonToggle, IonTextarea, IonModal, IonContent, IonDatetime, IonList, IonItemSliding, IonItemOptions, IonItemOption, IonIcon]
 })
 export class GliderFormComponent implements OnInit {
     @Input()
@@ -76,13 +76,16 @@ export class GliderFormComponent implements OnInit {
         const modal = await this.modalController.create({
             component: CheckComponent,
             componentProps: {
-                gliderCheck: copyGliderCheck
+                gliderCheck: copyGliderCheck,
+                mode: type
             }
         });
         await modal.present();
 
         const { data } = await modal.onWillDismiss();
-        if (data && data.type === 'close') {
+        // No data means a backdrop dismiss; reading data.gliderCheck below
+        // would throw, so treat it the same as an explicit close.
+        if (!data || data.type === 'close') {
             return;
         }
 

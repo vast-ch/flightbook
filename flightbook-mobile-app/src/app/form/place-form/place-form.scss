@@ -1,0 +1,22 @@
+// Ionic controls inside .fb-row are styled globally in theme/tokens.scss.
+
+.form-card {
+    margin-top: 12px;
+
+    &:first-of-type {
+        margin-top: 0;
+    }
+}
+
+.form-section-label {
+    margin: 22px 0 9px;
+}
+
+// The card supplies the framing the map's own 5px border used to.
+.form-card--map {
+    --fb-place-map-height: 280px;
+}
+
+.map-hint {
+    margin-top: 10px;
+}

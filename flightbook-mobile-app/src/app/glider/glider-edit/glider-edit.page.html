@@ -1,13 +1,22 @@
-<ion-header>
-  <ion-toolbar color='primary'>
-    <ion-buttons slot="start">
-      <ion-back-button defaultHref='gliders'></ion-back-button>
-    </ion-buttons>
-    <ion-title>{{ 'groupname.glider' | translate }}</ion-title>
-  </ion-toolbar>
-</ion-header>
+<div class="form-header">
+  <button type="button" class="icon-button" (click)="close()"
+          [attr.aria-label]="'buttons.back' | translate">
+    <ion-icon name="chevron-back" aria-hidden="true"></ion-icon>
+  </button>
+  <h1 class="form-header__title">{{ glider?.brand }} {{ glider?.name }}</h1>
+</div>
 
-<ion-content class="ion-padding">
-  <glider-form [glider]=glider (saveGlider)="saveGlider($event)"></glider-form>
-  <ion-button [disabled]="deleteDisabled" class="delete" expand="block" color="danger" (click)="delete()" >{{ 'buttons.delete' | translate }}</ion-button>
+<ion-content>
+  <div class="form-body">
+    <glider-form [glider]=glider (saveGlider)="saveGlider($event)"></glider-form>
+
+    <div class="secondary-actions">
+      <ion-button expand="block" fill="clear" color="danger" [disabled]="deleteDisabled"
+                  (click)="delete()">{{ 'buttons.delete' | translate }}</ion-button>
+    </div>
+  </div>
 </ion-content>
+
+<ion-footer class="form-footer">
+  <ion-button expand="block" type="submit" form="gliderForm">{{ 'buttons.save' | translate }}</ion-button>
+</ion-footer>

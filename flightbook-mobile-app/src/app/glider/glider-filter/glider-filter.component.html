@@ -1,34 +1,69 @@
-<ion-header>
-  <ion-toolbar color='primary'>
-    <ion-title>{{ 'buttons.filter' | translate }}</ion-title>
-  </ion-toolbar>
-</ion-header>
+<div class="form-header">
+  <button type="button" class="icon-button" (click)="dismiss()"
+          [attr.aria-label]="'buttons.close' | translate">
+    <ion-icon name="close" aria-hidden="true"></ion-icon>
+  </button>
+  <h1 class="form-header__title">{{ 'buttons.filter' | translate }}</h1>
+</div>
 
-<ion-content class="ion-padding">
-  <form (ngSubmit)="filterElement()">
-    <ion-item>
-      <ion-input label="{{ 'glider.brand' | translate }}" labelPlacement="stacked" type="text" [(ngModel)]="filter.brand" name="brand"></ion-input>
-    </ion-item>
-    <ion-item>
-      <ion-input label="{{ 'glider.name' | translate }}" labelPlacement="stacked" type="text" [(ngModel)]="filter.name" name="name"></ion-input>
-    </ion-item>
-    <ion-item>
-      <ion-select label="{{ 'glider.type' | translate }}" labelPlacement="stacked" [(ngModel)]="filter.type" name="type" okText="{{ 'buttons.done' | translate }}"
-        cancelText="{{ 'buttons.cancel' | translate }}">
-        <ion-select-option value="">{{ 'glider.all' | translate }}</ion-select-option>
-        <ion-select-option value="0">{{ 'glider.solo' | translate }}</ion-select-option>
-        <ion-select-option value="1">{{ 'glider.tandem' | translate }}</ion-select-option>
-      </ion-select>
-    </ion-item>
-    <ion-item>
-      <ion-select label="{{ 'glider.archived' | translate }}" labelPlacement="stacked" [(ngModel)]="filter.archived" name="archived" okText="{{ 'buttons.done' | translate }}"
-        cancelText="{{ 'buttons.cancel' | translate }}">
-        <ion-select-option value="">{{ 'glider.all' | translate }}</ion-select-option>
-        <ion-select-option value="1">{{ 'buttons.yes' | translate }}</ion-select-option>
-        <ion-select-option value="0">{{ 'buttons.no' | translate }}</ion-select-option>
-      </ion-select>
-    </ion-item>
-    <ion-button type="button" (click)="clearFilter()">{{ 'buttons.clear' | translate }}</ion-button>
-    <ion-button type="submit">{{ 'buttons.filter' | translate }}</ion-button>
-  </form>
+<ion-content>
+  <div class="form-body">
+    <form id="gliderFilterForm" (ngSubmit)="filterElement()">
+      <div class="fb-card--flush">
+        <div class="fb-row">
+          <span class="fb-row__label" id="lbl-filter-brand">{{ 'glider.brand' | translate }}</span>
+          <span class="fb-row__value">
+            <ion-input clearInput type="text" [(ngModel)]="filter.brand" name="brand"
+                       aria-labelledby="lbl-filter-brand"></ion-input>
+          </span>
+        </div>
+
+        <div class="fb-row">
+          <span class="fb-row__label" id="lbl-filter-name">{{ 'glider.name' | translate }}</span>
+          <span class="fb-row__value">
+            <ion-input clearInput type="text" [(ngModel)]="filter.name" name="name"
+                       aria-labelledby="lbl-filter-name"></ion-input>
+          </span>
+        </div>
+
+        <div class="fb-row fb-row--select">
+          <span class="fb-row__label" id="lbl-filter-type">{{ 'glider.type' | translate }}</span>
+          <span class="fb-row__value">
+            <ion-select [(ngModel)]="filter.type" name="type" interface="popover"
+                        toggleIcon="chevron-forward" aria-labelledby="lbl-filter-type"
+                        okText="{{ 'buttons.done' | translate }}"
+                        cancelText="{{ 'buttons.cancel' | translate }}">
+              <ion-select-option value="">{{ 'glider.all' | translate }}</ion-select-option>
+              <ion-select-option value="0">{{ 'glider.solo' | translate }}</ion-select-option>
+              <ion-select-option value="1">{{ 'glider.tandem' | translate }}</ion-select-option>
+            </ion-select>
+          </span>
+        </div>
+
+        <div class="fb-row fb-row--select">
+          <span class="fb-row__label" id="lbl-filter-archived">{{ 'glider.archived' | translate }}</span>
+          <span class="fb-row__value">
+            <ion-select [(ngModel)]="filter.archived" name="archived" interface="popover"
+                        toggleIcon="chevron-forward" aria-labelledby="lbl-filter-archived"
+                        okText="{{ 'buttons.done' | translate }}"
+                        cancelText="{{ 'buttons.cancel' | translate }}">
+              <ion-select-option value="">{{ 'glider.all' | translate }}</ion-select-option>
+              <ion-select-option value="1">{{ 'buttons.yes' | translate }}</ion-select-option>
+              <ion-select-option value="0">{{ 'buttons.no' | translate }}</ion-select-option>
+            </ion-select>
+          </span>
+        </div>
+      </div>
+
+      <div class="secondary-actions">
+        <ion-button expand="block" fill="clear" type="button" (click)="clearFilter()">
+          {{ 'buttons.clear' | translate }}
+        </ion-button>
+      </div>
+    </form>
+  </div>
 </ion-content>
+
+<ion-footer class="form-footer">
+  <ion-button expand="block" type="submit" form="gliderFilterForm">{{ 'buttons.filter' | translate }}</ion-button>
+</ion-footer>

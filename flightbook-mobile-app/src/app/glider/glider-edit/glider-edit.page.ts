@@ -1,14 +1,16 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { LoadingController, AlertController, IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonContent, IonButton } from '@ionic/angular/standalone';
+import { LoadingController, AlertController, IonContent, IonFooter, IonButton, IonIcon } from '@ionic/angular/standalone';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import HttpStatusCode from '../../shared/util/HttpStatusCode';
 import { Glider } from '../shared/glider.model';
 import { GliderStore } from '../shared/glider.store';
 import { FlightStore } from 'src/app/flight/shared/flight.store';
 import moment from 'moment';
+import { addIcons } from 'ionicons';
+import { chevronBack } from 'ionicons/icons';
 import { GliderFormComponent } from '../../form/glider-form/glider-form';
 
 @Component({
@@ -18,16 +20,13 @@ import { GliderFormComponent } from '../../form/glider-form/glider-form';
     imports: [
         GliderFormComponent,
         TranslateModule,
-        IonHeader,
-        IonToolbar,
-        IonButtons,
-        IonBackButton,
-        IonTitle,
         IonContent,
-        IonButton
+        IonFooter,
+        IonButton,
+        IonIcon
     ]
 })
-export class GliderEditPage implements OnInit, OnDestroy {
+export class GliderEditPage implements OnDestroy {
     unsubscribe$ = new Subject<void>();
     private gliderId: number;
     glider: Glider;
@@ -54,14 +53,16 @@ export class GliderEditPage implements OnInit, OnDestroy {
                 this.deleteDisabled = false;
             }
         });
-    }
-
-    ngOnInit() {
+        addIcons({ 'chevron-back': chevronBack });
     }
 
     ngOnDestroy() {
         this.unsubscribe$.next();
         this.unsubscribe$.complete();
+    }
+
+    close() {
+        this.router.navigate(['/gliders'], { replaceUrl: true });
     }
 
     async saveGlider(glider: Glider) {

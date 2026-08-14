@@ -1,25 +1,44 @@
-<ion-header>
-    <ion-toolbar color='primary'>
-        <ion-title>{{ 'glider.check.title' | translate }}</ion-title>
-        <ion-buttons slot="end">
-            <ion-button (click)="closeCheckModal()"><ion-icon name="close"></ion-icon></ion-button>
-        </ion-buttons>
-    </ion-toolbar>
-</ion-header>
-<ion-content class="ion-padding">
-    <form>
-        <ion-item id="checkDateInput">
-            <ion-input required label="{{ 'glider.check.date' | translate }}*" labelPlacement="stacked"
-                value="{{ gliderCheck?.date | date:'dd.MM.yyyy' }}"></ion-input>
-        </ion-item>
-        <ion-item>
-            <ion-textarea label="{{ 'glider.check.result' | translate }}" labelPlacement="stacked"
-                 [(ngModel)]="gliderCheck.result" name="result" autocomplete="on" autocorrect="on"
-                auto-grow="true"></ion-textarea>
-        </ion-item>
-        <ion-button (click)="saveCheck()" expand="block">{{ 'buttons.add' | translate }}</ion-button>
-    </form>
+<div class="form-header">
+  <button type="button" class="icon-button" (click)="closeCheckModal()"
+          [attr.aria-label]="'buttons.close' | translate">
+    <ion-icon name="close" aria-hidden="true"></ion-icon>
+  </button>
+  <h1 class="form-header__title">{{ 'glider.check.title' | translate }}</h1>
+</div>
+
+<ion-content>
+  <div class="form-body">
+    <div class="fb-card--flush">
+      <!-- type="button" is mandatory: inside a form a bare button submits -->
+      <button type="button" id="checkDateInput" class="fb-row">
+        <span class="fb-row__label">{{ 'glider.check.date' | translate }}</span>
+        <span class="fb-row__value" [class.is-placeholder]="!gliderCheck?.date">
+          @if (gliderCheck?.date) {
+            {{ gliderCheck.date | date:'dd.MM.yyyy' }}
+          } @else {
+            {{ 'glider.check.date' | translate }}
+          }
+        </span>
+        <ion-icon class="fb-row__chevron" name="chevron-forward" aria-hidden="true"></ion-icon>
+      </button>
+
+      <div class="fb-row fb-row--stack">
+        <span class="fb-row__label" id="lbl-check-result">{{ 'glider.check.result' | translate }}</span>
+        <span class="fb-row__value">
+          <ion-textarea [(ngModel)]="gliderCheck.result" name="result" autocomplete="on"
+                        autocorrect="on" auto-grow="true"
+                        aria-labelledby="lbl-check-result"></ion-textarea>
+        </span>
+      </div>
+    </div>
+  </div>
 </ion-content>
+
+<ion-footer class="form-footer">
+  <ion-button expand="block" (click)="saveCheck()">
+    {{ (mode === 'edit' ? 'buttons.save' : 'buttons.add') | translate }}
+  </ion-button>
+</ion-footer>
 
 <ion-modal class="dateModal" trigger='checkDateInput'>
   <ng-template>

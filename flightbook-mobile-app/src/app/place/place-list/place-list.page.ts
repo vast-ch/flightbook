@@ -1,5 +1,5 @@
-import { Component, OnInit, ViewChild, OnDestroy, AfterViewInit } from '@angular/core';
-import { NavController, LoadingController, AlertController, IonHeader, IonToolbar, IonButtons, IonMenuButton, IonTitle, IonButton, IonIcon, IonContent, IonItem, IonGrid, IonRow, IonCol, IonList, IonInfiniteScroll, IonInfiniteScrollContent, IonLabel } from '@ionic/angular/standalone';
+import { Component, ViewChild, OnDestroy } from '@angular/core';
+import { NavController, LoadingController, AlertController, ActionSheetController, IonIcon, IonContent, IonItem, IonList, IonInfiniteScroll, IonInfiniteScrollContent } from '@ionic/angular/standalone';
 import { takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
@@ -16,7 +16,7 @@ import { MapUtil } from 'src/app/shared/util/MapUtil';
 import { RouterLink } from '@angular/router';
 import { FlagsModule } from 'nxt-flags';
 import { addIcons } from "ionicons";
-import { add, locationOutline } from "ionicons/icons";
+import { add, locationOutline, shareOutline, chevronBack, chevronForward } from "ionicons/icons";
 
 @Component({
     selector: 'app-place-list',
@@ -26,27 +26,16 @@ import { add, locationOutline } from "ionicons/icons";
         RouterLink,
         FlagsModule,
         TranslateModule,
-        IonHeader,
-        IonToolbar,
-        IonButtons,
-        IonMenuButton,
-        IonTitle,
-        IonButton,
         IonIcon,
         IonContent,
         IonItem,
-        IonGrid,
-        IonRow,
-        IonCol,
-        IonLabel,
         IonList,
         IonInfiniteScroll,
         IonInfiniteScrollContent
     ]
 })
-export class PlaceListPage implements OnInit, OnDestroy, AfterViewInit {
+export class PlaceListPage implements OnDestroy {
     @ViewChild(IonInfiniteScroll) infiniteScroll: IonInfiniteScroll;
-    @ViewChild(IonContent) content: IonContent;
 
     unsubscribe$ = new Subject<void>();
     // Use signals directly from the store
@@ -60,6 +49,7 @@ export class PlaceListPage implements OnInit, OnDestroy, AfterViewInit {
     constructor(
         public navCtrl: NavController,
         private alertController: AlertController,
+        private actionSheetCtrl: ActionSheetController,
         private placeStore: PlaceStore,
         private translate: TranslateService,
         private loadingCtrl: LoadingController,
@@ -69,6 +59,9 @@ export class PlaceListPage implements OnInit, OnDestroy, AfterViewInit {
         addIcons({
             add,
             locationOutline,
+            shareOutline,
+            'chevron-back': chevronBack,
+            'chevron-forward': chevronForward,
             'place': 'assets/custom-ion-icons/place.svg'
         });
     }
@@ -86,22 +79,11 @@ export class PlaceListPage implements OnInit, OnDestroy, AfterViewInit {
         await loading.present();
         this.placeStore.getPlaces({ limit: this.limit, clearStore: true })
             .pipe(takeUntil(this.unsubscribe$))
-            .subscribe(async (res: Place[]) => {
-                // @hack for hide export item
-                setTimeout(async () => {
-                    await this.content.scrollToPoint(0, 54);
-                    await loading.dismiss();
-                }, 1);
-            }, async (error: any) => {
+            .subscribe(async () => {
+                await loading.dismiss();
+            }, async () => {
                 await loading.dismiss();
             });
-    }
-
-    ngOnInit() {
-    }
-
-    ngAfterViewInit() {
-        this.content.scrollToPoint(0, 54);
     }
 
     ngOnDestroy() {
@@ -109,8 +91,26 @@ export class PlaceListPage implements OnInit, OnDestroy, AfterViewInit {
         this.unsubscribe$.complete();
     }
 
-    itemTapped(event: MouseEvent, place: Place) {
+    /** Places hang off the More page, so that is where back leads. */
+    goBack() {
+        this.navCtrl.navigateBack('more');
+    }
+
+    itemTapped(place: Place) {
         this.navCtrl.navigateForward(`places/${place.id}`);
+    }
+
+    /** Two formats, so the header button opens a picker rather than doubling up. */
+    async openExport() {
+        const sheet = await this.actionSheetCtrl.create({
+            header: this.translate.instant('buttons.export'),
+            buttons: [
+                { text: 'XLSX', handler: () => { this.xlsxExport(); } },
+                { text: 'CSV', handler: () => { this.csvExport(); } },
+                { text: this.translate.instant('buttons.cancel'), role: 'cancel' }
+            ]
+        });
+        await sheet.present();
     }
 
     loadData(event: any) {
@@ -125,7 +125,13 @@ export class PlaceListPage implements OnInit, OnDestroy, AfterViewInit {
     }
 
     getCountryNameByCode(code: string) {
-        return code ? this.countries.find(x => x.code === code).name[this.lang] : "";
+        if (!code) {
+            return "";
+        }
+        // An unknown code used to throw here and take the whole list down with
+        // it; fall back to showing the raw code instead.
+        const country = this.countries.find(x => x.code === code);
+        return country?.name[this.lang] ?? code.toUpperCase();
     }
 
     async csvExport() {

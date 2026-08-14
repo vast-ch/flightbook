@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, Input, NgZone, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, Input, NgZone, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
 import { AlertController } from '@ionic/angular/standalone';
 import { TranslateService } from '@ngx-translate/core';
 import { Point as GeoPoint, Position } from 'geojson';
@@ -23,7 +23,9 @@ import { ConfigurationService } from '../../services/configuration.service';
     styleUrls: ['./place-map.component.scss'],
     standalone: true,
 })
-export class PlaceMapComponent implements OnInit, AfterViewInit, OnChanges {
+export class PlaceMapComponent implements AfterViewInit, OnChanges {
+
+    @ViewChild('mapContainer', { static: true }) private mapContainer: ElementRef<HTMLDivElement>;
 
     private map: Map;
     private vectorSource = new VectorSource();
@@ -63,19 +65,22 @@ export class PlaceMapComponent implements OnInit, AfterViewInit, OnChanges {
     }
 
     ngOnChanges(changes: SimpleChanges): void {
-        if (changes.placeName.firstChange) {
-            if (this.place.coordinates) {
-                return;
-            }
+        // Only placeName drives the lookup; a `place`-only change used to throw
+        // here because changes.placeName was dereferenced unconditionally.
+        const placeName = changes.placeName;
+        if (!placeName) {
+            return;
         }
 
-        if (!this.place.coordinates && changes.placeName.currentValue && changes.placeName.currentValue != "") {
+        if (placeName.firstChange && this.place?.coordinates) {
+            return;
+        }
+
+        if (!this.place?.coordinates && placeName.currentValue && placeName.currentValue != "") {
             clearTimeout(this.timerId);
-            this.timerId = setTimeout(() => this.searchPlace(changes.placeName.currentValue), 1000);
+            this.timerId = setTimeout(() => this.searchPlace(placeName.currentValue), 1000);
         }
     }
-
-    ngOnInit() { }
 
     ngAfterViewInit() {
         this.initMap(this.place.coordinates);
@@ -119,7 +124,7 @@ export class PlaceMapComponent implements OnInit, AfterViewInit, OnChanges {
                 this.vectorLayer
             ],
             controls: [attributionControl],
-            target: 'map',
+            target: this.mapContainer.nativeElement,
             view: new View({
                 center: mapPoition,
                 zoom: zoom,
