@@ -356,11 +356,18 @@
         "soloRequired": "Au moins un requis",
         "skills": "Compétences",
         "rated": "{{rated}} sur {{total}} évaluées",
-        "notScheduled": "Non planifié",
+        "notPassed": "Pas encore réussi",
+        "passedOn": "Réussi le {{date}}",
+        "level": {
+            "0": "Pas encore évalué",
+            "1": "Introduit",
+            "2": "En cours d'acquisition",
+            "3": "Maîtrisé"
+        },
         "exam": {
-            "title": "Examens",
-            "theory": "Théorie réussie le",
-            "practice": "Pratique réussie le"
+            "title": "Examens finaux",
+            "theory": "Examen théorique",
+            "practice": "Examen pratique"
         },
         "trainingHill": {
             "title": "Pente école",

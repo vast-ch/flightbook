@@ -525,16 +525,14 @@ button.fb-row {
 }
 
 /*
- * Segmented control: a bordered, rounded strip of equal-width buttons with one
- * active. Shared by the statistics period picker and the account language
- * switcher. Separators use adjacency so the first item never gets a left edge.
+ * Control-sheet skill sheet: rating, level and coaching copy in one sheet.
+ * Global for the same reason as .fb-add-sheet - Ionic renders modals at the app
+ * root, outside component style scope. The component paints its own head, so
+ * only the shell is set here.
  */
-/*
- * Control-sheet rating sheet. Global for the same reason as .fb-add-sheet:
- * Ionic renders modals at the app root, outside component style scope.
- */
-.sheet-star-modal {
+.skill-sheet-modal {
   --background: var(--fb-bg);
+  --border-radius: 18px 18px 0 0;
   --backdrop-opacity: 1;
 
   &::part(backdrop) {
@@ -542,6 +540,11 @@ button.fb-row {
   }
 }
 
+/*
+ * Segmented control: a bordered, rounded strip of equal-width buttons with one
+ * active. Shared by the statistics period picker and the account language
+ * switcher. Separators use adjacency so the first item never gets a left edge.
+ */
 .fb-segments {
   display: flex;
   border: 1px solid var(--fb-border);

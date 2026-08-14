@@ -356,11 +356,18 @@
         "soloRequired": "At least one required",
         "skills": "Skills",
         "rated": "{{rated}} of {{total}} rated",
-        "notScheduled": "Not scheduled",
+        "notPassed": "Not passed yet",
+        "passedOn": "Passed on {{date}}",
+        "level": {
+            "0": "Not rated yet",
+            "1": "Introduced",
+            "2": "Practising",
+            "3": "Mastered"
+        },
         "exam": {
-            "title": "Exams",
-            "theory": "Theory passed on",
-            "practice": "Practice passed on"
+            "title": "Final exams",
+            "theory": "Theory exam",
+            "practice": "Practical exam"
         },
         "trainingHill": {
             "title": "Übungshang",

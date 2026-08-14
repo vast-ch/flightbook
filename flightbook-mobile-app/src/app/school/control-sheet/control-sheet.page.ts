@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewChild, computed, signal } from '@angular/core';
+import { Component, OnDestroy, OnInit, computed, signal } from '@angular/core';
 import { ControlSheet } from 'src/app/shared/domain/control-sheet';
 import { SchoolService } from '../shared/school.service';
 import { Subject, takeUntil } from 'rxjs';
@@ -10,14 +10,7 @@ import { DatePipe } from '@angular/common';
 import { StarRatingComponent } from '../../shared/components/star-rating/star-rating.component';
 import { HomeStore } from 'src/app/home/shared/home.store';
 import { addIcons } from 'ionicons';
-import { chevronBack, chevronDown, chevronUp, checkmark } from 'ionicons/icons';
-
-type StarRating = {
-    currentValue: number,
-    translationKey: string,
-    type: string,
-    key: string
-}
+import { chevronBack, chevronDown, chevronForward, chevronUp, checkmark } from 'ionicons/icons';
 
 /** The three rated groups, in the order the design lists them. */
 type SkillGroup = 'theory' | 'trainingHill' | 'altitudeFlight';
@@ -41,10 +34,6 @@ type SkillRow = { key: string, value: number };
 export class ControlSheetPage implements OnInit, OnDestroy {
     unsubscribe$ = new Subject<void>();
     controlSheet: ControlSheet | undefined;
-    @ViewChild('starModal') starModal: IonModal;
-
-    // Star rating
-    starRating: StarRating;
 
     orderedAltitudeFlight: SkillRow[] = [];
     orderedTheory: SkillRow[] = [];
@@ -82,7 +71,13 @@ export class ControlSheetPage implements OnInit, OnDestroy {
         private nxgTransalteSortPipe: NxgTransalteSortPipe
     ) {
         this.language = this.translate.currentLang;
-        addIcons({ 'chevron-back': chevronBack, 'chevron-down': chevronDown, 'chevron-up': chevronUp, checkmark });
+        addIcons({
+            'chevron-back': chevronBack,
+            'chevron-down': chevronDown,
+            'chevron-forward': chevronForward,
+            'chevron-up': chevronUp,
+            checkmark
+        });
     }
 
     ngOnInit() {
@@ -203,41 +198,33 @@ export class ControlSheetPage implements OnInit, OnDestroy {
             .map(key => ({ key, value: group[key] }));
     }
 
-    async openDetail(group: SkillGroup, key: string) {
-        if (!this.hasDetail(group)) {
-            return;
-        }
+    /**
+     * One sheet per skill, as the design has it: the rating and the coaching
+     * text share it, so a student rates what they are reading about. Theory
+     * skills have no coaching text, so their sheet opens shallower.
+     */
+    async openSkill(group: SkillGroup, row: SkillRow) {
+        const height = this.hasDetail(group) ? 0.82 : 0.42;
         const modal = await this.modalCtrl.create({
             component: ControlSheetDetailsComponent,
+            cssClass: 'skill-sheet-modal',
+            handle: false,
+            breakpoints: [0, height],
+            initialBreakpoint: height,
             componentProps: {
                 type: group,
-                key: key
+                key: row.key,
+                titleKey: this.labelKey(group, row.key),
+                rating: row.value ?? 0,
+                canEdit: this.canEdit,
+                persist: (value: number) => this.saveRating(group, row.key, value)
             }
         });
 
         return await modal.present();
     }
 
-    async openRateAlert(event: Event, currentRating: number, group: SkillGroup, key: string) {
-        // Without this the tap also opens the coaching modal behind the sheet.
-        event.stopPropagation();
-        if (!this.canEdit) {
-            return;
-        }
-
-        this.starRating = {
-            currentValue: currentRating,
-            translationKey: this.labelKey(group, key),
-            type: group,
-            key: key
-        };
-        this.starModal.present();
-    }
-
-    async saveRating(value: number) {
-        const group = this.starRating.type as SkillGroup;
-        const key = this.starRating.key;
-
+    async saveRating(group: SkillGroup, key: string, value: number) {
         this.controlSheet[group][key] = value;
 
         const rows = this.rows(group);
@@ -246,8 +233,6 @@ export class ControlSheetPage implements OnInit, OnDestroy {
             rows[index] = { key, value };
         }
 
-        // Close the sheet on the way out; only the error path used to.
-        await this.starModal.dismiss();
         await this.postControlSheet();
     }
 

@@ -356,11 +356,18 @@
         "soloRequired": "Mindestens einer erforderlich",
         "skills": "Fähigkeiten",
         "rated": "{{rated}} von {{total}} bewertet",
-        "notScheduled": "Nicht geplant",
+        "notPassed": "Noch nicht bestanden",
+        "passedOn": "Bestanden am {{date}}",
+        "level": {
+            "0": "Noch nicht bewertet",
+            "1": "Eingeführt",
+            "2": "Wird geübt",
+            "3": "Beherrscht"
+        },
         "exam": {
-            "title": "Prüfungen",
-            "theory": "Theorie bestanden am",
-            "practice": "Praxis bestanden am"
+            "title": "Abschlussprüfungen",
+            "theory": "Theorieprüfung",
+            "practice": "Praktische Prüfung"
         },
         "trainingHill": {
             "title": "Übungshang",

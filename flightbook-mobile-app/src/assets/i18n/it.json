@@ -356,11 +356,18 @@
         "soloRequired": "Almeno uno richiesto",
         "skills": "Competenze",
         "rated": "{{rated}} di {{total}} valutate",
-        "notScheduled": "Non programmato",
+        "notPassed": "Non ancora superato",
+        "passedOn": "Superato il {{date}}",
+        "level": {
+            "0": "Non ancora valutato",
+            "1": "Introdotto",
+            "2": "In esercitazione",
+            "3": "Padroneggiato"
+        },
         "exam": {
-            "title": "Esami",
-            "theory": "Teoria superata il",
-            "practice": "Pratica superata il"
+            "title": "Esami finali",
+            "theory": "Esame teorico",
+            "practice": "Esame pratico"
         },
         "trainingHill": {
             "title": "Übungshang",
