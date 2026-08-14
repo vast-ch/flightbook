@@ -184,7 +184,17 @@ export class HomeStore {
         const scheduled = moment.utc(next.appointment.scheduling).tz(zone);
 
         return {
-            appointment: next.appointment,
+            /*
+             * scheduling is rebuilt as the school's wall clock, exactly as the
+             * appointment list does it. Angular's DatePipe cannot take an IANA
+             * zone - it parses the argument with Date.parse and falls back to the
+             * device offset - so without this Home showed a pilot abroad a
+             * different time than the appointment screens for the same date.
+             */
+            appointment: {
+                ...next.appointment,
+                scheduling: new Date(scheduled.format('YYYY-MM-DD HH:mm:ss'))
+            } as Appointment,
             school: next.school,
             daysUntil: scheduled.startOf('day').diff(moment().tz(zone).startOf('day'), 'days')
         };

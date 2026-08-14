@@ -63,10 +63,10 @@
         </div>
         <div class="next-flight__date">
           <span class="next-flight__day">
-            {{ next.appointment.scheduling | date:'EE dd MMM':next.school.timezone:currentLang }}
+            {{ next.appointment.scheduling | date:'EE dd MMM':undefined:currentLang }}
           </span>
           <span class="next-flight__time">
-            {{ next.appointment.scheduling | date:'HH:mm':next.school.timezone }}
+            {{ next.appointment.scheduling | date:'HH:mm' }}
           </span>
         </div>
         @if (next.appointment.meetingPoint) {

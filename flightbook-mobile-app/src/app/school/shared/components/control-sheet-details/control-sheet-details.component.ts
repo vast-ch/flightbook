@@ -66,10 +66,19 @@ export class ControlSheetDetailsComponent implements OnInit {
         this.persist?.(value);
     }
 
-    /** null for 42 of the 48 skills, so the template must check the value. */
+    /**
+     * null for 42 of the 48 skills, so the template must check the value - and
+     * theory skills have no `video` key at all, which resolves to the key
+     * itself. Without that check the iframe would load "controlSheet.theory.x
+     * .video" as a relative URL, which the SPA fallback answers with index.html:
+     * the whole app, booted again inside the sheet.
+     */
     videoUrl(): string | null {
         const url = this.translate.instant(`controlSheet.${this.type}.${this.key}.video`);
-        return url && typeof url === 'string' ? url : null;
+        if (!url || typeof url !== 'string' || url.startsWith('controlSheet.')) {
+            return null;
+        }
+        return url;
     }
 
     close() {

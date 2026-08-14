@@ -138,6 +138,11 @@ export class IgcMapComponent implements AfterViewInit, OnDestroy {
     ngOnDestroy() {
         // Without this the replay loop keeps running after navigation.
         this.stop();
+        // And without this the map holds its WebGL context: browsers cap those
+        // at around 16, so opening that many IGC tracks in one session started
+        // blanking the earliest maps.
+        this.map?.setTarget(undefined);
+        this.map?.dispose();
     }
 
     onAddfeature = ((evt: any) => {
@@ -472,7 +477,9 @@ export class IgcMapComponent implements AfterViewInit, OnDestroy {
                 },
             });
         } catch (e) {
-            // No WebGL: fall back to the plain basemap rather than a blank map.
+            // Only catches building the layer. A WebGL context is not created
+            // until the first render, so a device that cannot provide one fails
+            // later and elsewhere - this is not that safety net.
             console.warn('Shaded relief unavailable', e);
             return null;
         }

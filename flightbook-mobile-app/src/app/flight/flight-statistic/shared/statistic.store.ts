@@ -56,6 +56,17 @@ function timeToSeconds(time?: string): number {
     return h * 3600 + m * 60 + s;
 }
 
+/**
+ * Parses a YYYY-MM-DD flight date as local midnight. `new Date('2025-01-01')`
+ * is parsed as UTC, so west of UTC it lands on the previous day - and since the
+ * grid keys and compares with local date parts, the last day of a year fell off
+ * the heatmap entirely.
+ */
+function localDate(value: string): Date {
+    const [year, month, day] = value.split('-').map(Number);
+    return new Date(year, (month ?? 1) - 1, day ?? 1);
+}
+
 @Injectable({
     providedIn: 'root'
 })
@@ -149,15 +160,15 @@ export class StatisticStore {
             // a three-month-old logbook should not open on a year of blanks.
             const window = new Date(today);
             window.setDate(window.getDate() - 364);
-            const first = new Date(sorted[0]);
+            const first = localDate(sorted[0]);
             start = first > window ? first : window;
         } else {
-            start = new Date(`${period}-01-01`);
+            start = new Date(Number(period), 0, 1);
         }
 
         const end = period === ALL_TIME || Number(period) === today.getFullYear()
             ? today
-            : new Date(`${period}-12-31`);
+            : new Date(Number(period), 11, 31);
 
         // Start on the Monday of the first week so the 7-row grid aligns.
         const cursor = new Date(start);

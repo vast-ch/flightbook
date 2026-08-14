@@ -22,6 +22,9 @@ import { School } from '../shared/school.model';
 /** How close a registration deadline has to be to earn the notice at the top. */
 const CLOSING_SOON_HOURS = 24;
 
+/** Backstop on the eager upcoming fetch - 20 a page, so 200 dates. */
+const MAX_UPCOMING_PAGES = 10;
+
 @Component({
     selector: 'app-appointment-list',
     templateUrl: './appointment-list.page.html',
@@ -196,23 +199,31 @@ export class AppointmentListPage implements OnInit, OnDestroy {
         const user = await firstValueFrom(this.accountService.currentUser());
         this.currentUser.set(user);
 
-        const rawAppointments = await firstValueFrom(
-            this.schoolService.getAppointments({ limit: this.schoolService.defaultLimit }, this.schoolId, this.scope())
-        );
+        const rawAppointments = this.scope() === 'upcoming'
+            ? await this.loadAllUpcoming()
+            : await firstValueFrom(
+                this.schoolService.getAppointments({ limit: this.schoolService.defaultLimit }, this.schoolId, 'past')
+            );
 
         this.fetchedCount = rawAppointments.length;
-        this.listComplete.set(rawAppointments.length < this.schoolService.defaultLimit);
+        this.listComplete.set(this.scope() === 'upcoming' || rawAppointments.length < this.schoolService.defaultLimit);
 
         // Enrich appointments with computed state
         const enrichedAppointments = rawAppointments.map(appointment =>
             this.enrichAppointment(appointment)
         );
 
-        this.appointments.set(enrichedAppointments.filter(appointment => this.inScope(appointment)));
+        const inScope = enrichedAppointments.filter(appointment => this.inScope(appointment));
+        // The endpoint sorts scheduling DESC, which reads correctly for Past but
+        // backwards for Upcoming - where the design lists the nearest date first.
+        if (this.scope() === 'upcoming') {
+            inScope.sort((a, b) => new Date(a.scheduling).getTime() - new Date(b.scheduling).getTime());
+        }
+        this.appointments.set(inScope);
 
-        // Reset infinite scroll state
+        // Upcoming is fully loaded above; only Past pages.
         if (this.infiniteScroll) {
-            this.infiniteScroll.disabled = false;
+            this.infiniteScroll.disabled = this.scope() === 'upcoming';
         }
 
         const appointmentToOpen = this.appointments().find((appointment: Appointment) => appointment.id == this.appointmentId);
@@ -227,6 +238,30 @@ export class AppointmentListPage implements OnInit, OnDestroy {
         await loading.dismiss();
     }
 }
+
+    /**
+     * Upcoming is pulled in full rather than paged. The endpoint sorts
+     * scheduling DESC and pages with take/skip, so page one would hold the
+     * furthest-future dates and tomorrow's course would be on the last page.
+     * Ordering cannot be asked for, so every page is fetched and then sorted -
+     * bounded by from=today, which is a school's published dates, not history.
+     */
+    private async loadAllUpcoming(): Promise<Appointment[]> {
+        const all: Appointment[] = [];
+        for (let page = 0; page < MAX_UPCOMING_PAGES; page++) {
+            const batch = await firstValueFrom(this.schoolService.getAppointments({
+                limit: this.schoolService.defaultLimit,
+                offset: all.length
+            }, this.schoolId, 'upcoming'));
+            all.push(...batch);
+            if (batch.length < this.schoolService.defaultLimit) {
+                return all;
+            }
+        }
+        // Hit the cap: say so rather than quietly showing a partial list.
+        console.warn(`More than ${all.length} upcoming appointments; the list is truncated.`);
+        return all;
+    }
 
     /**
      * from/to are date-only, so today's appointments come back for either tab.
@@ -338,6 +373,13 @@ export class AppointmentListPage implements OnInit, OnDestroy {
     }
 
     loadData(event: any) {
+        // Only Past pages; Upcoming was loaded in full, so appending a DESC page
+        // to an ascending list would interleave dates.
+        if (this.scope() === 'upcoming') {
+            event.target.complete();
+            event.target.disabled = true;
+            return;
+        }
         this.schoolService.getAppointments({
             limit: this.schoolService.defaultLimit,
             // fetchedCount, not the rendered length: inScope() drops today's

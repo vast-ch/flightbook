@@ -33,7 +33,6 @@ import { cloudUpload, copy } from 'ionicons/icons';
 })
 export class AppComponent implements OnDestroy, OnInit {
     unsubscribe$ = new Subject<void>();
-    initialRequestsFired = false;
 
     constructor(
         private router: Router,
@@ -42,7 +41,8 @@ export class AppComponent implements OnDestroy, OnInit {
         private swUpdate: SwUpdate,
         private schoolService: SchoolService,
         private alertController: AlertController,
-        private paymentService: PaymentService
+        private paymentService: PaymentService,
+        private sessionService: SessionService
     ) {
         this.translate.setDefaultLang('en');
         this.translate.use(localStorage.getItem('language') || navigator.language.split('-')[0]);
@@ -93,7 +93,7 @@ export class AppComponent implements OnDestroy, OnInit {
     }
 
     subscribeToEmmiter(componentRef: any) {
-        if (componentRef instanceof LoginPage || componentRef instanceof RegisterPage || this.initialRequestsFired) {
+        if (componentRef instanceof LoginPage || componentRef instanceof RegisterPage || this.sessionService.sessionBootstrapped) {
             return;
         }
 
@@ -121,7 +121,7 @@ export class AppComponent implements OnDestroy, OnInit {
             }
         })
 
-        this.initialRequestsFired = true;
+        this.sessionService.markBootstrapped();
     }
 
     private initPushNotification() {
