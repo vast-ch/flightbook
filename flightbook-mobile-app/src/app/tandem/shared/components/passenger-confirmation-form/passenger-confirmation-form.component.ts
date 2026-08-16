@@ -47,17 +47,33 @@ export class PassengerConfirmationFormComponent implements OnDestroy {
 
   signaturePad!: SignaturePad;
 
+  /** The element the current pad is bound to, so a re-created canvas rebinds. */
+  private signatureCanvasElement?: HTMLCanvasElement;
+
   /**
    * A setter, not a plain @ViewChild: the canvas only enters the DOM when the
    * signature step opens, which is after ngAfterViewInit has already run.
+   *
+   * Compared by element, not by "do we have a pad": the canvas lives inside
+   * @if (step() === 2 || isView), so stepping back to the details and forward
+   * again destroys it and builds a new one. Skipping that rebind left the pad
+   * listening to a detached canvas - the visible one took no strokes, while
+   * isEmpty() and toDataURL() still answered from the old one.
    */
   @ViewChild('signatureCanvas') set signatureCanvas(element: ElementRef<HTMLCanvasElement> | undefined) {
-    if (!element?.nativeElement || this.signaturePad) {
+    const canvas = element?.nativeElement;
+    if (!canvas || canvas === this.signatureCanvasElement) {
       return;
     }
+    // Carry the stroke across the round trip, and release the old canvas.
+    const previous = this.signaturePad && !this.signaturePad.isEmpty()
+      ? this.signaturePad.toDataURL()
+      : null;
+    this.signaturePad?.off();
+    this.signatureCanvasElement = canvas;
     // Next frame, so the canvas has been laid out and can be measured - and so
     // this lands outside the change-detection pass that created it.
-    requestAnimationFrame(() => this.initSignaturePad(element.nativeElement));
+    requestAnimationFrame(() => this.initSignaturePad(canvas, previous));
   }
 
   constructor(
@@ -110,7 +126,7 @@ export class PassengerConfirmationFormComponent implements OnDestroy {
 
   // ---- Signature ------------------------------------------------------
 
-  private initSignaturePad(canvas: HTMLCanvasElement) {
+  private initSignaturePad(canvas: HTMLCanvasElement, restore: string | null = null) {
     // The bitmap has to match the element's own size, or every stroke lands
     // offset from the pen: a canvas defaults to 300x150 whatever the CSS says.
     canvas.width = canvas.offsetWidth || 300;
@@ -122,12 +138,14 @@ export class PassengerConfirmationFormComponent implements OnDestroy {
 
     if (this.isView && this.passengerData.signature) {
       this.signaturePad.fromDataURL(this.passengerData.signature);
+    } else if (restore) {
+      this.signaturePad.fromDataURL(restore);
     }
     this.cdr.detectChanges();
   }
 
   clearSignature() {
-    this.signaturePad.clear();
+    this.signaturePad?.clear();
   }
 
   // ---- Actions --------------------------------------------------------

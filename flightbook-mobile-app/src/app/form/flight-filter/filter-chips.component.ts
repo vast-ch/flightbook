@@ -6,6 +6,7 @@ import { addIcons } from 'ionicons';
 import { close } from 'ionicons/icons';
 import moment from 'moment';
 import { FlightStore } from 'src/app/flight/shared/flight.store';
+import { LanguageService } from 'src/app/shared/services/language.service';
 import { GliderStore } from 'src/app/glider/shared/glider.store';
 import { Glider } from 'src/app/glider/shared/glider.model';
 
@@ -57,6 +58,7 @@ export class FilterChipsComponent {
     private flightStore = inject(FlightStore);
     private gliderStore = inject(GliderStore);
     private translate = inject(TranslateService);
+    private languageService = inject(LanguageService);
     private datePipe = new DatePipe('en-US');
 
     /** Fires after a criterion is dropped, so the host can refetch. */
@@ -68,6 +70,10 @@ export class FilterChipsComponent {
 
     public chips = computed<Chip[]>(() => {
         const filter = this.flightStore.filter();
+        // Every label below comes from translate.instant(), which is a plain
+        // call - without reading the language signal the chips would keep the
+        // previous language's wording after a switch.
+        this.languageService.lang();
         const chips: Chip[] = [];
 
         if (filter.from || filter.to) {

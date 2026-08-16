@@ -88,7 +88,7 @@
 
             <div class="appt-row__main">
               <div class="appt-row__top">
-                <span class="appt-row__title">{{ appointment.type?.name || '&ndash;' }}</span>
+                <span class="appt-row__title">{{ appointment.type?.name || '–' }}</span>
                 <span class="fb-status fb-status--{{ appointment.state }}">
                   {{ 'appointment.stateValue.' + appointment.state | translate }}
                 </span>
@@ -98,7 +98,7 @@
                 <span class="appt-row__time">{{ appointment.scheduling | date:'HH:mm':timezone:currentLang }}</span>
                 <span class="appt-row__sep" aria-hidden="true"></span>
                 <ion-icon name="place" class="appt-row__place-icon" aria-hidden="true"></ion-icon>
-                <span class="appt-row__place">{{ appointment.meetingPoint || '&ndash;' }}</span>
+                <span class="appt-row__place">{{ appointment.meetingPoint || '–' }}</span>
               </div>
 
               <!-- Capacity, or the cancellation reason in its place -->
@@ -108,18 +108,18 @@
                   <span class="appt-row__canceled">{{ 'appointment.canceledBySchool' | translate }}</span>
                 } @else if (appointment.maxPeople) {
                   <span class="spots">
-                    @for (cell of spotCells(appointment); track $index) {
+                    @for (cell of appointment.spotCells ?? []; track $index) {
                       <span class="spots__cell" [class.is-taken]="cell === 'taken'"
                             [class.is-full]="cell === 'full'"></span>
                     }
                   </span>
-                  @if (isFull(appointment)) {
+                  @if (appointment.isFull) {
                     <span class="appt-row__capacity is-full">
                       {{ 'appointment.full' | translate:{ count: appointment.countSubscription, total: appointment.maxPeople } }}
                     </span>
                   } @else {
                     <span class="appt-row__capacity">
-                      {{ 'appointment.spotsFree' | translate:{ free: freeSpots(appointment), total: appointment.maxPeople } }}
+                      {{ 'appointment.spotsFree' | translate:{ free: appointment.freeSpots, total: appointment.maxPeople } }}
                     </span>
                   }
                 } @else {

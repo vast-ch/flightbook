@@ -17,6 +17,8 @@ import { ModalController } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { chevronForward, filterOutline, trendingUp } from 'ionicons/icons';
 import { AvatarButtonComponent } from 'src/app/shared/components/avatar-button/avatar-button.component';
+import { LanguageService } from 'src/app/shared/services/language.service';
+import { splitDistance, splitDuration, toHoursMinutes } from 'src/app/shared/util/format';
 
 @Component({
     selector: 'app-flight-statistic',
@@ -46,6 +48,7 @@ export class FlightStatisticPage implements OnDestroy {
     private router = inject(Router);
     private modalCtrl = inject(ModalController);
     private flightStore = inject(FlightStore);
+    private languageService = inject(LanguageService);
 
     public filtered = this.flightStore.filtered;
 
@@ -57,8 +60,6 @@ export class FlightStatisticPage implements OnDestroy {
     public years = this.store.years;
     public headline = this.store.headline;
     public heatmap = this.store.heatmap;
-    public flyingDays = this.store.flyingDays;
-    public weekCount = this.store.weekCount;
     public cumulative = this.store.cumulative;
     public bests = this.store.bests;
     public firstFlightDate = this.store.firstFlightDate;
@@ -73,13 +74,11 @@ export class FlightStatisticPage implements OnDestroy {
     public airtimeParts = computed(() => this.splitDuration(this.headline().airtime));
     public averageParts = computed(() => this.splitDuration(this.headline().average));
 
-    public distanceParts = computed(() => {
-        const km = this.headline().distance;
-        return { value: km >= 100 ? km.toFixed(0) : km.toFixed(1), unit: 'km' };
-    });
+    public distanceParts = computed(() => splitDistance(this.headline().distance));
 
+    /** LanguageService, not translate.currentLang: reactive, and always a locale Angular has data for. */
     get currentLang(): string {
-        return this.translate.currentLang;
+        return this.languageService.lang();
     }
 
     constructor() {
@@ -136,9 +135,13 @@ export class FlightStatisticPage implements OnDestroy {
         return `${head} · ${rank}`;
     });
 
-    /** Sparkline bars share the season's own busiest month, not a global max. */
-    sparkHeight(value: number, months: number[]): string {
-        const max = Math.max(...months, 1);
+    /**
+     * Sparkline bars share the season's own busiest month, not a global max.
+     * `max` is precomputed on the Season - derived here it was a fresh spread
+     * plus 12 comparisons per bar, i.e. ~156 per change-detection pass on a
+     * 13-season logbook, on every scroll frame.
+     */
+    sparkHeight(value: number, max: number): string {
         return value === 0 ? '2px' : `${Math.max(3, Math.round(value / max * 22))}px`;
     }
 
@@ -184,18 +187,7 @@ export class FlightStatisticPage implements OnDestroy {
     }
 
     /** Seconds to HH:mm. */
-    toHoursMinutes(seconds: number): string {
-        const total = Math.max(0, Math.floor(Number(seconds ?? 0)));
-        const h = Math.floor(total / 3600);
-        const m = Math.floor((total % 3600) / 60);
-        return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
-    }
+    toHoursMinutes = toHoursMinutes;
 
-    private splitDuration(seconds: number): { value: string; unit: string } {
-        const total = Math.max(0, Math.floor(Number(seconds ?? 0)));
-        if (total < 3600) {
-            return { value: `${Math.round(total / 60)}`, unit: 'min' };
-        }
-        return { value: (total / 3600).toFixed(1), unit: 'h' };
-    }
+    private splitDuration = splitDuration;
 }

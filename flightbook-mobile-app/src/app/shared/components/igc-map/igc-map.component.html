@@ -30,12 +30,15 @@
   </div>
 
   <div class="playback">
-    <ion-button fill="clear" class="playback__button" (click)="togglePlay()"
+    <!-- Disabled until the map exists: the track parses before the map
+         configuration request returns, so the controls render first. -->
+    <ion-button fill="clear" class="playback__button" (click)="togglePlay()" [disabled]="!mapReady"
                 [attr.aria-label]="(playing ? 'buttons.pause' : 'buttons.play') | translate">
       <ion-icon slot="icon-only" [name]="playing ? 'pause' : 'play'"></ion-icon>
     </ion-button>
     <ion-range class="playback__range" min="0" max="100" step="0.1"
                [value]="inputValue * 100"
+               [disabled]="!mapReady"
                (ionKnobMoveStart)="onKnobMoveStart()"
                (ionInput)="onTimeSliderInput($event)"
                [attr.aria-label]="'flight.vario.scrubLabel' | translate"></ion-range>

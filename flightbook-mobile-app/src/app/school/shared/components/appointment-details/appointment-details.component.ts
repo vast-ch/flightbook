@@ -13,6 +13,7 @@ import { addIcons } from "ionicons";
 import { chevronBack, peopleOutline, timeOutline } from "ionicons/icons";
 import moment from 'moment-timezone';
 import { School } from '../../school.model';
+import { resolveLanguage } from 'src/app/shared/services/language.service';
 
 /** Above this the relative deadline reads in days rather than hours. */
 const HOURS_BEFORE_DAYS = 48;
@@ -46,7 +47,7 @@ export class AppointmentDetailsComponent implements OnInit {
         private translate: TranslateService,
         private schoolService: SchoolService
     ) {
-        this.currentLang = this.translate.currentLang;
+        this.currentLang = resolveLanguage(this.translate.currentLang);
         addIcons({
             'chevron-back': chevronBack,
             'time-outline': timeOutline,

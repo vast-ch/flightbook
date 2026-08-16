@@ -137,7 +137,12 @@ export class AccountService {
   }
 
   private initializeUserConfig(user: User) {
-          if (user && !user.config) {
+          // The `user &&` on the next line was doing nothing - every branch
+          // below dereferences user.config unconditionally.
+          if (!user) {
+              return;
+          }
+          if (!user.config) {
               user.config = {};
           }
           if (!user.config.preparation) {

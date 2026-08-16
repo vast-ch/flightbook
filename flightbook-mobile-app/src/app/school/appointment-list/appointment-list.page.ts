@@ -12,12 +12,15 @@ import { Subscription } from '../shared/subscription.model';
 import { AppointmentDetailsComponent } from '../shared/components/appointment-details/appointment-details.component';
 import { AppointmentFilterComponent } from '../shared/components/appointment-filter/appointment-filter.component';
 import { State } from '../shared/state';
-import { SpotCell, freeSpots, isFull, spotCells } from '../shared/spots';
+import { freeSpots, isFull, spotCells } from '../shared/spots';
 import { DatePipe } from '@angular/common';
 import { addIcons } from "ionicons";
 import { filterOutline, ellipsisVerticalOutline, chevronBack, timeOutline, checkmark, close } from "ionicons/icons";
 import { FormsModule } from '@angular/forms';
 import { School } from '../shared/school.model';
+import { resolveLanguage } from 'src/app/shared/services/language.service';
+import { Location } from '@angular/common';
+import { navigateBackOrTo } from 'src/app/shared/util/back-navigation';
 
 /** How close a registration deadline has to be to earn the notice at the top. */
 const CLOSING_SOON_HOURS = 24;
@@ -110,6 +113,7 @@ export class AppointmentListPage implements OnInit, OnDestroy {
     constructor(
         private activeRoute: ActivatedRoute,
         public navCtrl: NavController,
+        private location: Location,
         private schoolService: SchoolService,
         private translate: TranslateService,
         private loadingCtrl: LoadingController,
@@ -117,7 +121,7 @@ export class AppointmentListPage implements OnInit, OnDestroy {
         private modalCtrl: ModalController,
         private alertController: AlertController
     ) {
-        this.currentLang = this.translate.currentLang;
+        this.currentLang = resolveLanguage(this.translate.currentLang);
         this.filtered = this.schoolService.filtered$.getValue();
         this.schoolService.filtered$.pipe(takeUntil(this.unsubscribe$))
             .subscribe((res: boolean) => {
@@ -152,7 +156,7 @@ export class AppointmentListPage implements OnInit, OnDestroy {
     // ---- View state -----------------------------------------------------
 
     close() {
-        this.navCtrl.navigateBack('more');
+        navigateBackOrTo(this.navCtrl, this.location, 'more');
     }
 
     /** The school's own timezone if it has one, matching how dates were stored. */
@@ -171,17 +175,8 @@ export class AppointmentListPage implements OnInit, OnDestroy {
         this.initialDataLoad();
     }
 
-    freeSpots(appointment: Appointment): number {
-        return freeSpots(appointment.countSubscription, appointment.maxPeople);
-    }
 
-    isFull(appointment: Appointment): boolean {
-        return isFull(appointment.countSubscription, appointment.maxPeople);
-    }
 
-    spotCells(appointment: Appointment): SpotCell[] {
-        return spotCells(appointment.countSubscription, appointment.maxPeople);
-    }
 
     // ---- Data -----------------------------------------------------------
 
@@ -192,18 +187,21 @@ export class AppointmentListPage implements OnInit, OnDestroy {
     await loading.present();
 
     try {
-        const schools = await this.schoolService.getSchools();
-        const school = schools.find((s: School) => s.id === this.schoolId);
-        this.currentSchool.set(school);
+        // In parallel: none of the three depends on another, and the
+        // appointment fetch only needs schoolId, which the route already gave
+        // us. Run in series this was three round-trips of spinner.
+        const [schools, user, rawAppointments] = await Promise.all([
+            this.schoolService.getSchools(),
+            firstValueFrom(this.accountService.currentUser()),
+            this.scope() === 'upcoming'
+                ? this.loadAllUpcoming()
+                : firstValueFrom(
+                    this.schoolService.getAppointments({ limit: this.schoolService.defaultLimit }, this.schoolId, 'past')
+                )
+        ]);
 
-        const user = await firstValueFrom(this.accountService.currentUser());
+        this.currentSchool.set(schools.find((s: School) => s.id === this.schoolId));
         this.currentUser.set(user);
-
-        const rawAppointments = this.scope() === 'upcoming'
-            ? await this.loadAllUpcoming()
-            : await firstValueFrom(
-                this.schoolService.getAppointments({ limit: this.schoolService.defaultLimit }, this.schoolId, 'past')
-            );
 
         this.fetchedCount = rawAppointments.length;
         this.listComplete.set(this.scope() === 'upcoming' || rawAppointments.length < this.schoolService.defaultLimit);
@@ -269,7 +267,7 @@ export class AppointmentListPage implements OnInit, OnDestroy {
      * as fewer.
      */
     private inScope(appointment: Appointment): boolean {
-        const scheduling = new Date(appointment.scheduling).getTime();
+        const scheduling = appointment.scheduledAt ?? moment.utc(appointment.scheduling).valueOf();
         return this.scope() === 'upcoming' ? scheduling >= Date.now() : scheduling < Date.now();
     }
 
@@ -407,6 +405,10 @@ export class AppointmentListPage implements OnInit, OnDestroy {
     // Helper method to enrich appointment with computed properties
     private enrichAppointment(appointment: Appointment): Appointment {
         const user = this.currentUser();
+        // Captured before the rewrite below: everything that compares this
+        // appointment against "now" has to use the real instant, not the
+        // school's wall clock parked in a device-local Date.
+        appointment.scheduledAt = moment.utc(appointment.scheduling).valueOf();
         appointment.subscribed = appointment.subscriptions?.some((subscription: Subscription) =>
             subscription.user.email === user?.email
         ) ?? false;
@@ -423,18 +425,26 @@ export class AppointmentListPage implements OnInit, OnDestroy {
         appointment.toggleDisabled = this.computeToggleDisabled(appointment);
         appointment.lineDisabled = this.computeLineDisabled(appointment, appointment.subscribed);
 
+        // Stamped here rather than called from the template: the row binds up
+        // to 20 cells per appointment, and a method call would rebuild every
+        // array on every change-detection pass - which Ionic runs on each
+        // scroll frame - forcing @for to re-diff the whole list each time.
+        appointment.spotCells = spotCells(appointment.countSubscription, appointment.maxPeople);
+        appointment.freeSpots = freeSpots(appointment.countSubscription, appointment.maxPeople);
+        appointment.isFull = isFull(appointment.countSubscription, appointment.maxPeople);
+
         return appointment;
     }
 
     private computeToggleDisabled(appointment: Appointment): boolean {
-        if (new Date(appointment.scheduling).getTime() < new Date().getTime() || appointment.state == State.CANCELED) {
+        if (appointment.scheduledAt < Date.now() || appointment.state == State.CANCELED) {
             return true;
         }
         return this.isDeadlinePassed(appointment);
     }
 
     private computeLineDisabled(appointment: Appointment, subscribed: boolean): boolean {
-        if (new Date(appointment.scheduling).getTime() < new Date().getTime() || appointment.state == State.CANCELED) {
+        if (appointment.scheduledAt < Date.now() || appointment.state == State.CANCELED) {
             return true;
         }
 
@@ -496,7 +506,9 @@ export class AppointmentListPage implements OnInit, OnDestroy {
                             await firstValueFrom(this.schoolService.leaveSchool(this.schoolId));
                             this.schoolService.removeSchoolFromStore(this.schoolId);
                             this.popover?.dismiss();
-                            this.navCtrl.navigateBack('/news');
+                            // 'home' now, not '/news' - that route only still
+                            // works because it redirects here.
+                            this.navCtrl.navigateBack('home');
                         } catch (error) {
                             console.error('Error leaving school:', error);
                         }

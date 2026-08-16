@@ -1,6 +1,6 @@
 import { DatePipe } from '@angular/common';
 import { Component, OnDestroy, OnInit, computed, signal } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ModalController, LoadingController, NavController, IonIcon, IonContent, IonInfiniteScroll, IonInfiniteScrollContent, AlertController } from '@ionic/angular/standalone';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { firstValueFrom, Subject, takeUntil } from 'rxjs';
@@ -15,6 +15,9 @@ import { XlsxExportService } from 'src/app/shared/services/xlsx-export.service';
 import { Directory, Filesystem } from '@capacitor/filesystem';
 import { FileOpener } from '@capacitor-community/file-opener';
 import { TandemSchoolService } from 'src/app/school/shared/tandem-school.service';
+import { resolveLanguage } from 'src/app/shared/services/language.service';
+import { Location } from '@angular/common';
+import { navigateBackOrTo } from 'src/app/shared/util/back-navigation';
 
 @Component({
   selector: 'app-passenger-confirmation-list',
@@ -59,15 +62,17 @@ export class PassengerConfirmationListPage implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private modalCtrl: ModalController,
     private navCtrl: NavController,
+    private location: Location,
     private tandemService: TandemService,
     private loadingCtrl: LoadingController,
     private alertController: AlertController,
     private translate: TranslateService,
     private paymentService: PaymentService,
     private xlsxExportService: XlsxExportService,
-    private tandemSchoolService: TandemSchoolService
+    private tandemSchoolService: TandemSchoolService,
+    private router: Router
   ) {
-    this.currentLang = this.translate.currentLang;
+    this.currentLang = resolveLanguage(this.translate.currentLang);
     addIcons({ add, checkmark, 'chevron-back': chevronBack });
   }
 
@@ -75,11 +80,30 @@ export class PassengerConfirmationListPage implements OnInit, OnDestroy {
     await this.tandemSchoolService.getSchools();
     await this.initialDataLoad();
 
-    // Arriving from the tab bar's add sheet. Opened only after the load above,
-    // because the quota checks read passengerConfirmations and schools().
-    if (this.route.snapshot.queryParamMap.get('new') === '1') {
-      this.openAddPassengerConfirmation();
-    }
+    /*
+     * Arriving from the tab bar's add sheet. Subscribed, not read from the
+     * snapshot: this page is a child of the tab shell, so triggering the sheet
+     * while already standing here is a query-param-only navigation. Ionic's
+     * route-reuse strategy keeps the instance, ngOnInit never re-runs, and the
+     * sheet just closed with nothing happening.
+     *
+     * The param is cleared once handled, so the same choice works twice (the
+     * router drops a navigation to a byte-identical URL) and a later
+     * re-creation of the page does not pop the form unprompted.
+     */
+    this.route.queryParamMap
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe(params => {
+        if (params.get('new') !== '1') {
+          return;
+        }
+        this.router.navigate([], {
+          relativeTo: this.route,
+          queryParams: {},
+          replaceUrl: true
+        });
+        this.openAddPassengerConfirmation();
+      });
   }
 
   ngOnDestroy() {
@@ -88,7 +112,7 @@ export class PassengerConfirmationListPage implements OnInit, OnDestroy {
   }
 
   close() {
-    this.navCtrl.navigateBack('more');
+    navigateBackOrTo(this.navCtrl, this.location, 'more');
   }
 
   initials(confirmation: PassengerConfirmation): string {

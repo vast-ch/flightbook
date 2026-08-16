@@ -5,7 +5,7 @@ import { Glider, GliderCheck } from 'src/app/glider/shared/glider.model';
 import { FormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { addIcons } from 'ionicons';
-import { add, close, trash } from 'ionicons/icons';
+import { add, chevronForward, close, trash } from 'ionicons/icons';
 import { CheckComponent } from './check/check.component';
 
 @Component({
@@ -28,7 +28,10 @@ export class GliderFormComponent implements OnInit {
         private modalController: ModalController
     ) {
         this.language = this.translate.currentLang;
-        addIcons({ close, trash, add });
+        // chevron-forward is used by the check rows in this template; without
+        // registering it here the icon only resolves if some earlier page
+        // happened to register it, so a deep link to the form renders a gap.
+        addIcons({ close, trash, add, 'chevron-forward': chevronForward });
     }
 
     ngOnInit() {

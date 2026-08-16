@@ -29,7 +29,20 @@ export class FlightStore {
   
   // Public filter state
   public filter = signal<FlightFilter>(new FlightFilter());
-  
+
+  /**
+   * Bumped whenever the logbook the API would return changes - a flight
+   * created, edited or deleted, or the shared filter moved. HomeStore and
+   * StatisticStore derive their figures from those same endpoints and cache
+   * them for the session, so this is what tells them their copy is stale.
+   */
+  public revision = signal(0);
+
+  private bumpRevision(): void {
+    this.revision.update(value => value + 1);
+  }
+
+
   // Default limit for pagination
   public defaultLimit = 25;
   
@@ -146,6 +159,7 @@ export class FlightStore {
           loading: false,
           error: null
         }));
+        this.bumpRevision();
       }),
       // After posting the flight, get the updated flight list
       concatMap((response: Flight) => {
@@ -188,6 +202,7 @@ export class FlightStore {
               error: null
             };
           });
+          this.bumpRevision();
         },
         error: (error) => {
           this.state.update(state => ({ 
@@ -211,6 +226,7 @@ export class FlightStore {
               loading: false,
               error: null
             }));
+            this.bumpRevision();
           }),
           // After posting the flight, get the updated flight list
           concatMap((response: Flight) => {
@@ -232,10 +248,12 @@ export class FlightStore {
   
   updateFilter(filter: Partial<FlightFilter>): void {
     this.filter.update(currentFilter => ({ ...currentFilter, ...filter }));
+    this.bumpRevision();
   }
   
   resetFilter(): void {
     this.filter.set(new FlightFilter());
+    this.bumpRevision();
   }
   
   clearFlights(): void {

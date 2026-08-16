@@ -20,10 +20,11 @@ import {
     cloudUploadOutline,
     shareOutline
 } from "ionicons/icons";
-import { PaymentService } from 'src/app/shared/services/payment.service';
 import { FlightValidationState } from '../shared/flight-validation-state';
 import { FlightStore } from '../shared/flight.store';
 import { AvatarButtonComponent } from 'src/app/shared/components/avatar-button/avatar-button.component';
+import { LanguageService } from 'src/app/shared/services/language.service';
+import { toHoursMinutes } from 'src/app/shared/util/format';
 
 @Component({
     selector: 'app-flight-list',
@@ -69,13 +70,8 @@ export class FlightListPage implements OnInit, OnDestroy {
     public listComplete = signal(false);
 
     public totalFlights = computed(() => this.totals()?.nbFlights ?? 0);
-    public totalAirtime = computed(() => {
-        // The API returns `time` as a string of seconds.
-        const seconds = Number(this.totals()?.time ?? 0);
-        const h = Math.floor(seconds / 3600);
-        const m = Math.floor((seconds % 3600) / 60);
-        return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
-    });
+    // The API returns `time` as a string of seconds.
+    public totalAirtime = computed(() => toHoursMinutes(Number(this.totals()?.time ?? 0)));
 
     /**
      * Flights grouped by month for the sectioned list. The store already sorts
@@ -100,8 +96,9 @@ export class FlightListPage implements OnInit, OnDestroy {
         return this.flightStore.filtered;
     }
 
+    /** LanguageService, not translate.currentLang: reactive, and always a locale Angular has data for. */
     get currentLang(): string {
-        return this.translate.currentLang;
+        return this.languageService.lang();
     }
 
     constructor(
@@ -112,8 +109,8 @@ export class FlightListPage implements OnInit, OnDestroy {
         private translate: TranslateService,
         private loadingCtrl: LoadingController,
         private flightExportService: FlightExportService,
-        private paymentService: PaymentService,
-        private router: Router
+        private router: Router,
+        private languageService: LanguageService
     ) {
         addIcons({
             add,
@@ -129,7 +126,12 @@ export class FlightListPage implements OnInit, OnDestroy {
         if (this.flights().length === 0) {
             this.initialDataLoad();
         }
-        this.loadTotals();
+        // Only when there is nothing to show or the logbook has moved: this
+        // used to cost a round-trip on every single visit to the tab, to redraw
+        // a header eyebrow that almost never changes.
+        if (this.totals() === null || this.totalsRevision !== this.flightStore.revision()) {
+            this.loadTotals();
+        }
     }
 
     private async initialDataLoad() {
@@ -154,12 +156,19 @@ export class FlightListPage implements OnInit, OnDestroy {
             });
     }
 
+    /** FlightStore.revision the header totals were fetched at. */
+    private totalsRevision = -1;
+
     /** applyFilter: false - the header always reports all-time totals. */
     private loadTotals() {
+        const revision = this.flightStore.revision();
         this.flightStore.getStatistics('global', false)
             .pipe(takeUntil(this.unsubscribe$))
             .subscribe({
-                next: (res: FlightStatistic[]) => this.totals.set(res?.[0] ?? null),
+                next: (res: FlightStatistic[]) => {
+                    this.totals.set(res?.[0] ?? null);
+                    this.totalsRevision = revision;
+                },
                 error: () => { /* header totals are non-critical */ }
             });
     }
@@ -247,18 +256,4 @@ export class FlightListPage implements OnInit, OnDestroy {
         this.flightExportService.openExport();
     }
 
-    async openAddFlight() {
-        if (!this.paymentService.getPaymentStatusValue()?.active && this.flightStore.flights().length >= 25) {
-          const alert = await this.alertController.create({
-                      header: this.translate.instant('message.infotitle'),
-                      message: this.translate.instant('payment.premiumUpgradeRequired'),
-                      buttons: [{
-                          text: this.translate.instant('buttons.done'),
-                      }]
-                  });
-                  await alert.present();
-          return;
-        }
-        this.router.navigate([`flights/add`]);
-      }
 }

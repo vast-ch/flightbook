@@ -68,7 +68,7 @@
                     @if (!flight.start?.name && !flight.landing?.name) {
                       &ndash;
                     } @else {
-                      {{ flight.start?.name || '&ndash;' }} &rarr; {{ flight.landing?.name || '&ndash;' }}
+                      {{ flight.start?.name || '–' }} &rarr; {{ flight.landing?.name || '–' }}
                     }
                   </div>
                   @if (flight.igc) {

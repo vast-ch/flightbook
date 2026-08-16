@@ -1,6 +1,6 @@
-import { Component, OnInit, Input, Output, EventEmitter, ElementRef, OnChanges } from '@angular/core';
-import { forkJoin, of } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { Component, OnInit, Input, Output, EventEmitter, ElementRef, OnChanges, OnDestroy } from '@angular/core';
+import { Subject, forkJoin, of } from 'rxjs';
+import { catchError, map, takeUntil } from 'rxjs/operators';
 import { Place } from 'src/app/place/shared/place.model';
 import { PlaceStore } from 'src/app/place/shared/place.store';
 import { FlightStore } from 'src/app/flight/shared/flight.store';
@@ -21,7 +21,9 @@ import { TranslateModule } from '@ngx-translate/core';
         TranslateModule
     ]
 })
-export class AutocompleteComponent implements OnInit, OnChanges {
+export class AutocompleteComponent implements OnInit, OnChanges, OnDestroy {
+    private unsubscribe$ = new Subject<void>();
+
     @Input()
     search: string;
     @Output()
@@ -101,14 +103,23 @@ export class AutocompleteComponent implements OnInit, OnChanges {
             missing.map(place =>
                 this.flightStore.nbFlightsByPlaceId(place.id).pipe(
                     // The API returns nbFlights as a string.
-                    map(resp => ({ id: place.id, count: Number(resp?.nbFlights ?? 0) })),
-                    catchError(() => of({ id: place.id, count: 0 }))
+                    map(resp => ({ id: place.id, count: Number(resp?.nbFlights ?? 0) as number | null })),
+                    catchError(() => of({ id: place.id, count: null }))
                 )
             )
-        ).subscribe(results => {
+        ).pipe(takeUntil(this.unsubscribe$)).subscribe(results => {
             for (const result of results) {
-                this.flightCounts[result.id] = result.count;
+                // Only a real answer is cached: caching the catchError fallback
+                // pinned "0 flights" on that place for the component's life.
+                if (result.count !== null) {
+                    this.flightCounts[result.id] = result.count;
+                }
             }
         });
+    }
+
+    ngOnDestroy() {
+        this.unsubscribe$.next();
+        this.unsubscribe$.complete();
     }
 }

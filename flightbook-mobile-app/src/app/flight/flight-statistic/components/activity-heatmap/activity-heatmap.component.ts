@@ -1,4 +1,4 @@
-import { Component, ElementRef, Input, ViewChild, computed, effect, inject, signal } from '@angular/core';
+import { Component, ElementRef, Injector, Input, ViewChild, afterNextRender, computed, effect, inject, signal } from '@angular/core';
 import { LanguageService } from 'src/app/shared/services/language.service';
 import { HeatmapDay } from '../../shared/statistic.store';
 
@@ -40,17 +40,23 @@ export class ActivityHeatmapComponent {
         } as HeatmapCell));
     });
 
+    private injector = inject(Injector);
+
     constructor() {
         // Open on the most recent weeks. Scrolled to the oldest, a long logbook
         // shows an empty grid while the actual flying sits off-screen right.
+        //
+        // afterNextRender, not queueMicrotask: a microtask runs before the
+        // browser has laid the new cells out, so scrollWidth could still be the
+        // previous grid's - which read as "works in dev, short on a cold load".
         effect(() => {
             this.cells();
-            queueMicrotask(() => {
+            afterNextRender(() => {
                 const el = this.scroller?.nativeElement;
                 if (el) {
                     el.scrollLeft = el.scrollWidth;
                 }
-            });
+            }, { injector: this.injector });
         });
     }
 }

@@ -13,6 +13,7 @@ import { LanguageService } from '../shared/services/language.service';
 import { HomeStore } from './shared/home.store';
 import { ActivityChartComponent } from './components/activity-chart/activity-chart.component';
 import { AvatarButtonComponent } from 'src/app/shared/components/avatar-button/avatar-button.component';
+import { splitDistance, splitDuration, toHoursMinutes } from 'src/app/shared/util/format';
 
 // The splash screen stays up until the first screen is ready to paint.
 setTimeout(() => {
@@ -58,22 +59,10 @@ export class HomePage implements OnDestroy {
 
     public latestNews = computed(() => this.newsStore.news()[0] ?? null);
 
-    /**
-     * Airtime for the headline strip: minutes while under an hour, then hours
-     * with one decimal. Returned split so the unit can be styled smaller.
-     */
-    public airtime = computed(() => {
-        const seconds = Number(this.globalStats()?.time ?? 0);
-        if (seconds < 3600) {
-            return { value: `${Math.round(seconds / 60)}`, unit: 'm' };
-        }
-        return { value: (seconds / 3600).toFixed(1), unit: 'h' };
-    });
+    /** Airtime for the headline strip, split so the unit can be styled smaller. */
+    public airtime = computed(() => splitDuration(Number(this.globalStats()?.time ?? 0)));
 
-    public distance = computed(() => {
-        const km = Number(this.globalStats()?.totalDistance ?? 0);
-        return { value: km >= 100 ? km.toFixed(0) : km.toFixed(1), unit: 'km' };
-    });
+    public distance = computed(() => splitDistance(Number(this.globalStats()?.totalDistance ?? 0)));
 
     /** Best month and average airtime, derived from the monthly rows. */
     public activitySummary = computed(() => {
@@ -98,12 +87,7 @@ export class HomePage implements OnDestroy {
     }
 
     /** Seconds to HH:mm - the chart footer format from the design. */
-    toHoursMinutes(seconds: number): string {
-        const total = Math.max(0, Math.floor(Number(seconds ?? 0)));
-        const h = Math.floor(total / 3600);
-        const m = Math.floor((total % 3600) / 60);
-        return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
-    }
+    toHoursMinutes = toHoursMinutes;
 
     // ionViewWillEnter, not ngOnInit: Ionic caches pages, so this is what runs
     // again when the user comes back to the tab.

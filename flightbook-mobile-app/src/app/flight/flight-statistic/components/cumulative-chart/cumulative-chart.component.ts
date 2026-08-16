@@ -32,13 +32,17 @@ export class CumulativeChartComponent {
 
     public hasData = computed(() => this.source().length > 1);
 
-    private isHighlighted(index: number): boolean {
-        const year = this.highlight();
-        return !!year && this.source()[index]?.year === year;
-    }
-
     public chartData = computed<ChartData<'line'>>(() => {
         const points = this.source();
+        /*
+         * Read here, in the computed's own body. The segment callbacks below are
+         * invoked by Chart.js at paint time, outside the reactive graph, so a
+         * signal read inside them registers no dependency - the computed kept
+         * returning its cached object and ng2-charts never saw a new `data`
+         * reference, leaving the highlight stuck on the previous season.
+         */
+        const year = this.highlight();
+        const isHighlighted = (index: number) => !!year && points[index]?.year === year;
         return {
             labels: points.map(p => p.label),
             datasets: [
@@ -57,8 +61,8 @@ export class CumulativeChartComponent {
                      * series or its fill.
                      */
                     segment: {
-                        borderColor: ctx => this.isHighlighted(ctx.p1DataIndex) ? '#ffffff' : '#45b1fd',
-                        borderWidth: ctx => this.isHighlighted(ctx.p1DataIndex) ? 3.4 : 2.6
+                        borderColor: ctx => isHighlighted(ctx.p1DataIndex) ? '#ffffff' : '#45b1fd',
+                        borderWidth: ctx => isHighlighted(ctx.p1DataIndex) ? 3.4 : 2.6
                     },
                     // Mark only where the line ends.
                     pointHoverRadius: 4

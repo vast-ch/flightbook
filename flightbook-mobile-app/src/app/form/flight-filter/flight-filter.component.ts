@@ -1,8 +1,8 @@
 import { Component, OnDestroy, OnInit, computed, signal } from '@angular/core';
 import { ModalController, IonContent, IonIcon, IonInput, IonButton, IonModal, IonDatetime } from '@ionic/angular/standalone';
-import { Subject, Subscription } from 'rxjs';
+import { Subject, Subscription, of } from 'rxjs';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
-import { debounceTime, takeUntil } from 'rxjs/operators';
+import { catchError, debounceTime, switchMap, takeUntil, tap } from 'rxjs/operators';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { FlightFilter } from 'src/app/flight/shared/flight-filter.model';
 import { Glider } from 'src/app/glider/shared/glider.model';
@@ -100,10 +100,21 @@ export class FlightFilterComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit() {
-        // One request per settled change, not per tap.
+        // One request per settled change, not per tap - and switchMap, so a
+        // slow response for an earlier filter cannot land after a faster one
+        // and leave the footer advertising another filter's count.
         this.countSub = this.filter$
-            .pipe(debounceTime(400), takeUntil(this.unsubscribe$))
-            .subscribe(() => this.refreshCount());
+            .pipe(
+                debounceTime(400),
+                tap(() => this.matchCount.set(null)),
+                switchMap(() => this.flightStore.getStatistics('global').pipe(
+                    catchError(() => of(null))
+                )),
+                takeUntil(this.unsubscribe$)
+            )
+            .subscribe((statistics: FlightStatistic[] | null) => {
+                this.matchCount.set(statistics ? Number(statistics[0]?.nbFlights ?? 0) : null);
+            });
     }
 
     ngOnDestroy() {
@@ -183,21 +194,6 @@ export class FlightFilterComponent implements OnInit, OnDestroy {
     }
 
     // ---- Footer ---------------------------------------------------------
-
-    /**
-     * Counts what the current filter would show. `global` statistics answer that
-     * in one request, and applyFilter defaults to true - which is the whole
-     * reason this sheet writes to the store rather than to a draft.
-     */
-    private refreshCount() {
-        this.matchCount.set(null);
-        this.flightStore.getStatistics('global').pipe(takeUntil(this.unsubscribe$)).subscribe({
-            next: (statistics: FlightStatistic[]) => {
-                this.matchCount.set(Number(statistics?.[0]?.nbFlights ?? 0));
-            },
-            error: () => this.matchCount.set(null)
-        });
-    }
 
     close() {
         return this.modalCtrl.dismiss({ filter: this.filter() }, 'filter');

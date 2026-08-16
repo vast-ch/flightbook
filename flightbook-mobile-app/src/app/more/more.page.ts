@@ -114,7 +114,9 @@ export class MorePage implements OnDestroy {
     // ionViewWillEnter, not ngOnInit: Ionic caches pages, so this is what runs
     // again when the user comes back to the tab.
     ionViewWillEnter() {
-        this.schoolService.getSchools();
+        // Caught: getSchools() rethrows, and a bare call left an unhandled
+        // rejection on every visit to the tab when the request failed.
+        this.schoolService.getSchools().catch(() => { /* the School section just stays empty */ });
 
         if (this.controlSheet() === null) {
             this.schoolService.getControlSheet().pipe(takeUntil(this.unsubscribe$)).subscribe({
@@ -139,8 +141,13 @@ export class MorePage implements OnDestroy {
 
     public editingLinks = signal(false);
 
-    /** The row being added or edited. index === null means a new link. */
-    public draft = signal<{ index: number | null; label: string; url: string } | null>(null);
+    /**
+     * The row being added or edited. index === null means a new link.
+     * `original` is what the row held when the editor opened - reorder and
+     * remove stay live underneath it, so the captured index alone would point
+     * at a different link by the time Save is tapped.
+     */
+    public draft = signal<{ index: number | null; label: string; url: string; original?: Link } | null>(null);
 
     public draftError = signal<string | null>(null);
 
@@ -184,7 +191,7 @@ export class MorePage implements OnDestroy {
 
     editLink(index: number) {
         const link = this.customLinks()[index];
-        this.draft.set({ index, label: link?.label ?? '', url: link?.url ?? '' });
+        this.draft.set({ index, label: link?.label ?? '', url: link?.url ?? '', original: link });
         this.draftError.set(null);
     }
 
@@ -211,7 +218,18 @@ export class MorePage implements OnDestroy {
         if (entry.index === null) {
             links.push(link);
         } else {
-            links[entry.index] = link;
+            // Located by value: a drag or a delete while the editor was open
+            // would otherwise make the captured index overwrite the wrong row.
+            const target = entry.original
+                ? links.findIndex(candidate =>
+                    candidate.label === entry.original.label && candidate.url === entry.original.url)
+                : entry.index;
+            if (target < 0) {
+                // The row went away underneath the editor; nothing to update.
+                this.draft.set(null);
+                return;
+            }
+            links[target] = link;
         }
         if (await this.persistLinks(links)) {
             this.draft.set(null);

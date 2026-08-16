@@ -20,6 +20,8 @@ import { addIcons } from 'ionicons';
 import { chevronBack, eyeOutline, eyeOffOutline, checkmark } from 'ionicons/icons';
 import { environment } from 'src/environments/environment';
 import { PhoneNumberComponent } from 'src/app/shared/components/phone-number/phone-number.component';
+import { Location } from '@angular/common';
+import { navigateBackOrTo } from 'src/app/shared/util/back-navigation';
 
 /** The four languages the app ships strings for. */
 const LANGUAGES = ['fr', 'de', 'en', 'it'];
@@ -68,6 +70,7 @@ export class AccountDataPage implements OnInit, OnDestroy {
         private alertController: AlertController,
         private loadingCtrl: LoadingController,
         public navCtrl: NavController,
+        private location: Location,
         private router: Router,
         private paymentService: PaymentService,
         private route: ActivatedRoute
@@ -128,7 +131,7 @@ export class AccountDataPage implements OnInit, OnDestroy {
     // ---- Actions --------------------------------------------------------
 
     close() {
-        this.navCtrl.navigateBack('more');
+        navigateBackOrTo(this.navCtrl, this.location, 'more');
     }
 
     /**
@@ -163,6 +166,19 @@ export class AccountDataPage implements OnInit, OnDestroy {
      * reports its own failure rather than one aborting the other.
      */
     async saveChanges() {
+        // Checked before anything is sent: the emergency-contact page this block
+        // replaced marked firstname/lastname/phone `required` and disabled
+        // submit. Those columns are NOT NULL, so a half-filled block used to
+        // POST a row the database rejects, surfacing as a generic error with no
+        // hint which field was missing.
+        if (this.emergencyContactState === 'partial') {
+            await this.alert(
+                this.translate.instant('message.errortitle'),
+                this.translate.instant('message.mendatoryFields')
+            );
+            return;
+        }
+
         const loading = await this.loadingCtrl.create({
             message: this.translate.instant('loading.saveaccount')
         });
@@ -176,7 +192,7 @@ export class AccountDataPage implements OnInit, OnDestroy {
         }
 
         let contactError: any = null;
-        if (this.hasEmergencyContactInput()) {
+        if (this.emergencyContactState === 'complete') {
             try {
                 this.emergencyContact = await firstValueFrom(
                     this.schoolService.postEmergencyContact(this.emergencyContact)
@@ -201,10 +217,20 @@ export class AccountDataPage implements OnInit, OnDestroy {
         }
     }
 
-    /** An untouched emergency-contact block must not create an empty record. */
-    private hasEmergencyContactInput(): boolean {
+    /**
+     * An untouched block must not create an empty record, and a half-filled one
+     * must not be sent at all: firstname, lastname and phone are NOT NULL
+     * server-side, and the DTO carries no validators to reject it politely.
+     */
+    private get emergencyContactState(): 'empty' | 'partial' | 'complete' {
         const contact = this.emergencyContact;
-        return !!(contact?.id || contact?.firstname || contact?.lastname || contact?.phone || contact?.additionalInformation);
+        const required = [contact?.firstname, contact?.lastname, contact?.phone];
+        const filled = required.filter(value => !!value).length;
+        if (filled === required.length) {
+            return 'complete';
+        }
+        const touched = filled > 0 || !!contact?.additionalInformation || !!contact?.id;
+        return touched ? 'partial' : 'empty';
     }
 
     async changePassword() {

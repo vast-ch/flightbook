@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, Input, NgZone, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, Input, NgZone, OnChanges, OnDestroy, SimpleChanges, ViewChild } from '@angular/core';
 import { AlertController } from '@ionic/angular/standalone';
 import { TranslateService } from '@ngx-translate/core';
 import { Point as GeoPoint, Position } from 'geojson';
@@ -23,7 +23,7 @@ import { ConfigurationService } from '../../services/configuration.service';
     styleUrls: ['./place-map.component.scss'],
     standalone: true,
 })
-export class PlaceMapComponent implements AfterViewInit, OnChanges {
+export class PlaceMapComponent implements AfterViewInit, OnChanges, OnDestroy {
 
     @ViewChild('mapContainer', { static: true }) private mapContainer: ElementRef<HTMLDivElement>;
 
@@ -88,13 +88,27 @@ export class PlaceMapComponent implements AfterViewInit, OnChanges {
         }
     }
 
+    private destroyed = false;
+
     ngAfterViewInit() {
         this.initMap(this.place.coordinates);
     }
 
+    /**
+     * Same teardown the IGC map got: an OpenLayers Map holds its target and its
+     * tile sources until disposed, and the debounced lookup can still fire a
+     * second after the form closed.
+     */
+    ngOnDestroy() {
+        this.destroyed = true;
+        clearTimeout(this.timerId);
+        this.map?.setTarget(undefined);
+        this.map?.dispose();
+    }
+
     private async searchPlace(name: string) {
         const res = await firstValueFrom(this.placeStore.searchOpenstreetmapPlace(name));
-        if (!res.features || res.features.length === 0) {
+        if (this.destroyed || !this.map || !res.features || res.features.length === 0) {
             return;
         }
         const geometry = res.features[0]?.geometry as GeoPoint

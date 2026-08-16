@@ -131,18 +131,35 @@ export class IgcMapComponent implements AfterViewInit, OnDestroy {
         addIcons({ play, pause });
     }
 
+    /** Resolves once initMap() has settled, so teardown can wait for it. */
+    private ready?: Promise<void>;
+    private destroyed = false;
+
     ngAfterViewInit() {
-        this.initMap();
+        // Kept, and caught: the map configuration is an HTTP call, so a failure
+        // here would otherwise surface as an unhandled promise rejection.
+        this.ready = this.initMap().catch(error => console.warn('Map unavailable', error));
     }
 
     ngOnDestroy() {
+        this.destroyed = true;
         // Without this the replay loop keeps running after navigation.
         this.stop();
         // And without this the map holds its WebGL context: browsers cap those
         // at around 16, so opening that many IGC tracks in one session started
-        // blanking the earliest maps.
-        this.map?.setTarget(undefined);
-        this.map?.dispose();
+        // blanking the earliest maps. Deferred until initMap has settled -
+        // leaving before the config request returned used to dispose nothing
+        // and then build a Map against a detached element.
+        const dispose = () => {
+            this.map?.setTarget(undefined);
+            this.map?.dispose();
+        };
+        this.ready ? this.ready.then(dispose, dispose) : dispose();
+    }
+
+    /** The playback controls are live as soon as the track parses, but they drive the map. */
+    public get mapReady(): boolean {
+        return !!this.map && !!this.featureOverlay;
     }
 
     onAddfeature = ((evt: any) => {
@@ -181,7 +198,10 @@ export class IgcMapComponent implements AfterViewInit, OnDestroy {
 
     /** Move the marker and readout to a fraction (0..1) of the flight. */
     seek(fraction: number) {
-        if (!this.time || !this.time.duration) {
+        // mapReady as well as time: the template renders play and the slider as
+        // soon as the track is parsed, but map/featureOverlay only exist after
+        // initMap's awaited configuration request has returned.
+        if (!this.time || !this.time.duration || !this.mapReady) {
             return;
         }
 
@@ -206,7 +226,7 @@ export class IgcMapComponent implements AfterViewInit, OnDestroy {
     }
 
     private play() {
-        if (!this.time || !this.time.duration) {
+        if (!this.time || !this.time.duration || !this.mapReady) {
             return;
         }
         // Restart from the top once the previous run has finished.
@@ -373,6 +393,9 @@ export class IgcMapComponent implements AfterViewInit, OnDestroy {
 
     private async initMap() {
         const config = await firstValueFrom(this.configurationService.getMapConfiguration());
+        if (this.destroyed) {
+            return;
+        }
         const attributionControl = new Attribution({
             collapsible: true,
             collapsed: true

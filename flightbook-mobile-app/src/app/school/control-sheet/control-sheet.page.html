@@ -66,11 +66,11 @@
               </span>
               @if (!isExpanded(group)) {
                 <span class="sheet-track sheet-track--group">
-                  <span class="sheet-track__fill" [style.width.%]="groupPercent(group)"></span>
+                  <span class="sheet-track__fill" [style.width.%]="progress[group].percent"></span>
                 </span>
               }
             </span>
-            <span class="sheet-group__count">{{ ratedCount(group) }} / {{ totalCount(group) }}</span>
+            <span class="sheet-group__count">{{ progress[group].rated }} / {{ progress[group].total }}</span>
             <ion-icon class="fb-row__chevron"
                       [name]="isExpanded(group) ? 'chevron-up' : 'chevron-down'"
                       aria-hidden="true"></ion-icon>

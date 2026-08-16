@@ -109,9 +109,19 @@ export class FlightExportService {
         flights = flights.sort((a: Flight, b: Flight) => b.number - a.number);
         flights.reverse();
 
-        const user = await firstValueFrom(this.accountService.currentUser());
-        const schools = await this.schoolService.getSchools();
-        const pdfObj: TCreatedPdf = await this.pdfExportService.generatePdf(flights, stat, user, schools.length !== 0, 'https://m.flightbook.ch');
+        // Inside the try as well: an expired token or a dropped connection here
+        // used to reject out of this method with the blocking spinner still up,
+        // leaving an overlay the user could only escape by killing the app.
+        let pdfObj: TCreatedPdf;
+        try {
+            const user = await firstValueFrom(this.accountService.currentUser());
+            const schools = await this.schoolService.getSchools();
+            pdfObj = await this.pdfExportService.generatePdf(flights, stat, user, schools.length !== 0, 'https://m.flightbook.ch');
+        } catch {
+            await loading.dismiss();
+            await this.alert(this.translate.instant('message.generationError'));
+            return;
+        }
 
         if (!Capacitor.isNativePlatform()) {
             await loading.dismiss();

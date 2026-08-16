@@ -12,6 +12,9 @@ import { AvatarButtonComponent } from 'src/app/shared/components/avatar-button/a
 import { HomeStore } from 'src/app/home/shared/home.store';
 import { addIcons } from 'ionicons';
 import { chevronBack, chevronDown, chevronForward, chevronUp, checkmark } from 'ionicons/icons';
+import { resolveLanguage } from 'src/app/shared/services/language.service';
+import { Location } from '@angular/common';
+import { navigateBackOrTo } from 'src/app/shared/util/back-navigation';
 
 /** The three rated groups, in the order the design lists them. */
 type SkillGroup = 'theory' | 'trainingHill' | 'altitudeFlight';
@@ -40,6 +43,18 @@ export class ControlSheetPage implements OnInit, OnDestroy {
     orderedAltitudeFlight: SkillRow[] = [];
     orderedTheory: SkillRow[] = [];
     orderedTrainingHill: SkillRow[] = [];
+
+    /**
+     * Rated/total/percent per group, recomputed only when the rows change.
+     * The template reads these for every group on every pass - as methods they
+     * ran five `.filter()` sweeps over ~53 rows per change-detection cycle,
+     * including every frame of a star drag.
+     */
+    public progress: Record<SkillGroup, { rated: number; total: number; percent: number }> = {
+        theory: { rated: 0, total: 0, percent: 0 },
+        trainingHill: { rated: 0, total: 0, percent: 0 },
+        altitudeFlight: { rated: 0, total: 0, percent: 0 }
+    };
 
     language: string;
     theoryExamDate: string;
@@ -72,10 +87,11 @@ export class ControlSheetPage implements OnInit, OnDestroy {
         private alertController: AlertController,
         private translate: TranslateService,
         private navCtrl: NavController,
+        private location: Location,
         private homeStore: HomeStore,
         private nxgTransalteSortPipe: NxgTransalteSortPipe
     ) {
-        this.language = this.translate.currentLang;
+        this.language = resolveLanguage(this.translate.currentLang);
         addIcons({
             'chevron-back': chevronBack,
             'chevron-down': chevronDown,
@@ -103,7 +119,7 @@ export class ControlSheetPage implements OnInit, OnDestroy {
     // ---- View state -----------------------------------------------------
 
     close() {
-        this.navCtrl.navigateBack('more');
+        navigateBackOrTo(this.navCtrl, this.location, 'more');
     }
 
     openExamPicker(exam: 'theory' | 'practice') {
@@ -138,20 +154,17 @@ export class ControlSheetPage implements OnInit, OnDestroy {
     }
 
     /** Rated (>= 1 star) out of total, matching how Home counts progress. */
-    ratedCount(group: SkillGroup): number {
-        return this.rows(group).filter(row => (row.value ?? 0) > 0).length;
-    }
-
-    totalCount(group: SkillGroup): number {
-        return this.rows(group).length;
-    }
-
-    groupPercent(group: SkillGroup): number {
-        const total = this.totalCount(group);
-        if (total === 0) {
-            return 0;
+    private refreshProgress(): void {
+        for (const group of this.groups) {
+            const rows = this.rows(group);
+            const total = rows.length;
+            const rated = rows.filter(row => (row.value ?? 0) > 0).length;
+            this.progress[group] = {
+                rated,
+                total,
+                percent: total === 0 ? 0 : Math.min(100, Math.round((rated / total) * 100))
+            };
         }
-        return Math.min(100, Math.round((this.ratedCount(group) / total) * 100));
     }
 
     /** Theory skills are plain names in i18n; the other two carry `.title`. */
@@ -206,6 +219,8 @@ export class ControlSheetPage implements OnInit, OnDestroy {
 
         this.orderedTrainingHill = this.toRows(controlSheet.trainingHill);
         this.nxgTransalteSortPipe.transform(this.orderedTrainingHill, 'trainingHill');
+
+        this.refreshProgress();
     }
 
     /** `id` is a database key, not a skill - filtered here rather than in the template. */
@@ -254,6 +269,7 @@ export class ControlSheetPage implements OnInit, OnDestroy {
         if (index > -1) {
             rows[index] = { key, value };
         }
+        this.refreshProgress();
 
         await this.postControlSheet();
     }
@@ -293,10 +309,11 @@ export class ControlSheetPage implements OnInit, OnDestroy {
         await loading.present();
         this.schoolService.postControlSheet(this.controlSheet).pipe(takeUntil(this.unsubscribe$))
             .subscribe({
-                next: async () => {
+                next: async (saved: ControlSheet) => {
                     await loading.dismiss();
-                    // Home shows the same counts; keep them in step.
-                    this.homeStore.load().pipe(takeUntil(this.unsubscribe$)).subscribe();
+                    // Home shows the same counts; hand it the sheet we just
+                    // saved rather than re-running the whole dashboard load.
+                    this.homeStore.setControlSheet(saved ?? this.controlSheet);
                 },
                 error: async () => {
                     await loading.dismiss();

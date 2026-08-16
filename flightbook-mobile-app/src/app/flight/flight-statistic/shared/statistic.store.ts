@@ -5,6 +5,7 @@ import { LanguageService } from 'src/app/shared/services/language.service';
 import { FlightStore } from '../../shared/flight.store';
 import { FlightStatistic } from '../../shared/flightStatistic.model';
 import { Flight } from '../../shared/flight.model';
+import { SessionTeardownRegistry } from 'src/app/shared/services/session-teardown.registry';
 
 /** 'all' or a four-digit year. */
 export type StatisticPeriod = string;
@@ -40,6 +41,8 @@ export interface Season {
     /** Seconds. */
     airtime: number;
     months: number[];
+    /** The season's busiest month, so the sparkline does not re-derive it per bar. */
+    monthMax: number;
 }
 
 export interface Bar {
@@ -81,6 +84,8 @@ export interface StatisticState {
     /** Every flight, fetched once per session and reused for every period. */
     flights: Flight[];
     loaded: boolean;
+    /** FlightStore.revision this snapshot was taken at. */
+    revision: number;
 }
 
 /** 'HH:mm:ss' from the API to seconds. */
@@ -127,13 +132,23 @@ export class StatisticStore {
         yearly: [],
         monthly: [],
         flights: [],
-        loaded: false
+        loaded: false,
+        revision: -1
     });
+
+    constructor() {
+        inject(SessionTeardownRegistry).register(() => this.clear());
+    }
 
     /** Selected period: ALL_TIME or a year. */
     public period = signal<StatisticPeriod>(ALL_TIME);
 
-    public loaded = computed(() => this.state().loaded);
+    /**
+     * False once the logbook or the shared filter has moved under us - the page
+     * only reloads while this is false, so a flight logged (or a filter set on
+     * the Flights tab) has to invalidate the cached figures.
+     */
+    public loaded = computed(() => this.state().loaded && this.state().revision === this.flightStore.revision());
     public hasFlights = computed(() => (this.state().global?.nbFlights ?? 0) > 0);
 
     /** Years with at least one flight, newest first. */
@@ -175,7 +190,8 @@ export class StatisticStore {
                     year: row.year,
                     flights: Number(row.nbFlights ?? 0),
                     airtime: Number(row.time ?? 0),
-                    months
+                    months,
+                    monthMax: Math.max(...months, 1)
                 };
             });
     });
@@ -206,7 +222,7 @@ export class StatisticStore {
     public bars = computed<Bar[]>(() => {
         const season = this.selectedSeason();
         if (season) {
-            const max = Math.max(...season.months, 1);
+            const max = season.monthMax;
             return season.months.map((value, index) => ({
                 ratio: value / max,
                 empty: value === 0,
@@ -293,13 +309,10 @@ export class StatisticStore {
     });
 
     /**
-     * One entry per day: the last 365 days for all-time, the calendar year for
-     * a selected year.
-     *
-     * All-time is windowed rather than run from the first flight because a
-     * pilot flying since 2013 produces ~650 columns - the grid then scrolls
-     * far off-screen and the recent weeks, the only ones anyone reads, are
-     * indistinguishable from the rest.
+     * One entry per day: from the first flight for all-time, the calendar year
+     * for a selected year. All-time is what the design's "every day since you
+     * started" describes; the grid compresses to fit rather than scrolling, so
+     * a long logbook draws narrower columns instead of running off the card.
      */
     public heatmap = computed<HeatmapDay[]>(() => {
         const flights = this.periodFlights();
@@ -318,10 +331,12 @@ export class StatisticStore {
         const sorted = [...counts.keys()].sort();
         const today = new Date();
 
-        // All-time runs from the first flight, which is what the design's
-        // "every day since you started" and its 62-week count describe. The
-        // grid compresses to fit rather than scrolling, so a long logbook draws
-        // narrower columns instead of running off the card.
+        // Flights can carry no date, so `flights` being non-empty does not mean
+        // `counts` is - and the all-time window is anchored on its first key.
+        if (period === ALL_TIME && sorted.length === 0) {
+            return [];
+        }
+
         const start: Date = period === ALL_TIME
             ? localDate(sorted[0])
             : new Date(Number(period), 0, 1);
@@ -343,9 +358,6 @@ export class StatisticStore {
         }
         return days;
     });
-
-    public flyingDays = computed(() => this.heatmap().filter(d => d.flights > 0).length);
-    public weekCount = computed(() => Math.ceil(this.heatmap().length / 7));
 
     /** Running airtime total per month, for the cumulative chart. */
     public cumulative = computed<CumulativePoint[]>(() => {
@@ -408,7 +420,7 @@ export class StatisticStore {
      * it now, and a chip bar that says what is narrowing the numbers.
      */
     load(): Observable<StatisticState> {
-        const global$ = this.flightStore.getStatistics('global').pipe(catchError(() => of([] as FlightStatistic[])));
+        const global$: Observable<FlightStatistic[] | null> = this.flightStore.getStatistics('global').pipe(catchError(() => of(null)));
         const yearly$ = this.flightStore.getStatistics('yearly').pipe(catchError(() => of([] as FlightStatistic[])));
         const monthly$ = this.flightStore.getStatistics('monthly').pipe(catchError(() => of([] as FlightStatistic[])));
         const flights$ = this.flightStore.getFlights({ store: false }).pipe(catchError(() => of([] as Flight[])));
@@ -419,7 +431,11 @@ export class StatisticStore {
                 yearly: yearly ?? [],
                 monthly: monthly ?? [],
                 flights: flights ?? [],
-                loaded: true
+                // A load where even the global aggregate failed is not loaded:
+                // caching it would pin the empty state for the whole session,
+                // because the page only refetches while `loaded` is false.
+                loaded: global !== null,
+                revision: this.flightStore.revision()
             })),
             tap(state => this.state.set(state))
         );
@@ -431,11 +447,21 @@ export class StatisticStore {
      */
     reload(): Observable<StatisticState> {
         this.state.update(state => ({ ...state, loaded: false }));
-        return this.load();
+        return this.load().pipe(
+            tap(() => {
+                // A filter can narrow the logbook to years the selected season
+                // is not among. Left pointing at it, the headline reads 0/0/0
+                // with no chip highlighted and no way back.
+                const period = this.period();
+                if (period !== ALL_TIME && !this.years().includes(period)) {
+                    this.period.set(ALL_TIME);
+                }
+            })
+        );
     }
 
     clear(): void {
         this.period.set(ALL_TIME);
-        this.state.set({ global: null, yearly: [], monthly: [], flights: [], loaded: false });
+        this.state.set({ global: null, yearly: [], monthly: [], flights: [], loaded: false, revision: -1 });
     }
 }

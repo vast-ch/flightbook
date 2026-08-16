@@ -7,6 +7,7 @@ import { SwUpdate, VersionReadyEvent } from '@angular/service-worker';
 import { AccountService } from './account/shared/account.service';
 import { SchoolService } from './school/shared/school.service';
 import { SessionService } from './shared/services/session.service';
+import { resolveLanguage } from './shared/services/language.service';
 import { LoginPage } from './account/login/login.page';
 import {
     ActionPerformed,
@@ -45,7 +46,10 @@ export class AppComponent implements OnDestroy, OnInit {
         private sessionService: SessionService
     ) {
         this.translate.setDefaultLang('en');
-        this.translate.use(localStorage.getItem('language') || navigator.language.split('-')[0]);
+        // Narrowed to a language we ship: an unsupported code sticks in
+        // translate.currentLang even though its bundle 404s, and every DatePipe
+        // given that locale then throws NG0701 on each change-detection pass.
+        this.translate.use(resolveLanguage(localStorage.getItem('language') || navigator.language));
 
         // Registered app-wide because the legacy pages that use them do not
         // register their own; each redesigned page registers what it needs.

@@ -1,6 +1,6 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { forkJoin, from, of, Observable } from 'rxjs';
-import { catchError, map, switchMap, tap } from 'rxjs/operators';
+import { catchError, map, shareReplay, switchMap, tap } from 'rxjs/operators';
 import moment from 'moment-timezone';
 import { FlightStore } from '../../flight/shared/flight.store';
 import { SchoolService } from '../../school/shared/school.service';
@@ -8,6 +8,7 @@ import { FlightStatistic } from '../../flight/shared/flightStatistic.model';
 import { Appointment } from '../../school/shared/appointment.model';
 import { School } from '../../school/shared/school.model';
 import { ControlSheet } from '../../shared/domain/control-sheet';
+import { SessionTeardownRegistry } from 'src/app/shared/services/session-teardown.registry';
 
 /**
  * Flights required for the SHV/SHGPA licence. Not exposed by the API, so it
@@ -38,6 +39,8 @@ export interface HomeState {
     controlSheet: ControlSheet | null;
     schools: School[];
     loaded: boolean;
+    /** FlightStore.revision this snapshot was taken at. */
+    revision: number;
 }
 
 @Injectable({
@@ -53,13 +56,26 @@ export class HomeStore {
         nextAppointment: null,
         controlSheet: null,
         schools: [],
-        loaded: false
+        loaded: false,
+        revision: -1
     });
+
+    constructor() {
+        // Registered rather than reached for by SessionService: importing this
+        // store there put moment-timezone in the initial bundle.
+        inject(SessionTeardownRegistry).register(() => this.clear());
+    }
 
     public globalStats = computed(() => this.state().globalStats);
     public monthlyStats = computed(() => this.state().monthlyStats);
     public nextAppointment = computed(() => this.state().nextAppointment);
-    public loaded = computed(() => this.state().loaded);
+
+    /**
+     * False once the logbook has moved under us. The page loads only while this
+     * is false, so without the revision check a flight added from the + tab
+     * never showed up on the dashboard for the rest of the session.
+     */
+    public loaded = computed(() => this.state().loaded && this.state().revision === this.flightStore.revision());
 
     public trainingProgress = computed<TrainingProgress | null>(() => {
         const sheet = this.state().controlSheet;
@@ -120,16 +136,21 @@ export class HomeStore {
     load(): Observable<HomeState> {
         // applyFilter: false - the dashboard always shows all-time totals,
         // never whatever the user last filtered the flight list by.
-        const global$: Observable<FlightStatistic[]> =
-            this.flightStore.getStatistics('global', false).pipe(catchError(() => of([] as FlightStatistic[])));
+        const global$: Observable<FlightStatistic[] | null> =
+            this.flightStore.getStatistics('global', false).pipe(catchError(() => of(null)));
         const monthly$: Observable<FlightStatistic[]> =
             this.flightStore.getStatistics('monthly', false).pipe(catchError(() => of([] as FlightStatistic[])));
         const controlSheet$: Observable<ControlSheet | null> =
             this.schoolService.getControlSheet().pipe(catchError(() => of(null)));
+        // One resolution of the school list, shared by the state field and the
+        // appointment fan-out - two calls raced the service's cache and sent
+        // two identical requests on every cold load.
+        const schools$: Observable<School[]> = from(this.schoolService.getSchools()).pipe(
+            catchError(() => of([] as School[])),
+            shareReplay({ bufferSize: 1, refCount: false })
+        );
         const nextAppointment$: Observable<UpcomingAppointment | null> =
-            this.loadNextAppointment().pipe(catchError(() => of(null)));
-        const schools$: Observable<School[]> =
-            from(this.schoolService.getSchools()).pipe(catchError(() => of([] as School[])));
+            this.loadNextAppointment(schools$).pipe(catchError(() => of(null)));
 
         return forkJoin([global$, monthly$, controlSheet$, nextAppointment$, schools$]).pipe(
             map(([global, monthly, controlSheet, nextAppointment, schools]): HomeState => ({
@@ -138,7 +159,12 @@ export class HomeStore {
                 nextAppointment,
                 controlSheet,
                 schools: schools ?? [],
-                loaded: true
+                // Only a load that actually reached the API counts as loaded.
+                // Marking a wholly failed load as done cached an all-zero
+                // dashboard for the session - the page's `if (!loaded())` guard
+                // would never retry it.
+                loaded: global !== null,
+                revision: this.flightStore.revision()
             })),
             tap(state => this.state.set(state))
         );
@@ -146,12 +172,12 @@ export class HomeStore {
 
     /**
      * Appointments are per school and come back scheduling-DESC, so they get
-     * flattened and re-sorted ascending here. The shared schoolService.filter is
-     * deliberately left untouched - mutating it would corrupt the appointment
-     * list page's own filter state.
+     * flattened and re-sorted ascending here. applyFilter: false because the
+     * appointment list's filter lives on the shared service and Home has no
+     * control to explain - or undo - a card that silently disappeared.
      */
-    private loadNextAppointment(): Observable<UpcomingAppointment | null> {
-        return from(this.schoolService.getSchools()).pipe(
+    private loadNextAppointment(schools$: Observable<School[]>): Observable<UpcomingAppointment | null> {
+        return schools$.pipe(
             switchMap((schools: School[]) => {
                 if (!schools || schools.length === 0) {
                     return of(null);
@@ -159,7 +185,7 @@ export class HomeStore {
 
                 return forkJoin(
                     schools.map(school =>
-                        this.schoolService.getAppointments({}, school.id).pipe(
+                        this.schoolService.getAppointments({ applyFilter: false }, school.id, 'upcoming').pipe(
                             map((appointments: Appointment[]) => (appointments ?? []).map(appointment => ({ appointment, school }))),
                             catchError(() => of([] as { appointment: Appointment; school: School }[]))
                         )
@@ -200,6 +226,16 @@ export class HomeStore {
         };
     }
 
+    /**
+     * Push a sheet the control-sheet page just saved straight into the state.
+     * That page used to call load() after every star tap - five requests,
+     * including one unbounded appointment fetch per school - to move a progress
+     * bar off a value it already had in hand.
+     */
+    setControlSheet(controlSheet: ControlSheet | null): void {
+        this.state.update(state => ({ ...state, controlSheet }));
+    }
+
     clear(): void {
         this.state.set({
             globalStats: null,
@@ -207,7 +243,8 @@ export class HomeStore {
             nextAppointment: null,
             controlSheet: null,
             schools: [],
-            loaded: false
+            loaded: false,
+            revision: -1
         });
     }
 }

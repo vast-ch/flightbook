@@ -3,6 +3,7 @@ import { AppointmentType } from "./appointment-type.model";
 import { School } from "./school.model";
 import { State } from "./state";
 import { Subscription } from "./subscription.model";
+import { SpotCell } from './spots';
 
 export class Appointment {
     id: number;
@@ -28,4 +29,14 @@ export class Appointment {
     // Computed properties for UI state
     toggleDisabled?: boolean;
     lineDisabled?: boolean;
+    /**
+     * The real instant the appointment starts, in epoch ms. `scheduling` is
+     * rewritten to the school's wall clock held in a local Date, so it cannot
+     * be compared against the device clock.
+     */
+    scheduledAt?: number;
+    /** Capacity, computed once at load - see enrichAppointment. */
+    spotCells?: SpotCell[];
+    freeSpots?: number;
+    isFull?: boolean;
 }

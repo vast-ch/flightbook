@@ -207,7 +207,7 @@
               <span class="season-row__spark">
                 @for (month of season.months; track $index) {
                   <span class="season-row__bar" [class.is-empty]="month === 0"
-                        [style.height]="sparkHeight(month, season.months)"></span>
+                        [style.height]="sparkHeight(month, season.monthMax)"></span>
                 }
               </span>
               <span class="season-row__totals">

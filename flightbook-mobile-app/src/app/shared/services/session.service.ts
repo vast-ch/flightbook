@@ -1,13 +1,12 @@
 import { Injectable, inject } from '@angular/core';
-import { Observable, tap } from 'rxjs';
+import { Observable, finalize } from 'rxjs';
 import { AccountService } from 'src/app/account/shared/account.service';
 import { FlightStore } from 'src/app/flight/shared/flight.store';
 import { GliderStore } from 'src/app/glider/shared/glider.store';
 import { PlaceStore } from 'src/app/place/shared/place.store';
 import { SchoolService } from 'src/app/school/shared/school.service';
 import { TandemSchoolService } from 'src/app/school/shared/tandem-school.service';
-import { HomeStore } from 'src/app/home/shared/home.store';
-import { StatisticStore } from 'src/app/flight/flight-statistic/shared/statistic.store';
+import { SessionTeardownRegistry } from './session-teardown.registry';
 
 /**
  * Owns the sign-out teardown so the side menu and the More page can't drift
@@ -23,8 +22,7 @@ export class SessionService {
     private placeStore = inject(PlaceStore);
     private schoolService = inject(SchoolService);
     private tandemSchoolService = inject(TandemSchoolService);
-    private homeStore = inject(HomeStore);
-    private statisticStore = inject(StatisticStore);
+    private teardown = inject(SessionTeardownRegistry);
 
     /**
      * Whether the once-per-session bootstrap (identity, entitlements, push
@@ -43,16 +41,15 @@ export class SessionService {
     }
 
     /**
-     * Stores are cleared up front so no cached logbook survives a failed
-     * request, and the tokens go once the server has accepted the logout.
+     * The local session goes whether or not the server accepts the sign-out.
+     * Both call sites navigate to login on either branch, so leaving the tokens
+     * and the caches behind on a failed request (offline, expired refresh
+     * token) would sign the next user straight back in as the previous one.
      */
     logout(): Observable<any> {
-        this.flightStore.clearFlights();
-        this.gliderStore.clearGliders();
-        this.placeStore.clearPlaces();
-
-        return this.accountService.logout(localStorage.getItem('refresh_token')).pipe(
-            tap(() => this.clearLocalSession())
+        const refreshToken = localStorage.getItem('refresh_token');
+        return this.accountService.logout(refreshToken).pipe(
+            finalize(() => this.clearLocalSession())
         );
     }
 
@@ -71,10 +68,10 @@ export class SessionService {
         // leaving it set would narrow the next account's logbook by a glider it
         // does not own.
         this.flightStore.resetFilter();
-        // Both gate their reloads on a `loaded` flag, so leaving them would show
-        // the previous account's totals to the next one.
-        this.homeStore.clear();
-        this.statisticStore.clear();
+        // Home and Statistics register themselves here once constructed. They
+        // gate their reloads on a `loaded` flag, so leaving them would show the
+        // previous account's totals to the next one.
+        this.teardown.runAll();
         this.bootstrapped = false;
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');

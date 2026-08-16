@@ -33,13 +33,13 @@
             <button type="button" class="filter-date" id="filterFrom">
                 <span class="filter-date__label">{{ 'filter.from' | translate }}</span>
                 <span class="filter-date__value" [class.is-placeholder]="!filter().from">
-                    {{ filter().from ? (filter().from | date:'dd.MM.yyyy') : '&ndash;' }}
+                    {{ filter().from ? (filter().from | date:'dd.MM.yyyy') : '–' }}
                 </span>
             </button>
             <button type="button" class="filter-date" id="filterTo">
                 <span class="filter-date__label">{{ 'filter.to' | translate }}</span>
                 <span class="filter-date__value" [class.is-placeholder]="!filter().to">
-                    {{ filter().to ? (filter().to | date:'dd.MM.yyyy') : '&ndash;' }}
+                    {{ filter().to ? (filter().to | date:'dd.MM.yyyy') : '–' }}
                 </span>
             </button>
         </div>
