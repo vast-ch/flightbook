@@ -206,13 +206,15 @@ export class ControlSheetPage implements OnInit, OnDestroy {
      * skills have no coaching text, so their sheet opens shallower.
      */
     async openSkill(group: SkillGroup, row: SkillRow) {
-        const height = this.hasDetail(group) ? 0.82 : 0.42;
+        /*
+         * A fixed height rather than sheet breakpoints. A breakpoint sheet is
+         * full-height and translated down, so everything below the breakpoint
+         * sits off-screen - and with 0.82 as the largest one, the last fifth of
+         * the coaching text could never be scrolled to.
+         */
         const modal = await this.modalCtrl.create({
             component: ControlSheetDetailsComponent,
-            cssClass: 'skill-sheet-modal',
-            handle: false,
-            breakpoints: [0, height],
-            initialBreakpoint: height,
+            cssClass: this.hasDetail(group) ? 'skill-sheet-modal' : 'skill-sheet-modal skill-sheet-modal--short',
             componentProps: {
                 type: group,
                 key: row.key,

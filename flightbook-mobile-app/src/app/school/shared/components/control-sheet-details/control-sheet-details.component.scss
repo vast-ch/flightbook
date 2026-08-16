@@ -71,6 +71,8 @@ app-control-sheet-details {
 
     .skill-sheet__scroll {
         padding: 18px 20px 22px;
+        /* Clears the home indicator, so the Done button is never half under it */
+        padding-bottom: max(22px, env(safe-area-inset-bottom));
     }
 
     .video-container {

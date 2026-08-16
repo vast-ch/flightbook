@@ -659,12 +659,23 @@ button.fb-row {
  * only the shell is set here.
  */
 .skill-sheet-modal {
+  --width: 100%;
+  --height: 82%;
   --background: var(--fb-bg);
   --border-radius: 18px 18px 0 0;
+  --box-shadow: 0 -8px 28px rgba(16, 41, 60, 0.18);
   --backdrop-opacity: 1;
+
+  /* Pinned to the bottom edge, the way .fb-add-sheet does it. */
+  align-items: flex-end;
 
   &::part(backdrop) {
     background: rgba(16, 41, 60, 0.4);
+  }
+
+  /* Theory skills carry no coaching text - only the rating and its level. */
+  &--short {
+    --height: 46%;
   }
 }
 
