@@ -35,6 +35,9 @@ export class PlaceMapComponent implements AfterViewInit, OnChanges {
 
     private timerId: NodeJS.Timeout;
 
+    /** True while the pin is the name lookup's guess rather than a real choice. */
+    private coordinatesFromSearch = false;
+
     @Input()
     placeName: String;
 
@@ -76,7 +79,10 @@ export class PlaceMapComponent implements AfterViewInit, OnChanges {
             return;
         }
 
-        if (!this.place?.coordinates && placeName.currentValue && placeName.currentValue != "") {
+        // A pin the lookup placed may follow further typing; one the pilot placed,
+        // or one loaded with an existing place, must not be moved by a rename.
+        const ownsPin = !this.place?.coordinates || this.coordinatesFromSearch;
+        if (ownsPin && placeName.currentValue && placeName.currentValue != "") {
             clearTimeout(this.timerId);
             this.timerId = setTimeout(() => this.searchPlace(placeName.currentValue), 1000);
         }
@@ -92,7 +98,15 @@ export class PlaceMapComponent implements AfterViewInit, OnChanges {
             return;
         }
         const geometry = res.features[0]?.geometry as GeoPoint
-        this.map.getView().setCenter(fromLonLat(geometry.coordinates));
+        const position = fromLonLat(geometry.coordinates);
+
+        // Centring alone left the map looking unset: mark the hit, and keep it
+        // as the place's position so saving stores what is on screen.
+        this.marker.setGeometry(new Point(position));
+        this.place.coordinates = position;
+        this.coordinatesFromSearch = true;
+
+        this.map.getView().setCenter(position);
         this.map.getView().setZoom(14);
     }
 
@@ -136,6 +150,8 @@ export class PlaceMapComponent implements AfterViewInit, OnChanges {
 
     onDblclick = (async (evt: any) => {
         this.place.coordinates = evt.coordinate;
+        // Placed deliberately, so the name lookup stops moving it.
+        this.coordinatesFromSearch = false;
         this.marker.setGeometry(new Point(evt.coordinate));
         const epsgGeometry: any = this.marker.getGeometry().clone().transform(this.map.getView().getProjection(), 'EPSG:4326')
         const res = await firstValueFrom(this.placeStore.getPlaceMetadata(epsgGeometry.flatCoordinates));

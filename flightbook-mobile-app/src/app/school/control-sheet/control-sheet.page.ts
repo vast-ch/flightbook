@@ -45,6 +45,9 @@ export class ControlSheetPage implements OnInit, OnDestroy {
     theoryExamDate: string;
     practiceExamDate: string;
 
+    /** Which exam's date picker is open, if any. */
+    public examPicker = signal<'theory' | 'practice' | null>(null);
+
     /**
      * Only one group is open at a time. Collapsed groups show a progress bar
      * instead of their rows - with 30 altitude skills, four always-open
@@ -101,6 +104,21 @@ export class ControlSheetPage implements OnInit, OnDestroy {
 
     close() {
         this.navCtrl.navigateBack('more');
+    }
+
+    openExamPicker(exam: 'theory' | 'practice') {
+        if (!this.canEdit) {
+            return;
+        }
+        // Suggest today when the exam has no date yet.
+        const stored = exam === 'theory' ? this.controlSheet?.passTheoryExam : this.controlSheet?.passPracticeExam;
+        const value = stored ? new Date(stored).toISOString() : new Date().toISOString();
+        if (exam === 'theory') {
+            this.theoryExamDate = value;
+        } else {
+            this.practiceExamDate = value;
+        }
+        this.examPicker.set(exam);
     }
 
     isExpanded(group: SkillGroup): boolean {

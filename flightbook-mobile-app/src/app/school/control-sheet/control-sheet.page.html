@@ -94,7 +94,8 @@
       <!-- Final exams -->
       <div class="fb-section-label sheet-exams-label">{{ 'controlSheet.exam.title' | translate }}</div>
       <div class="fb-card--flush">
-        <button type="button" id="theoryDateInput" class="fb-row sheet-exam" [disabled]="!canEdit">
+        <button type="button" class="fb-row sheet-exam" [disabled]="!canEdit"
+                (click)="openExamPicker('theory')">
           <span class="sheet-exam__check" [class.is-passed]="!!controlSheet.passTheoryExam">
             @if (controlSheet.passTheoryExam) {
               <ion-icon name="checkmark" aria-hidden="true"></ion-icon>
@@ -111,7 +112,8 @@
           </span>
         </button>
 
-        <button type="button" id="practiceDateInput" class="fb-row sheet-exam" [disabled]="!canEdit">
+        <button type="button" class="fb-row sheet-exam" [disabled]="!canEdit"
+                (click)="openExamPicker('practice')">
           <span class="sheet-exam__check" [class.is-passed]="!!controlSheet.passPracticeExam">
             @if (controlSheet.passPracticeExam) {
               <ion-icon name="checkmark" aria-hidden="true"></ion-icon>
@@ -151,7 +153,13 @@
   Cancel genuinely cancels now. Clearing a date is a separate action below the
   card, so backing out of the picker no longer wipes the value.
 -->
-<ion-modal class="dateModal" trigger="theoryDateInput">
+<!--
+  Opened from state rather than trigger="<id>". Ionic resolves a trigger id once,
+  when the modal initialises - and these rows are inside @if (controlSheet), so
+  at that moment the element does not exist yet and the tap never fired.
+-->
+<ion-modal class="dateModal" [isOpen]="examPicker() === 'theory'"
+           (ionModalDidDismiss)="examPicker.set(null)">
   <ng-template>
     <ion-datetime size="cover" presentation="date" [preferWheel]="true" [value]="theoryExamDate"
       (ionChange)="onTheoryDateChange($event)" locale="{{ language }}" [showDefaultButtons]="true"
@@ -159,7 +167,8 @@
   </ng-template>
 </ion-modal>
 
-<ion-modal class="dateModal" trigger="practiceDateInput">
+<ion-modal class="dateModal" [isOpen]="examPicker() === 'practice'"
+           (ionModalDidDismiss)="examPicker.set(null)">
   <ng-template>
     <ion-datetime size="cover" presentation="date" [preferWheel]="true" [value]="practiceExamDate"
       (ionChange)="onPracticeDateChange($event)" locale="{{ language }}" [showDefaultButtons]="true"
