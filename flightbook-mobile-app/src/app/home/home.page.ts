@@ -52,7 +52,8 @@ export class HomePage implements OnDestroy {
     public globalStats = this.homeStore.globalStats;
     public monthlyStats = this.homeStore.monthlyStats;
     public nextAppointment = this.homeStore.nextAppointment;
-    public trainingProgress = this.homeStore.trainingProgress;
+    /** Hidden once the practical exam is passed - see the store. */
+    public activeTrainingProgress = this.homeStore.activeTrainingProgress;
     public licenceProgress = this.homeStore.licenceProgress;
     public controlSheetPercent = this.homeStore.controlSheetPercent;
     public soloFlightDone = this.homeStore.soloFlightDone;

@@ -78,7 +78,7 @@
     }
 
     <!-- Training progress, for pilots with a control sheet -->
-    @if (trainingProgress(); as progress) {
+    @if (activeTrainingProgress(); as progress) {
       <div class="fb-card--flush training" (click)="openControlSheet()">
         <div class="training__body">
           <div class="training__top">

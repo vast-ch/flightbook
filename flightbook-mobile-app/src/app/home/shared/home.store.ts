@@ -109,6 +109,19 @@ export class HomeStore {
     });
 
     /** Percentage of control-sheet skills rated, for the progress bar. */
+    /**
+     * What Home shows: the same progress, but only while training is still
+     * running. A passed practical exam ends it, and a licensed pilot has no use
+     * for a training tracker on their dashboard.
+     *
+     * Deliberately not folded into trainingProgress - the control sheet reads
+     * that for its school name and skills count, and it stays the record of the
+     * training after the exam is behind you.
+     */
+    public activeTrainingProgress = computed<TrainingProgress | null>(() =>
+        this.state().controlSheet?.passPracticeExam ? null : this.trainingProgress()
+    );
+
     public controlSheetPercent = computed(() => {
         const progress = this.trainingProgress();
         if (!progress || progress.totalSkills === 0) {
