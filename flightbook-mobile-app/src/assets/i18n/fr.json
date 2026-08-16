@@ -821,7 +821,7 @@
         "flightsPerMonth": "Vols par mois",
         "bestMonth": "Meilleur mois",
         "average": "Moy.",
-        "fromShv": "De la FSVL",
+        "fromShv": "News",
         "emptyLogbook": "C'est tout ton carnet de vol pour l'instant. Importe des fichiers IGC pour ajouter des vols antérieurs — ",
         "importFromDevice": "Importer depuis l'appareil"
     },

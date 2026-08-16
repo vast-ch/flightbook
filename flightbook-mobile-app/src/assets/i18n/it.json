@@ -816,7 +816,7 @@
         "flightsPerMonth": "Voli al mese",
         "bestMonth": "Mese migliore",
         "average": "Media",
-        "fromShv": "Dalla FSVL",
+        "fromShv": "News",
         "emptyLogbook": "Questo è tutto il tuo libro di volo finora. Importa file IGC per aggiungere voli precedenti — ",
         "importFromDevice": "Importa dal dispositivo",
         "ofTotal": "di {{total}}",

@@ -816,7 +816,7 @@
         "flightsPerMonth": "Flights per month",
         "bestMonth": "Best month",
         "average": "Avg",
-        "fromShv": "From the SHV",
+        "fromShv": "News",
         "emptyLogbook": "That's your whole logbook so far. Import IGC files to backfill earlier flights — ",
         "importFromDevice": "Import from device",
         "ofTotal": "of {{total}}",
