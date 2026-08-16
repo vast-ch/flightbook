@@ -122,6 +122,32 @@ export class PlaceMapComponent implements AfterViewInit, OnChanges, OnDestroy {
 
         this.map.getView().setCenter(position);
         this.map.getView().setZoom(14);
+
+        await this.applySearchMetadata(geometry.coordinates);
+    }
+
+    /**
+     * Altitude and country for a pin the lookup placed, so a place created by
+     * name alone saves with the same fields a double-tapped one does.
+     *
+     * Silent, unlike the double-tap path: this runs off the debounced rename,
+     * and the only values it can overwrite are an earlier guess of its own -
+     * ngOnChanges will not call us once the pilot has placed the pin themselves.
+     * The metadata lookup is best-effort; losing it must not undo the position.
+     */
+    private async applySearchMetadata(lonLat: Position) {
+        try {
+            const metadata = await firstValueFrom(this.placeStore.getPlaceMetadata(lonLat));
+            if (this.destroyed || !this.coordinatesFromSearch) {
+                return;
+            }
+            this.zone.run(() => {
+                this.place.altitude = metadata.altitude;
+                this.place.country = metadata.country;
+            });
+        } catch {
+            // Keep the coordinates; the pilot can still fill these in by hand.
+        }
     }
 
     private async initMap(position?: Position) {
@@ -164,13 +190,16 @@ export class PlaceMapComponent implements AfterViewInit, OnChanges, OnDestroy {
 
     onDblclick = (async (evt: any) => {
         this.place.coordinates = evt.coordinate;
+        // Whatever altitude is on the place right now was filled in by the name
+        // lookup, not typed - so there is nothing to ask about before replacing it.
+        const autoFilled = this.coordinatesFromSearch;
         // Placed deliberately, so the name lookup stops moving it.
         this.coordinatesFromSearch = false;
         this.marker.setGeometry(new Point(evt.coordinate));
         const epsgGeometry: any = this.marker.getGeometry().clone().transform(this.map.getView().getProjection(), 'EPSG:4326')
         const res = await firstValueFrom(this.placeStore.getPlaceMetadata(epsgGeometry.flatCoordinates));
 
-        if (this.place.altitude) {
+        if (this.place.altitude && !autoFilled) {
             const alert = await this.alertController.create({
                 header: this.translate.instant('message.infotitle'),
                 message: this.translate.instant('place.override'),
