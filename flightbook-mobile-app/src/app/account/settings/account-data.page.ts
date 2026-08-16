@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit, effect } from '@angular/core';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
-import { AlertController, LoadingController, ModalController, NavController, IonContent, IonButton, IonIcon, IonInput, IonTextarea, IonToggle, IonReorder, IonReorderGroup, ReorderEndCustomEvent } from '@ionic/angular/standalone';
+import { AlertController, LoadingController, NavController, IonContent, IonButton, IonIcon, IonInput, IonTextarea, IonToggle } from '@ionic/angular/standalone';
 import HttpStatusCode from '../../shared/util/HttpStatusCode';
 import { User } from 'src/app/account/shared/user.model';
 import { AccountService } from '../shared/account.service';
@@ -17,9 +17,7 @@ import moment from 'moment';
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { addIcons } from 'ionicons';
-import { add, chevronBack, eyeOutline, eyeOffOutline, checkmark, trash } from 'ionicons/icons';
-import { Link } from '../shared/userConfig.model';
-import { LinkComponent } from '../shared/components/link/link.component';
+import { chevronBack, eyeOutline, eyeOffOutline, checkmark } from 'ionicons/icons';
 import { environment } from 'src/environments/environment';
 import { PhoneNumberComponent } from 'src/app/shared/components/phone-number/phone-number.component';
 
@@ -40,8 +38,6 @@ const LANGUAGES = ['fr', 'de', 'en', 'it'];
         IonInput,
         IonTextarea,
         IonToggle,
-        IonReorder,
-        IonReorderGroup,
         PhoneNumberComponent
     ]
 })
@@ -74,11 +70,10 @@ export class AccountDataPage implements OnInit, OnDestroy {
         public navCtrl: NavController,
         private router: Router,
         private paymentService: PaymentService,
-        private modalCtrl: ModalController,
         private route: ActivatedRoute
     ) {
         this.isNative = Capacitor.isNativePlatform();
-        addIcons({ 'chevron-back': chevronBack, 'eye-outline': eyeOutline, 'eye-off-outline': eyeOffOutline, checkmark, add, trash });
+        addIcons({ 'chevron-back': chevronBack, 'eye-outline': eyeOutline, 'eye-off-outline': eyeOffOutline, checkmark });
 
         // Deep clone: edits must not touch the signal until a save succeeds.
         effect(() => {
@@ -151,41 +146,6 @@ export class AccountDataPage implements OnInit, OnDestroy {
         user.config.preparation = user.config.preparation ?? {};
         user.config.preparation.links = user.config.preparation.links ?? [];
         return user;
-    }
-
-    // ---- Flight preparation links ---------------------------------------
-
-    linkAddButton() {
-        this.manageLinkModal(new Link(), 'add');
-    }
-
-    async manageLinkModal(link: Link, type: 'add' | 'edit') {
-        // Edited on a copy, so cancelling leaves the original untouched.
-        const copyLink = { ...link };
-        const modal = await this.modalCtrl.create({
-            component: LinkComponent,
-            componentProps: { link: copyLink, type }
-        });
-        await modal.present();
-
-        const { data } = await modal.onWillDismiss();
-        if (!data || data.type === 'close') {
-            return;
-        }
-
-        if (type === 'add') {
-            this.user.config.preparation.links.push(data.link);
-        } else {
-            Object.assign(link, copyLink);
-        }
-    }
-
-    deleteLinkItem(index: number) {
-        this.user.config.preparation.links.splice(index, 1);
-    }
-
-    handleReorderEnd(event: ReorderEndCustomEvent) {
-        this.user.config.preparation.links = event.detail.complete(this.user.config.preparation.links);
     }
 
     private loadEmergencyContact() {

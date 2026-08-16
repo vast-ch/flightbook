@@ -1,16 +1,18 @@
 import { Component, OnDestroy, computed, inject, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { IonContent, IonIcon } from '@ionic/angular/standalone';
-import { TranslateModule } from '@ngx-translate/core';
+import { AlertController, IonContent, IonIcon, IonInput, IonReorder, IonReorderGroup, ReorderEndCustomEvent } from '@ionic/angular/standalone';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
-import { chevronForward } from 'ionicons/icons';
+import { add, chevronForward, openOutline, remove } from 'ionicons/icons';
 import { Browser } from '@capacitor/browser';
 import { Capacitor } from '@capacitor/core';
-import { Subject } from 'rxjs';
+import { Subject, firstValueFrom } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import { AccountService } from '../account/shared/account.service';
 import { Link } from '../account/shared/userConfig.model';
+import { User } from '../account/shared/user.model';
 import { SchoolService } from '../school/shared/school.service';
 import { ControlSheet } from '../shared/domain/control-sheet';
 import { FlightExportService } from '../shared/services/flight-export.service';
@@ -36,9 +38,13 @@ const SHV_APP_URLS = {
     styleUrls: ['./more.page.scss'],
     imports: [
         AvatarButtonComponent,
+        FormsModule,
         TranslateModule,
         IonContent,
-        IonIcon
+        IonIcon,
+        IonInput,
+        IonReorder,
+        IonReorderGroup
     ]
 })
 export class MorePage implements OnDestroy {
@@ -49,6 +55,8 @@ export class MorePage implements OnDestroy {
     private sessionService = inject(SessionService);
     private flightExportService = inject(FlightExportService);
     private router = inject(Router);
+    private alertController = inject(AlertController);
+    private translate = inject(TranslateService);
 
     public appVersion = environment.appVersion;
 
@@ -93,6 +101,9 @@ export class MorePage implements OnDestroy {
 
     constructor() {
         addIcons({
+            add,
+            remove,
+            'open-outline': openOutline,
             chevronForward,
             glider: 'assets/custom-ion-icons/glider.svg',
             place: 'assets/custom-ion-icons/place.svg',
@@ -122,6 +133,122 @@ export class MorePage implements OnDestroy {
 
     open(route: string | any[]) {
         this.router.navigate(Array.isArray(route) ? route : [route]);
+    }
+
+    // ---- Before you fly: the pilot's own links ---------------------------
+
+    public editingLinks = signal(false);
+
+    /** The row being added or edited. index === null means a new link. */
+    public draft = signal<{ index: number | null; label: string; url: string } | null>(null);
+
+    public draftError = signal<string | null>(null);
+
+    public canSaveDraft = computed(() => {
+        const entry = this.draft();
+        return !!entry?.label?.trim() && /^https?:\/\/.+/.test(entry?.url?.trim() ?? '');
+    });
+
+    /** The design puts the host under the name; the full URL rarely fits. */
+    hostOf(url: string): string {
+        try {
+            return new URL(url).hostname.replace(/^www\./, '');
+        } catch {
+            return url;
+        }
+    }
+
+    toggleLinkEdit() {
+        this.editingLinks.update(editing => !editing);
+        this.draft.set(null);
+        this.draftError.set(null);
+    }
+
+    startLink() {
+        this.draft.set({ index: null, label: '', url: '' });
+        this.draftError.set(null);
+    }
+
+    editLink(index: number) {
+        const link = this.customLinks()[index];
+        this.draft.set({ index, label: link?.label ?? '', url: link?.url ?? '' });
+        this.draftError.set(null);
+    }
+
+    setDraftLabel(label: string) {
+        this.draft.update(entry => entry ? { ...entry, label } : entry);
+    }
+
+    setDraftUrl(url: string) {
+        this.draft.update(entry => entry ? { ...entry, url } : entry);
+    }
+
+    cancelLink() {
+        this.draft.set(null);
+        this.draftError.set(null);
+    }
+
+    async saveLink() {
+        const entry = this.draft();
+        if (!entry || !this.canSaveDraft()) {
+            return;
+        }
+        const links = [...this.customLinks()];
+        const link: Link = { label: entry.label.trim(), url: entry.url.trim() };
+        if (entry.index === null) {
+            links.push(link);
+        } else {
+            links[entry.index] = link;
+        }
+        if (await this.persistLinks(links)) {
+            this.draft.set(null);
+        }
+    }
+
+    async removeLink(event: Event, index: number) {
+        // The row itself opens the editor, so the remove button must not bubble.
+        event.stopPropagation();
+        const links = [...this.customLinks()];
+        links.splice(index, 1);
+        await this.persistLinks(links);
+        if (links.length === 0) {
+            this.editingLinks.set(false);
+        }
+    }
+
+    async handleReorderEnd(event: ReorderEndCustomEvent) {
+        const links = event.detail.complete([...this.customLinks()]) as Link[];
+        await this.persistLinks(links);
+    }
+
+    /**
+     * There is no Save button on this screen, so every change writes through.
+     * The user signal is only replaced by a successful response, which is what
+     * lets a failed save leave the list exactly as it was.
+     */
+    private async persistLinks(links: Link[]): Promise<boolean> {
+        const user = structuredClone(this.accountService.currentUser$()) as User;
+        if (!user) {
+            return false;
+        }
+        user.config = user.config ?? {};
+        user.config.preparation = user.config.preparation ?? {};
+        user.config.preparation.links = links;
+
+        try {
+            await firstValueFrom(this.accountService.updateUser(user));
+            this.draftError.set(null);
+            return true;
+        } catch {
+            this.draftError.set('message.error');
+            const alert = await this.alertController.create({
+                header: this.translate.instant('message.infotitle'),
+                message: this.translate.instant('message.error'),
+                buttons: [this.translate.instant('buttons.done')]
+            });
+            await alert.present();
+            return false;
+        }
     }
 
     openDabs(when: 'today' | 'tomorrow') {

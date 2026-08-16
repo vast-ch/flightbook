@@ -79,7 +79,15 @@
 
     <!-- Before you fly -->
     <div class="more-section">
-      <div class="fb-section-label">{{ 'groupname.preparation' | translate }}</div>
+      <div class="more-section__head">
+        <span class="fb-section-label">{{ 'more.beforeYouFly' | translate }}</span>
+        @if (customLinks().length > 0) {
+          <button type="button" class="fb-section-action" (click)="toggleLinkEdit()">
+            {{ (editingLinks() ? 'buttons.editDone' : 'buttons.edit') | translate }}
+          </button>
+        }
+      </div>
+
       <div class="fb-card--flush">
         <!-- One row, two destinations: the design shows both days inline -->
         <div class="fb-row more-row">
@@ -97,12 +105,72 @@
         <button type="button" class="fb-row more-row" (click)="openShvApp()">
           <span class="more-row__title">{{ 'more.shvApp' | translate }}</span>
         </button>
-        @for (link of customLinks(); track $index) {
-          <button type="button" class="fb-row more-row" (click)="openLink(link.url)">
-            <span class="more-row__title">{{ link.label }}</span>
+
+        <!--
+          The pilot's own links. Built-in rows above are not editable; these are,
+          and edit mode swaps the external-link marker for remove and reorder.
+        -->
+        <ion-reorder-group [disabled]="!editingLinks()" (ionReorderEnd)="handleReorderEnd($any($event))">
+          @for (link of customLinks(); track $index) {
+            <div class="fb-row link-row" [class.is-editing]="editingLinks()"
+                 (click)="editingLinks() ? editLink($index) : openLink(link.url)">
+              @if (editingLinks()) {
+                <button type="button" class="link-row__remove" (click)="removeLink($event, $index)"
+                        [attr.aria-label]="'buttons.delete' | translate">
+                  <ion-icon name="remove" aria-hidden="true"></ion-icon>
+                </button>
+              }
+
+              <span class="link-row__text">
+                <span class="link-row__name">{{ link.label }}</span>
+                <span class="link-row__host">{{ hostOf(link.url) }}</span>
+              </span>
+
+              @if (editingLinks()) {
+                <ion-reorder class="link-row__handle"></ion-reorder>
+              } @else {
+                <ion-icon name="open-outline" class="link-row__external" aria-hidden="true"></ion-icon>
+              }
+            </div>
+          }
+        </ion-reorder-group>
+
+        <!-- Add and edit share this form; the design has no separate edit screen -->
+        @if (draft(); as entry) {
+          <div class="link-draft">
+            <label class="link-draft__label" for="link-draft-name">{{ 'more.linkName' | translate }}</label>
+            <ion-input id="link-draft-name" class="link-draft__input" type="text"
+                       [ngModel]="entry.label" (ngModelChange)="setDraftLabel($event)"
+                       autocapitalize="sentences"></ion-input>
+
+            <label class="link-draft__label" for="link-draft-url">{{ 'more.linkUrl' | translate }}</label>
+            <ion-input id="link-draft-url" class="link-draft__input" type="url" inputmode="url"
+                       placeholder="https://example.com"
+                       [ngModel]="entry.url" (ngModelChange)="setDraftUrl($event)"></ion-input>
+
+            @if (draftError()) {
+              <div class="fb-field__error">{{ draftError() | translate }}</div>
+            }
+
+            <div class="link-draft__actions">
+              <button type="button" class="link-draft__cancel" (click)="cancelLink()">
+                {{ 'buttons.cancel' | translate }}
+              </button>
+              <button type="button" class="link-draft__save" [disabled]="!canSaveDraft()"
+                      (click)="saveLink()">
+                {{ 'more.saveLink' | translate }}
+              </button>
+            </div>
+          </div>
+        } @else if (!editingLinks()) {
+          <button type="button" class="fb-row link-add" (click)="startLink()">
+            <ion-icon name="add" class="link-add__icon" aria-hidden="true"></ion-icon>
+            <span class="link-add__text">{{ 'more.addLink' | translate }}</span>
           </button>
         }
       </div>
+
+      <p class="more-links-hint">{{ 'more.linksHint' | translate }}</p>
     </div>
 
     <!-- Import & export -->

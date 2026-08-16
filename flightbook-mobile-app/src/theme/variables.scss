@@ -25,8 +25,9 @@ ion-modal.dateModal {
 //
 // phone-number stays because it is restyled from the outside (see the
 // ::ng-deep blocks in register.page.scss and account-data.page.scss) rather
-// than converted. The link modal, the passenger-confirmation form and the
-// control sheet have since been converted and are off this list.
+// than converted. The passenger-confirmation form and the control sheet have
+// since been converted and are off this list; the link modal is gone entirely,
+// replaced by the inline editor in More.
 
 // Label color
 .label-text-wrapper {

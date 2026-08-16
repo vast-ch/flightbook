@@ -131,35 +131,6 @@
           </div>
         </div>
 
-        <!--
-          The links More lists under "Flight preparation". Also on user.config,
-          so the same Save persists them - and drag order is the order More
-          renders them in.
-        -->
-        <div class="fb-section-label account-section-label">{{ 'groupname.preparation' | translate }}</div>
-        <div class="fb-card--flush">
-          <ion-reorder-group [disabled]="false" (ionReorderEnd)="handleReorderEnd($any($event))">
-            @for (link of user.config.preparation.links; track $index) {
-              <div class="fb-row link-row">
-                <ion-reorder class="link-row__handle"></ion-reorder>
-                <button type="button" class="link-row__open" (click)="manageLinkModal(link, 'edit')">
-                  <span class="link-row__label">{{ link.label }}</span>
-                  <span class="link-row__url">{{ link.url }}</span>
-                </button>
-                <button type="button" class="link-row__delete" (click)="deleteLinkItem($index)"
-                        [attr.aria-label]="'buttons.delete' | translate">
-                  <ion-icon name="trash" aria-hidden="true"></ion-icon>
-                </button>
-              </div>
-            }
-          </ion-reorder-group>
-
-          <button type="button" class="fb-row link-add" (click)="linkAddButton()">
-            <ion-icon name="add" class="link-add__icon" aria-hidden="true"></ion-icon>
-            <span class="link-add__text">{{ 'account.configuration.link' | translate }}</span>
-          </button>
-        </div>
-
         <div class="account-actions">
           <ion-button expand="block" type="submit" [disabled]="accountForm.invalid">
             {{ 'account.saveChanges' | translate }}
