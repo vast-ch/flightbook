@@ -75,10 +75,8 @@
       <div class="fb-card activity">
         <div class="activity__head">
           <span class="activity__title">{{ 'statistics.flightActivity' | translate }}</span>
-          <!-- All-time is a rolling 365-day window, not the whole logbook, so
-               the hint has to name the range the grid actually covers. -->
           <span class="activity__hint">
-            {{ period() === ALL_TIME ? ('statistics.last12Months' | translate) : period() }}
+            {{ period() === ALL_TIME ? ('statistics.sinceStart' | translate) : period() }}
           </span>
         </div>
 

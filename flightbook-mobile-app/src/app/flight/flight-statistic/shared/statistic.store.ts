@@ -154,17 +154,13 @@ export class StatisticStore {
         const sorted = [...counts.keys()].sort();
         const today = new Date();
 
-        let start: Date;
-        if (period === ALL_TIME) {
-            // 365 days inclusive of today, but never before the first flight -
-            // a three-month-old logbook should not open on a year of blanks.
-            const window = new Date(today);
-            window.setDate(window.getDate() - 364);
-            const first = localDate(sorted[0]);
-            start = first > window ? first : window;
-        } else {
-            start = new Date(Number(period), 0, 1);
-        }
+        // All-time runs from the first flight, which is what the design's
+        // "every day since you started" and its 62-week count describe. The
+        // grid compresses to fit rather than scrolling, so a long logbook draws
+        // narrower columns instead of running off the card.
+        const start: Date = period === ALL_TIME
+            ? localDate(sorted[0])
+            : new Date(Number(period), 0, 1);
 
         const end = period === ALL_TIME || Number(period) === today.getFullYear()
             ? today

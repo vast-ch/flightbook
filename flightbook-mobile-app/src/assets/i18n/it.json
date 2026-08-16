@@ -191,6 +191,7 @@
         "period": "Periodo",
         "flightActivity": "Attività di volo",
         "last12Months": "Ultimi 12 mesi",
+        "sinceStart": "Ogni giorno da quando hai iniziato",
         "flyingDays": "{{days}} giorni di volo in {{weeks}} settimane",
         "less": "Meno",
         "more": "Più",
