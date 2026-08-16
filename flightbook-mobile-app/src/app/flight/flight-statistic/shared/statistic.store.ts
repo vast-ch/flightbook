@@ -270,16 +270,39 @@ export class StatisticStore {
         return this.toBars(seasons.map(s => s.flights), index => this.seasonLabel(seasons, index));
     });
 
-    /** The same shape for money, so both charts render through fb-flights-bars. */
-    public incomeBars = computed<Bar[]>(() => {
-        const season = this.selectedSeason();
-        if (season) {
-            const initials = this.monthInitials();
-            return this.toBars(season.incomeMonths, index => initials[index]);
-        }
-
+    /**
+     * Income per season, one bar each. Deliberately period-independent: the
+     * point of the yearly view is the shape across seasons, and narrowing it to
+     * the selected one would leave a single bar. Empty when nothing was priced,
+     * so the chart can be left out rather than drawn as a row of hairlines.
+     */
+    public incomeByYear = computed<Bar[]>(() => {
         const seasons = this.seasons();
-        return this.toBars(seasons.map(s => s.income), index => this.seasonLabel(seasons, index));
+        const values = seasons.map(season => season.income);
+        return values.some(value => value > 0)
+            ? this.toBars(values, index => this.seasonLabel(seasons, index))
+            : [];
+    });
+
+    /**
+     * Income per calendar month, twelve bars. A selected season shows its own
+     * months; all time sums every season onto one calendar, which answers
+     * whether the flying is seasonal rather than how a single year went.
+     */
+    public incomeByMonth = computed<Bar[]>(() => {
+        const season = this.selectedSeason();
+        const months = season
+            ? season.incomeMonths
+            : this.seasons().reduce<number[]>(
+                (totals, entry) => totals.map((total, index) => total + entry.incomeMonths[index]),
+                Array(12).fill(0)
+            );
+
+        if (!months.some(value => value > 0)) {
+            return [];
+        }
+        const initials = this.monthInitials();
+        return this.toBars(months, index => initials[index]);
     });
 
     /** The busiest month of the season, or the strongest season all-time. */

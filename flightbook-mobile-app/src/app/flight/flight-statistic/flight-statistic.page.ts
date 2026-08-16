@@ -87,7 +87,8 @@ export class FlightStatisticPage implements OnDestroy {
 
     public hasIncome = this.store.hasIncome;
     public incomeSummary = this.store.incomeSummary;
-    public incomeBars = this.store.incomeBars;
+    public incomeByYear = this.store.incomeByYear;
+    public incomeByMonth = this.store.incomeByMonth;
 
     public seasons = this.store.seasons;
     public seasonGrid = this.store.seasonGrid;
@@ -99,14 +100,23 @@ export class FlightStatisticPage implements OnDestroy {
     /** Newest first, the way the design stacks the seasons list. */
     public seasonsNewestFirst = computed(() => [...this.seasons()].reverse());
 
-    public chartMeta = computed(() => {
+    /** The full span of seasons - the yearly income chart always covers all of them. */
+    public seasonSpan = computed(() => {
         const seasons = this.seasons();
-        if (this.period() !== ALL_TIME) {
-            return this.period();
-        }
         return seasons.length > 1
             ? `${seasons[0].year} – ${seasons[seasons.length - 1].year}`
             : (seasons[0]?.year ?? '');
+    });
+
+    public chartMeta = computed(() => this.period() !== ALL_TIME ? this.period() : this.seasonSpan());
+
+    /** "All time" or the selected year, for card metadata. */
+    public periodLabel = computed(() => {
+        // Read so the label re-renders on a language switch; instant() does not.
+        this.languageService.lang();
+        return this.period() === ALL_TIME
+            ? this.translate.instant('statistics.allTime')
+            : this.period();
     });
 
     /** The design's second sentence names a specific year; only the first generalises. */
