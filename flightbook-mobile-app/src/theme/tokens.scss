@@ -260,10 +260,11 @@
   flex: 0 0 76px;
   /*
    * The design's label column is a fixed 76px and carries no mandatory marker.
-   * Ours does, and "Firstname&nbsp;*" is wider than 76px - without min-width: 0
-   * a flex item's automatic minimum size grows it to fit, which would push the
-   * value out of line on mandatory rows only. Zero lets the marker overhang
-   * into the row's 12px gap instead, so every column still lines up.
+   * Ours does, and a label like "Nachname&nbsp;*" is wider than 76px.
+   *
+   * min-width: 0 stops a flex item's automatic minimum size from widening the
+   * column to fit, which would push the value out of line on mandatory rows
+   * only. The marker itself is .fb-row__req below, which takes no width at all.
    */
   min-width: 0;
   font-size: 11px;
@@ -272,6 +273,23 @@
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--fb-text-secondary);
+}
+
+/*
+ * The mandatory marker, rendered so it occupies no width: Ionic's body sets
+ * `word-wrap: break-word`, which is inherited here, so anything that does not
+ * fit the fixed 76px column wraps rather than overflows - and for a label like
+ * "Nachname *" the point it wraps at is right before the marker, dropping the
+ * asterisk onto a line of its own. A zero-width box cannot push the line over,
+ * so the glyph paints into the row's 12px gap and the label stays intact.
+ * Long labels (GLEITSCHIRM, BEZEICHNUNG) still wrap as they always have.
+ */
+.fb-row__req {
+  display: inline-block;
+  width: 0;
+  padding-left: 3px;
+  overflow: visible;
+  white-space: nowrap;
 }
 
 .fb-row__value {

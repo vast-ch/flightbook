@@ -66,7 +66,7 @@
                 </div>
 
                 <div class="fb-row">
-                    <span class="fb-row__label" id="lbl-pc-firstname">{{ 'account.firstname' | translate }}&nbsp;*</span>
+                    <span class="fb-row__label" id="lbl-pc-firstname">{{ 'account.firstname' | translate }}<span class="fb-row__req" aria-hidden="true">*</span></span>
                     <span class="fb-row__value">
                         <ion-input [(ngModel)]="passengerData.firstname" #firstname="ngModel" required
                                    name="firstname" type="text" aria-labelledby="lbl-pc-firstname"
@@ -78,7 +78,7 @@
                 }
 
                 <div class="fb-row">
-                    <span class="fb-row__label" id="lbl-pc-lastname">{{ 'account.lastname' | translate }}&nbsp;*</span>
+                    <span class="fb-row__label" id="lbl-pc-lastname">{{ 'account.lastname' | translate }}<span class="fb-row__req" aria-hidden="true">*</span></span>
                     <span class="fb-row__value">
                         <ion-input [(ngModel)]="passengerData.lastname" #lastname="ngModel" required
                                    name="lastname" type="text" aria-labelledby="lbl-pc-lastname"
@@ -90,7 +90,7 @@
                 }
 
                 <div class="fb-row">
-                    <span class="fb-row__label" id="lbl-pc-email">{{ 'login.email' | translate }}&nbsp;*</span>
+                    <span class="fb-row__label" id="lbl-pc-email">{{ 'login.email' | translate }}<span class="fb-row__req" aria-hidden="true">*</span></span>
                     <span class="fb-row__value">
                         <ion-input [(ngModel)]="passengerData.email" #email="ngModel" required
                                    name="email" type="email" inputmode="email"
@@ -108,7 +108,7 @@
                 }
 
                 <div class="fb-row">
-                    <span class="fb-row__label" id="lbl-pc-phone">{{ 'account.phone' | translate }}&nbsp;*</span>
+                    <span class="fb-row__label" id="lbl-pc-phone">{{ 'account.phone' | translate }}<span class="fb-row__req" aria-hidden="true">*</span></span>
                     <span class="fb-row__value">
                         <ion-input [(ngModel)]="passengerData.phone" #phone="ngModel" required
                                    name="phone" type="tel" inputmode="tel"
@@ -120,7 +120,7 @@
                 }
 
                 <div class="fb-row">
-                    <span class="fb-row__label" id="lbl-pc-place">{{ 'place.place' | translate }}&nbsp;*</span>
+                    <span class="fb-row__label" id="lbl-pc-place">{{ 'place.place' | translate }}<span class="fb-row__req" aria-hidden="true">*</span></span>
                     <span class="fb-row__value">
                         <ion-input [(ngModel)]="passengerData.place" #place="ngModel" required
                                    name="place" type="text" aria-labelledby="lbl-pc-place"

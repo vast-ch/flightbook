@@ -11,7 +11,7 @@
         <div class="form-body">
             <div class="fb-card--flush">
                 <div class="fb-row">
-                    <span class="fb-row__label" id="lbl-link-label">{{ 'account.configuration.label' | translate }}&nbsp;*</span>
+                    <span class="fb-row__label" id="lbl-link-label">{{ 'account.configuration.label' | translate }}<span class="fb-row__req" aria-hidden="true">*</span></span>
                     <span class="fb-row__value">
                         <ion-input [(ngModel)]="link.label" #inputLabel="ngModel" required
                                    name="inputLabel" type="text" autocapitalize="sentences"
@@ -23,7 +23,7 @@
                 }
 
                 <div class="fb-row">
-                    <span class="fb-row__label" id="lbl-link-url">{{ 'account.configuration.url' | translate }}&nbsp;*</span>
+                    <span class="fb-row__label" id="lbl-link-url">{{ 'account.configuration.url' | translate }}<span class="fb-row__req" aria-hidden="true">*</span></span>
                     <span class="fb-row__value">
                         <ion-input [(ngModel)]="link.url" #inputUrl="ngModel" required
                                    name="inputUrl" type="url" inputmode="url"

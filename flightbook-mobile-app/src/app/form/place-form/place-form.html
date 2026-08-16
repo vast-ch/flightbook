@@ -7,7 +7,7 @@
 
   <div class="fb-card--flush form-card">
     <div class="fb-row">
-      <span class="fb-row__label" id="lbl-place-name">{{ 'place.name' | translate }}&nbsp;*</span>
+      <span class="fb-row__label" id="lbl-place-name">{{ 'place.name' | translate }}<span class="fb-row__req" aria-hidden="true">*</span></span>
       <span class="fb-row__value">
         <ion-input required clearInput [(ngModel)]="place.name" type="text" name="name"
                    aria-labelledby="lbl-place-name"></ion-input>
