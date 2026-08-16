@@ -242,14 +242,14 @@ export class StatisticStore {
      * One load per session. Everything else is derived, so switching period
      * costs no requests.
      *
-     * applyFilter is false throughout: the flight-list filter is global state,
-     * and this page has no filter control to explain a skewed number.
+     * The shared flight filter applies here: this page has its own control for
+     * it now, and a chip bar that says what is narrowing the numbers.
      */
     load(): Observable<StatisticState> {
-        const global$ = this.flightStore.getStatistics('global', false).pipe(catchError(() => of([] as FlightStatistic[])));
-        const yearly$ = this.flightStore.getStatistics('yearly', false).pipe(catchError(() => of([] as FlightStatistic[])));
-        const monthly$ = this.flightStore.getStatistics('monthly', false).pipe(catchError(() => of([] as FlightStatistic[])));
-        const flights$ = this.flightStore.getFlights({ store: false, applyFilter: false }).pipe(catchError(() => of([] as Flight[])));
+        const global$ = this.flightStore.getStatistics('global').pipe(catchError(() => of([] as FlightStatistic[])));
+        const yearly$ = this.flightStore.getStatistics('yearly').pipe(catchError(() => of([] as FlightStatistic[])));
+        const monthly$ = this.flightStore.getStatistics('monthly').pipe(catchError(() => of([] as FlightStatistic[])));
+        const flights$ = this.flightStore.getFlights({ store: false }).pipe(catchError(() => of([] as Flight[])));
 
         return forkJoin([global$, yearly$, monthly$, flights$]).pipe(
             map(([global, yearly, monthly, flights]): StatisticState => ({
@@ -261,6 +261,15 @@ export class StatisticStore {
             })),
             tap(state => this.state.set(state))
         );
+    }
+
+    /**
+     * Same request set, but past the once-per-session guard the page applies -
+     * a filter change has to refetch even though the page never left.
+     */
+    reload(): Observable<StatisticState> {
+        this.state.update(state => ({ ...state, loaded: false }));
+        return this.load();
     }
 
     clear(): void {

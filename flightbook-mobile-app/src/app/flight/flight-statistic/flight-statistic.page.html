@@ -14,10 +14,18 @@
   <h1 class="stat-header__title">{{ 'groupname.statistics' | translate }}</h1>
   </div>
 
-  <fb-avatar-button></fb-avatar-button>
+  <div class="stat-header__actions">
+    <button type="button" class="icon-button" [class.is-active]="filtered()"
+            (click)="openFilter()" [attr.aria-label]="'buttons.filter' | translate">
+      <ion-icon name="filter-outline" aria-hidden="true"></ion-icon>
+    </button>
+    <fb-avatar-button></fb-avatar-button>
+  </div>
 </div>
 
 <ion-content class="no-padding">
+  <fb-filter-chips (changed)="reloadForFilter()"></fb-filter-chips>
+
   <div class="stat-body">
 
     @if (hasFlights()) {
@@ -129,6 +137,16 @@
           <span class="bests__value">{{ bests().startPlaces }} / {{ bests().landingPlaces }}</span>
           <span class="bests__meta">{{ 'statistics.startLanding' | translate }}</span>
         </div>
+      </div>
+
+    } @else if (loaded() && filtered()) {
+      <!-- Two date controls can disagree; say so rather than draw empty charts -->
+      <div class="fb-card filter-empty">
+        <div class="filter-empty__title">{{ 'filter.noMatch' | translate }}</div>
+        <div class="filter-empty__hint">{{ 'filter.noMatchHint' | translate }}</div>
+        <ion-button class="filter-empty__action" (click)="clearFilter()">
+          {{ 'filter.clearFilters' | translate }}
+        </ion-button>
       </div>
 
     } @else if (loaded()) {

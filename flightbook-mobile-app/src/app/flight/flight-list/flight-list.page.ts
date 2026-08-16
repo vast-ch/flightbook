@@ -1,8 +1,9 @@
 import { Component, OnInit, OnDestroy, ViewChild, Signal, computed, signal } from '@angular/core';
-import { NavController, ModalController, LoadingController, AlertController, IonContent, IonItem, IonList, IonInfiniteScroll, IonInfiniteScrollContent, IonIcon, IonItemSliding, IonItemOptions, IonItemOption } from '@ionic/angular/standalone';
+import { NavController, ModalController, LoadingController, AlertController, IonButton, IonContent, IonItem, IonList, IonInfiniteScroll, IonInfiniteScrollContent, IonIcon, IonItemSliding, IonItemOptions, IonItemOption } from '@ionic/angular/standalone';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { FlightFilterComponent } from 'src/app/form/flight-filter/flight-filter.component';
+import { FilterChipsComponent } from 'src/app/form/flight-filter/filter-chips.component';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { FlightExportService } from 'src/app/shared/services/flight-export.service';
 import { Flight } from '../shared/flight.model';
@@ -41,7 +42,9 @@ import { AvatarButtonComponent } from 'src/app/shared/components/avatar-button/a
         IonItemOption,
         IonItemSliding,
         IonInfiniteScroll,
-        IonInfiniteScrollContent
+        IonInfiniteScrollContent,
+        IonButton,
+        FilterChipsComponent
     ]
 })
 export class FlightListPage implements OnInit, OnDestroy {
@@ -212,14 +215,27 @@ export class FlightListPage implements OnInit, OnDestroy {
     async openFilter() {
         const modal = await this.modalCtrl.create({
             component: FlightFilterComponent,
-            cssClass: 'flight-filter-class',
-            componentProps: {
-                infiniteScroll: this.infiniteScroll,
-                type: 'FlightListPage'
-            }
+            cssClass: 'flight-filter-class'
         });
 
-        return await modal.present();
+        await modal.present();
+        // The sheet only edits the filter now; reloading is the host's job.
+        await modal.onWillDismiss();
+        this.reloadForFilter();
+    }
+
+    /** Also the handler for a chip cleared from the summary row. */
+    reloadForFilter() {
+        if (this.infiniteScroll) {
+            this.infiniteScroll.disabled = false;
+        }
+        this.flightStore.getFlights({ limit: this.flightStore.defaultLimit, clearStore: true })
+            .pipe(takeUntil(this.unsubscribe$)).subscribe();
+    }
+
+    clearFilter() {
+        this.flightStore.resetFilter();
+        this.reloadForFilter();
     }
 
     openImport() {

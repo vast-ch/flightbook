@@ -1,13 +1,19 @@
 import { Component, OnDestroy, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { DatePipe, DecimalPipe } from '@angular/common';
-import { IonContent, IonSkeletonText } from '@ionic/angular/standalone';
+import { IonButton, IonContent, IonIcon, IonSkeletonText } from '@ionic/angular/standalone';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { ALL_TIME, StatisticPeriod, StatisticStore } from './shared/statistic.store';
 import { ActivityHeatmapComponent } from './components/activity-heatmap/activity-heatmap.component';
 import { CumulativeChartComponent } from './components/cumulative-chart/cumulative-chart.component';
+import { FlightFilterComponent } from 'src/app/form/flight-filter/flight-filter.component';
+import { FilterChipsComponent } from 'src/app/form/flight-filter/filter-chips.component';
+import { FlightStore } from 'src/app/flight/shared/flight.store';
+import { ModalController } from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import { filterOutline } from 'ionicons/icons';
 import { AvatarButtonComponent } from 'src/app/shared/components/avatar-button/avatar-button.component';
 
 @Component({
@@ -21,8 +27,11 @@ import { AvatarButtonComponent } from 'src/app/shared/components/avatar-button/a
         TranslateModule,
         ActivityHeatmapComponent,
         CumulativeChartComponent,
+        IonButton,
         IonContent,
-        IonSkeletonText
+        IonIcon,
+        IonSkeletonText,
+        FilterChipsComponent
     ]
 })
 export class FlightStatisticPage implements OnDestroy {
@@ -31,6 +40,10 @@ export class FlightStatisticPage implements OnDestroy {
     private store = inject(StatisticStore);
     private translate = inject(TranslateService);
     private router = inject(Router);
+    private modalCtrl = inject(ModalController);
+    private flightStore = inject(FlightStore);
+
+    public filtered = this.flightStore.filtered;
 
     public readonly ALL_TIME = ALL_TIME;
 
@@ -66,6 +79,7 @@ export class FlightStatisticPage implements OnDestroy {
     }
 
     constructor() {
+        addIcons({ filterOutline });
     }
 
     ionViewWillEnter() {
@@ -74,6 +88,26 @@ export class FlightStatisticPage implements OnDestroy {
         if (!this.loaded()) {
             this.store.load().pipe(takeUntil(this.unsubscribe$)).subscribe();
         }
+    }
+
+    async openFilter() {
+        const modal = await this.modalCtrl.create({
+            component: FlightFilterComponent,
+            cssClass: 'flight-filter-class'
+        });
+        await modal.present();
+        await modal.onWillDismiss();
+        this.reloadForFilter();
+    }
+
+    /** The store caches per session, so a filter change has to force a refetch. */
+    reloadForFilter() {
+        this.store.reload().pipe(takeUntil(this.unsubscribe$)).subscribe();
+    }
+
+    clearFilter() {
+        this.flightStore.resetFilter();
+        this.reloadForFilter();
     }
 
     ngOnDestroy() {

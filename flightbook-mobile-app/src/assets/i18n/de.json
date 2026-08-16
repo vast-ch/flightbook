@@ -306,7 +306,21 @@
     },
     "filter": {
         "from": "Von",
-        "to": "Bis"
+        "to": "Bis",
+        "title": "Flüge filtern",
+        "period": "Zeitraum",
+        "allTime": "Gesamt",
+        "last12Months": "Letzte 12 Monate",
+        "flightType": "Flugart",
+        "schoolValidation": "Validierung",
+        "descriptionContains": "Beschreibung enthält",
+        "descriptionPlaceholder": "Ein Wort aus den Notizen",
+        "clearAll": "Alle entfernen",
+        "showFlights": "{{count}} Flüge anzeigen",
+        "showFlight": "1 Flug anzeigen",
+        "noMatch": "Keine Flüge gefunden",
+        "noMatchHint": "Versuche einen grösseren Zeitraum oder einen anderen Schirm.",
+        "clearFilters": "Filter zurücksetzen"
     },
     "export": {
         "pilote": "Pilot",

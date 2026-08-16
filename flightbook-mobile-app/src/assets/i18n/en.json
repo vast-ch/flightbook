@@ -306,7 +306,21 @@
     },
     "filter": {
         "from": "From",
-        "to": "To"
+        "to": "To",
+        "title": "Filter flights",
+        "period": "Period",
+        "allTime": "All time",
+        "last12Months": "Last 12 months",
+        "flightType": "Flight type",
+        "schoolValidation": "School validation",
+        "descriptionContains": "Description contains",
+        "descriptionPlaceholder": "Any word from the flight notes",
+        "clearAll": "Clear all",
+        "showFlights": "Show {{count}} flights",
+        "showFlight": "Show 1 flight",
+        "noMatch": "No flights match",
+        "noMatchHint": "Try a wider period or another glider.",
+        "clearFilters": "Clear filters"
     },
     "export": {
         "pilote": "Pilot",

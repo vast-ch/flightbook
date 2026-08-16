@@ -67,6 +67,10 @@ export class SessionService {
         this.placeStore.clearPlaces();
         this.schoolService.clearSchools();
         this.tandemSchoolService.clearSchools();
+        // The filter is shared by the flight list and the statistics page, so
+        // leaving it set would narrow the next account's logbook by a glider it
+        // does not own.
+        this.flightStore.resetFilter();
         // Both gate their reloads on a `loaded` flag, so leaving them would show
         // the previous account's totals to the next one.
         this.homeStore.clear();

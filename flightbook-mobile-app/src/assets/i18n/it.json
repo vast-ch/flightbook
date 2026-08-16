@@ -306,7 +306,21 @@
     },
     "filter": {
         "from": "Da",
-        "to": "a"
+        "to": "a",
+        "title": "Filtra i voli",
+        "period": "Periodo",
+        "allTime": "Sempre",
+        "last12Months": "Ultimi 12 mesi",
+        "flightType": "Tipo di volo",
+        "schoolValidation": "Validazione",
+        "descriptionContains": "La descrizione contiene",
+        "descriptionPlaceholder": "Una parola dalle note di volo",
+        "clearAll": "Cancella tutto",
+        "showFlights": "Mostra {{count}} voli",
+        "showFlight": "Mostra 1 volo",
+        "noMatch": "Nessun volo corrispondente",
+        "noMatchHint": "Prova un periodo più ampio o un'altra vela.",
+        "clearFilters": "Cancella i filtri"
     },
     "export": {
         "pilote": "Pilota",

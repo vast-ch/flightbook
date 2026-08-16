@@ -591,6 +591,88 @@ button.fb-row {
   }
 }
 
+/*
+ * Selectable pill. The filter sheet uses them as radio-like options and the
+ * screens above it as removable summaries of what is active, so both variants
+ * live here rather than in one page.
+ */
+.fb-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 13px;
+  appearance: none;
+  border: 1px solid var(--fb-border);
+  border-radius: 99px;
+  background: var(--fb-surface);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1;
+  color: var(--fb-text-body);
+  cursor: pointer;
+
+  &--active {
+    border-color: var(--fb-accent);
+    background: var(--fb-accent-soft);
+    color: #0a5e9b;
+  }
+
+  /* Summary of an applied criterion; tapping it clears that one */
+  &--removable {
+    padding: 6px 10px;
+    border-color: var(--fb-accent);
+    background: var(--fb-accent-soft);
+    font-size: 11.5px;
+    color: #0a5e9b;
+
+    ion-icon {
+      font-size: 10px;
+    }
+  }
+}
+
+/* Card shown when a filter matches nothing. Both list screens use it. */
+.filter-empty {
+  margin: 16px var(--fb-gutter);
+  padding: 26px 20px;
+  text-align: center;
+}
+
+.filter-empty__title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--fb-text);
+}
+
+.filter-empty__hint {
+  margin-top: 7px;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--fb-text-secondary);
+  text-wrap: pretty;
+}
+
+.filter-empty__action {
+  display: block;
+  max-width: 180px;
+  margin: 16px auto 0;
+  --border-radius: 10px;
+  --box-shadow: none;
+  height: 44px;
+  font-size: 13.5px;
+  font-weight: 600;
+  text-transform: none;
+}
+
+/* Row of chips that wraps rather than scrolling */
+.fb-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
 /* Initials circle for a person in a list, as opposed to the header's own avatar */
 .fb-avatar-initials {
   display: flex;
@@ -642,6 +724,27 @@ button.fb-row {
   --height: auto;
   --border-radius: 18px 18px 0 0;
   --background: var(--fb-bg);
+  --box-shadow: 0 -8px 28px rgba(16, 41, 60, 0.18);
+  --backdrop-opacity: 1;
+
+  align-items: flex-end;
+
+  &::part(backdrop) {
+    background: rgba(16, 41, 60, 0.4);
+  }
+}
+
+/*
+ * Filter sheet, shared by Flights and Statistics. A fixed height rather than
+ * sheet breakpoints, for the reason .skill-sheet-modal below carries: a
+ * breakpoint sheet is full-height and translated down, so anything past the
+ * breakpoint cannot be scrolled to.
+ */
+.flight-filter-class {
+  --width: 100%;
+  --height: 88%;
+  --background: var(--fb-bg);
+  --border-radius: 18px 18px 0 0;
   --box-shadow: 0 -8px 28px rgba(16, 41, 60, 0.18);
   --backdrop-opacity: 1;
 
@@ -754,6 +857,16 @@ button.fb-row {
   ion-icon {
     font-size: 17px;
     color: var(--fb-text-body);
+  }
+
+  /* Filled while the action it opens is doing something - e.g. an active filter */
+  &.is-active {
+    border-color: var(--ion-color-primary);
+    background: var(--ion-color-primary);
+
+    ion-icon {
+      color: #fff;
+    }
   }
 }
 

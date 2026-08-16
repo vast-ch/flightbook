@@ -8,6 +8,13 @@
     border-bottom: 1px solid var(--fb-border);
 }
 
+.stat-header__actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: none;
+}
+
 .stat-header__text {
     flex: 1;
     min-width: 0;

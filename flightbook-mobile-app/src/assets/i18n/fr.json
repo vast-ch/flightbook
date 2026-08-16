@@ -306,7 +306,21 @@
     },
     "filter": {
         "from": "Du",
-        "to": "Au"
+        "to": "Au",
+        "title": "Filtrer les vols",
+        "period": "Période",
+        "allTime": "Tout",
+        "last12Months": "12 derniers mois",
+        "flightType": "Type de vol",
+        "schoolValidation": "Validation",
+        "descriptionContains": "La description contient",
+        "descriptionPlaceholder": "Un mot des notes de vol",
+        "clearAll": "Tout effacer",
+        "showFlights": "Afficher {{count}} vols",
+        "showFlight": "Afficher 1 vol",
+        "noMatch": "Aucun vol correspondant",
+        "noMatchHint": "Essaie une période plus large ou une autre aile.",
+        "clearFilters": "Effacer les filtres"
     },
     "export": {
         "pilote": "Pilote",

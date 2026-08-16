@@ -1,16 +1,24 @@
-import { Component, OnInit, Input, OnDestroy } from '@angular/core';
-import { IonInfiniteScroll, ModalController, LoadingController, IonHeader, IonToolbar, IonTitle, IonContent, IonItem, IonSelect, IonSelectOption, IonInput, IonButton, IonModal, IonDatetime } from '@ionic/angular/standalone';
-import { Subject, firstValueFrom } from 'rxjs';
+import { Component, OnDestroy, OnInit, computed, signal } from '@angular/core';
+import { ModalController, IonContent, IonIcon, IonInput, IonButton, IonModal, IonDatetime } from '@ionic/angular/standalone';
+import { Subject, Subscription } from 'rxjs';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
-import { takeUntil } from 'rxjs/operators';
+import { debounceTime, takeUntil } from 'rxjs/operators';
+import { toObservable } from '@angular/core/rxjs-interop';
 import { FlightFilter } from 'src/app/flight/shared/flight-filter.model';
 import { Glider } from 'src/app/glider/shared/glider.model';
 import { FlightStore } from 'src/app/flight/shared/flight.store';
 import { GliderStore } from 'src/app/glider/shared/glider.store';
-import { Flight } from 'src/app/flight/shared/flight.model';
 import { FlightStatistic } from 'src/app/flight/shared/flightStatistic.model';
 import { FormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
+import { addIcons } from 'ionicons';
+import { search } from 'ionicons/icons';
+import moment from 'moment';
+
+/** How many past years the period shorthand offers. */
+const YEAR_CHOICES = 2;
+
+type PeriodKey = 'all' | 'last12' | string;
 
 @Component({
     selector: 'app-flight-filter',
@@ -20,13 +28,8 @@ import { DatePipe } from '@angular/common';
         FormsModule,
         DatePipe,
         TranslateModule,
-        IonHeader,
-        IonToolbar,
-        IonTitle,
         IonContent,
-        IonItem,
-        IonSelect,
-        IonSelectOption,
+        IonIcon,
         IonInput,
         IonButton,
         IonModal,
@@ -34,113 +37,169 @@ import { DatePipe } from '@angular/common';
     ]
 })
 export class FlightFilterComponent implements OnInit, OnDestroy {
-    @Input() infiniteScroll: IonInfiniteScroll;
-    @Input() type: string;
-    @Input() graphType: string;
-    public gliders: Glider[];
+    public gliders: Glider[] = [];
     private unsubscribe$ = new Subject<void>();
-    public filter: FlightFilter;
-    public language;
+    public language: string;
+
+    /**
+     * The sheet edits the store's filter directly - it has no Cancel, and the
+     * count on the footer button has to reflect what is actually set, since the
+     * statistics endpoint reads the filter from the store.
+     */
+    public filter = this.flightStore.filter;
+
+    /** null while a count is in flight, so the button can say something neutral. */
+    public matchCount = signal<number | null>(null);
+
+    public isFiltered = this.flightStore.filtered;
+
+    /** Offered as period shorthands: all time, this year, last year, 12 months. */
+    public readonly years: string[] = Array.from(
+        { length: YEAR_CHOICES },
+        (_unused, index) => String(new Date().getFullYear() - index)
+    );
+
+    public activePeriod = computed<PeriodKey>(() => {
+        const { from, to } = this.filter();
+        if (!from && !to) {
+            return 'all';
+        }
+        for (const year of this.years) {
+            if (this.isYear(from, to, year)) {
+                return year;
+            }
+        }
+        return this.isLast12Months(from, to) ? 'last12' : '';
+    });
+
+    /**
+     * Created here, not in ngOnInit: toObservable() needs an injection context,
+     * and a field initializer is one.
+     */
+    private filter$ = toObservable(this.filter);
+
+    private countSub?: Subscription;
 
     constructor(
         private modalCtrl: ModalController,
         private flightStore: FlightStore,
         private gliderStore: GliderStore,
-        private loadingCtrl: LoadingController,
         private translate: TranslateService
     ) {
-        this.filter = this.flightStore.filter();
         this.language = translate.currentLang;
+        addIcons({ search });
 
         if (this.gliderStore.isGliderlistComplete) {
             this.gliders = this.gliderStore.gliders();
         } else {
-            this.gliderStore.getGliders({ clearStore: true }).pipe(takeUntil(this.unsubscribe$)).subscribe((resp: Glider[]) => {
+            this.gliderStore.getGliders({ clearStore: true }).pipe(takeUntil(this.unsubscribe$)).subscribe(() => {
                 this.gliderStore.isGliderlistComplete = true;
                 this.gliders = this.gliderStore.gliders();
             });
         }
     }
 
-    ngOnInit() { }
+    ngOnInit() {
+        // One request per settled change, not per tap.
+        this.countSub = this.filter$
+            .pipe(debounceTime(400), takeUntil(this.unsubscribe$))
+            .subscribe(() => this.refreshCount());
+    }
 
     ngOnDestroy() {
+        this.countSub?.unsubscribe();
         this.unsubscribe$.next();
         this.unsubscribe$.complete();
     }
 
-    async filterElement() {
-        this.flightStore.updateFilter(this.filter);
-        this.closeFilter();
+    // ---- Period ---------------------------------------------------------
+
+    setPeriod(period: PeriodKey) {
+        if (period === 'all') {
+            this.flightStore.updateFilter({ from: null, to: null });
+            return;
+        }
+        if (period === 'last12') {
+            const from = moment().subtract(12, 'months').toDate();
+            this.flightStore.updateFilter({ from, to: moment().toDate() });
+            return;
+        }
+        const year = Number(period);
+        this.flightStore.updateFilter({
+            from: new Date(year, 0, 1),
+            to: new Date(year, 11, 31)
+        });
+    }
+
+    private isYear(from: Date | null, to: Date | null, year: string): boolean {
+        if (!from || !to) {
+            return false;
+        }
+        return moment(from).isSame(moment(`${year}-01-01`), 'day')
+            && moment(to).isSame(moment(`${year}-12-31`), 'day');
+    }
+
+    private isLast12Months(from: Date | null, to: Date | null): boolean {
+        if (!from || !to) {
+            return false;
+        }
+        return moment(from).isSame(moment().subtract(12, 'months'), 'day')
+            && moment(to).isSame(moment(), 'day');
+    }
+
+    changeDate(type: 'from' | 'to', event: CustomEvent) {
+        const value = event.detail.value ? new Date(event.detail.value) : new Date();
+        this.flightStore.updateFilter(type === 'from' ? { from: value } : { to: value });
+    }
+
+    clearDateButton(type: 'from' | 'to') {
+        this.flightStore.updateFilter(type === 'from' ? { from: null } : { to: null });
+    }
+
+    // ---- The other criteria ---------------------------------------------
+
+    setGlider(glider: Glider | null) {
+        this.flightStore.updateFilter({ glider: glider ?? new Glider() });
+    }
+
+    isGliderSelected(glider: Glider): boolean {
+        return this.filter().glider?.id === glider.id;
+    }
+
+    setGliderType(gliderType: string) {
+        this.flightStore.updateFilter({ gliderType });
+    }
+
+    setValidationState(validationState: string) {
+        this.flightStore.updateFilter({ validationState });
+    }
+
+    setDescription(description: string) {
+        this.flightStore.updateFilter({ description: description ?? '' });
     }
 
     clearFilter() {
-        this.filter = new FlightFilter();
-        this.flightStore.updateFilter(this.filter);
-        this.closeFilter();
+        this.flightStore.resetFilter();
     }
 
-    clearGLiderButton() {
-        this.filter.glider = new Glider();
-    }
+    // ---- Footer ---------------------------------------------------------
 
-    clearDateButton(type: string) {
-        if (type === 'from') {
-            this.filter.from = null;
-        } else {
-            this.filter.to = null;
-        }
-    }
-
-    changeDate(type: string, event: CustomEvent) {
-        if (type === 'from') {
-            this.filter.from = event.detail.value ? event.detail.value : new Date();
-        } else {
-            this.filter.to = event.detail.value ? event.detail.value : new Date();
-        }
-    }
-
-    private async closeFilter() {
-        const loading = await this.loadingCtrl.create({
-            message: this.translate.instant('loading.loading')
+    /**
+     * Counts what the current filter would show. `global` statistics answer that
+     * in one request, and applyFilter defaults to true - which is the whole
+     * reason this sheet writes to the store rather than to a draft.
+     */
+    private refreshCount() {
+        this.matchCount.set(null);
+        this.flightStore.getStatistics('global').pipe(takeUntil(this.unsubscribe$)).subscribe({
+            next: (statistics: FlightStatistic[]) => {
+                this.matchCount.set(Number(statistics?.[0]?.nbFlights ?? 0));
+            },
+            error: () => this.matchCount.set(null)
         });
-        await loading.present();
-
-        if (this.type === 'FlightListPage') {
-            this.closeFlightFilter(loading);
-        } else {
-            this.closeStatisticFilter(loading);
-        }
     }
 
-    private async closeFlightFilter(loading: HTMLIonLoadingElement) {
-        this.infiniteScroll.disabled = false;
-        this.flightStore.getFlights({ limit: this.flightStore.defaultLimit, clearStore: true })
-            .pipe(takeUntil(this.unsubscribe$)).subscribe(async (res: Flight[]) => {
-                await loading.dismiss();
-                this.modalCtrl.dismiss({
-                    dismissed: true
-                });
-            }, async (error: any) => {
-                await loading.dismiss();
-            });
-    }
-
-    private async closeStatisticFilter(loading: HTMLIonLoadingElement) {
-        this.flightStore.clearFlights();
-        try {
-            const promiseList = [];
-            promiseList.push(firstValueFrom(this.flightStore.getStatistics('global')));
-            promiseList.push(firstValueFrom(this.flightStore.getStatistics(this.graphType)));
-            const data = await Promise.all(promiseList);
-            await loading.dismiss();
-            this.modalCtrl.dismiss({
-                dismissed: true,
-                statistics: (data[0] as FlightStatistic[])[0],
-                graphData: data[1] as FlightStatistic[]
-            });
-        } catch (exception: any) {
-            await loading.dismiss();
-        }
+    close() {
+        return this.modalCtrl.dismiss({ filter: this.filter() }, 'filter');
     }
 }
