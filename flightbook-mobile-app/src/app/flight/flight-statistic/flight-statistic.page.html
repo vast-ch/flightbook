@@ -175,7 +175,7 @@
         @if (bests().longestDistance; as best) {
           <div class="bests__row">
             <span class="bests__name">{{ 'statistics.longestDistance' | translate }}</span>
-            <span class="bests__value">{{ best.km | number:'1.2-2' }} km</span>
+            <span class="bests__value">{{ best.km | number:'1.2-2':currentLang }} km</span>
             <span class="bests__meta">{{ best.date | date:'dd.MM.yyyy' }}</span>
           </div>
         }
@@ -192,6 +192,42 @@
           <span class="bests__meta">{{ 'statistics.startLanding' | translate }}</span>
         </div>
       </div>
+
+      <!--
+        Income, only for pilots who price their flights - `price` is optional on
+        the flight form and most logbooks leave it empty. Gated on the whole
+        logbook, so it does not flicker in and out as seasons are switched.
+      -->
+      @if (hasIncome()) {
+        <div class="fb-section-label stat-section-label">{{ 'statistics.income' | translate }}</div>
+        <div class="fb-card--flush bests">
+          <div class="bests__row">
+            <span class="bests__name">{{ 'statistics.incomeTotal' | translate }}</span>
+            <span class="bests__value">{{ incomeSummary().total | number:'1.0-2':currentLang }}</span>
+            <span class="bests__meta">
+              {{ period() === ALL_TIME ? ('statistics.allTime' | translate) : period() }}
+            </span>
+          </div>
+          <div class="bests__row">
+            <span class="bests__name">{{ 'statistics.incomePerFlight' | translate }}</span>
+            <span class="bests__value">{{ incomeSummary().perFlight | number:'1.0-2':currentLang }}</span>
+            <span class="bests__meta">
+              {{ 'statistics.paidFlights' | translate:{ count: incomeSummary().paidFlights } }}
+            </span>
+          </div>
+        </div>
+
+        <div class="fb-card activity">
+          <div class="activity__head">
+            <span class="activity__title">
+              {{ (period() === ALL_TIME ? 'statistics.incomePerYear' : 'statistics.incomePerMonth') | translate }}
+            </span>
+            <span class="activity__hint">{{ chartMeta() }}</span>
+          </div>
+
+          <fb-flights-bars [data]="incomeBars()"></fb-flights-bars>
+        </div>
+      }
 
       @if (period() === ALL_TIME && seasons().length > 0) {
         <div class="stat-section-head">

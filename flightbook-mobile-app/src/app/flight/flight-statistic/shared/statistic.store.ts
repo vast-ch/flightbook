@@ -19,6 +19,8 @@ export interface HeadlineStats {
     average: number;
     /** Kilometres. */
     distance: number;
+    /** Sum of the per-flight price. Unitless - the app models no currency. */
+    income: number;
 }
 
 export interface HeatmapDay {
@@ -43,6 +45,9 @@ export interface Season {
     months: number[];
     /** The season's busiest month, so the sparkline does not re-derive it per bar. */
     monthMax: number;
+    /** Income for the season, and per calendar month. */
+    income: number;
+    incomeMonths: number[];
 }
 
 export interface Bar {
@@ -68,6 +73,15 @@ export interface SeasonComparison {
     /** 1 = best season by flights. */
     rank: number;
     previousYear: string | null;
+}
+
+export interface IncomeSummary {
+    /** The period's total, from the authoritative aggregate row. */
+    total: number;
+    /** Flights in the period that carry a price. */
+    paidFlights: number;
+    /** total / paidFlights, or 0 when nothing in the period is priced. */
+    perFlight: number;
 }
 
 export interface PersonalBests {
@@ -177,6 +191,7 @@ export class StatisticStore {
             .sort((a, b) => Number(a.year) - Number(b.year))
             .map(row => {
                 const months = Array(12).fill(0);
+                const incomeMonths = Array(12).fill(0);
                 for (const entry of monthly) {
                     if (entry.year !== row.year) {
                         continue;
@@ -184,6 +199,7 @@ export class StatisticStore {
                     const index = Number(entry.month) - 1;
                     if (index >= 0 && index < 12) {
                         months[index] = Number(entry.nbFlights ?? 0);
+                        incomeMonths[index] = Number(entry.income ?? 0);
                     }
                 }
                 return {
@@ -191,7 +207,9 @@ export class StatisticStore {
                     flights: Number(row.nbFlights ?? 0),
                     airtime: Number(row.time ?? 0),
                     months,
-                    monthMax: Math.max(...months, 1)
+                    monthMax: Math.max(...months, 1),
+                    income: Number(row.income ?? 0),
+                    incomeMonths
                 };
             });
     });
@@ -218,30 +236,50 @@ export class StatisticStore {
         };
     });
 
+    /**
+     * Ratio against the tallest bar, with the peak marked. Shared by the flight
+     * and income charts, which differ only in the numbers they are given.
+     */
+    private toBars(values: number[], label: (index: number) => string): Bar[] {
+        const max = Math.max(...values, 1);
+        return values.map((value, index) => ({
+            ratio: value / max,
+            empty: value === 0,
+            peak: value > 0 && value === max,
+            label: label(index)
+        }));
+    }
+
+    /** Only the ends and every fifth year, or the axis turns to mush. */
+    private seasonLabel(seasons: Season[], index: number): string {
+        const year = seasons[index].year;
+        return (index === 0 || index === seasons.length - 1 || Number(year) % 5 === 0)
+            ? `’${year.slice(2)}`
+            : '';
+    }
+
     /** One bar per season all-time, one per month inside a season. */
     public bars = computed<Bar[]>(() => {
         const season = this.selectedSeason();
         if (season) {
-            const max = season.monthMax;
-            return season.months.map((value, index) => ({
-                ratio: value / max,
-                empty: value === 0,
-                peak: value > 0 && value === max,
-                label: this.monthInitials()[index]
-            }));
+            const initials = this.monthInitials();
+            return this.toBars(season.months, index => initials[index]);
         }
 
         const seasons = this.seasons();
-        const max = Math.max(...seasons.map(s => s.flights), 1);
-        return seasons.map((s, index) => ({
-            ratio: s.flights / max,
-            empty: s.flights === 0,
-            peak: s.flights === max,
-            // Only the ends and every fifth year, or the axis turns to mush.
-            label: (index === 0 || index === seasons.length - 1 || Number(s.year) % 5 === 0)
-                ? `’${s.year.slice(2)}`
-                : ''
-        }));
+        return this.toBars(seasons.map(s => s.flights), index => this.seasonLabel(seasons, index));
+    });
+
+    /** The same shape for money, so both charts render through fb-flights-bars. */
+    public incomeBars = computed<Bar[]>(() => {
+        const season = this.selectedSeason();
+        if (season) {
+            const initials = this.monthInitials();
+            return this.toBars(season.incomeMonths, index => initials[index]);
+        }
+
+        const seasons = this.seasons();
+        return this.toBars(seasons.map(s => s.income), index => this.seasonLabel(seasons, index));
     });
 
     /** The busiest month of the season, or the strongest season all-time. */
@@ -304,8 +342,33 @@ export class StatisticStore {
             flights,
             airtime,
             average: Number(row?.average ?? 0),
-            distance: Number(row?.totalDistance ?? 0)
+            distance: Number(row?.totalDistance ?? 0),
+            income: Number(row?.income ?? 0)
         };
+    });
+
+    /**
+     * Whether to offer the income section at all, judged on the whole logbook
+     * rather than the selected period: price is optional per flight and most
+     * pilots never fill it, and a section that appeared and vanished as you
+     * moved between seasons would read as a glitch.
+     */
+    public hasIncome = computed(() => Number(this.state().global?.income ?? 0) > 0);
+
+    /**
+     * The total comes from the aggregate row, so it follows the shared filter;
+     * the paid-flight count has to come from the flights themselves, because
+     * the API only sums the prices, it does not count them.
+     */
+    public incomeSummary = computed<IncomeSummary>(() => {
+        const total = this.headline().income;
+        let paidFlights = 0;
+        for (const flight of this.periodFlights()) {
+            if (Number(flight.price ?? 0) > 0) {
+                paidFlights++;
+            }
+        }
+        return { total, paidFlights, perFlight: paidFlights > 0 ? total / paidFlights : 0 };
     });
 
     /**

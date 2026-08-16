@@ -85,6 +85,10 @@ export class FlightStatisticPage implements OnDestroy {
         addIcons({ filterOutline, trendingUp, 'chevron-forward': chevronForward });
     }
 
+    public hasIncome = this.store.hasIncome;
+    public incomeSummary = this.store.incomeSummary;
+    public incomeBars = this.store.incomeBars;
+
     public seasons = this.store.seasons;
     public seasonGrid = this.store.seasonGrid;
     public bars = this.store.bars;
