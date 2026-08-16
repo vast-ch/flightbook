@@ -26,6 +26,18 @@ export function splitDuration(seconds: number): { value: string; unit: string } 
     return { value: (total / 3600).toFixed(1), unit: 'h' };
 }
 
+/**
+ * Parses a YYYY-MM-DD date from the API as local midnight.
+ *
+ * `new Date('2025-01-01')` is parsed as UTC, so west of UTC it lands on the
+ * previous day - while Angular's DatePipe parses the same string as local. Mix
+ * the two on one screen and the row says 1 March under a February heading.
+ */
+export function localDate(value: string): Date {
+    const [year, month, day] = String(value ?? '').split('-').map(Number);
+    return new Date(year, (month ?? 1) - 1, day ?? 1);
+}
+
 /** Distance split the same way: no decimal once it stops fitting. */
 export function splitDistance(km: number): { value: string; unit: string } {
     const distance = Number(km ?? 0);

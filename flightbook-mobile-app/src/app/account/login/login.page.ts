@@ -17,6 +17,7 @@ import { AccountService } from '../shared/account.service';
 import { NewsStore } from 'src/app/news/shared/news.store';
 import { App } from '@capacitor/app';
 import { NavigationService } from 'src/app/shared/services/navigation.service';
+import { LanguageService } from 'src/app/shared/services/language.service';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
@@ -46,7 +47,7 @@ export class LoginPage implements OnInit, OnDestroy {
     showPassword = false;
 
     get currentLang(): string {
-        return this.translate.currentLang;
+        return this.languageService.lang();
     }
 
     togglePassword() {
@@ -62,7 +63,8 @@ export class LoginPage implements OnInit, OnDestroy {
         private loadingCtrl: LoadingController,
         private navigationService: NavigationService,
         private route: ActivatedRoute,
-        private router: Router
+        private router: Router,
+        private languageService: LanguageService
     ) {
         this.defineVersion();
         addIcons({ eyeOutline, eyeOffOutline });
@@ -164,8 +166,8 @@ export class LoginPage implements OnInit, OnDestroy {
     }
 
     setLanguage(lang: string) {
-        localStorage.setItem('language', lang);
-        this.translate.use(lang);
+        this.languageService.setLanguage(lang);
+        // News is fetched per language, so the cached copy is now the wrong one.
         this.newsStore.clearNews();
     }
 

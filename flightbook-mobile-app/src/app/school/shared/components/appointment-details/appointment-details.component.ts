@@ -13,7 +13,7 @@ import { addIcons } from "ionicons";
 import { chevronBack, peopleOutline, timeOutline } from "ionicons/icons";
 import moment from 'moment-timezone';
 import { School } from '../../school.model';
-import { resolveLanguage } from 'src/app/shared/services/language.service';
+import { LanguageService } from 'src/app/shared/services/language.service';
 
 /** Above this the relative deadline reads in days rather than hours. */
 const HOURS_BEFORE_DAYS = 48;
@@ -34,20 +34,24 @@ export class AppointmentDetailsComponent implements OnInit {
 
     appointment: Appointment;
     currentUser: User;
-    currentLang: string;
     school: School;
     isSubscribed = false;
     subscribed: Subscription[] = [];
     waitingList: Subscription[] = [];
     hasChanges = false;
 
+    /** LanguageService, not translate.currentLang: reactive, and always a locale Angular has data for. */
+    get currentLang(): string {
+        return this.languageService.lang();
+    }
+
     constructor(
         private modalCtrl: ModalController,
         private alertController: AlertController,
         private translate: TranslateService,
-        private schoolService: SchoolService
+        private schoolService: SchoolService,
+        private languageService: LanguageService
     ) {
-        this.currentLang = resolveLanguage(this.translate.currentLang);
         addIcons({
             'chevron-back': chevronBack,
             'time-outline': timeOutline,
@@ -108,10 +112,18 @@ export class AppointmentDetailsComponent implements OnInit {
         if (!this.hasDeadline()) {
             return null;
         }
-        const hours = moment(this.appointment.deadline).diff(moment(), 'hours');
-        if (hours < 0) {
+        // deadlineAt, not `deadline`: that field has been rewritten into the
+        // school's wall clock held in a device-local Date, so measuring it
+        // against the device clock is out by the offset between the two - a
+        // pilot abroad was offered "in 3 h" on a registration already closed.
+        // Minutes, not diff('hours'), which truncates toward zero: anything
+        // inside the hour either side came back as 0 and read "in 0 h".
+        const closesAt = this.appointment.deadlineAt ?? moment.utc(this.appointment.deadline).valueOf();
+        const minutes = Math.round((closesAt - Date.now()) / 60000);
+        if (minutes <= 0) {
             return null;
         }
+        const hours = Math.ceil(minutes / 60);
         return hours <= HOURS_BEFORE_DAYS
             ? this.translate.instant('appointment.inHours', { hours })
             : this.translate.instant('appointment.inDays', { days: Math.round(hours / 24) });
@@ -119,8 +131,9 @@ export class AppointmentDetailsComponent implements OnInit {
 
     /** Past or canceled, as opposed to merely closed for registration. */
     isPast(): boolean {
-        return new Date(this.appointment.scheduling).getTime() < new Date().getTime()
-            || this.appointment.state === State.CANCELED;
+        // scheduledAt for the same reason as deadlineAt above.
+        const startsAt = this.appointment.scheduledAt ?? moment.utc(this.appointment.scheduling).valueOf();
+        return startsAt < Date.now() || this.appointment.state === State.CANCELED;
     }
 
     // ---- Registration ---------------------------------------------------
@@ -201,6 +214,12 @@ export class AppointmentDetailsComponent implements OnInit {
      * same treatment the date and time visibly jump after registering.
      */
     private normalizeSchedule(appointment: Appointment): Appointment {
+        // Captured before any rewrite, exactly as the list does it: everything
+        // that compares this appointment against "now" needs the real instant,
+        // not the school's wall clock parked in a device-local Date.
+        appointment.scheduledAt = moment.utc(appointment.scheduling).valueOf();
+        appointment.deadlineAt = appointment.deadline ? moment.utc(appointment.deadline).valueOf() : undefined;
+
         const timezone = this.school?.timezone;
         if (!timezone) {
             return appointment;

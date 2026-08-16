@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter, ElementRef, OnChanges, OnDestroy } from '@angular/core';
 import { Subject, forkJoin, of } from 'rxjs';
-import { catchError, map, takeUntil } from 'rxjs/operators';
+import { catchError, debounceTime, map, switchMap, takeUntil } from 'rxjs/operators';
 import { Place } from 'src/app/place/shared/place.model';
 import { PlaceStore } from 'src/app/place/shared/place.store';
 import { FlightStore } from 'src/app/flight/shared/flight.store';
@@ -23,6 +23,7 @@ import { TranslateModule } from '@ngx-translate/core';
 })
 export class AutocompleteComponent implements OnInit, OnChanges, OnDestroy {
     private unsubscribe$ = new Subject<void>();
+    private searchTerm$ = new Subject<string>();
 
     @Input()
     search: string;
@@ -46,6 +47,29 @@ export class AutocompleteComponent implements OnInit, OnChanges, OnDestroy {
         this.search = null;
         this.show = false;
         addIcons({ close });
+
+        // Wired in the constructor, not ngOnInit: the first ngOnChanges runs
+        // before ngOnInit, and a Subject drops anything emitted before there is
+        // a subscriber.
+        this.searchTerm$.pipe(
+            // One lookup per settled prefix rather than one per keystroke: each
+            // match also costs up to four flight-count requests below.
+            debounceTime(250),
+            switchMap(term => this.placeStore.getPlacesByName(term, { limit: 4 }).pipe(
+                catchError(() => of([] as Place[]))
+            )),
+            takeUntil(this.unsubscribe$)
+        ).subscribe((res: Place[]) => {
+            if (res && res.length > 0) {
+                this.show = true;
+                this.listElement = res;
+                // Fired after the list renders, so names appear immediately
+                // and counts fill in when they arrive.
+                this.loadFlightCounts(res);
+            } else {
+                this.show = false;
+            }
+        });
     }
 
     ngOnInit() { }
@@ -58,17 +82,11 @@ export class AutocompleteComponent implements OnInit, OnChanges, OnDestroy {
 
     ngOnChanges() {
         if (this.search && this.search !== '') {
-            this.placeStore.getPlacesByName(this.search, { limit: 4 }).subscribe((res: Place[]) => {
-                if (res && res.length > 0) {
-                    this.show = true;
-                    this.listElement = res;
-                    // Fired after the list renders, so names appear immediately
-                    // and counts fill in when they arrive.
-                    this.loadFlightCounts(res);
-                } else {
-                    this.show = false;
-                }
-            });
+            // switchMap, not a bare subscribe: this runs on every keystroke, so
+            // a slow answer for "Fie" could otherwise land after "Fiesch" and
+            // put the wrong suggestions back on screen. takeUntil so the last
+            // one in flight does not outlive the component.
+            this.searchTerm$.next(this.search);
         } else {
             this.show = false;
         }

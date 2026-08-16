@@ -12,7 +12,7 @@ import { AvatarButtonComponent } from 'src/app/shared/components/avatar-button/a
 import { HomeStore } from 'src/app/home/shared/home.store';
 import { addIcons } from 'ionicons';
 import { chevronBack, chevronDown, chevronForward, chevronUp, checkmark } from 'ionicons/icons';
-import { resolveLanguage } from 'src/app/shared/services/language.service';
+import { LanguageService } from 'src/app/shared/services/language.service';
 import { Location } from '@angular/common';
 import { navigateBackOrTo } from 'src/app/shared/util/back-navigation';
 
@@ -56,7 +56,10 @@ export class ControlSheetPage implements OnInit, OnDestroy {
         altitudeFlight: { rated: 0, total: 0, percent: 0 }
     };
 
-    language: string;
+    /** LanguageService, not translate.currentLang: reactive, and always a locale Angular has data for. */
+    get language(): string {
+        return this.languageService.lang();
+    }
     theoryExamDate: string;
     practiceExamDate: string;
 
@@ -89,9 +92,9 @@ export class ControlSheetPage implements OnInit, OnDestroy {
         private navCtrl: NavController,
         private location: Location,
         private homeStore: HomeStore,
-        private nxgTransalteSortPipe: NxgTransalteSortPipe
+        private nxgTransalteSortPipe: NxgTransalteSortPipe,
+        private languageService: LanguageService
     ) {
-        this.language = resolveLanguage(this.translate.currentLang);
         addIcons({
             'chevron-back': chevronBack,
             'chevron-down': chevronDown,

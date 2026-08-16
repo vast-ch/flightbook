@@ -285,6 +285,7 @@
         "deleteError": "Questa entità è collegata ad un volo e non può essere cancellata.",
         "mendatoryFields": "I campi obbligatori devono essere forniti.",
         "invalidEmail": "Si prega di inserire un indirizzo e-mail valido.",
+        "exportSavedNoViewer": "L’esportazione è stata salvata sul dispositivo, ma non è installata alcuna app in grado di aprire questo tipo di file.",
         "generationError": "Si è verificato un errore durante la generazione del file di esportazione",
         "wrongIgcFileType": "Scegliere un file IGC",
         "emptyIgcFile": "Questo file IGC è vuoto",
@@ -835,9 +836,11 @@
         "tandemHint": "Briefing passeggero e firma"
     },
     "gliderlist": {
+        "summaryOne": "1 vela",
         "summary": "{{count}} vele"
     },
     "placelist": {
+        "summaryOne": "1 luogo",
         "summary": "{{count}} luoghi"
     }
 }

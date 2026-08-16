@@ -56,6 +56,17 @@ export class SchoolService {
   }
 
   /**
+   * The appointment filter is shared by every school screen and outlives the
+   * page that set it, so it has to go with the session too - the flight filter
+   * already does. Left set, the next account opened its appointment list
+   * silently narrowed by a date range and a state it never chose.
+   */
+  resetFilter() {
+    this.filter = new AppointmentFilter();
+    this.filtered$.next(false);
+  }
+
+  /**
    * @param applyFilter pass false to ignore the shared appointment filter - the
    * dashboard's next-appointment card has no filter control of its own, so it
    * must not silently inherit whatever the appointment list was last narrowed by.

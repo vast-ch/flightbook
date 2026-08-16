@@ -26,25 +26,7 @@ export class StarRatingComponent implements OnInit, OnChanges {
      }
 
     ngOnInit(): void {
-        let className = this.edit ? 'star-gray star-hover star' : 'star-gray star';
-
-        this.stars = [
-            {
-                id: 1,
-                icon: 'star',
-                class: className
-            },
-            {
-                id: 2,
-                icon: 'star',
-                class: className
-            },
-            {
-                id: 3,
-                icon: 'star',
-                class: className
-            }
-        ]
+        this.stars = [1, 2, 3].map(id => ({ id, icon: 'star', class: '' }));
         this.displayStars(this.selectedRating || 0);
     }
 
@@ -54,20 +36,21 @@ export class StarRatingComponent implements OnInit, OnChanges {
      * when a control-sheet row is re-rated.
      */
     ngOnChanges(changes: SimpleChanges): void {
-        if (changes['selectedRating'] && this.stars) {
+        if ((changes['selectedRating'] || changes['edit']) && this.stars) {
             this.displayStars(this.selectedRating || 0);
         }
     }
 
+    /**
+     * Rebuilds the class of every star. `star-hover` is part of it, not set
+     * once in ngOnInit: this method overwrote the class on that very first
+     * call, so the hover preview the stylesheet describes was never in the DOM.
+     */
     displayStars(value: number): void {
-        this.stars.filter((star) => {
-            if (star.id <= value) {
-                star.class = `star-gold star`;
-            } else {
-                star.class = `star-gray star`;
-            }
-            return star;
-        });
+        const hover = this.edit ? ' star-hover' : '';
+        for (const star of this.stars) {
+            star.class = `${star.id <= value ? 'star-gold' : 'star-gray'} star${hover}`;
+        }
     }
 
 

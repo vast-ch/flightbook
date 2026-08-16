@@ -35,6 +35,8 @@ export class Appointment {
      * be compared against the device clock.
      */
     scheduledAt?: number;
+    /** The real instant registration closes, in epoch ms. Same reason as scheduledAt. */
+    deadlineAt?: number;
     /** Capacity, computed once at load - see enrichAppointment. */
     spotCells?: SpotCell[];
     freeSpots?: number;

@@ -11,7 +11,11 @@
   <div class="list-header__text">
     <div class="list-header__eyebrow">
       <span class="fb-section-label">
-        {{ 'placelist.summary' | translate:{ count: places().length } }}
+        @if (places().length === 1) {
+          {{ 'placelist.summaryOne' | translate }}
+        } @else {
+          {{ 'placelist.summary' | translate:{ count: places().length } }}
+        }
       </span>
     </div>
     <h1 class="list-header__title">{{ 'groupname.place' | translate }}</h1>

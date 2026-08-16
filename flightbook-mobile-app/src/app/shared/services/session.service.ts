@@ -6,6 +6,8 @@ import { GliderStore } from 'src/app/glider/shared/glider.store';
 import { PlaceStore } from 'src/app/place/shared/place.store';
 import { SchoolService } from 'src/app/school/shared/school.service';
 import { TandemSchoolService } from 'src/app/school/shared/tandem-school.service';
+import { NavigationService } from './navigation.service';
+import { PaymentService } from './payment.service';
 import { SessionTeardownRegistry } from './session-teardown.registry';
 
 /**
@@ -22,6 +24,8 @@ export class SessionService {
     private placeStore = inject(PlaceStore);
     private schoolService = inject(SchoolService);
     private tandemSchoolService = inject(TandemSchoolService);
+    private navigationService = inject(NavigationService);
+    private paymentService = inject(PaymentService);
     private teardown = inject(SessionTeardownRegistry);
 
     /**
@@ -64,10 +68,20 @@ export class SessionService {
         this.placeStore.clearPlaces();
         this.schoolService.clearSchools();
         this.tandemSchoolService.clearSchools();
-        // The filter is shared by the flight list and the statistics page, so
-        // leaving it set would narrow the next account's logbook by a glider it
-        // does not own.
+        // Identity and route history: cleared here as well as in
+        // AccountService.logout(), because deleting an account calls this
+        // method directly and used to leave the deleted user in currentUser$
+        // and their routes on the back stack.
+        this.accountService.currentUser$.set(null);
+        this.navigationService.clearHistory();
+        // Entitlements are per account, and the paywalls read them
+        // synchronously before the next user's refresh can land.
+        this.paymentService.clear();
+        // The filters are shared by the flight list and the statistics page,
+        // and by every school screen, so leaving them set would narrow the next
+        // account's logbook by a glider it does not own.
         this.flightStore.resetFilter();
+        this.schoolService.resetFilter();
         // Home and Statistics register themselves here once constructed. They
         // gate their reloads on a `loaded` flag, so leaving them would show the
         // previous account's totals to the next one.

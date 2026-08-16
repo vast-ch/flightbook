@@ -39,7 +39,7 @@ export interface HomeState {
     controlSheet: ControlSheet | null;
     schools: School[];
     loaded: boolean;
-    /** FlightStore.revision this snapshot was taken at. */
+    /** FlightStore.dataRevision this snapshot was taken at. */
     revision: number;
 }
 
@@ -74,8 +74,12 @@ export class HomeStore {
      * False once the logbook has moved under us. The page loads only while this
      * is false, so without the revision check a flight added from the + tab
      * never showed up on the dashboard for the rest of the session.
+     *
+     * dataRevision, not revision: every request below passes applyFilter:false,
+     * so a filter tap on the Flights tab cannot change these figures - and
+     * watching the combined counter refetched all five of them to prove it.
      */
-    public loaded = computed(() => this.state().loaded && this.state().revision === this.flightStore.revision());
+    public loaded = computed(() => this.state().loaded && this.state().revision === this.flightStore.dataRevision());
 
     public trainingProgress = computed<TrainingProgress | null>(() => {
         const sheet = this.state().controlSheet;
@@ -147,6 +151,7 @@ export class HomeStore {
     });
 
     load(): Observable<HomeState> {
+        const previous = this.state();
         // applyFilter: false - the dashboard always shows all-time totals,
         // never whatever the user last filtered the flight list by.
         const global$: Observable<FlightStatistic[] | null> =
@@ -177,9 +182,12 @@ export class HomeStore {
                 // dashboard for the session - the page's `if (!loaded())` guard
                 // would never retry it.
                 loaded: global !== null,
-                revision: this.flightStore.revision()
+                revision: this.flightStore.dataRevision()
             })),
-            tap(state => this.state.set(state))
+            // A load that reached nothing keeps the last good snapshot rather
+            // than blanking a dashboard that was already filled - the flag is
+            // still false, so the next visit to the tab retries either way.
+            tap(state => this.state.set(state.loaded ? state : { ...previous, loaded: false }))
         );
     }
 
@@ -247,6 +255,16 @@ export class HomeStore {
      */
     setControlSheet(controlSheet: ControlSheet | null): void {
         this.state.update(state => ({ ...state, controlSheet }));
+    }
+
+    /**
+     * Marks the snapshot stale without dropping it, so the next visit to Home
+     * refetches. For changes the dashboard reads but FlightStore.revision knows
+     * nothing about - leaving a school being the one that showed: the card kept
+     * offering an appointment at a school the pilot had just left.
+     */
+    invalidate(): void {
+        this.state.update(state => ({ ...state, loaded: false }));
     }
 
     clear(): void {

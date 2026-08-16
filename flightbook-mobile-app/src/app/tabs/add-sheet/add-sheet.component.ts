@@ -4,6 +4,7 @@ import { AlertController, ModalController, IonIcon } from '@ionic/angular/standa
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { chevronForward } from 'ionicons/icons';
+import { firstValueFrom } from 'rxjs';
 import { FlightStore } from 'src/app/flight/shared/flight.store';
 import { PaymentService } from 'src/app/shared/services/payment.service';
 
@@ -49,8 +50,7 @@ export class AddSheetComponent {
     async logFlight() {
         await this.dismiss();
 
-        if (!this.paymentService.getPaymentStatusValue()?.active
-            && this.flightStore.flights().length >= FREE_FLIGHT_LIMIT) {
+        if (!this.paymentService.getPaymentStatusValue()?.active && await this.overFreeLimit()) {
             const alert = await this.alertController.create({
                 header: this.translate.instant('message.infotitle'),
                 message: this.translate.instant('payment.premiumUpgradeRequired'),
@@ -61,6 +61,24 @@ export class AddSheetComponent {
         }
 
         this.router.navigate(['flights/add']);
+    }
+
+    /**
+     * The all-time count from the API, not `flightStore.flights().length`: that
+     * signal holds only the page the Flights tab happened to load, and is empty
+     * until that tab has been opened at all - so a free account that logged
+     * from Home on a cold start walked straight past the limit. It also read
+     * "at capacity" at exactly the first page size for anyone who had.
+     */
+    private async overFreeLimit(): Promise<boolean> {
+        try {
+            const stats = await firstValueFrom(this.flightStore.getStatistics('global', false));
+            return Number(stats?.[0]?.nbFlights ?? 0) >= FREE_FLIGHT_LIMIT;
+        } catch {
+            // The count is unreachable; let the flight be logged rather than
+            // block a paying-or-not pilot on a failed request.
+            return false;
+        }
     }
 
     /**

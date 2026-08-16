@@ -11,8 +11,8 @@
       <div class="fb-card--flush">
 
         <div class="fb-field">
-          <label class="fb-field__label" for="regFirstname">{{ 'account.firstname' | translate }}</label>
-          <ion-input id="regFirstname" [(ngModel)]="registerData.firstname" #firstname="ngModel"
+          <label class="fb-field__label" id="lbl-regFirstname" for="regFirstname">{{ 'account.firstname' | translate }}</label>
+          <ion-input id="regFirstname" aria-labelledby="lbl-regFirstname" [(ngModel)]="registerData.firstname" #firstname="ngModel"
                      name="firstname" required type="text"
                      autocomplete="given-name" enterkeyhint="next"></ion-input>
           @if (firstname.invalid && (firstname.dirty || firstname.touched)) {
@@ -21,8 +21,8 @@
         </div>
 
         <div class="fb-field">
-          <label class="fb-field__label" for="regLastname">{{ 'account.lastname' | translate }}</label>
-          <ion-input id="regLastname" [(ngModel)]="registerData.lastname" #lastname="ngModel"
+          <label class="fb-field__label" id="lbl-regLastname" for="regLastname">{{ 'account.lastname' | translate }}</label>
+          <ion-input id="regLastname" aria-labelledby="lbl-regLastname" [(ngModel)]="registerData.lastname" #lastname="ngModel"
                      name="lastname" required type="text"
                      autocomplete="family-name" enterkeyhint="next"></ion-input>
           @if (lastname.invalid && (lastname.dirty || lastname.touched)) {
@@ -31,8 +31,8 @@
         </div>
 
         <div class="fb-field">
-          <label class="fb-field__label" for="regEmail">{{ 'login.email' | translate }}</label>
-          <ion-input id="regEmail" [(ngModel)]="registerData.email" #email="ngModel"
+          <label class="fb-field__label" id="lbl-regEmail" for="regEmail">{{ 'login.email' | translate }}</label>
+          <ion-input id="regEmail" aria-labelledby="lbl-regEmail" [(ngModel)]="registerData.email" #email="ngModel"
                      name="email" required email type="email"
                      inputmode="email" autocomplete="email" enterkeyhint="next"></ion-input>
           @if (email.invalid && (email.dirty || email.touched)) {
@@ -58,8 +58,8 @@
 
         <div class="fb-field fb-field--split">
           <div class="fb-field__main">
-            <label class="fb-field__label" for="regPassword">{{ 'login.password' | translate }}</label>
-            <ion-input id="regPassword" [(ngModel)]="registerData.password" #password="ngModel"
+            <label class="fb-field__label" id="lbl-regPassword" for="regPassword">{{ 'login.password' | translate }}</label>
+            <ion-input id="regPassword" aria-labelledby="lbl-regPassword" [(ngModel)]="registerData.password" #password="ngModel"
                        name="password" required
                        [type]="showPassword ? 'text' : 'password'"
                        autocomplete="new-password" enterkeyhint="go"></ion-input>

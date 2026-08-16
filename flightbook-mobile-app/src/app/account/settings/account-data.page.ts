@@ -23,7 +23,7 @@ import { PhoneNumberComponent } from 'src/app/shared/components/phone-number/pho
 import { Location } from '@angular/common';
 import { navigateBackOrTo } from 'src/app/shared/util/back-navigation';
 
-/** The four languages the app ships strings for. */
+/** The four languages the app ships strings for, in the design's order. */
 const LANGUAGES = ['fr', 'de', 'en', 'it'];
 
 @Component({
@@ -268,8 +268,7 @@ export class AccountDataPage implements OnInit, OnDestroy {
     }
 
     setLanguage(lang: string) {
-        localStorage.setItem('language', lang);
-        this.translate.use(lang);
+        this.languageService.setLanguage(lang);
     }
 
     async paymentSuccess() {

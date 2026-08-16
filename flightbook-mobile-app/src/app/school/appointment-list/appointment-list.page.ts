@@ -18,7 +18,8 @@ import { addIcons } from "ionicons";
 import { filterOutline, ellipsisVerticalOutline, chevronBack, timeOutline, checkmark, close } from "ionicons/icons";
 import { FormsModule } from '@angular/forms';
 import { School } from '../shared/school.model';
-import { resolveLanguage } from 'src/app/shared/services/language.service';
+import { LanguageService } from 'src/app/shared/services/language.service';
+import { HomeStore } from 'src/app/home/shared/home.store';
 import { Location } from '@angular/common';
 import { navigateBackOrTo } from 'src/app/shared/util/back-navigation';
 
@@ -54,7 +55,6 @@ export class AppointmentListPage implements OnInit, OnDestroy {
     appointments = signal<Appointment[]>([]);
     currentUser = signal<User | null>(null);
     currentSchool = signal<School | null>(null);
-    currentLang: string;
     filtered: boolean;
     private readonly schoolId: number;
     private appointmentId: number;
@@ -101,13 +101,14 @@ export class AppointmentListPage implements OnInit, OnDestroy {
         }
         const now = Date.now();
         const limit = now + CLOSING_SOON_HOURS * 60 * 60 * 1000;
+        // deadlineAt, not `deadline`: enrichAppointment rewrites that field into
+        // the school's wall clock parked in a device-local Date, so comparing it
+        // against the device clock slid the window by the offset between the two
+        // - a pilot abroad was warned about the wrong appointments.
         return this.appointments()
-            .filter(appointment => appointment.state !== State.CANCELED && appointment.deadline)
-            .filter(appointment => {
-                const deadline = new Date(appointment.deadline).getTime();
-                return deadline > now && deadline <= limit;
-            })
-            .sort((a, b) => new Date(a.deadline).getTime() - new Date(b.deadline).getTime())[0] ?? null;
+            .filter(appointment => appointment.state !== State.CANCELED && appointment.deadlineAt)
+            .filter(appointment => appointment.deadlineAt > now && appointment.deadlineAt <= limit)
+            .sort((a, b) => a.deadlineAt - b.deadlineAt)[0] ?? null;
     });
 
     constructor(
@@ -119,9 +120,10 @@ export class AppointmentListPage implements OnInit, OnDestroy {
         private loadingCtrl: LoadingController,
         private accountService: AccountService,
         private modalCtrl: ModalController,
-        private alertController: AlertController
+        private alertController: AlertController,
+        private languageService: LanguageService,
+        private homeStore: HomeStore
     ) {
-        this.currentLang = resolveLanguage(this.translate.currentLang);
         this.filtered = this.schoolService.filtered$.getValue();
         this.schoolService.filtered$.pipe(takeUntil(this.unsubscribe$))
             .subscribe((res: boolean) => {
@@ -157,6 +159,11 @@ export class AppointmentListPage implements OnInit, OnDestroy {
 
     close() {
         navigateBackOrTo(this.navCtrl, this.location, 'more');
+    }
+
+    /** LanguageService, not translate.currentLang: reactive, and always a locale Angular has data for. */
+    get currentLang(): string {
+        return this.languageService.lang();
     }
 
     /** The school's own timezone if it has one, matching how dates were stored. */
@@ -409,6 +416,7 @@ export class AppointmentListPage implements OnInit, OnDestroy {
         // appointment against "now" has to use the real instant, not the
         // school's wall clock parked in a device-local Date.
         appointment.scheduledAt = moment.utc(appointment.scheduling).valueOf();
+        appointment.deadlineAt = appointment.deadline ? moment.utc(appointment.deadline).valueOf() : undefined;
         appointment.subscribed = appointment.subscriptions?.some((subscription: Subscription) =>
             subscription.user.email === user?.email
         ) ?? false;
@@ -505,6 +513,10 @@ export class AppointmentListPage implements OnInit, OnDestroy {
                         try {
                             await firstValueFrom(this.schoolService.leaveSchool(this.schoolId));
                             this.schoolService.removeSchoolFromStore(this.schoolId);
+                            // Home caches the next appointment and the school
+                            // name, and its own guard only watches the logbook,
+                            // so it has to be told the enrolment changed.
+                            this.homeStore.invalidate();
                             this.popover?.dismiss();
                             // 'home' now, not '/news' - that route only still
                             // works because it redirects here.

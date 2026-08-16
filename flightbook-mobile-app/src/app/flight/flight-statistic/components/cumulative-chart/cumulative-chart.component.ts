@@ -91,8 +91,12 @@ export class CumulativeChartComponent {
                 callbacks: {
                     label: (context) => {
                         const hours = context.parsed.y ?? 0;
-                        const h = Math.floor(hours);
-                        const m = Math.round((hours - h) * 60);
+                        // Round once, to whole minutes: flooring the hours and
+                        // rounding the remainder separately printed "100:60 h"
+                        // whenever the fraction landed above 59.5/60.
+                        const totalMinutes = Math.round(hours * 60);
+                        const h = Math.floor(totalMinutes / 60);
+                        const m = totalMinutes % 60;
                         return `${h}:${m.toString().padStart(2, '0')} h`;
                     }
                 }

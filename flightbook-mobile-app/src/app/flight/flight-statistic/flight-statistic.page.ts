@@ -172,9 +172,15 @@ export class FlightStatisticPage implements OnDestroy {
             component: FlightFilterComponent,
             cssClass: 'flight-filter-class'
         });
+        const revision = this.flightStore.revision();
         await modal.present();
         await modal.onWillDismiss();
-        this.reloadForFilter();
+        // Only if the sheet actually moved the filter: reload() refetches three
+        // aggregates plus the whole unpaginated logbook, and opening the sheet
+        // to look at it used to pay that price.
+        if (this.flightStore.revision() !== revision) {
+            this.reloadForFilter();
+        }
     }
 
     /** The store caches per session, so a filter change has to force a refetch. */

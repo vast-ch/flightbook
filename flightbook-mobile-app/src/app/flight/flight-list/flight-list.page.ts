@@ -20,7 +20,7 @@ import {
     cloudUploadOutline,
     shareOutline
 } from "ionicons/icons";
-import { FlightStore } from '../shared/flight.store';
+import { BASE_PAGE_SIZE, FlightStore } from '../shared/flight.store';
 import { AvatarButtonComponent } from 'src/app/shared/components/avatar-button/avatar-button.component';
 import { LanguageService } from 'src/app/shared/services/language.service';
 import { toHoursMinutes } from 'src/app/shared/util/format';
@@ -121,7 +121,13 @@ export class FlightListPage implements OnInit, OnDestroy {
     }
 
     ionViewDidEnter() {
-        if (this.flights().length === 0) {
+        // The revision check, not just an empty list: the filter is shared with
+        // the Statistics tab, so it can move while this page is off-screen.
+        // Without it the rows stayed unfiltered under a filter chip that said
+        // otherwise, and the next infinite-scroll page - fetched *with* the
+        // filter, at the unfiltered offset - appended flights already on screen,
+        // which duplicates `track flight.id` and throws NG0955.
+        if (this.flights().length === 0 || this.listRevision !== this.flightStore.revision()) {
             this.initialDataLoad();
         }
         // Only when there is nothing to show or the logbook has moved: this
@@ -137,15 +143,21 @@ export class FlightListPage implements OnInit, OnDestroy {
             message: this.translate.instant('loading.loading')
         });
         await loading.present();
-        if (window.innerHeight > 1024) {
-            this.flightStore.defaultLimit += Math.ceil((window.innerHeight - 1024) / 47) + 2;
-        }
+        // Derived from the base size, never added to it. `defaultLimit` is a
+        // mutable field on a root-provided store and this method now runs on
+        // every filter change, so `+=` grew the page size without bound - and
+        // the store's own refetches after add/edit/delete grew with it.
+        this.flightStore.defaultLimit = window.innerHeight > 1024
+            ? BASE_PAGE_SIZE + Math.ceil((window.innerHeight - 1024) / 47) + 2
+            : BASE_PAGE_SIZE;
 
+        const revision = this.flightStore.revision();
         this.flightStore.getFlights({ limit: this.flightStore.defaultLimit, clearStore: true })
             .pipe(takeUntil(this.unsubscribe$))
             .subscribe({
                 next: async (res: Flight[]) => {
                     this.listComplete.set(res.length < this.flightStore.defaultLimit);
+                    this.listRevision = revision;
                     await loading.dismiss();
                 },
                 error: async () => {
@@ -153,6 +165,9 @@ export class FlightListPage implements OnInit, OnDestroy {
                 }
             });
     }
+
+    /** FlightStore.revision the rows on screen were fetched at. */
+    private listRevision = -1;
 
     /** FlightStore.revision the header totals were fetched at. */
     private totalsRevision = -1;
@@ -211,6 +226,15 @@ export class FlightListPage implements OnInit, OnDestroy {
 
         this.flightStore.deleteFlight(flight).pipe(takeUntil(this.unsubscribe$)).subscribe({
             next: async () => {
+                // deleteFlight refetches a single page with clearStore, so the
+                // list is back to page one: re-arm the scroller and re-answer
+                // the end-of-list footnote, or the rest of a long logbook stays
+                // unreachable under a note saying it is all there.
+                this.listComplete.set(this.flights().length < this.flightStore.defaultLimit);
+                this.listRevision = this.flightStore.revision();
+                if (this.infiniteScroll) {
+                    this.infiniteScroll.disabled = false;
+                }
                 await loading.dismiss();
             },
             error: async (resp: any) => {
@@ -225,10 +249,15 @@ export class FlightListPage implements OnInit, OnDestroy {
             cssClass: 'flight-filter-class'
         });
 
+        const revision = this.flightStore.revision();
         await modal.present();
-        // The sheet only edits the filter now; reloading is the host's job.
+        // The sheet only edits the filter now; reloading is the host's job -
+        // and only if the sheet actually changed something, since opening and
+        // closing it untouched used to cost a full page fetch.
         await modal.onWillDismiss();
-        this.reloadForFilter();
+        if (this.flightStore.revision() !== revision) {
+            this.reloadForFilter();
+        }
     }
 
     /** Also the handler for a chip cleared from the summary row. */
@@ -236,8 +265,17 @@ export class FlightListPage implements OnInit, OnDestroy {
         if (this.infiniteScroll) {
             this.infiniteScroll.disabled = false;
         }
+        const revision = this.flightStore.revision();
         this.flightStore.getFlights({ limit: this.flightStore.defaultLimit, clearStore: true })
-            .pipe(takeUntil(this.unsubscribe$)).subscribe();
+            .pipe(takeUntil(this.unsubscribe$))
+            .subscribe({
+                // listComplete has to be re-answered for the new result set, or
+                // the end-of-list footnote keeps the previous filter's verdict.
+                next: (res: Flight[]) => {
+                    this.listComplete.set(res.length < this.flightStore.defaultLimit);
+                    this.listRevision = revision;
+                }
+            });
     }
 
     clearFilter() {

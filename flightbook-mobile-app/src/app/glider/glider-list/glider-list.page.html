@@ -11,7 +11,11 @@
   <div class="list-header__text">
     <div class="list-header__eyebrow">
       <span class="fb-section-label">
-        {{ 'gliderlist.summary' | translate:{ count: gliders().length } }}
+        @if (gliders().length === 1) {
+          {{ 'gliderlist.summaryOne' | translate }}
+        } @else {
+          {{ 'gliderlist.summary' | translate:{ count: gliders().length } }}
+        }
       </span>
       @if (filtered()) {
         <span class="list-header__chip">{{ 'groupname.filtered' | translate }}</span>

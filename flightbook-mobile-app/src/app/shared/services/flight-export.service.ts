@@ -23,6 +23,13 @@ const SPREADSHEET_MIME: Record<SpreadsheetFormat, string> = {
 };
 
 /**
+ * SheetJS writes a BOM for every output type except `string`, which returns the
+ * payload without it, so we prepend it ourselves. Without it Excel on Windows
+ * decodes the CSV as the system codepage and turns "Zürich" into "ZÃ¼rich".
+ */
+const UTF8_BOM = '\ufeff';
+
+/**
  * The logbook export picker, shared by the flight list header and the More page
  * so both offer the same formats from one place.
  */
@@ -78,7 +85,7 @@ export class FlightExportService {
             const data: string = await this.xlsxExportService.generateFlightsXlsxFile(flights, { bookType: 'csv', type: 'string' });
             await loading.dismiss();
             fileSaver.saveAs(
-                new Blob([data], { type: `${SPREADSHEET_MIME.csv};charset=UTF-8` }),
+                new Blob([UTF8_BOM + data], { type: `${SPREADSHEET_MIME.csv};charset=UTF-8` }),
                 `flights_export_${Date.now()}.csv`
             );
             return;
@@ -150,12 +157,14 @@ export class FlightExportService {
     }
 
     private async writeNativeSpreadsheet(flights: Flight[], format: SpreadsheetFormat, loading: HTMLIonLoadingElement) {
+        let uri: string;
         try {
             // Filesystem takes base64 for binary and plain text for CSV.
             const writeOptions = format === 'csv'
                 ? { bookType: 'csv', type: 'string' }
                 : { bookType: 'xlsx', type: 'base64' };
-            const data: any = await this.xlsxExportService.generateFlightsXlsxFile(flights, writeOptions);
+            const generated: any = await this.xlsxExportService.generateFlightsXlsxFile(flights, writeOptions);
+            const data = format === 'csv' ? UTF8_BOM + generated : generated;
 
             const result = await Filesystem.writeFile({
                 path: `${format}/flights_export.${format}`,
@@ -164,24 +173,22 @@ export class FlightExportService {
                 recursive: true,
                 ...(format === 'csv' ? { encoding: Encoding.UTF8 } : {})
             });
-
-            await loading.dismiss();
-
-            try {
-                await FileOpener.open({
-                    filePath: result.uri,
-                    contentType: SPREADSHEET_MIME[format]
-                });
-            } catch (error) {
-                if (Capacitor.getPlatform() == 'android') {
-                    await this.alert(this.translate.instant('message.downloadExcel'));
-                } else {
-                    throw error;
-                }
-            }
+            uri = result.uri;
         } catch {
             await loading.dismiss();
             await this.alert(this.translate.instant('message.generationError'));
+            return;
+        }
+
+        await loading.dismiss();
+
+        // Opening is a separate step: the file is already on disk, so a device
+        // with no viewer for it must not be reported as a failed export - which
+        // is what re-throwing into the generation catch used to do off Android.
+        try {
+            await FileOpener.open({ filePath: uri, contentType: SPREADSHEET_MIME[format] });
+        } catch {
+            await this.alert(this.translate.instant('message.exportSavedNoViewer'));
         }
     }
 

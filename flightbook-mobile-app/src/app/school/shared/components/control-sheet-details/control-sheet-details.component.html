@@ -17,9 +17,9 @@
             null for 42 of the 48 skills, so the old key comparison was always true
             and rendered an <iframe src="null">.
         -->
-        @if (videoUrl(); as url) {
+        @if (safeVideoUrl) {
             <div class="video-container">
-                <iframe [src]="getSafeUrl(url)" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                <iframe [src]="safeVideoUrl" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
             </div>
         }
 

@@ -6,6 +6,7 @@ import { FlightStore } from '../../shared/flight.store';
 import { FlightStatistic } from '../../shared/flightStatistic.model';
 import { Flight } from '../../shared/flight.model';
 import { SessionTeardownRegistry } from 'src/app/shared/services/session-teardown.registry';
+import { localDate } from 'src/app/shared/util/format';
 
 /** 'all' or a four-digit year. */
 export type StatisticPeriod = string;
@@ -123,17 +124,6 @@ function shade(value: number, max: number): number {
     }
     const ratio = value / max;
     return ratio > 2 / 3 ? 3 : (ratio > 1 / 3 ? 2 : 1);
-}
-
-/**
- * Parses a YYYY-MM-DD flight date as local midnight. `new Date('2025-01-01')`
- * is parsed as UTC, so west of UTC it lands on the previous day - and since the
- * grid keys and compares with local date parts, the last day of a year fell off
- * the heatmap entirely.
- */
-function localDate(value: string): Date {
-    const [year, month, day] = value.split('-').map(Number);
-    return new Date(year, (month ?? 1) - 1, day ?? 1);
 }
 
 @Injectable({
@@ -535,9 +525,19 @@ export class StatisticStore {
      * a filter change has to refetch even though the page never left.
      */
     reload(): Observable<StatisticState> {
+        const previous = this.state();
         this.state.update(state => ({ ...state, loaded: false }));
         return this.load().pipe(
-            tap(() => {
+            tap(next => {
+                if (!next.loaded && previous.loaded) {
+                    // The refetch reached nothing (offline, expired token). Put
+                    // the figures that were on screen back rather than leaving
+                    // the empty snapshot: the page only reloads while `loaded`
+                    // is false and the user never leaves it, so that pinned the
+                    // skeletons for the rest of the session.
+                    this.state.set(previous);
+                    return;
+                }
                 // A filter can narrow the logbook to years the selected season
                 // is not among. Left pointing at it, the headline reads 0/0/0
                 // with no chip highlighted and no way back.

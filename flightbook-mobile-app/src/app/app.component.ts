@@ -1,4 +1,4 @@
-import { Component, effect, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 
 import { AlertController, IonicSafeString } from '@ionic/angular/standalone';
 import { TranslateService } from '@ngx-translate/core';
@@ -16,7 +16,7 @@ import {
     Token,
 } from '@capacitor/push-notifications';
 import { Capacitor } from '@capacitor/core';
-import { StatusBar, Style } from '@capacitor/status-bar';
+import { StatusBar } from '@capacitor/status-bar';
 import { Router } from '@angular/router';
 import { RegisterPage } from './account/register/register.page';
 import { PaymentStatus } from './account/shared/paymentStatus.model';
@@ -101,8 +101,11 @@ export class AppComponent implements OnDestroy, OnInit {
             return;
         }
 
-        // Populates schoolsSignal, which Home and More both read.
-        this.schoolService.getSchools();
+        // Populates schoolsSignal, which Home and More both read. Caught:
+        // getSchools() memoises a promise, so a failed bootstrap request would
+        // otherwise surface as an unhandled rejection - the pages that need the
+        // list ask again themselves.
+        this.schoolService.getSchools().catch(() => { /* the pages retry */ });
 
         this.accountService.currentUser().pipe(takeUntil(this.unsubscribe$)).subscribe((user: any) => {});
 

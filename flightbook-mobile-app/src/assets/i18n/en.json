@@ -285,6 +285,7 @@
         "deleteError": "This entity is conected with a flight and can not be deleted.",
         "mendatoryFields": "Mandatory fields must be provided.",
         "invalidEmail": "Please enter a valid email address.",
+        "exportSavedNoViewer": "The export was saved to your device, but no app is installed that can open this file type.",
         "generationError": "Unable to generate export file",
         "wrongIgcFileType": "Please choose an IGC file",
         "emptyIgcFile": "This IGC file is empty",
@@ -835,9 +836,11 @@
         "tandemHint": "Passenger briefing and signature"
     },
     "gliderlist": {
+        "summaryOne": "1 glider",
         "summary": "{{count}} gliders"
     },
     "placelist": {
+        "summaryOne": "1 place",
         "summary": "{{count}} places"
     }
 }

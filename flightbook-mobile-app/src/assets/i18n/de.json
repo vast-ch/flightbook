@@ -285,6 +285,7 @@
         "deleteError": "Diese Entität ist mit einem Flug verbunden und kann nicht gelöscht werden.",
         "mendatoryFields": "Pflichtfelder müssen angegeben werden.",
         "invalidEmail": "Bitte geben Sie eine gültige E-Mail-Adresse ein.",
+        "exportSavedNoViewer": "Der Export wurde auf deinem Gerät gespeichert, aber es ist keine App installiert, die diesen Dateityp öffnen kann.",
         "generationError": "Exportdatei konnte nicht generiert werden",
         "wrongIgcFileType": "Bitte wählen Sie eine IGC-Datei",
         "emptyIgcFile": "Diese IGC-Datei ist leer",
@@ -835,9 +836,11 @@
         "tandemHint": "Passagier-Briefing und Unterschrift"
     },
     "gliderlist": {
+        "summaryOne": "1 Schirm",
         "summary": "{{count}} Schirme"
     },
     "placelist": {
+        "summaryOne": "1 Ort",
         "summary": "{{count}} Orte"
     }
 }

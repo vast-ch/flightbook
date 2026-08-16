@@ -73,8 +73,12 @@ export class PassengerConfirmationFormComponent implements OnDestroy {
     this.signatureCanvasElement = canvas;
     // Next frame, so the canvas has been laid out and can be measured - and so
     // this lands outside the change-detection pass that created it.
-    requestAnimationFrame(() => this.initSignaturePad(canvas, previous));
+    cancelAnimationFrame(this.signatureFrame);
+    this.signatureFrame = requestAnimationFrame(() => this.initSignaturePad(canvas, previous));
   }
+
+  /** Pending signature-pad init, cancelled on destroy. */
+  private signatureFrame = 0;
 
   constructor(
     private modalController: ModalController,
@@ -87,6 +91,10 @@ export class PassengerConfirmationFormComponent implements OnDestroy {
   }
 
   ngOnDestroy() {
+    // The pending frame outlives the view otherwise, and initSignaturePad
+    // ends in detectChanges() - NG0911 on a destroyed view if the sheet was
+    // dragged shut inside the same frame that revealed the canvas.
+    cancelAnimationFrame(this.signatureFrame);
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
   }
@@ -136,10 +144,16 @@ export class PassengerConfirmationFormComponent implements OnDestroy {
       penColor: this.colorService.getIonTextColor()
     });
 
+    // The size has to be passed: fromDataURL defaults to
+    // `canvas.width / devicePixelRatio`, and this bitmap is in CSS pixels, so
+    // on a phone it redrew every restored signature at a third of its size in
+    // the top-left corner. On the add path that shrunken image is what
+    // savePassengerConfirmation() then persists, once per step-back.
+    const size = { width: canvas.width, height: canvas.height };
     if (this.isView && this.passengerData.signature) {
-      this.signaturePad.fromDataURL(this.passengerData.signature);
+      this.signaturePad.fromDataURL(this.passengerData.signature, size);
     } else if (restore) {
-      this.signaturePad.fromDataURL(restore);
+      this.signaturePad.fromDataURL(restore, size);
     }
     this.cdr.detectChanges();
   }

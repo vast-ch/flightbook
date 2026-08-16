@@ -15,9 +15,10 @@ import { XlsxExportService } from 'src/app/shared/services/xlsx-export.service';
 import { Directory, Filesystem } from '@capacitor/filesystem';
 import { FileOpener } from '@capacitor-community/file-opener';
 import { TandemSchoolService } from 'src/app/school/shared/tandem-school.service';
-import { resolveLanguage } from 'src/app/shared/services/language.service';
+import { LanguageService, resolveLanguage } from 'src/app/shared/services/language.service';
 import { Location } from '@angular/common';
 import { navigateBackOrTo } from 'src/app/shared/util/back-navigation';
+import { localDate } from 'src/app/shared/util/format';
 
 @Component({
   selector: 'app-passenger-confirmation-list',
@@ -37,7 +38,10 @@ export class PassengerConfirmationListPage implements OnInit, OnDestroy {
   unsubscribe$ = new Subject<void>();
   passengerConfirmations = signal<PassengerConfirmation[]>([]);
   schools = this.tandemSchoolService.schools;
-  currentLang: string;
+  /** LanguageService, not translate.currentLang: reactive, and always a locale Angular has data for. */
+  get currentLang(): string {
+    return this.languageService.lang();
+  }
 
   /**
    * Grouped by month, as the design lists them. A single pass keeps the order
@@ -46,7 +50,11 @@ export class PassengerConfirmationListPage implements OnInit, OnDestroy {
   public groupedConfirmations = computed(() => {
     const groups: { key: string; date: Date; confirmations: PassengerConfirmation[] }[] = [];
     for (const confirmation of this.passengerConfirmations()) {
-      const date = new Date(confirmation.date);
+      // localDate, not new Date(): the API sends a date-only string, which the
+      // Date constructor reads as UTC while the row's DatePipe reads it as
+      // local - so west of UTC the 1st of a month landed under the previous
+      // month's heading, next to rows the pipe had dated correctly.
+      const date = localDate(confirmation.date as unknown as string);
       const key = `${date.getFullYear()}-${date.getMonth()}`;
       const last = groups[groups.length - 1];
       if (last && last.key === key) {
@@ -70,9 +78,9 @@ export class PassengerConfirmationListPage implements OnInit, OnDestroy {
     private paymentService: PaymentService,
     private xlsxExportService: XlsxExportService,
     private tandemSchoolService: TandemSchoolService,
+    private languageService: LanguageService,
     private router: Router
   ) {
-    this.currentLang = resolveLanguage(this.translate.currentLang);
     addIcons({ add, checkmark, 'chevron-back': chevronBack });
   }
 
@@ -163,7 +171,12 @@ export class PassengerConfirmationListPage implements OnInit, OnDestroy {
     if (role == "save") {
       this.savePassengerConfirmation(modal.componentProps.passengerData);
     }
-    this.translate.use(localStorage.getItem('language') || navigator.language.split('-')[0]);
+    // The form lets the passenger read the waiver in their own language; this
+    // puts the pilot's back. Narrowed, because an unshipped device locale (es)
+    // sticks in translate.currentLang while its bundle 404s, and every
+    // date:...:currentLang binding then throws NG0701. Not setLanguage(): this
+    // restores a language, it does not choose one, so it must not persist.
+    this.translate.use(resolveLanguage(localStorage.getItem('language') || navigator.language));
   }
 
   async itemTapped(passengerConfirmation: PassengerConfirmation) {
@@ -182,7 +195,12 @@ export class PassengerConfirmationListPage implements OnInit, OnDestroy {
     if (role == "delete") {
       this.deletePassengerConfirmation(modal.componentProps.passengerData);
     }
-    this.translate.use(localStorage.getItem('language') || navigator.language.split('-')[0]);
+    // The form lets the passenger read the waiver in their own language; this
+    // puts the pilot's back. Narrowed, because an unshipped device locale (es)
+    // sticks in translate.currentLang while its bundle 404s, and every
+    // date:...:currentLang binding then throws NG0701. Not setLanguage(): this
+    // restores a language, it does not choose one, so it must not persist.
+    this.translate.use(resolveLanguage(localStorage.getItem('language') || navigator.language));
   }
 
   private async initialDataLoad() {

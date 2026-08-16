@@ -37,6 +37,8 @@ export class PlaceMapComponent implements AfterViewInit, OnChanges, OnDestroy {
 
     /** True while the pin is the name lookup's guess rather than a real choice. */
     private coordinatesFromSearch = false;
+    /** Whether the altitude and country on screen are this component's own guess. */
+    private metadataFromSearch = false;
 
     @Input()
     placeName: String;
@@ -75,7 +77,12 @@ export class PlaceMapComponent implements AfterViewInit, OnChanges, OnDestroy {
             return;
         }
 
-        if (placeName.firstChange && this.place?.coordinates) {
+        // Never on the first change: that one is the place arriving from the
+        // store, and re-geocoding a place the pilot already saved replaced
+        // their surveyed altitude and country with an OSM guess a second after
+        // the form opened - silently, and then on Save. `new Place()` has no
+        // name, so the add form loses nothing.
+        if (placeName.firstChange) {
             return;
         }
 
@@ -142,8 +149,17 @@ export class PlaceMapComponent implements AfterViewInit, OnChanges, OnDestroy {
                 return;
             }
             this.zone.run(() => {
-                this.place.altitude = metadata.altitude;
-                this.place.country = metadata.country;
+                // Fill an empty field, or refine an earlier guess of our own -
+                // but never replace a value the pilot entered. An existing
+                // place reaches here by being renamed, and its altitude may
+                // have been surveyed rather than looked up.
+                if (this.metadataFromSearch || this.place.altitude == null) {
+                    this.place.altitude = metadata.altitude;
+                }
+                if (this.metadataFromSearch || !this.place.country) {
+                    this.place.country = metadata.country;
+                }
+                this.metadataFromSearch = true;
             });
         } catch {
             // Keep the coordinates; the pilot can still fill these in by hand.
@@ -152,6 +168,12 @@ export class PlaceMapComponent implements AfterViewInit, OnChanges, OnDestroy {
 
     private async initMap(position?: Position) {
         const config = await firstValueFrom(this.configurationService.getMapConfiguration());
+        // The configuration is an HTTP call: leaving the form before it returns
+        // would otherwise build a Map against a detached element that
+        // ngOnDestroy has already run past, so nothing ever disposes it.
+        if (this.destroyed) {
+            return;
+        }
         const attributionControl = new Attribution({
             collapsible: true,
             collapsed: true
@@ -190,9 +212,11 @@ export class PlaceMapComponent implements AfterViewInit, OnChanges, OnDestroy {
 
     onDblclick = (async (evt: any) => {
         this.place.coordinates = evt.coordinate;
-        // Whatever altitude is on the place right now was filled in by the name
-        // lookup, not typed - so there is nothing to ask about before replacing it.
-        const autoFilled = this.coordinatesFromSearch;
+        // Only skip the confirm when the altitude on the place really is our
+        // own guess. coordinatesFromSearch was too loose: the pin can come from
+        // the name lookup while the metadata request that follows it failed,
+        // leaving a typed altitude that would then be replaced unannounced.
+        const autoFilled = this.metadataFromSearch;
         // Placed deliberately, so the name lookup stops moving it.
         this.coordinatesFromSearch = false;
         this.marker.setGeometry(new Point(evt.coordinate));

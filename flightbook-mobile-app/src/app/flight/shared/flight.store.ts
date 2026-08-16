@@ -1,4 +1,4 @@
-import { Injectable, Injector, computed, effect, inject, runInInjectionContext, signal } from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, concatMap, map, tap } from 'rxjs';
 import { environment } from 'src/environments/environment';
@@ -12,6 +12,13 @@ export interface FlightState {
   loading: boolean;
   error: string | null;
 }
+
+/**
+ * Rows in one page of the logbook. The flight list sizes `defaultLimit` up from
+ * this on a tall screen, and has to derive it rather than add to it - the field
+ * is shared, and every reload would otherwise grow the page for the whole app.
+ */
+export const BASE_PAGE_SIZE = 25;
 
 @Injectable({
   providedIn: 'root'
@@ -32,19 +39,34 @@ export class FlightStore {
 
   /**
    * Bumped whenever the logbook the API would return changes - a flight
-   * created, edited or deleted, or the shared filter moved. HomeStore and
-   * StatisticStore derive their figures from those same endpoints and cache
+   * created, edited or deleted, or the shared filter moved. StatisticStore and
+   * the flight list derive their figures from those same endpoints and cache
    * them for the session, so this is what tells them their copy is stale.
    */
   public revision = signal(0);
 
+  /**
+   * The same, minus filter changes. Consumers that always fetch with
+   * `applyFilter: false` - HomeStore - cannot be affected by the filter, and
+   * watching `revision` made every filter tap throw the dashboard away and
+   * refetch five requests to arrive at identical numbers.
+   */
+  public dataRevision = signal(0);
+
+  /** A flight was created, edited or deleted. */
+  private bumpDataRevision(): void {
+    this.dataRevision.update(value => value + 1);
+    this.bumpRevision();
+  }
+
+  /** The shared filter moved: what the API returns changes, the logbook does not. */
   private bumpRevision(): void {
     this.revision.update(value => value + 1);
   }
 
 
   // Default limit for pagination
-  public defaultLimit = 25;
+  public defaultLimit = BASE_PAGE_SIZE;
   
   // Selectors (computed values)
   public flights = computed(() => this.state().flights);
@@ -159,7 +181,7 @@ export class FlightStore {
           loading: false,
           error: null
         }));
-        this.bumpRevision();
+        this.bumpDataRevision();
       }),
       // After posting the flight, get the updated flight list
       concatMap((response: Flight) => {
@@ -202,7 +224,7 @@ export class FlightStore {
               error: null
             };
           });
-          this.bumpRevision();
+          this.bumpDataRevision();
         },
         error: (error) => {
           this.state.update(state => ({ 
@@ -226,7 +248,7 @@ export class FlightStore {
               loading: false,
               error: null
             }));
-            this.bumpRevision();
+            this.bumpDataRevision();
           }),
           // After posting the flight, get the updated flight list
           concatMap((response: Flight) => {

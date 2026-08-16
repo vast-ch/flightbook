@@ -9,7 +9,7 @@ import { StarRatingComponent } from 'src/app/shared/components/star-rating/star-
  * single HTML blob per skill, so matching the heading text is the only signal we
  * have for which section to tint - and the SHV copy is German in every locale.
  */
-const CAUTION_HEADING = /^(fehler|gefahr|mistake|erreur|danger|errori|pericol)/i;
+const CAUTION_HEADING = /^(fehler|gefahr|mistake|erreur|risque|danger|errori|pericol)/i;
 
 @Component({
     selector: 'app-control-sheet-details',
@@ -47,6 +47,15 @@ export class ControlSheetDetailsComponent implements OnInit {
     /** Null for theory, whose skills are names without coaching content. */
     content: string | null = null;
 
+    /**
+     * Resolved once, not from the template. bypassSecurityTrustResourceUrl
+     * returns a fresh object every call, so binding it into [src] made the
+     * binding dirty on every change-detection pass and the iframe re-navigated
+     * - which, inside a scrolling Ionic modal, meant the player restarted
+     * dozens of times a second and never finished loading.
+     */
+    safeVideoUrl: SafeResourceUrl | null = null;
+
     constructor(
         private modalCtrl: ModalController,
         private sanitizer: DomSanitizer,
@@ -55,6 +64,8 @@ export class ControlSheetDetailsComponent implements OnInit {
 
     ngOnInit(): void {
         this.content = this.buildContent();
+        const video = this.videoUrl();
+        this.safeVideoUrl = video ? this.sanitizer.bypassSecurityTrustResourceUrl(video) : null;
     }
 
     get levelKey(): string {
@@ -73,7 +84,7 @@ export class ControlSheetDetailsComponent implements OnInit {
      * .video" as a relative URL, which the SPA fallback answers with index.html:
      * the whole app, booted again inside the sheet.
      */
-    videoUrl(): string | null {
+    private videoUrl(): string | null {
         const url = this.translate.instant(`controlSheet.${this.type}.${this.key}.video`);
         if (!url || typeof url !== 'string' || url.startsWith('controlSheet.')) {
             return null;
@@ -83,10 +94,6 @@ export class ControlSheetDetailsComponent implements OnInit {
 
     close() {
         return this.modalCtrl.dismiss();
-    }
-
-    getSafeUrl(url: string): SafeResourceUrl {
-        return this.sanitizer.bypassSecurityTrustResourceUrl(url);
     }
 
     private buildContent(): string | null {

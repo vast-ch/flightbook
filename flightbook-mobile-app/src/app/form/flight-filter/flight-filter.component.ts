@@ -4,7 +4,6 @@ import { Subject, Subscription, of } from 'rxjs';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { catchError, debounceTime, switchMap, takeUntil, tap } from 'rxjs/operators';
 import { toObservable } from '@angular/core/rxjs-interop';
-import { FlightFilter } from 'src/app/flight/shared/flight-filter.model';
 import { Glider } from 'src/app/glider/shared/glider.model';
 import { FlightStore } from 'src/app/flight/shared/flight.store';
 import { GliderStore } from 'src/app/glider/shared/glider.store';
