@@ -48,8 +48,6 @@
     "b64-to-blob": "^1.2.19",
     "chart.js": "^3.6.0",
     "chartjs-adapter-moment": "^1.0.1",
-    "chartjs-plugin-datalabels": "^2.2.0",
-    "chartjs-plugin-zoom": "^2.2.0",
     "file-saver": "^2.0.5",
     "igc-parser": "^1.1.0",
     "igc-xc-score": "^1.7.0",
