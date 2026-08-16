@@ -51,6 +51,8 @@ export interface Season {
 }
 
 export interface Bar {
+    /** The number behind the bar, for charts that print it above the column. */
+    value: number;
     /** 0..1 of the tallest bar. */
     ratio: number;
     /** Nothing flown - the design draws a hairline rather than an empty slot. */
@@ -243,6 +245,7 @@ export class StatisticStore {
     private toBars(values: number[], label: (index: number) => string): Bar[] {
         const max = Math.max(...values, 1);
         return values.map((value, index) => ({
+            value,
             ratio: value / max,
             empty: value === 0,
             peak: value > 0 && value === max,
