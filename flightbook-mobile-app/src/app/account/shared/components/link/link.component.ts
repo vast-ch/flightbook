@@ -1,34 +1,35 @@
 import { Component, Input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { IonHeader, IonToolbar, IonTitle, IonInput, IonButtons, IonContent, IonItem, IonButton, IonTextarea, IonIcon, IonModal, IonDatetime, IonPopover, ModalController, IonText } from "@ionic/angular/standalone";
+import { IonInput, IonContent, IonButton, IonIcon, ModalController } from "@ionic/angular/standalone";
 import { TranslateModule } from '@ngx-translate/core';
+import { addIcons } from 'ionicons';
+import { close } from 'ionicons/icons';
 import { Link } from '../../userConfig.model';
 
 @Component({
   selector: 'app-link',
   templateUrl: './link.component.html',
   styleUrls: ['./link.component.scss'],
-  imports: [IonText, 
+  imports: [
     TranslateModule,
     FormsModule,
     IonIcon,
     IonButton,
-    IonItem,
     IonContent,
-    IonButtons,
-    IonInput,
-    IonTitle,
-    IonToolbar,
-    IonHeader
+    IonInput
   ]
 })
 export class LinkComponent {
 
   @Input() link: Link;
 
+  /** Only decides the button's wording; the caller owns what happens after. */
+  @Input() type: 'add' | 'edit' = 'add';
+
   constructor(
     private modalCtrl: ModalController
   ) {
+    addIcons({ close });
   }
 
   closeLinkModal() {

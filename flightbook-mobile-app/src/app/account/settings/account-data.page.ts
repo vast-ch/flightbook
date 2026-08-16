@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit, effect } from '@angular/core';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
-import { AlertController, LoadingController, NavController, IonContent, IonButton, IonIcon, IonInput, IonTextarea, IonToggle } from '@ionic/angular/standalone';
+import { AlertController, LoadingController, ModalController, NavController, IonContent, IonButton, IonIcon, IonInput, IonTextarea, IonToggle, IonReorder, IonReorderGroup, ReorderEndCustomEvent } from '@ionic/angular/standalone';
 import HttpStatusCode from '../../shared/util/HttpStatusCode';
 import { User } from 'src/app/account/shared/user.model';
 import { AccountService } from '../shared/account.service';
@@ -17,7 +17,9 @@ import moment from 'moment';
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { addIcons } from 'ionicons';
-import { chevronBack, eyeOutline, eyeOffOutline, checkmark } from 'ionicons/icons';
+import { add, chevronBack, eyeOutline, eyeOffOutline, checkmark, trash } from 'ionicons/icons';
+import { Link } from '../shared/userConfig.model';
+import { LinkComponent } from '../shared/components/link/link.component';
 import { environment } from 'src/environments/environment';
 import { PhoneNumberComponent } from 'src/app/shared/components/phone-number/phone-number.component';
 
@@ -38,6 +40,8 @@ const LANGUAGES = ['fr', 'de', 'en', 'it'];
         IonInput,
         IonTextarea,
         IonToggle,
+        IonReorder,
+        IonReorderGroup,
         PhoneNumberComponent
     ]
 })
@@ -70,14 +74,15 @@ export class AccountDataPage implements OnInit, OnDestroy {
         public navCtrl: NavController,
         private router: Router,
         private paymentService: PaymentService,
+        private modalCtrl: ModalController,
         private route: ActivatedRoute
     ) {
         this.isNative = Capacitor.isNativePlatform();
-        addIcons({ 'chevron-back': chevronBack, 'eye-outline': eyeOutline, 'eye-off-outline': eyeOffOutline, checkmark });
+        addIcons({ 'chevron-back': chevronBack, 'eye-outline': eyeOutline, 'eye-off-outline': eyeOffOutline, checkmark, add, trash });
 
         // Deep clone: edits must not touch the signal until a save succeeds.
         effect(() => {
-            this.user = structuredClone(this.accountService.currentUser$());
+            this.user = this.withConfig(structuredClone(this.accountService.currentUser$()));
         });
 
         this.paymentService.getPaymentStatus().pipe(takeUntil(this.unsubscribe$)).subscribe((paymentStatus: PaymentStatus) => {
@@ -129,6 +134,58 @@ export class AccountDataPage implements OnInit, OnDestroy {
 
     close() {
         this.navCtrl.navigateBack('more');
+    }
+
+    /**
+     * The template binds into config three levels deep, and an account that has
+     * never saved a setting comes back without it - so fill the shape in rather
+     * than guard every binding.
+     */
+    private withConfig(user: User | null): User | null {
+        if (!user) {
+            return user;
+        }
+        user.config = user.config ?? {};
+        user.config.notifications = user.config.notifications ?? {};
+        user.config.notifications.email = user.config.notifications.email ?? {};
+        user.config.preparation = user.config.preparation ?? {};
+        user.config.preparation.links = user.config.preparation.links ?? [];
+        return user;
+    }
+
+    // ---- Flight preparation links ---------------------------------------
+
+    linkAddButton() {
+        this.manageLinkModal(new Link(), 'add');
+    }
+
+    async manageLinkModal(link: Link, type: 'add' | 'edit') {
+        // Edited on a copy, so cancelling leaves the original untouched.
+        const copyLink = { ...link };
+        const modal = await this.modalCtrl.create({
+            component: LinkComponent,
+            componentProps: { link: copyLink, type }
+        });
+        await modal.present();
+
+        const { data } = await modal.onWillDismiss();
+        if (!data || data.type === 'close') {
+            return;
+        }
+
+        if (type === 'add') {
+            this.user.config.preparation.links.push(data.link);
+        } else {
+            Object.assign(link, copyLink);
+        }
+    }
+
+    deleteLinkItem(index: number) {
+        this.user.config.preparation.links.splice(index, 1);
+    }
+
+    handleReorderEnd(event: ReorderEndCustomEvent) {
+        this.user.config.preparation.links = event.detail.complete(this.user.config.preparation.links);
     }
 
     private loadEmergencyContact() {

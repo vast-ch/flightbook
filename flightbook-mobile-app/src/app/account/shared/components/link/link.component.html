@@ -1,32 +1,51 @@
-<ion-header>
-    <ion-toolbar color='primary'>
-        <ion-title>{{ 'glider.check.title' | translate }}</ion-title>
-        <ion-buttons slot="end">
-            <ion-button (click)="closeLinkModal()"><ion-icon name="close"></ion-icon></ion-button>
-        </ion-buttons>
-    </ion-toolbar>
-</ion-header>
-<ion-content class="ion-padding">
-    <form #form="ngForm">
-        <ion-item class="error-item">
-            <ion-input label="{{ 'account.configuration.label' | translate }}" labelPlacement="stacked" [(ngModel)]="link.label"
-                #inputLabel="ngModel" required name="inputLabel" type="text"></ion-input>
-            @if (inputLabel.invalid && (inputLabel.dirty || inputLabel.touched)) {
-                <ion-text color="danger" class="error-text">{{ 'message.required' | translate }}</ion-text>
-            }
-        </ion-item>
-        <ion-item class="error-item">
-            <ion-input label="{{ 'account.configuration.url' | translate }}" labelPlacement="stacked" [(ngModel)]="link.url"
-                #inputUrl="ngModel" required name="inputUrl" type="url" pattern="https?://.+" placeholder="https://example.com"></ion-input>
-            @if (inputUrl.invalid && (inputUrl.dirty || inputUrl.touched)) {
-                @if(inputUrl.errors?.['required']) {
-                    <ion-text color="danger" class="error-text">{{ 'message.required' | translate }}</ion-text>
+<div class="form-header">
+    <button type="button" class="icon-button" (click)="closeLinkModal()"
+            [attr.aria-label]="'buttons.cancel' | translate">
+        <ion-icon name="close" aria-hidden="true"></ion-icon>
+    </button>
+    <h1 class="form-header__title">{{ 'account.configuration.link' | translate }}</h1>
+</div>
+
+<ion-content>
+    <form id="linkForm" #form="ngForm" (ngSubmit)="saveLink()">
+        <div class="form-body">
+            <div class="fb-card--flush">
+                <div class="fb-row">
+                    <span class="fb-row__label" id="lbl-link-label">{{ 'account.configuration.label' | translate }}&nbsp;*</span>
+                    <span class="fb-row__value">
+                        <ion-input [(ngModel)]="link.label" #inputLabel="ngModel" required
+                                   name="inputLabel" type="text" autocapitalize="sentences"
+                                   aria-labelledby="lbl-link-label"></ion-input>
+                    </span>
+                </div>
+                @if (inputLabel.invalid && (inputLabel.dirty || inputLabel.touched)) {
+                    <div class="fb-field__error">{{ 'message.required' | translate }}</div>
                 }
-                @if(inputUrl.errors?.['pattern']) {
-                    <ion-text color="danger" class="error-text">{{ 'message.invalidUrl' | translate }}</ion-text>
+
+                <div class="fb-row">
+                    <span class="fb-row__label" id="lbl-link-url">{{ 'account.configuration.url' | translate }}&nbsp;*</span>
+                    <span class="fb-row__value">
+                        <ion-input [(ngModel)]="link.url" #inputUrl="ngModel" required
+                                   name="inputUrl" type="url" inputmode="url"
+                                   pattern="https?://.+" placeholder="https://example.com"
+                                   aria-labelledby="lbl-link-url"></ion-input>
+                    </span>
+                </div>
+                @if (inputUrl.invalid && (inputUrl.dirty || inputUrl.touched)) {
+                    @if (inputUrl.errors?.['required']) {
+                        <div class="fb-field__error">{{ 'message.required' | translate }}</div>
+                    } @else if (inputUrl.errors?.['pattern']) {
+                        <div class="fb-field__error">{{ 'message.invalidUrl' | translate }}</div>
+                    }
                 }
-            }
-        </ion-item>
-        <ion-button [disabled]="form.invalid" (click)="saveLink()" expand="block">{{ 'buttons.add' | translate }}</ion-button>
+            </div>
+        </div>
     </form>
 </ion-content>
+
+<div class="form-footer">
+    <!-- "Add" when adding, "Save" when editing - it used to say Add for both -->
+    <ion-button expand="block" type="submit" form="linkForm" [disabled]="form.invalid">
+        {{ (type === 'edit' ? 'buttons.save' : 'buttons.add') | translate }}
+    </ion-button>
+</div>
