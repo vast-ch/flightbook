@@ -89,22 +89,33 @@
       </div>
 
       <div class="fb-card--flush">
-        <!-- One row, two destinations: the design shows both days inline -->
-        <div class="fb-row more-row">
-          <span class="more-row__title">{{ 'more.dabs' | translate }}</span>
-          <span class="more-dabs">
-            <button type="button" class="more-dabs__link" (click)="openDabs('today')">
+        <!--
+          Built-in rows take the same two-line shape as the pilot's own, which
+          is what the design's `builtIn` entry is: name over host, plus a meta
+          on the right. DABS keeps both days tappable - one row, two URLs.
+        -->
+        <div class="fb-row link-row">
+          <span class="link-row__text">
+            <span class="link-row__name">{{ 'more.dabs' | translate }}</span>
+            <span class="link-row__host">{{ dabsHost }}</span>
+          </span>
+          <span class="link-row__meta">
+            <button type="button" class="link-row__meta-link" (click)="openDabs('today')">
               {{ 'more.today' | translate }}
             </button>
-            <span class="more-dabs__sep" aria-hidden="true">·</span>
-            <button type="button" class="more-dabs__link" (click)="openDabs('tomorrow')">
+            <span class="link-row__meta-sep" aria-hidden="true">·</span>
+            <button type="button" class="link-row__meta-link" (click)="openDabs('tomorrow')">
               {{ 'more.tomorrow' | translate }}
             </button>
           </span>
         </div>
-        <button type="button" class="fb-row more-row" (click)="openShvApp()">
-          <span class="more-row__title">{{ 'more.shvApp' | translate }}</span>
-        </button>
+
+        <div class="fb-row link-row" (click)="openShvApp()">
+          <span class="link-row__text">
+            <span class="link-row__name">{{ 'more.shvApp' | translate }}</span>
+            <span class="link-row__host">{{ shvHost }}</span>
+          </span>
+        </div>
 
         <!--
           The pilot's own links. Built-in rows above are not editable; these are,

@@ -316,3 +316,28 @@
   color: var(--fb-text-secondary);
   text-wrap: pretty;
 }
+
+// The design's built-in row carries a meta on the right. Ours stays tappable -
+// it is two destinations, not a caption - but takes the design's weight.
+.link-row__meta {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex: none;
+}
+
+.link-row__meta-link {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--ion-color-primary);
+  cursor: pointer;
+}
+
+.link-row__meta-sep {
+  font-size: 12px;
+  color: var(--fb-text-secondary);
+}

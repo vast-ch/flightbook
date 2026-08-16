@@ -149,6 +149,19 @@ export class MorePage implements OnDestroy {
         return !!entry?.label?.trim() && /^https?:\/\/.+/.test(entry?.url?.trim() ?? '');
     });
 
+    /** Hosts for the built-in rows, so every row reads the same way. */
+    public get dabsHost(): string {
+        return this.hostOf(DABS_URLS.today);
+    }
+
+    public get shvHost(): string {
+        return this.hostOf(this.shvUrl());
+    }
+
+    private shvUrl(): string {
+        return Capacitor.getPlatform() === 'ios' ? SHV_APP_URLS.ios : SHV_APP_URLS.other;
+    }
+
     /** The design puts the host under the name; the full URL rarely fits. */
     hostOf(url: string): string {
         try {
@@ -257,8 +270,7 @@ export class MorePage implements OnDestroy {
 
     /** Store link for the SHV/FSVL app: App Store on iOS, Play Store elsewhere. */
     openShvApp() {
-        const url = Capacitor.getPlatform() === 'ios' ? SHV_APP_URLS.ios : SHV_APP_URLS.other;
-        Browser.open({ url });
+        Browser.open({ url: this.shvUrl() });
     }
 
     openLink(url: string) {
