@@ -29,6 +29,42 @@ export interface CumulativePoint {
     label: string;
     /** Cumulative seconds up to and including this month. */
     seconds: number;
+    /** Which season this month belongs to, so one can be highlighted. */
+    year: string;
+}
+
+/** One season: the year, its totals, and flights per calendar month. */
+export interface Season {
+    year: string;
+    flights: number;
+    /** Seconds. */
+    airtime: number;
+    months: number[];
+}
+
+export interface Bar {
+    /** 0..1 of the tallest bar. */
+    ratio: number;
+    /** Nothing flown - the design draws a hairline rather than an empty slot. */
+    empty: boolean;
+    /** The tallest bar, which the design paints in the primary colour. */
+    peak: boolean;
+    label: string;
+}
+
+export interface SeasonRow {
+    year: string;
+    /** Twelve levels, 0..3, one per month. */
+    cells: number[];
+}
+
+export interface SeasonComparison {
+    flights: number;
+    /** Against the previous season; null when this is the first. */
+    delta: number | null;
+    /** 1 = best season by flights. */
+    rank: number;
+    previousYear: string | null;
 }
 
 export interface PersonalBests {
@@ -54,6 +90,18 @@ function timeToSeconds(time?: string): number {
     }
     const [h = 0, m = 0, s = 0] = time.split(':').map(Number);
     return h * 3600 + m * 60 + s;
+}
+
+/**
+ * The design's four-level intensity scale, shared by both activity grids:
+ * nothing, then thirds of the busiest cell.
+ */
+function shade(value: number, max: number): number {
+    if (!value || max <= 0) {
+        return 0;
+    }
+    const ratio = value / max;
+    return ratio > 2 / 3 ? 3 : (ratio > 1 / 3 ? 2 : 1);
 }
 
 /**
@@ -101,6 +149,122 @@ export class StatisticStore {
         const dates = this.state().flights.map(f => f.date).filter(Boolean).sort();
         return dates.length ? dates[0] : null;
     });
+
+    /**
+     * Every season with its monthly breakdown, oldest first. The yearly rows
+     * carry the totals and the monthly rows the shape; both are already loaded,
+     * so nothing new is fetched for the grid, the bars or the seasons list.
+     */
+    public seasons = computed<Season[]>(() => {
+        const monthly = this.state().monthly;
+        return this.state().yearly
+            .filter(row => Number(row.nbFlights) > 0)
+            .sort((a, b) => Number(a.year) - Number(b.year))
+            .map(row => {
+                const months = Array(12).fill(0);
+                for (const entry of monthly) {
+                    if (entry.year !== row.year) {
+                        continue;
+                    }
+                    const index = Number(entry.month) - 1;
+                    if (index >= 0 && index < 12) {
+                        months[index] = Number(entry.nbFlights ?? 0);
+                    }
+                }
+                return {
+                    year: row.year,
+                    flights: Number(row.nbFlights ?? 0),
+                    airtime: Number(row.time ?? 0),
+                    months
+                };
+            });
+    });
+
+    private selectedSeason = computed<Season | null>(() =>
+        this.seasons().find(season => season.year === this.period()) ?? null
+    );
+
+    /** How the selected season stands against the one before, and against all. */
+    public comparison = computed<SeasonComparison | null>(() => {
+        const season = this.selectedSeason();
+        if (!season) {
+            return null;
+        }
+        const seasons = this.seasons();
+        const previous = seasons.find(s => Number(s.year) === Number(season.year) - 1) ?? null;
+        const rank = [...seasons].sort((a, b) => b.flights - a.flights)
+            .findIndex(s => s.year === season.year) + 1;
+        return {
+            flights: season.flights,
+            delta: previous ? season.flights - previous.flights : null,
+            rank,
+            previousYear: previous?.year ?? null
+        };
+    });
+
+    /** One bar per season all-time, one per month inside a season. */
+    public bars = computed<Bar[]>(() => {
+        const season = this.selectedSeason();
+        if (season) {
+            const max = Math.max(...season.months, 1);
+            return season.months.map((value, index) => ({
+                ratio: value / max,
+                empty: value === 0,
+                peak: value > 0 && value === max,
+                label: this.monthInitials()[index]
+            }));
+        }
+
+        const seasons = this.seasons();
+        const max = Math.max(...seasons.map(s => s.flights), 1);
+        return seasons.map((s, index) => ({
+            ratio: s.flights / max,
+            empty: s.flights === 0,
+            peak: s.flights === max,
+            // Only the ends and every fifth year, or the axis turns to mush.
+            label: (index === 0 || index === seasons.length - 1 || Number(s.year) % 5 === 0)
+                ? `’${s.year.slice(2)}`
+                : ''
+        }));
+    });
+
+    /** The busiest month of the season, or the strongest season all-time. */
+    public peakLabel = computed<{ name: string; flights: number } | null>(() => {
+        const season = this.selectedSeason();
+        if (season) {
+            const max = Math.max(...season.months);
+            return max > 0
+                ? { name: this.monthNames()[season.months.indexOf(max)], flights: max }
+                : null;
+        }
+        const best = [...this.seasons()].sort((a, b) => b.flights - a.flights)[0];
+        return best ? { name: best.year, flights: best.flights } : null;
+    });
+
+    /** Newest season first, as the design stacks them. */
+    public seasonGrid = computed<SeasonRow[]>(() => {
+        const seasons = this.seasons();
+        const max = Math.max(...seasons.flatMap(s => s.months), 1);
+        return [...seasons].reverse().map(season => ({
+            year: `’${season.year.slice(2)}`,
+            cells: season.months.map(value => shade(value, max))
+        }));
+    });
+
+    /** Months of the selected season that saw at least one flight. */
+    public activeMonths = computed(() =>
+        this.selectedSeason()?.months.filter(value => value > 0).length ?? 0
+    );
+
+    /** Localised month names and their initials, for the bars and the grid. */
+    public monthNames = computed<string[]>(() => {
+        const formatter = new Intl.DateTimeFormat(this.languageService.lang(), { month: 'long' });
+        return Array.from({ length: 12 }, (_unused, index) => formatter.format(new Date(2020, index, 1)));
+    });
+
+    public monthInitials = computed<string[]>(() =>
+        this.monthNames().map(name => name.charAt(0).toUpperCase())
+    );
 
     /** Flights inside the selected period. */
     private periodFlights = computed<Flight[]>(() => {
@@ -187,9 +351,10 @@ export class StatisticStore {
     public cumulative = computed<CumulativePoint[]>(() => {
         // Read as a signal so the axis labels re-render on a language switch.
         const lang = this.languageService.lang();
-        const period = this.period();
-        const rows = this.state().monthly
-            .filter(row => period === ALL_TIME || row.year === period)
+        // Always the whole logbook, whatever the period: the design puts the
+        // selected season in context by highlighting its stretch of the line,
+        // which a chart cut down to that season could not show.
+        const rows = [...this.state().monthly]
             .sort((a, b) => (a.year + a.month).localeCompare(b.year + b.month));
 
         let running = 0;
@@ -199,7 +364,8 @@ export class StatisticStore {
             const date = new Date(Number(row.year), Number(row.month) - 1, 1);
             return {
                 label: date.toLocaleDateString(lang, { month: 'short', year: 'numeric' }),
-                seconds: running
+                seconds: running,
+                year: row.year
             };
         });
     });

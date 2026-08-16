@@ -1,0 +1,62 @@
+:host {
+    display: block;
+}
+
+.bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 4px;
+    height: 96px;
+    margin-top: 16px;
+    border-bottom: 1px solid var(--fb-track);
+
+    &--tight {
+        gap: 2px;
+    }
+}
+
+.bars__slot {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+}
+
+.bars__bar {
+    border-radius: 2px;
+    background: var(--fb-accent);
+
+    &.is-empty {
+        background: var(--fb-track);
+    }
+
+    &.is-peak {
+        background: var(--ion-color-primary);
+    }
+}
+
+.labels {
+    display: flex;
+    gap: 4px;
+    margin-top: 7px;
+
+    &--tight {
+        gap: 2px;
+    }
+}
+
+.labels__cell {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-align: center;
+    font-size: 9px;
+    font-weight: 500;
+    color: var(--fb-text);
+
+    &.is-quiet {
+        color: #98a4c0;
+    }
+}

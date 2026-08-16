@@ -7,13 +7,15 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { ALL_TIME, StatisticPeriod, StatisticStore } from './shared/statistic.store';
 import { ActivityHeatmapComponent } from './components/activity-heatmap/activity-heatmap.component';
+import { FlightsBarsComponent } from './components/flights-bars/flights-bars.component';
+import { SeasonGridComponent } from './components/season-grid/season-grid.component';
 import { CumulativeChartComponent } from './components/cumulative-chart/cumulative-chart.component';
 import { FlightFilterComponent } from 'src/app/form/flight-filter/flight-filter.component';
 import { FilterChipsComponent } from 'src/app/form/flight-filter/filter-chips.component';
 import { FlightStore } from 'src/app/flight/shared/flight.store';
 import { ModalController } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { filterOutline } from 'ionicons/icons';
+import { chevronForward, filterOutline, trendingUp } from 'ionicons/icons';
 import { AvatarButtonComponent } from 'src/app/shared/components/avatar-button/avatar-button.component';
 
 @Component({
@@ -26,6 +28,8 @@ import { AvatarButtonComponent } from 'src/app/shared/components/avatar-button/a
         DecimalPipe,
         TranslateModule,
         ActivityHeatmapComponent,
+        FlightsBarsComponent,
+        SeasonGridComponent,
         CumulativeChartComponent,
         IonButton,
         IonContent,
@@ -79,7 +83,63 @@ export class FlightStatisticPage implements OnDestroy {
     }
 
     constructor() {
-        addIcons({ filterOutline });
+        addIcons({ filterOutline, trendingUp, 'chevron-forward': chevronForward });
+    }
+
+    public seasons = this.store.seasons;
+    public seasonGrid = this.store.seasonGrid;
+    public bars = this.store.bars;
+    public comparison = this.store.comparison;
+    public monthInitials = this.store.monthInitials;
+    public activeMonths = this.store.activeMonths;
+
+    /** Newest first, the way the design stacks the seasons list. */
+    public seasonsNewestFirst = computed(() => [...this.seasons()].reverse());
+
+    public chartMeta = computed(() => {
+        const seasons = this.seasons();
+        if (this.period() !== ALL_TIME) {
+            return this.period();
+        }
+        return seasons.length > 1
+            ? `${seasons[0].year} – ${seasons[seasons.length - 1].year}`
+            : (seasons[0]?.year ?? '');
+    });
+
+    /** The design's second sentence names a specific year; only the first generalises. */
+    public chartNote = computed(() => {
+        const peak = this.store.peakLabel();
+        if (!peak) {
+            return '';
+        }
+        const key = this.period() === ALL_TIME ? 'statistics.strongestSeason' : 'statistics.busiestMonth';
+        return this.translate.instant(key, { name: peak.name, flights: peak.flights, count: peak.flights });
+    });
+
+    public comparisonText = computed(() => {
+        const compare = this.comparison();
+        if (!compare) {
+            return '';
+        }
+        if (compare.delta === null) {
+            return this.translate.instant('statistics.compareFirst', { count: compare.flights });
+        }
+        const delta = compare.delta >= 0 ? `+${compare.delta}` : String(compare.delta);
+        const rank = compare.rank === 1
+            ? this.translate.instant('statistics.rankBest')
+            : this.translate.instant('statistics.rankOrdinal', { rank: compare.rank });
+        const head = this.translate.instant('statistics.compare', {
+            count: compare.flights,
+            delta,
+            year: compare.previousYear
+        });
+        return `${head} · ${rank}`;
+    });
+
+    /** Sparkline bars share the season's own busiest month, not a global max. */
+    sparkHeight(value: number, months: number[]): string {
+        const max = Math.max(...months, 1);
+        return value === 0 ? '2px' : `${Math.max(3, Math.round(value / max * 22))}px`;
     }
 
     ionViewWillEnter() {

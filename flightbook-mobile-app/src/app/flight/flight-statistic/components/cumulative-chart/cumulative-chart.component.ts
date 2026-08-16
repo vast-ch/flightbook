@@ -23,7 +23,19 @@ export class CumulativeChartComponent {
         this.source.set(value ?? []);
     }
 
+    /** The season to pick out of the line, or null for the whole run. */
+    @Input() set highlightYear(value: string | null) {
+        this.highlight.set(value);
+    }
+
+    private highlight = signal<string | null>(null);
+
     public hasData = computed(() => this.source().length > 1);
+
+    private isHighlighted(index: number): boolean {
+        const year = this.highlight();
+        return !!year && this.source()[index]?.year === year;
+    }
 
     public chartData = computed<ChartData<'line'>>(() => {
         const points = this.source();
@@ -38,6 +50,16 @@ export class CumulativeChartComponent {
                     fill: 'origin',
                     tension: 0,
                     pointRadius: 0,
+                    /*
+                     * A segment callback rather than a second dataset: the
+                     * design paints the selected season's stretch white, and
+                     * Chart.js can colour per segment without duplicating the
+                     * series or its fill.
+                     */
+                    segment: {
+                        borderColor: ctx => this.isHighlighted(ctx.p1DataIndex) ? '#ffffff' : '#45b1fd',
+                        borderWidth: ctx => this.isHighlighted(ctx.p1DataIndex) ? 3.4 : 2.6
+                    },
                     // Mark only where the line ends.
                     pointHoverRadius: 4
                 }

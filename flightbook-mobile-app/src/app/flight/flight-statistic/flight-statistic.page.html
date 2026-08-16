@@ -1,14 +1,15 @@
 <!-- Surface strip rather than an ion-toolbar; the page lives in the tab shell -->
 <div class="stat-header">
+  <!-- Title row, then the period chips underneath it -->
+  <div class="stat-header__row">
   <div class="stat-header__text">
   <div class="fb-section-label">
     @if (period() === ALL_TIME) {
-      {{ 'statistics.allTime' | translate }}
-      @if (firstFlightDate()) {
-        &middot; {{ 'statistics.since' | translate:{ date: (firstFlightDate() | date:'dd.MM.yyyy') } }}
-      }
+      {{ 'statistics.kickerAll' | translate:{
+           count: headline().flights,
+           date: (firstFlightDate() | date:'dd.MM.yyyy') } }}
     } @else {
-      {{ period() }}
+      {{ 'statistics.kickerSeason' | translate:{ year: period(), count: headline().flights } }}
     }
   </div>
   <h1 class="stat-header__title">{{ 'groupname.statistics' | translate }}</h1>
@@ -21,6 +22,30 @@
     </button>
     <fb-avatar-button></fb-avatar-button>
   </div>
+  </div>
+
+  <!--
+    A pinned "All time" plus a scrolling row of seasons: a segmented control
+    cannot hold a logbook with a dozen of them.
+  -->
+  @if (years().length > 0) {
+    <div class="period" role="group" [attr.aria-label]="'statistics.period' | translate">
+      <div class="period__pinned">
+        <button type="button" class="fb-chip" [class.fb-chip--active]="period() === ALL_TIME"
+                [attr.aria-pressed]="period() === ALL_TIME" (click)="selectPeriod(ALL_TIME)">
+          {{ 'statistics.allTime' | translate }}
+        </button>
+      </div>
+      <div class="period__scroll">
+        @for (year of years(); track year) {
+          <button type="button" class="fb-chip" [class.fb-chip--active]="period() === year"
+                  [attr.aria-pressed]="period() === year" (click)="selectPeriod(year)">
+            {{ year }}
+          </button>
+        }
+      </div>
+    </div>
+  }
 </div>
 
 <ion-content class="no-padding">
@@ -29,21 +54,6 @@
   <div class="stat-body">
 
     @if (hasFlights()) {
-      <!-- Period -->
-      @if (years().length > 0) {
-        <div class="fb-segments" role="group" [attr.aria-label]="'statistics.period' | translate">
-          <button type="button" class="fb-segments__item" [class.is-active]="period() === ALL_TIME"
-                  [attr.aria-pressed]="period() === ALL_TIME" (click)="selectPeriod(ALL_TIME)">
-            {{ 'statistics.allTime' | translate }}
-          </button>
-          @for (year of years(); track year) {
-            <button type="button" class="fb-segments__item" [class.is-active]="period() === year"
-                    [attr.aria-pressed]="period() === year" (click)="selectPeriod(year)">
-              {{ year }}
-            </button>
-          }
-        </div>
-      }
 
       <!-- Headline -->
       <div class="fb-card--flush headline">
@@ -71,26 +81,63 @@
         </div>
       </div>
 
-      <!-- Activity heatmap -->
+      <!-- How this season stands against the last -->
+      @if (comparison(); as compare) {
+        <div class="season-compare">
+          <ion-icon name="trending-up" aria-hidden="true"></ion-icon>
+          <span>{{ comparisonText() }}</span>
+        </div>
+      }
+
+      <!-- Flights per season, or per month inside one -->
+      <div class="fb-card activity">
+        <div class="activity__head">
+          <span class="activity__title">
+            {{ (period() === ALL_TIME ? 'statistics.flightsPerYear' : 'statistics.flightsPerMonth') | translate }}
+          </span>
+          <span class="activity__hint">{{ chartMeta() }}</span>
+        </div>
+
+        <fb-flights-bars [data]="bars()"></fb-flights-bars>
+
+        @if (chartNote(); as note) {
+          <p class="activity__note">{{ note }}</p>
+        }
+      </div>
+
+      <!-- Activity: a season grid all-time, a day grid inside a season -->
       <div class="fb-card activity">
         <div class="activity__head">
           <span class="activity__title">{{ 'statistics.flightActivity' | translate }}</span>
           <span class="activity__hint">
-            {{ period() === ALL_TIME ? ('statistics.sinceStart' | translate) : period() }}
+            @if (period() === ALL_TIME) {
+              {{ 'statistics.seasonsByMonth' | translate:{ count: seasons().length } }}
+            } @else {
+              {{ 'statistics.everyDayIn' | translate:{ year: period() } }}
+            }
           </span>
         </div>
 
-        <fb-activity-heatmap [days]="heatmap()"></fb-activity-heatmap>
+        @if (period() === ALL_TIME) {
+          <fb-season-grid [seasons]="seasonGrid()" [months]="monthInitials()"></fb-season-grid>
+        } @else {
+          <fb-activity-heatmap [days]="heatmap()"></fb-activity-heatmap>
+        }
 
         <div class="activity__foot">
           <span class="activity__count">
-            {{ 'statistics.flyingDays' | translate:{ days: flyingDays(), weeks: weekCount() } }}
+            @if (period() === ALL_TIME) {
+              {{ 'statistics.seasonGridNote' | translate }}
+            } @else {
+              {{ 'statistics.monthsWithFlights' | translate:{ flights: headline().flights, months: activeMonths() } }}
+            }
           </span>
           <span class="activity__legend">
             <span class="activity__legend-label">{{ 'statistics.less' | translate }}</span>
             <i class="activity__swatch" data-level="0"></i>
             <i class="activity__swatch" data-level="1"></i>
             <i class="activity__swatch" data-level="2"></i>
+            <i class="activity__swatch" data-level="3"></i>
             <span class="activity__legend-label">{{ 'statistics.more' | translate }}</span>
           </span>
         </div>
@@ -103,11 +150,20 @@
           <span class="cumulative__total">{{ totalAirtime() }}</span>
         </div>
 
-        <fb-cumulative-chart [points]="cumulative()"></fb-cumulative-chart>
+        <fb-cumulative-chart [points]="cumulative()"
+                             [highlightYear]="period() === ALL_TIME ? null : period()"></fb-cumulative-chart>
 
         @if (cumulative().length > 1) {
+          <!-- Ends, with what the line is showing between them -->
           <div class="cumulative__axis">
             <span>{{ cumulative()[0].label }}</span>
+            <span class="cumulative__axis-note">
+              @if (period() === ALL_TIME) {
+                {{ 'statistics.totalAirtime' | translate }}
+              } @else {
+                {{ 'statistics.seasonHighlighted' | translate:{ year: period() } }}
+              }
+            </span>
             <span>{{ cumulative()[cumulative().length - 1].label }}</span>
           </div>
         }
@@ -136,6 +192,35 @@
           <span class="bests__meta">{{ 'statistics.startLanding' | translate }}</span>
         </div>
       </div>
+
+      @if (period() === ALL_TIME && seasons().length > 0) {
+        <div class="stat-section-head">
+          <span class="fb-section-label">{{ 'statistics.seasons' | translate }}</span>
+          <span class="stat-section-head__count">
+            {{ 'statistics.seasonCount' | translate:{ count: seasons().length } }}
+          </span>
+        </div>
+        <div class="fb-card--flush">
+          @for (season of seasonsNewestFirst(); track season.year) {
+            <button type="button" class="season-row" (click)="selectPeriod(season.year)">
+              <span class="season-row__year">{{ season.year }}</span>
+              <span class="season-row__spark">
+                @for (month of season.months; track $index) {
+                  <span class="season-row__bar" [class.is-empty]="month === 0"
+                        [style.height]="sparkHeight(month, season.months)"></span>
+                }
+              </span>
+              <span class="season-row__totals">
+                <span class="season-row__flights">
+                  {{ 'statistics.flightCount' | translate:{ count: season.flights } }}
+                </span>
+                <span class="season-row__airtime">{{ toHoursMinutes(season.airtime) }}</span>
+              </span>
+              <ion-icon name="chevron-forward" class="season-row__chevron" aria-hidden="true"></ion-icon>
+            </button>
+          }
+        </div>
+      }
 
     } @else if (loaded() && filtered()) {
       <!-- Two date controls can disagree; say so rather than draw empty charts -->

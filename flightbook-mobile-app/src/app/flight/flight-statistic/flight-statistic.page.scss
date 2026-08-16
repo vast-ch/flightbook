@@ -1,11 +1,22 @@
 // ---- Header -------------------------------------------------------------
 .stat-header {
+    // A column now: the title row sits above the period chips.
+    padding: calc(env(safe-area-inset-top) + 14px) var(--fb-gutter) 0;
+    background: var(--fb-surface);
+    border-bottom: 1px solid var(--fb-border);
+}
+
+.stat-header__row {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: calc(env(safe-area-inset-top) + 14px) var(--fb-gutter) 14px;
-    background: var(--fb-surface);
-    border-bottom: 1px solid var(--fb-border);
+    // Carries the bottom padding when there are no chips to show.
+    padding-bottom: 14px;
+}
+
+// The chips bring their own bottom padding, so the row drops its own.
+.stat-header:has(.period) .stat-header__row {
+    padding-bottom: 0;
 }
 
 .stat-header__actions {
@@ -224,4 +235,167 @@
     font-size: 11px;
     color: var(--fb-text-secondary);
     white-space: nowrap;
+}
+
+// ---- Period chips -------------------------------------------------------
+// A dozen seasons will not fit a segmented control, so the design pins
+// "All time" and scrolls the rest behind it.
+.period {
+    display: flex;
+    margin-top: 14px;
+}
+
+.period__pinned {
+    flex: none;
+    padding-right: 9px;
+    // Sits above the scroller so chips slide under it rather than past it.
+    position: relative;
+    z-index: 2;
+    background: var(--fb-surface);
+}
+
+.period__scroll {
+    display: flex;
+    gap: 7px;
+    flex: 1;
+    min-width: 0;
+    padding-bottom: 12px;
+    overflow-x: auto;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+
+    .fb-chip {
+        flex: none;
+    }
+}
+
+// ---- Season comparison --------------------------------------------------
+.season-compare {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    margin-top: 12px;
+    padding: 13px 15px;
+    border: 1px solid var(--fb-accent);
+    border-radius: var(--fb-radius);
+    background: var(--fb-accent-soft);
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.45;
+    color: #0a5e9b;
+    text-wrap: pretty;
+
+    ion-icon {
+        flex: none;
+        font-size: 15px;
+        color: var(--ion-color-primary);
+    }
+}
+
+.activity__note {
+    margin: 12px 0 0;
+    padding-top: 12px;
+    border-top: 1px solid var(--fb-hairline);
+    font-size: 11.5px;
+    font-weight: 400;
+    line-height: 1.5;
+    color: var(--fb-text-body);
+    text-wrap: pretty;
+}
+
+// ---- Seasons list -------------------------------------------------------
+.stat-section-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 10px;
+    margin: 22px 0 9px;
+}
+
+.stat-section-head__count {
+    font-size: 11.5px;
+    font-weight: 400;
+    color: var(--fb-text-secondary);
+}
+
+.season-row {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    width: 100%;
+    padding: 13px 16px;
+    appearance: none;
+    border: 0;
+    background: transparent;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+
+    // Adjacency, never :last-child - @for leaves comment anchors behind.
+    & + & {
+        border-top: 1px solid var(--fb-hairline);
+    }
+}
+
+.season-row__year {
+    flex: none;
+    width: 32px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--fb-text);
+}
+
+.season-row__spark {
+    display: flex;
+    align-items: flex-end;
+    gap: 1.5px;
+    flex: 1;
+    min-width: 0;
+    height: 22px;
+}
+
+.season-row__bar {
+    flex: 1;
+    border-radius: 1px;
+    background: var(--fb-accent);
+
+    &.is-empty {
+        background: var(--fb-track);
+    }
+}
+
+.season-row__totals {
+    flex: none;
+    width: 78px;
+    text-align: right;
+}
+
+.season-row__flights {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--fb-text);
+}
+
+.season-row__airtime {
+    display: block;
+    margin-top: 3px;
+    font-size: 10.5px;
+    font-weight: 400;
+    color: var(--fb-text-secondary);
+}
+
+.season-row__chevron {
+    flex: none;
+    font-size: 12px;
+    color: var(--fb-text-muted);
+}
+
+.cumulative__axis-note {
+    flex: 1;
+    text-align: center;
+    color: var(--fb-inverse-text-muted);
 }

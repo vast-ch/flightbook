@@ -3,8 +3,8 @@ import { LanguageService } from 'src/app/shared/services/language.service';
 import { HeatmapDay } from '../../shared/statistic.store';
 
 export interface HeatmapCell {
-    /** 0 = no flights, 1 = one, 2 = two or more. */
-    level: 0 | 1 | 2;
+    /** Four levels, matching the design's legend: none, one, two, three or more. */
+    level: 0 | 1 | 2 | 3;
     title: string;
 }
 
@@ -35,7 +35,7 @@ export class ActivityHeatmapComponent {
         // Read as a signal so the tooltips re-render on a language switch.
         const lang = this.languageService.lang();
         return this.source().map(day => ({
-            level: day.flights === 0 ? 0 : (day.flights === 1 ? 1 : 2),
+            level: day.flights === 0 ? 0 : (day.flights === 1 ? 1 : (day.flights === 2 ? 2 : 3)),
             title: `${day.date.toLocaleDateString(lang)} — ${day.flights}`
         } as HeatmapCell));
     });

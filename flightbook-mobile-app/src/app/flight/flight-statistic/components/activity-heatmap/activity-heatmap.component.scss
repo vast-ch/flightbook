@@ -29,4 +29,8 @@
   &[data-level='2'] {
     background: var(--fb-accent);
   }
+
+  &[data-level='3'] {
+    background: var(--ion-color-primary);
+  }
 }
