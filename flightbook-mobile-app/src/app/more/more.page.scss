@@ -155,6 +155,12 @@
   }
 }
 
+// Adjacency cannot reach across the reorder group's boundary, so the first
+// custom link had no rule between it and the built-in above it.
+ion-reorder-group .link-row:first-child {
+  border-top: 1px solid var(--fb-hairline);
+}
+
 .link-row__remove {
   display: flex;
   align-items: center;
