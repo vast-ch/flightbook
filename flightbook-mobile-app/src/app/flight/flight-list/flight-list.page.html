@@ -74,14 +74,6 @@
                   @if (flight.igc) {
                     <ion-icon name="attach-outline" class="flight-row__igc" aria-hidden="true"></ion-icon>
                   }
-                  <!--
-                    Three states: validated, rejected, and "no validation
-                    object" - which is the neutral default for any pilot who
-                    is not enrolled in a school, not a problem state.
-                  -->
-                  <span class="flight-row__dot"
-                        [class.is-validated]="flight.validation?.state === FlightValidationState.VALIDATED"
-                        [class.is-rejected]="flight.validation?.state === FlightValidationState.REJECTED"></span>
                 </div>
 
                 <div class="flight-row__meta">

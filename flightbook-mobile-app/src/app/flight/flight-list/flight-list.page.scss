@@ -59,23 +59,6 @@
   color: var(--fb-text-muted);
 }
 
-.flight-row__dot {
-  flex: none;
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  // Default: no validation object. Neutral, not an error.
-  background: var(--ion-color-warning);
-
-  &.is-validated {
-    background: var(--ion-color-success);
-  }
-
-  &.is-rejected {
-    background: var(--ion-color-danger);
-  }
-}
-
 .flight-row__meta {
   display: flex;
   gap: 14px;

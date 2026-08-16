@@ -20,7 +20,6 @@ import {
     cloudUploadOutline,
     shareOutline
 } from "ionicons/icons";
-import { FlightValidationState } from '../shared/flight-validation-state';
 import { FlightStore } from '../shared/flight.store';
 import { AvatarButtonComponent } from 'src/app/shared/components/avatar-button/avatar-button.component';
 import { LanguageService } from 'src/app/shared/services/language.service';
@@ -57,7 +56,6 @@ export class FlightListPage implements OnInit, OnDestroy {
     public loading = this.flightStore.loading;
     public error = this.flightStore.error;
 
-    public FlightValidationState = FlightValidationState;
 
     /** All-time totals for the header eyebrow, deliberately unfiltered. */
     private totals = signal<FlightStatistic | null>(null);
