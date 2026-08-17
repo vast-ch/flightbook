@@ -37,8 +37,16 @@ export class PlaceMapComponent implements AfterViewInit, OnChanges, OnDestroy {
 
     /** True while the pin is the name lookup's guess rather than a real choice. */
     private coordinatesFromSearch = false;
-    /** Whether the altitude and country on screen are this component's own guess. */
-    private metadataFromSearch = false;
+    /**
+     * What this component last wrote into altitude and country. Compared against
+     * the field rather than tracked as a "we filled this once" flag: that flag
+     * never went back to false, so once the pilot corrected an auto-filled
+     * altitude the next rename claimed the corrected value as ours and
+     * overwrote it. A value still equal to the guess is ours to refine; the
+     * moment it differs, it is the pilot's to keep.
+     */
+    private guessedAltitude?: number;
+    private guessedCountry?: string;
 
     @Input()
     placeName: String;
@@ -153,17 +161,43 @@ export class PlaceMapComponent implements AfterViewInit, OnChanges, OnDestroy {
                 // but never replace a value the pilot entered. An existing
                 // place reaches here by being renamed, and its altitude may
                 // have been surveyed rather than looked up.
-                if (this.metadataFromSearch || this.place.altitude == null) {
+                if (this.ownsAltitude()) {
                     this.place.altitude = metadata.altitude;
+                    this.guessedAltitude = metadata.altitude;
                 }
-                if (this.metadataFromSearch || !this.place.country) {
+                if (this.ownsCountry()) {
                     this.place.country = metadata.country;
+                    this.guessedCountry = metadata.country;
                 }
-                this.metadataFromSearch = true;
             });
         } catch {
             // Keep the coordinates; the pilot can still fill these in by hand.
         }
+    }
+
+    /**
+     * Empty counts as ours - there is nothing to lose by filling it. An
+     * ion-input can hand the value back as a string, which fails the identity
+     * check and so errs towards leaving it alone: the safe direction.
+     */
+    private ownsAltitude(): boolean {
+        return this.place.altitude == null || this.place.altitude === this.guessedAltitude;
+    }
+
+    private ownsCountry(): boolean {
+        return !this.place.country || this.place.country === this.guessedCountry;
+    }
+
+    /**
+     * The deliberate double-tap path, which replaces both fields together.
+     * Recording what it wrote is what lets a second double-tap tell its own
+     * guess from a surveyed value and skip the confirm only for the former.
+     */
+    private writeMetadata(metadata: Place) {
+        this.place.altitude = metadata.altitude;
+        this.guessedAltitude = metadata.altitude;
+        this.place.country = metadata.country;
+        this.guessedCountry = metadata.country;
     }
 
     private async initMap(position?: Position) {
@@ -216,7 +250,7 @@ export class PlaceMapComponent implements AfterViewInit, OnChanges, OnDestroy {
         // own guess. coordinatesFromSearch was too loose: the pin can come from
         // the name lookup while the metadata request that follows it failed,
         // leaving a typed altitude that would then be replaced unannounced.
-        const autoFilled = this.metadataFromSearch;
+        const autoFilled = this.ownsAltitude();
         // Placed deliberately, so the name lookup stops moving it.
         this.coordinatesFromSearch = false;
         this.marker.setGeometry(new Point(evt.coordinate));
@@ -231,8 +265,7 @@ export class PlaceMapComponent implements AfterViewInit, OnChanges, OnDestroy {
                     {
                         text: this.translate.instant('buttons.yes'),
                         handler: () => {
-                            this.place.altitude = res.altitude;
-                            this.place.country = res.country;
+                            this.writeMetadata(res);
                         }
                     },
                     this.translate.instant('buttons.no')
@@ -243,10 +276,7 @@ export class PlaceMapComponent implements AfterViewInit, OnChanges, OnDestroy {
             await alert.onDidDismiss();
             await alert.dismiss();
         } else {
-            this.zone.run(() => {
-                this.place.altitude = res.altitude;
-                this.place.country = res.country;
-            });
+            this.zone.run(() => this.writeMetadata(res));
         }
     });
 }
