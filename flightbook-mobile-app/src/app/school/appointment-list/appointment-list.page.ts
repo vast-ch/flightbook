@@ -478,7 +478,8 @@ export class AppointmentListPage implements OnInit, OnDestroy {
         // the school's wall clock before this runs, and .tz() only changes how an
         // instant prints - it cannot undo the shift. Same fix as the detail view.
         const closesAt = appointment.deadlineAt ?? moment.utc(appointment.deadline).valueOf();
-        return closesAt < Date.now();
+        // An unparseable deadline leaves NaN, which is neither past nor future.
+        return Number.isFinite(closesAt) && closesAt < Date.now();
     }
 
     async openFilter() {

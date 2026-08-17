@@ -249,7 +249,9 @@ export class PlaceMapComponent implements AfterViewInit, OnChanges, OnDestroy {
         const epsgGeometry: any = this.marker.getGeometry().clone().transform(this.map.getView().getProjection(), 'EPSG:4326')
         const res = await firstValueFrom(this.placeStore.getPlaceMetadata(epsgGeometry.flatCoordinates));
 
-        if (this.place.altitude && !autoFilled) {
+        // != null, not truthy: a place at sea level has altitude 0, and treating
+        // that as "nothing to lose" overwrote it without asking.
+        if (this.place.altitude != null && !autoFilled) {
             const alert = await this.alertController.create({
                 header: this.translate.instant('message.infotitle'),
                 message: this.translate.instant('place.override'),

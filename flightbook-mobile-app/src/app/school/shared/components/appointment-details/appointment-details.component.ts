@@ -265,18 +265,24 @@ export class AppointmentDetailsComponent implements OnInit {
         }
 
         // @TODO -> Remove after migrate scheduling and deadline date to the correct utc time
+        //
+        // Anchored to Zurich, matching the appointment list: the stored value is
+        // not really UTC, so it is read as a Swiss wall clock rather than the
+        // device's. Reading it as device-local made a closed registration look
+        // open to a pilot abroad - the same contradiction the migrated path just
+        // lost, and the reason deadlineAt is deliberately ignored here.
         if (!this.school.timezone) {
-            const deadlineWithoutTimezone = moment(moment.utc(appointment.deadline).format('YYYY-MM-DD HH:mm:ss'));
-            const nowWithoutTimezone = moment(moment(new Date()).format('YYYY-MM-DD HH:mm:ss'));
+            const deadlineWithoutTimezone = moment.utc(appointment.deadline).tz('Europe/Zurich', true);
+            const nowWithoutTimezone = moment.tz('Europe/Zurich');
             return deadlineWithoutTimezone.isBefore(nowWithoutTimezone);
         }
 
-        // deadlineAt for the same reason, and .tz() could never have rescued the
-        // old comparison: it changes how an instant prints, not which instant it
-        // is, so both sides were rendered in the school's zone while one of them
-        // was still the shifted value.
+        // deadlineAt, not `deadline`: normalizeSchedule has rewritten that field
+        // into the school's wall clock.
         const closesAt = appointment.deadlineAt ?? moment.utc(appointment.deadline).valueOf();
-        return closesAt < Date.now();
+        // An unparseable deadline leaves NaN, which is neither past nor future -
+        // stated rather than left to NaN comparisons happening to return false.
+        return Number.isFinite(closesAt) && closesAt < Date.now();
     }
 
     close() {

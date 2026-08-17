@@ -237,6 +237,10 @@ export class FlightListPage implements OnInit, OnDestroy {
                 if (this.infiniteScroll) {
                     this.infiniteScroll.disabled = false;
                 }
+                // The eyebrow counts every flight, so a delete changes it - and
+                // loadTotals is otherwise only reachable from ionViewDidEnter,
+                // which leaves the old count on screen until the tab is revisited.
+                this.loadTotals();
                 await loading.dismiss();
             },
             error: async (resp: any) => {
