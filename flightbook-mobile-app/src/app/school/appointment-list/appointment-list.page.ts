@@ -474,9 +474,11 @@ export class AppointmentListPage implements OnInit, OnDestroy {
             return deadlineWithoutTimezone.isBefore(nowWithoutTimezone);
         }
 
-        const deadline = moment(appointment.deadline).tz(this.currentSchool().timezone);
-        const now = moment.tz(this.currentSchool().timezone);
-        return deadline.isBefore(now);
+        // deadlineAt, not `deadline`: enrichAppointment rewrites that field into
+        // the school's wall clock before this runs, and .tz() only changes how an
+        // instant prints - it cannot undo the shift. Same fix as the detail view.
+        const closesAt = appointment.deadlineAt ?? moment.utc(appointment.deadline).valueOf();
+        return closesAt < Date.now();
     }
 
     async openFilter() {

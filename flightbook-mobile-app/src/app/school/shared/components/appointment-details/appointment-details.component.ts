@@ -248,7 +248,12 @@ export class AppointmentDetailsComponent implements OnInit {
     }
 
     isDisabled() {
-        if (new Date(this.appointment.scheduling).getTime() < new Date().getTime() || this.appointment.state == State.CANCELED) {
+        // scheduledAt, not `scheduling`: normalizeSchedule has parked the school's
+        // wall clock in that field, so measuring it against the device clock is
+        // out by the offset between the two - which is what left Register enabled
+        // beside an appointment the relative label already called past.
+        const startsAt = this.appointment.scheduledAt ?? moment.utc(this.appointment.scheduling).valueOf();
+        if (startsAt < Date.now() || this.appointment.state == State.CANCELED) {
             return true;
         }
         return this.isDeadlinePassed(this.appointment);
@@ -266,9 +271,12 @@ export class AppointmentDetailsComponent implements OnInit {
             return deadlineWithoutTimezone.isBefore(nowWithoutTimezone);
         }
 
-        const deadline = moment(appointment.deadline).tz(this.school.timezone);
-        const now = moment().tz(this.school.timezone);
-        return deadline.isBefore(now);
+        // deadlineAt for the same reason, and .tz() could never have rescued the
+        // old comparison: it changes how an instant prints, not which instant it
+        // is, so both sides were rendered in the school's zone while one of them
+        // was still the shifted value.
+        const closesAt = appointment.deadlineAt ?? moment.utc(appointment.deadline).valueOf();
+        return closesAt < Date.now();
     }
 
     close() {
