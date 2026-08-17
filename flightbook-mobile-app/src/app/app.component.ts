@@ -1,14 +1,13 @@
-import { Component, effect, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 
-import { MenuController, AlertController, IonicSafeString } from '@ionic/angular/standalone';
+import { AlertController, IonicSafeString } from '@ionic/angular/standalone';
 import { TranslateService } from '@ngx-translate/core';
 import { filter, takeUntil } from 'rxjs/operators';
 import { SwUpdate, VersionReadyEvent } from '@angular/service-worker';
 import { AccountService } from './account/shared/account.service';
-import { FlightStore } from './flight/shared/flight.store';
-import { GliderStore } from './glider/shared/glider.store';
-import { PlaceStore } from './place/shared/place.store';
 import { SchoolService } from './school/shared/school.service';
+import { SessionService } from './shared/services/session.service';
+import { resolveLanguage } from './shared/services/language.service';
 import { LoginPage } from './account/login/login.page';
 import {
     ActionPerformed,
@@ -17,19 +16,14 @@ import {
     Token,
 } from '@capacitor/push-notifications';
 import { Capacitor } from '@capacitor/core';
-import { StatusBar, Style } from '@capacitor/status-bar';
+import { StatusBar } from '@capacitor/status-bar';
 import { Router } from '@angular/router';
 import { RegisterPage } from './account/register/register.page';
 import { PaymentStatus } from './account/shared/paymentStatus.model';
 import { PaymentService } from './shared/services/payment.service';
 import { firstValueFrom, Subject } from 'rxjs';
-import { ControlSheet } from './shared/domain/control-sheet';
-import { Browser } from '@capacitor/browser';
 import { addIcons } from "ionicons";
-import { home, statsChart, cloudUpload, linkOutline, settings, ellipsisHorizontal, logOutOutline, school, document as iconDocument, bandage, checkmarkDone, personCircle, personCircleOutline } from 'ionicons/icons';
-import { EmergencyContact } from './school/shared/emergency-contact.model';
-import { User } from './account/shared/user.model';
-import { TandemSchoolService } from './school/shared/tandem-school.service';
+import { cloudUpload, copy } from 'ionicons/icons';
 
 
 @Component({
@@ -40,47 +34,28 @@ import { TandemSchoolService } from './school/shared/tandem-school.service';
 })
 export class AppComponent implements OnDestroy, OnInit {
     unsubscribe$ = new Subject<void>();
-    schools = this.schoolService.schoolsSignal;
-    hasControlSheet = false;
-    initialRequestsFired = false;
-    hasEmergencyContacts = false;
-    currentUser: User | undefined;
-
 
     constructor(
         private router: Router,
         private translate: TranslateService,
         private accountService: AccountService,
-        private menuCtrl: MenuController,
         private swUpdate: SwUpdate,
-        private flightStore: FlightStore,
-        private gliderStore: GliderStore,
-        private placeStore: PlaceStore,
         private schoolService: SchoolService,
         private alertController: AlertController,
         private paymentService: PaymentService,
-        private tandemSchoolService: TandemSchoolService
+        private sessionService: SessionService
     ) {
         this.translate.setDefaultLang('en');
-        this.translate.use(localStorage.getItem('language') || navigator.language.split('-')[0]);
-        
-        effect(() => {
-            this.currentUser = this.accountService.currentUser$();
-        });
+        // Narrowed to a language we ship: an unsupported code sticks in
+        // translate.currentLang even though its bundle 404s, and every DatePipe
+        // given that locale then throws NG0701 on each change-detection pass.
+        this.translate.use(resolveLanguage(localStorage.getItem('language') || navigator.language));
 
+        // Registered app-wide because the legacy pages that use them do not
+        // register their own; each redesigned page registers what it needs.
         addIcons({
-            home,
-            statsChart,
             cloudUpload,
-            linkOutline,
-            bandage,
-            settings,
-            ellipsisHorizontal,
-            logOutOutline,
-            school,
-            checkmarkDone,
-            personCircleOutline,
-            'document': iconDocument,
+            copy,
             'flight': 'assets/custom-ion-icons/flight.svg',
             'copyflight': 'assets/custom-ion-icons/copyflight.svg',
             'glider': 'assets/custom-ion-icons/glider.svg',
@@ -121,36 +96,16 @@ export class AppComponent implements OnDestroy, OnInit {
         }
     }
 
-    logout() {
-        this.menuCtrl.enable(false);
-        this.flightStore.clearFlights();
-        this.gliderStore.clearGliders();
-        this.placeStore.clearPlaces();
-        this.accountService.logout(localStorage.getItem('refresh_token')).pipe(takeUntil(this.unsubscribe$)).subscribe(resp => {
-            // TODO error handling
-            localStorage.removeItem('access_token');
-            localStorage.removeItem('refresh_token');
-            localStorage.removeItem('last_login');
-            this.initialRequestsFired = false;
-            this.schoolService.clearSchools();
-            this.tandemSchoolService.clearSchools();
-        });
-    }
-
     subscribeToEmmiter(componentRef: any) {
-        if (componentRef instanceof LoginPage || componentRef instanceof RegisterPage || this.initialRequestsFired) {
+        if (componentRef instanceof LoginPage || componentRef instanceof RegisterPage || this.sessionService.sessionBootstrapped) {
             return;
         }
 
-        this.schoolService.getSchools();
-
-        this.schoolService.getControlSheet().pipe(takeUntil(this.unsubscribe$)).subscribe((controlSheet: ControlSheet) => {
-            this.hasControlSheet = controlSheet ? true : false;
-        })
-
-        this.schoolService.getEmergencyContacts().pipe(takeUntil(this.unsubscribe$)).subscribe((emergencyContacts: EmergencyContact[]) => {
-            this.hasEmergencyContacts = emergencyContacts && emergencyContacts.length > 0 ? true : false;
-        })
+        // Populates schoolsSignal, which Home and More both read. Caught:
+        // getSchools() memoises a promise, so a failed bootstrap request would
+        // otherwise surface as an unhandled rejection - the pages that need the
+        // list ask again themselves.
+        this.schoolService.getSchools().catch(() => { /* the pages retry */ });
 
         this.accountService.currentUser().pipe(takeUntil(this.unsubscribe$)).subscribe((user: any) => {});
 
@@ -173,7 +128,7 @@ export class AppComponent implements OnDestroy, OnInit {
             }
         })
 
-        this.initialRequestsFired = true;
+        this.sessionService.markBootstrapped();
     }
 
     private initPushNotification() {
@@ -273,44 +228,6 @@ export class AppComponent implements OnDestroy, OnInit {
                 }
             }
         );
-    }
-
-    async openBrowser(type: string) {
-        let url
-
-        switch (type) {
-            case "shvWeather":
-                if (this.translate.currentLang === 'fr') {
-                    url = "https://www.meteo-fsvl.ch";
-                } else {
-                    url = "https://www.meteo-shv.ch";
-                }
-
-                break;
-            case "dabsToday":
-                url = "https://www.skybriefing.com/o/dabs?today";
-                break;
-            case "dabsTomorrow":
-                url = "https://www.skybriefing.com/o/dabs?tomorrow";
-                break;
-            default:
-                return;
-        }
-
-        const browserOption = {
-            url: url
-        }
-        Browser.open(browserOption);
-    }
-
-    async openLink(link: string) {
-        if (!link || link === '') {
-            return;
-        }
-
-        Browser.open({
-            url: link
-        });
     }
 
     ngOnDestroy() {

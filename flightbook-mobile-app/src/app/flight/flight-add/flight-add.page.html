@@ -1,13 +1,23 @@
-<ion-header>
-  <ion-toolbar color='primary'>
-    <ion-buttons slot="start">
-      <ion-menu-button></ion-menu-button>
-    </ion-buttons>
-    <ion-title>{{ 'groupname.flight' | translate }}</ion-title>
-  </ion-toolbar>
-</ion-header>
+<div class="form-header">
+  <button type="button" class="icon-button" (click)="close()" [attr.aria-label]="'buttons.cancel' | translate">
+    <ion-icon name="close" aria-hidden="true"></ion-icon>
+  </button>
+  <h1 class="form-header__title">{{ 'buttons.logFlight' | translate }}</h1>
+</div>
 
-<ion-content class="ion-padding">
-  <fb-file-input (onFilesSelectEvent)="onFilesSelectEvent($event)"></fb-file-input>
-  <flight-form [flight]=flight [gliders]=gliders [schools]=schools [tandemSchools]="tandemSchools()" [igcFile]=igcFile (saveFlight)="saveFlight($event)"></flight-form>
+<ion-content>
+  <div class="form-body">
+    <fb-file-input appearance="card" (onFilesSelectEvent)="onFilesSelectEvent($event)"></fb-file-input>
+    <div class="form-divider">{{ 'flight.orByHand' | translate }}</div>
+
+    <flight-form [flight]=flight [gliders]=gliders [schools]=schools [tandemSchools]="tandemSchools()" [igcFile]=igcFile (saveFlight)="saveFlight($event)"></flight-form>
+  </div>
 </ion-content>
+
+<!--
+  The button submits the child component's form via ion-button's native `form`
+  property, so ngSubmit and Enter-to-submit keep working.
+-->
+<ion-footer class="form-footer">
+  <ion-button expand="block" type="submit" form="flightForm">{{ 'buttons.save' | translate }}</ion-button>
+</ion-footer>

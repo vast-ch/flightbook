@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { LoadingController, IonHeader, IonToolbar, IonButtons, IonMenuButton, IonTitle, IonContent, IonList, IonItem, IonSpinner, IonButton, IonIcon } from '@ionic/angular/standalone';
+import { LoadingController, IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonContent, IonList, IonItem, IonSpinner, IonButton, IonIcon } from '@ionic/angular/standalone';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -28,7 +28,7 @@ import { trashOutline, cloudDoneOutline, alert } from "ionicons/icons";
         IonHeader,
         IonToolbar,
         IonButtons,
-        IonMenuButton,
+        IonBackButton,
         IonTitle,
         IonContent,
         IonList,

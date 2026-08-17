@@ -1,81 +1,86 @@
-<ion-header>
-  <ion-toolbar color='primary'>
-    <ion-buttons slot="start">
-      <ion-menu-button></ion-menu-button>
-    </ion-buttons>
-    <ion-title>{{ 'groupname.glider' | translate }} 
-      @if (filtered()) {
-        <span>({{ 'groupname.filtered' | translate }})</span>
-      }
-    </ion-title>
-    <ion-buttons slot="primary">
-      <ion-button class="submit-button" [routerLink]="['/gliders/add']">
-        <ion-icon name="add"></ion-icon>
-      </ion-button>
-      <ion-button (click)="openFilter()">
-        <ion-icon name="filter-outline"></ion-icon>
-      </ion-button>
-    </ion-buttons>
-  </ion-toolbar>
-</ion-header>
+<!--
+  Surface strip rather than an ion-toolbar. This page is reached from More, not
+  from a tab, so unlike the flight list it leads with a back affordance.
+-->
+<div class="list-header">
+  <button type="button" class="icon-button" (click)="goBack()"
+          [attr.aria-label]="'buttons.back' | translate">
+    <ion-icon name="chevron-back" aria-hidden="true"></ion-icon>
+  </button>
 
-<ion-content class="no-padding">
+  <div class="list-header__text">
+    <div class="list-header__eyebrow">
+      <span class="fb-section-label">
+        @if (gliders().length === 1) {
+          {{ 'gliderlist.summaryOne' | translate }}
+        } @else {
+          {{ 'gliderlist.summary' | translate:{ count: gliders().length } }}
+        }
+      </span>
+      @if (filtered()) {
+        <span class="list-header__chip">{{ 'groupname.filtered' | translate }}</span>
+      }
+    </div>
+    <h1 class="list-header__title">{{ 'groupname.glider' | translate }}</h1>
+  </div>
+
+  <div class="list-header__actions">
+    <button type="button" class="icon-button" [routerLink]="['/gliders/add']"
+            [attr.aria-label]="'buttons.add' | translate">
+      <ion-icon name="add" aria-hidden="true"></ion-icon>
+    </button>
+    <button type="button" class="icon-button" (click)="openFilter()"
+            [attr.aria-label]="'buttons.filter' | translate">
+      <ion-icon name="filter-outline" aria-hidden="true"></ion-icon>
+    </button>
+    <button type="button" class="icon-button" (click)="xlsxExport()"
+            [attr.aria-label]="'buttons.export' | translate">
+      <ion-icon name="share-outline" aria-hidden="true"></ion-icon>
+    </button>
+  </div>
+</div>
+
+<ion-content>
   @if (gliders().length > 0) {
-    <ion-item class="export-buttons">
-      <ion-grid>
-        <ion-row>
-          <ion-col>
-            <ion-button (click)="xlsxExport()">Xlsx Export</ion-button>
-          </ion-col>
-        </ion-row>
-      </ion-grid>
-    </ion-item>
-  }
-  <ion-list>
-    @for (glider of gliders(); track glider.id) {
-      @let timeParts = (glider.time || "0" | hoursFormat)?.split(':');
-      <ion-item button detail="false" (click)="itemTapped($event, glider)">
-        <ion-grid>
-          <ion-row class="ion-align-items-center">
-            <ion-col>
-              <div class="glider-name">
-                <ion-icon [name]="glider.tandem ? 'people-outline' : 'person-outline'"></ion-icon>
-                <span>{{ glider.brand }} {{ glider.name }}</span>
+    <ion-list class="list-block">
+      @for (glider of gliders(); track glider.id) {
+        @let timeParts = (glider.time || "0" | hoursFormat)?.split(':');
+        <ion-item button detail="false" lines="none" class="glider-row"
+                  (click)="itemTapped(glider)">
+          <div class="glider-row__inner">
+            <ion-icon class="glider-row__icon"
+                      [name]="glider.tandem ? 'people-outline' : 'person-outline'"
+                      aria-hidden="true"></ion-icon>
+
+            <div class="glider-row__main">
+              <div class="glider-row__top">
+                <span class="glider-row__name">{{ glider.brand }} {{ glider.name }}</span>
+                @if (glider.archived) {
+                  <span class="glider-row__badge">{{ 'glider.archived' | translate }}</span>
+                }
               </div>
-              <ion-row class="glider-stats ion-align-items-center">
-                <ion-col size="4">
-                  <ion-icon name="checkmark-done-outline"></ion-icon>
-                  <span>
-                    @if (glider.checks && glider.checks.length > 0) {
-                      {{ glider.checks[0].date | date:'dd.MM.yyyy' }}
-                    } @else {
-                      -
-                    }
+              <div class="glider-row__meta">
+                <span>{{ glider.nbFlights }} ×</span>
+                <span>{{ timeParts ? timeParts[0] + ':' + timeParts[1] : '00:00' }}</span>
+                @if (glider.checks?.length > 0) {
+                  <span class="glider-row__check">
+                    {{ 'glider.check.title' | translate }}
+                    {{ glider.checks[0].date | date:'dd.MM.yyyy' }}
                   </span>
-                </ion-col>
-                <ion-col size="3" class="stat-icon">
-                  <ion-icon name="stats-chart-outline"></ion-icon> {{ glider.nbFlights }}
-                </ion-col>
-                <ion-col size="3" class="time-icon">
-                  <ion-icon name="time-outline"></ion-icon> {{ timeParts ? timeParts[0]+':'+timeParts[1] : '-' }}
-                </ion-col>
-                <ion-col size="2" class="archive-icon">
-                  @if (glider.archived) {
-                    <ion-icon name="archive-outline"></ion-icon>
-                  }
-                </ion-col>
-              </ion-row>
-            </ion-col>
-          </ion-row>
-        </ion-grid>
-      </ion-item>
-    }
-    @empty {
-      <ion-item lines="none">
-        <ion-label class="ion-text-center">{{ 'emptylist' | translate }}</ion-label>
-      </ion-item>
-    }
-  </ion-list>
+                } @else {
+                  <span class="is-muted">{{ 'glider.check.title' | translate }} —</span>
+                }
+              </div>
+            </div>
+
+            <ion-icon class="fb-row__chevron" name="chevron-forward" aria-hidden="true"></ion-icon>
+          </div>
+        </ion-item>
+      }
+    </ion-list>
+  } @else {
+    <div class="list-empty fb-empty-hint">{{ 'emptylist' | translate }}</div>
+  }
 
   <ion-infinite-scroll threshold="100px" (ionInfinite)="loadData($event)">
     <ion-infinite-scroll-content loadingSpinner="bubbles" loadingText="{{ 'loading.loading' | translate }}">

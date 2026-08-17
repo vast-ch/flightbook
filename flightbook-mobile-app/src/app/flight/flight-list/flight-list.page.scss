@@ -1,138 +1,83 @@
-ion-list {
-  padding-top: 0;
+// .list-header*, .list-block, .list-empty, .list-footnote and .icon-button all
+// live in theme/tokens.scss - shared with the glider and place lists.
+
+// ---- Month sections -----------------------------------------------------
+.month-heading {
+  padding: 14px var(--fb-gutter) 8px;
 }
 
-ion-item {
+// ---- Row ----------------------------------------------------------------
+.flight-row {
   --padding-start: 0;
   --inner-padding-end: 0;
+  --background: var(--fb-surface);
+  --min-height: 0;
+
+  // Separator between siblings only, so the last row in a month block never
+  // doubles up with the block's own bottom border.
+  ion-item-sliding + ion-item-sliding & {
+    border-top: 1px solid var(--fb-hairline);
+  }
 }
 
-ion-grid {
+.flight-row__inner {
+  display: flex;
+  gap: 14px;
   width: 100%;
-  margin-top: 5px;
-  margin-bottom: 5px;
+  padding: 15px var(--fb-gutter);
 }
 
-.flight-meta {
-  color: var(--ion-color-medium-shade);
-  text-align: left;
-  padding-left: 5px;
-  font-size: 0.9em;
+// The date column is .row-date in theme/tokens.scss - the appointment list draws
+// the same one.
 
-  .flight-number {
-    color: var(--ion-color-dark-shade);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 80px;
-
-    .flight-igc {
-      margin-right: 5px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-  }
-
-  // Special case for iOS
-  &:host-context(.ios) .flight-number .flight-igc {
-    margin-right: 0px;
-  }
-
-  .flight-date {
-    white-space: nowrap;
-    width: 80px;
-  }
+.flight-row__main {
+  flex: 1;
+  min-width: 0;
 }
 
-.flight-details {
-  font-size: 0.9em;
+.flight-row__top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 
-  .location,
-  .glider {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
+.flight-row__route {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--fb-text);
+}
 
-  .location {
-    color: var(--ion-color-primary);
+.flight-row__igc {
+  flex: none;
+  font-size: 13px;
+  color: var(--fb-text-muted);
+}
 
-    ion-icon[name="arrow-forward-outline"] {
-      font-size: 0.7em;
-      margin-left: 3px;
-      margin-right: 3px;
-    }
+.flight-row__meta {
+  display: flex;
+  gap: 14px;
+  margin-top: 7px;
+  font-size: 11.5px;
+  color: var(--fb-text-secondary);
 
-    nxt-flag {
-      margin-right: 3px;
-    }
-  }
-
-  .glider {
-    color: var(--ion-color-medium-shade);
-    display: flex;
-    align-items: center;
-
-    ion-icon {
-      margin-right: 4px;
-    }
+  .is-muted {
+    color: #78829b;
   }
 }
 
-.flight-stats {
-  font-size: 0.8em;
-  color: var(--ion-color-dark-shade);
-
-  ion-col {
-    display: flex;
-    align-items: center;
-  }
-
-  ion-icon {
-    margin-right: 4px;
-    font-size: 1.1em;
-  }
-
-  ion-icon[name="arrow-forward-outline"] {
-    font-size: 0.9em;
-  }
+.flight-row__glider {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--fb-text-muted);
 }
 
-.export-buttons ion-button {
-  width: 100%;
-  height: 36px;
-}
 
-ion-grid,
-ion-col {
-  padding-top: 0;
-  padding-bottom: 0;
-}
-
-ion-item {
-  --min-height: 48px;
-}
-
-ion-item-sliding.validated ion-item {
-  --background: #e6f9e6 !important;
-  /* light green */
-  background: #e6f9e6 !important;
-}
-
-ion-item-sliding.rejected ion-item {
-  --background: #ffe5e5 !important;
-  /* light red */
-  background: #ffe5e5 !important;
-}
-
-// Dark mode styles
-@media (prefers-color-scheme: dark) {
-  .flight-meta .flight-number {
-    color: var(--ion-color-medium-shade);
-  }
-
-  .flight-stats {
-    color: var(--ion-color-medium-shade);
-  }
-}
+// .filter-empty lives in theme/tokens.scss - Statistics shows it too.

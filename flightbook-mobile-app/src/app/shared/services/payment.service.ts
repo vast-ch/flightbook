@@ -23,4 +23,14 @@ export class PaymentService {
   setPaymentStatus(nextState: PaymentStatus): void {
     this.paymentStatus$.next(nextState);
   }
+
+  /**
+   * Entitlements belong to the account that signed in, so they go with the
+   * session. Left behind, the previous pilot's premium status waved the next
+   * one past the free-tier flight and confirmation limits until the refresh
+   * landed - and stayed if that request failed.
+   */
+  clear(): void {
+    this.paymentStatus$.next(null);
+  }
 }

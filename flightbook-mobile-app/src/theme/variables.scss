@@ -1,16 +1,5 @@
-@media (prefers-color-scheme: dark) {
-  :root {
-    ion-select::part(text) {
-      color: var(--ion-color-primary-contrast);
-    }
-
-    /* @TODO -> can be removed in an upcoming ionic version */
-    --ion-color-primary-contrast: #ffffff;
-    --ion-color-primary-contrast-rgb: 255, 255, 255;
-    --ion-color-danger-contrast: #ffffff;
-    --ion-color-danger-contrast-rgb: 255, 255, 255;
-  }
-}
+// Palette and shared primitives live in ./tokens.scss (loaded before this file).
+// The app is light-only for now, so the former prefers-color-scheme block is gone.
 
 // ------ custom css ------
 .ios ion-content {
@@ -27,6 +16,18 @@ ion-modal.dateModal {
 .ios .dateModal ion-content {
   --background: transparent;
 }
+
+// Legacy control styling for the screens still on ion-item + labelPlacement:
+// flight-filter, imports/data, appointment-filter, phone-number and
+// glider-select. The redesigned forms opt out by scoping their own rules under
+// .fb-row in tokens.scss, which outranks these on specificity. Do not delete
+// until the list above is empty - grep before assuming it is.
+//
+// phone-number stays because it is restyled from the outside (see the
+// ::ng-deep blocks in register.page.scss and account-data.page.scss) rather
+// than converted. The passenger-confirmation form and the control sheet have
+// since been converted and are off this list; the link modal is gone entirely,
+// replaced by the inline editor in More.
 
 // Label color
 .label-text-wrapper {

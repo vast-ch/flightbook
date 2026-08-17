@@ -1,0 +1,130 @@
+import { Component, OnDestroy, computed, inject } from '@angular/core';
+import { Router } from '@angular/router';
+import { DatePipe } from '@angular/common';
+import { IonContent, IonSkeletonText, IonIcon } from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import { chevronForward, checkmark } from 'ionicons/icons';
+import { TranslateService, TranslateModule } from '@ngx-translate/core';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { SplashScreen } from '@capacitor/splash-screen';
+import { NewsStore } from '../news/shared/news.store';
+import { LanguageService } from '../shared/services/language.service';
+import { HomeStore } from './shared/home.store';
+import { ActivityChartComponent } from './components/activity-chart/activity-chart.component';
+import { AvatarButtonComponent } from 'src/app/shared/components/avatar-button/avatar-button.component';
+import { splitDistance, splitDuration, toHoursMinutes } from 'src/app/shared/util/format';
+
+// The splash screen stays up until the first screen is ready to paint.
+setTimeout(() => {
+    SplashScreen.hide();
+}, 700);
+
+@Component({
+    selector: 'app-home',
+    templateUrl: './home.page.html',
+    styleUrls: ['./home.page.scss'],
+    imports: [
+        AvatarButtonComponent,
+        DatePipe,
+        TranslateModule,
+        ActivityChartComponent,
+        IonContent,
+        IonSkeletonText,
+        IonIcon
+    ]
+})
+export class HomePage implements OnDestroy {
+    private unsubscribe$ = new Subject<void>();
+
+    private homeStore = inject(HomeStore);
+    private newsStore = inject(NewsStore);
+    private translate = inject(TranslateService);
+    private router = inject(Router);
+    private languageService = inject(LanguageService);
+
+    /** Feeds the DatePipe's locale argument, as on the flight list. */
+    get currentLang(): string {
+        return this.languageService.lang();
+    }
+
+    public loaded = this.homeStore.loaded;
+    public globalStats = this.homeStore.globalStats;
+    public monthlyStats = this.homeStore.monthlyStats;
+    public nextAppointment = this.homeStore.nextAppointment;
+    /** Hidden once the practical exam is passed - see the store. */
+    public activeTrainingProgress = this.homeStore.activeTrainingProgress;
+    public licenceProgress = this.homeStore.licenceProgress;
+    public controlSheetPercent = this.homeStore.controlSheetPercent;
+    public soloFlightDone = this.homeStore.soloFlightDone;
+
+    public latestNews = computed(() => this.newsStore.news()[0] ?? null);
+
+    /** Airtime for the headline strip, split so the unit can be styled smaller. */
+    public airtime = computed(() => splitDuration(Number(this.globalStats()?.time ?? 0)));
+
+    public distance = computed(() => splitDistance(Number(this.globalStats()?.totalDistance ?? 0)));
+
+    /** Best month and average airtime, derived from the monthly rows. */
+    public activitySummary = computed(() => {
+        const rows = this.monthlyStats();
+        if (rows.length === 0) {
+            return null;
+        }
+        const best = rows.reduce((a, b) => (b.nbFlights > a.nbFlights ? b : a));
+        const totalTime = rows.reduce((sum, r) => sum + Number(r.time ?? 0), 0);
+        const bestDate = new Date(Number(best.year), Number(best.month) - 1, 1);
+        return {
+            bestMonthFlights: best.nbFlights,
+            bestMonthTime: Number(best.time ?? 0),
+            // The design labels this column with the month itself, not a caption.
+            bestMonthLabel: bestDate.toLocaleDateString(this.languageService.lang(), { month: 'long' }),
+            averageTime: Math.round(totalTime / rows.length)
+        };
+    });
+
+    constructor() {
+        addIcons({ chevronForward, checkmark });
+    }
+
+    /** Seconds to HH:mm - the chart footer format from the design. */
+    toHoursMinutes = toHoursMinutes;
+
+    // ionViewWillEnter, not ngOnInit: Ionic caches pages, so this is what runs
+    // again when the user comes back to the tab.
+    ionViewWillEnter() {
+        if (!this.loaded()) {
+            this.homeStore.load().pipe(takeUntil(this.unsubscribe$)).subscribe();
+        }
+
+        const news = this.newsStore.news();
+        if (news.length === 0 || news[0].language !== this.translate.currentLang) {
+            this.newsStore.getNews(this.translate.currentLang).pipe(takeUntil(this.unsubscribe$)).subscribe();
+        }
+    }
+
+    ngOnDestroy() {
+        this.unsubscribe$.next();
+        this.unsubscribe$.complete();
+    }
+
+    openStatistics() {
+        this.router.navigate(['statistics']);
+    }
+
+    openControlSheet() {
+        this.router.navigate(['control-sheet']);
+    }
+
+    openAppointment() {
+        const next = this.nextAppointment();
+        if (next) {
+            this.router.navigate(['/school/', next.school.id], { queryParams: { appointmentId: next.appointment.id } });
+        }
+    }
+
+    openImport() {
+        this.router.navigate(['imports/igc']);
+    }
+
+}

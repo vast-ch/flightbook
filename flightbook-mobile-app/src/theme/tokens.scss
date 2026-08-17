@@ -1,0 +1,1070 @@
+/*
+ * Flightbook design tokens
+ * ----------------------------------------------------------------------------
+ * Single source of truth for the redesign palette. Ionic's own `--ion-color-*`
+ * roles are mapped here so that existing `color="primary"` / `color="danger"`
+ * usages across the app pick up the new palette for free; the `--fb-*` tokens
+ * cover the surfaces and text tiers Ionic has no role for.
+ *
+ * Light-only by design: the OS dark palette is intentionally not imported.
+ */
+
+:root {
+  /* ---- Ionic roles ---- */
+
+  /* primary — links, active tab, primary actions */
+  --ion-color-primary: #0b76c2;
+  --ion-color-primary-rgb: 11, 118, 194;
+  --ion-color-primary-contrast: #ffffff;
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-shade: #095c99;
+  --ion-color-primary-tint: #2489d0;
+
+  /* secondary — the bright accent: FAB, progress fill, chart bars */
+  --ion-color-secondary: #45b1fd;
+  --ion-color-secondary-rgb: 69, 177, 253;
+  --ion-color-secondary-contrast: #ffffff;
+  --ion-color-secondary-contrast-rgb: 255, 255, 255;
+  --ion-color-secondary-shade: #3d9cdf;
+  --ion-color-secondary-tint: #58b9fd;
+
+  --ion-color-tertiary: #0a5e9b;
+  --ion-color-tertiary-rgb: 10, 94, 155;
+  --ion-color-tertiary-contrast: #ffffff;
+  --ion-color-tertiary-contrast-rgb: 255, 255, 255;
+  --ion-color-tertiary-shade: #095388;
+  --ion-color-tertiary-tint: #236ea5;
+
+  --ion-color-success: #2f7a4f;
+  --ion-color-success-rgb: 47, 122, 79;
+  --ion-color-success-contrast: #ffffff;
+  --ion-color-success-contrast-rgb: 255, 255, 255;
+  --ion-color-success-shade: #296b46;
+  --ion-color-success-tint: #448761;
+
+  --ion-color-warning: #b4801a;
+  --ion-color-warning-rgb: 180, 128, 26;
+  --ion-color-warning-contrast: #ffffff;
+  --ion-color-warning-contrast-rgb: 255, 255, 255;
+  --ion-color-warning-shade: #9e7117;
+  --ion-color-warning-tint: #bc8d31;
+
+  --ion-color-danger: #c0392b;
+  --ion-color-danger-rgb: 192, 57, 43;
+  --ion-color-danger-contrast: #ffffff;
+  --ion-color-danger-contrast-rgb: 255, 255, 255;
+  --ion-color-danger-shade: #a93226;
+  --ion-color-danger-tint: #c94d40;
+
+  --ion-color-medium: #5b7284;
+  --ion-color-medium-rgb: 91, 114, 132;
+  --ion-color-medium-contrast: #ffffff;
+  --ion-color-medium-contrast-rgb: 255, 255, 255;
+  --ion-color-medium-shade: #506474;
+  --ion-color-medium-tint: #6b8090;
+
+  --ion-color-light: #f2f7fb;
+  --ion-color-light-rgb: 242, 247, 251;
+  --ion-color-light-contrast: #10293c;
+  --ion-color-light-contrast-rgb: 16, 41, 60;
+  --ion-color-light-shade: #d5d9dd;
+  --ion-color-light-tint: #f3f8fb;
+
+  --ion-color-dark: #10293c;
+  --ion-color-dark-rgb: 16, 41, 60;
+  --ion-color-dark-contrast: #ffffff;
+  --ion-color-dark-contrast-rgb: 255, 255, 255;
+  --ion-color-dark-shade: #0e2435;
+  --ion-color-dark-tint: #293e50;
+
+  /* ---- Global surfaces + type ---- */
+  --ion-background-color: #f2f7fb;
+  --ion-background-color-rgb: 242, 247, 251;
+  --ion-text-color: #10293c;
+  --ion-text-color-rgb: 16, 41, 60;
+
+  --ion-font-family: 'Sora', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+
+  /* Ionic paints toolbars/cards from these; keep them on the surface colour */
+  --ion-toolbar-background: #ffffff;
+  --ion-toolbar-color: #10293c;
+  --ion-item-background: #ffffff;
+  --ion-card-background: #ffffff;
+
+  /* ---- Flightbook tokens (no Ionic equivalent) ---- */
+  --fb-surface: #ffffff;
+  --fb-bg: #f2f7fb;
+  --fb-border: #dce8f1;
+  --fb-hairline: #e7f0f7;
+  --fb-track: #e1ecf4;
+
+  --fb-accent: #45b1fd;
+  --fb-accent-weak: #a7dafe;
+  --fb-accent-soft: #e9f6ff;
+
+  --fb-text: #10293c;
+  --fb-text-body: #37556b;
+  --fb-text-secondary: #5b7284;
+  --fb-text-muted: #6c8394;
+
+  --fb-success-bg: #f1f9f4;
+  --fb-success-border: #bfe0cc;
+  --fb-success-text: #186340;
+
+  --fb-danger-bg: #fdeeec;
+  --fb-danger-border: #f3c7c1;
+  --fb-danger-text: #8e241a;
+
+  /* Amber, for a state that is neither settled nor wrong - e.g. announced */
+  --fb-warning-bg: #fdf3e0;
+  --fb-warning-text: #9a6b12;
+
+  /* Ground for the autocomplete list nested inside a form card */
+  --fb-sunken: #f7fbfe;
+  --fb-placeholder: #7e8fa0;
+
+  /*
+   * Inverted surface, for cards that deliberately break out of the light page
+   * (the cumulative-airtime card on Statistics). Defined as tokens so the next
+   * dark surface matches instead of inventing its own rgba values.
+   */
+  --fb-inverse-surface: #10293c;
+  --fb-inverse-text: #ffffff;
+  --fb-inverse-text-muted: rgba(255, 255, 255, 0.55);
+  --fb-inverse-hairline: rgba(255, 255, 255, 0.14);
+
+  --fb-radius: 12px;
+  --fb-radius-sm: 9px;
+  --fb-gutter: 18px;
+
+  /* Star rating (control sheet) */
+  --fb-star: #e8b33a;
+  --fb-star-empty: #d5e5ef;
+}
+
+/*
+ * Shared primitives
+ * ----------------------------------------------------------------------------
+ * Used by the home screen and intended for the remaining redesigned screens.
+ */
+
+.fb-card {
+  background: var(--fb-surface);
+  border: 1px solid var(--fb-border);
+  border-radius: var(--fb-radius);
+  padding: 16px 18px;
+}
+
+/* Small uppercase label that opens a section */
+.fb-section-label {
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--fb-text-secondary);
+}
+
+/* Inline "see all" style action next to a section label */
+.fb-section-action {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--ion-color-primary);
+  cursor: pointer;
+}
+
+/* A big number with its caption underneath */
+.fb-stat {
+  .fb-stat__value {
+    font-size: 22px;
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: var(--fb-text);
+
+    .fb-stat__unit {
+      font-size: 13px;
+      color: var(--fb-text-secondary);
+    }
+  }
+
+  .fb-stat__label {
+    margin-top: 9px;
+    font-size: 9.5px;
+    font-weight: 500;
+    line-height: 1.2;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--fb-text-secondary);
+  }
+}
+
+.fb-divider {
+  border-top: 1px solid var(--fb-hairline);
+}
+
+/* Dashed hint block used for empty states */
+.fb-empty-hint {
+  padding: 15px 17px;
+  border: 1px dashed #c3ddee;
+  border-radius: var(--fb-radius);
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--fb-text-body);
+  text-wrap: pretty;
+}
+
+/*
+ * Flush card — same shell as .fb-card but with no padding, so stacked rows can
+ * own their own spacing and run edge to edge. `overflow: hidden` keeps nested
+ * rows clipped to the rounded corners.
+ */
+.fb-card--flush {
+  background: var(--fb-surface);
+  border: 1px solid var(--fb-border);
+  border-radius: var(--fb-radius);
+  overflow: hidden;
+}
+
+/*
+ * Form row: fixed label column + flexible value.
+ *
+ * Deliberately CSS rather than a component. Angular's NgModel resolves its
+ * ControlContainer with @Host(), which does not cross a component boundary, so
+ * an <fb-form-row> owning the input would silently stop registering with
+ * NgForm. Keeping this as classes lets the Ionic controls stay direct
+ * descendants of the <form>.
+ */
+.fb-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 17px;
+  width: 100%;
+  margin: 0;
+  background: transparent;
+  text-align: left;
+  box-sizing: border-box;
+
+  /*
+   * Separator between siblings only. Never `border-bottom` + `:last-child`:
+   * Angular's @if/@for leave comment anchor nodes behind, and the adjacent
+   * sibling combinator structurally cannot produce a trailing border.
+   */
+  & + .fb-row {
+    border-top: 1px solid var(--fb-hairline);
+  }
+}
+
+.fb-row__label {
+  flex: 0 0 76px;
+  /*
+   * The design's label column is a fixed 76px and carries no mandatory marker.
+   * Ours does, and a label like "Nachname&nbsp;*" is wider than 76px.
+   *
+   * min-width: 0 stops a flex item's automatic minimum size from widening the
+   * column to fit, which would push the value out of line on mandatory rows
+   * only. The marker itself is .fb-row__req below, which takes no width at all.
+   */
+  min-width: 0;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.3;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--fb-text-secondary);
+}
+
+/*
+ * The mandatory marker, rendered so it occupies no width: Ionic's body sets
+ * `word-wrap: break-word`, which is inherited here, so anything that does not
+ * fit the fixed 76px column wraps rather than overflows - and for a label like
+ * "Nachname *" the point it wraps at is right before the marker, dropping the
+ * asterisk onto a line of its own. A zero-width box cannot push the line over,
+ * so the glyph paints into the row's 12px gap and the label stays intact.
+ * Long labels (GLEITSCHIRM, BEZEICHNUNG) still wrap as they always have.
+ */
+.fb-row__req {
+  display: inline-block;
+  width: 0;
+  padding-left: 3px;
+  overflow: visible;
+  white-space: nowrap;
+}
+
+.fb-row__value {
+  flex: 1;
+  min-width: 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--fb-text);
+
+  &.is-placeholder {
+    font-weight: 400;
+    color: var(--fb-placeholder);
+  }
+}
+
+.fb-row__chevron {
+  flex: none;
+  font-size: 13px;
+  color: var(--fb-text-muted);
+}
+
+/*
+ * Opener row — a row that launches a picker. Rendered as a native <button>,
+ * which inside a <form> defaults to type="submit"; it MUST carry
+ * type="button" or tapping it saves the flight.
+ */
+button.fb-row {
+  appearance: none;
+  border: 0;
+  border-radius: 0;
+  font: inherit;
+  cursor: pointer;
+}
+
+/* Label above value — for the auto-grow textarea and other tall controls */
+.fb-row--stack {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+
+  .fb-row__label {
+    flex: none;
+  }
+}
+
+/* Toggle sits hard right, label takes the slack */
+.fb-row--toggle {
+  .fb-row__label {
+    flex: 1;
+    text-transform: none;
+    font-size: 14px;
+    letter-spacing: 0;
+    color: var(--fb-text);
+  }
+}
+
+/*
+ * Marks a row whose value is an ion-select. Deliberately carries no layout of
+ * its own: the `.fb-row ion-select { width: 100% }` rule below already fills
+ * the value column, and adding more here would restyle the shipped flight form
+ * for no gain. Kept as a semantic hook for select-specific tweaks.
+ */
+
+/* The textarea row stacks, so its value column must span the full width */
+.fb-row--stack .fb-row__value {
+  width: 100%;
+}
+
+/*
+ * Ionic controls inside .fb-row.
+ *
+ * The row owns padding and height, so the controls have to stop contributing
+ * their own. These live here rather than in a component stylesheet because all
+ * three redesigned forms (flight, glider, place) need them identically; being
+ * in this global sheet also means no ::ng-deep is required to pierce Ionic's
+ * scoped styles. The `.fb-row` class ahead of each element keeps these winning
+ * over the bare `ion-select` rules in theme/variables.scss, which loads later.
+ */
+.fb-row {
+  ion-input,
+  ion-textarea {
+    --padding-start: 0;
+    --padding-end: 0;
+    --padding-top: 0;
+    --padding-bottom: 0;
+    --background: transparent;
+    min-height: 0;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--fb-text);
+
+    .native-wrapper,
+    .textarea-wrapper {
+      min-height: 0;
+    }
+
+    .native-input,
+    .native-textarea {
+      padding: 0;
+      min-height: 0;
+    }
+  }
+
+  ion-input .native-input::placeholder,
+  ion-textarea .native-textarea::placeholder {
+    color: var(--fb-placeholder);
+    opacity: 1;
+  }
+
+  ion-select {
+    --padding-start: 0;
+    --padding-end: 0;
+    min-height: 0;
+    width: 100%;
+    color: var(--fb-text);
+
+    &::part(text) {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--fb-text);
+    }
+
+    &::part(placeholder) {
+      color: var(--fb-placeholder);
+    }
+
+    &::part(icon) {
+      color: var(--fb-text-muted);
+      opacity: 1;
+    }
+  }
+
+  ion-toggle {
+    flex: none;
+    padding: 0;
+    --track-background-checked: var(--ion-color-primary);
+  }
+
+  /* fb-glider-select wraps an ion-select; make it fill the value column */
+  fb-glider-select {
+    display: block;
+    width: 100%;
+  }
+}
+
+/*
+ * ---- List page chrome ---------------------------------------------------
+ * The static surface strip above ion-content on a list page: an eyebrow line
+ * over a large title, with icon actions pinned to the right. Shared by the
+ * flight, glider and place lists.
+ */
+.list-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  padding: calc(env(safe-area-inset-top) + 14px) var(--fb-gutter) 14px;
+  background: var(--fb-surface);
+  border-bottom: 1px solid var(--fb-border);
+}
+
+/* Wraps eyebrow + title so the actions can sit opposite them */
+.list-header__text {
+  flex: 1;
+  min-width: 0;
+}
+
+.list-header__eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Small pill, e.g. "filtered" */
+.list-header__chip {
+  padding: 2px 7px;
+  border-radius: 5px;
+  background: var(--fb-accent-soft);
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ion-color-primary);
+}
+
+.list-header__title {
+  margin: 8px 0 0;
+  font-size: 26px;
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+  color: var(--fb-text);
+}
+
+.list-header__actions {
+  display: flex;
+  gap: 8px;
+  flex: none;
+}
+
+/* The header aligns to flex-end for the title baseline; the avatar centres */
+.list-header .fb-avatar-button {
+  align-self: center;
+}
+
+/*
+ * Full-bleed block of rows. The design draws list rows edge to edge on a white
+ * band with hairline separators, not as an inset rounded card - that treatment
+ * (.fb-card--flush) is for forms and settings.
+ */
+.list-block {
+  padding: 0;
+  margin: 0;
+  background: var(--fb-surface);
+  border-top: 1px solid var(--fb-border);
+  border-bottom: 1px solid var(--fb-border);
+}
+
+/* Dashed hint blocks sitting in the page gutter */
+.list-empty,
+.list-footnote {
+  margin: 16px var(--fb-gutter);
+}
+
+/*
+ * Leading date column of a list row: a large day number over a small uppercase
+ * month. Shared by the flight list and the appointment list, which the design
+ * draws identically.
+ */
+.row-date {
+  flex: none;
+  width: 36px;
+}
+
+.row-date__day {
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--fb-text);
+}
+
+.row-date__month {
+  margin-top: 5px;
+  font-size: 9px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--fb-text-muted);
+}
+
+/*
+ * State pill. The design's greens and reds sit within a shade of the banner
+ * tokens above, so those are reused rather than duplicated; only the amber of
+ * an announced-but-unconfirmed state is new.
+ */
+.fb-status {
+  flex: none;
+  padding: 3px 8px;
+  border-radius: 99px;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+
+  &--CONFIRMED {
+    background: var(--fb-success-bg);
+    color: var(--fb-success-text);
+  }
+
+  &--ANNOUNCED {
+    background: var(--fb-warning-bg);
+    color: var(--fb-warning-text);
+  }
+
+  &--CANCELED {
+    background: var(--fb-danger-bg);
+    color: var(--fb-danger-text);
+  }
+}
+
+/*
+ * Capacity bar - one cell per spot, filled for the taken ones. The list row
+ * draws fixed 7px squares; the detail card sets .spots--wide to stretch the
+ * same cells across the card.
+ */
+.spots {
+  display: flex;
+  gap: 2px;
+  flex: none;
+}
+
+.spots__cell {
+  width: 7px;
+  height: 7px;
+  border-radius: 1px;
+  background: var(--fb-border);
+
+  &.is-taken {
+    background: var(--fb-accent);
+  }
+
+  &.is-full {
+    background: var(--fb-danger-text);
+  }
+}
+
+.spots--wide {
+  gap: 3px;
+  width: 100%;
+
+  .spots__cell {
+    flex: 1;
+    width: auto;
+    height: 5px;
+  }
+}
+
+/*
+ * Selectable pill. The filter sheet uses them as radio-like options and the
+ * screens above it as removable summaries of what is active, so both variants
+ * live here rather than in one page.
+ */
+.fb-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 13px;
+  appearance: none;
+  border: 1px solid var(--fb-border);
+  border-radius: 99px;
+  background: var(--fb-surface);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1;
+  color: var(--fb-text-body);
+  cursor: pointer;
+
+  &--active {
+    border-color: var(--fb-accent);
+    background: var(--fb-accent-soft);
+    color: #0a5e9b;
+  }
+
+  /* Summary of an applied criterion; tapping it clears that one */
+  &--removable {
+    padding: 6px 10px;
+    border-color: var(--fb-accent);
+    background: var(--fb-accent-soft);
+    font-size: 11.5px;
+    color: #0a5e9b;
+
+    ion-icon {
+      font-size: 10px;
+    }
+  }
+}
+
+/* Card shown when a filter matches nothing. Both list screens use it. */
+.filter-empty {
+  margin: 16px var(--fb-gutter);
+  padding: 26px 20px;
+  text-align: center;
+}
+
+.filter-empty__title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--fb-text);
+}
+
+.filter-empty__hint {
+  margin-top: 7px;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--fb-text-secondary);
+  text-wrap: pretty;
+}
+
+.filter-empty__action {
+  display: block;
+  max-width: 180px;
+  margin: 16px auto 0;
+  --border-radius: 10px;
+  --box-shadow: none;
+  height: 44px;
+  font-size: 13.5px;
+  font-weight: 600;
+  text-transform: none;
+}
+
+/* Row of chips that wraps rather than scrolling */
+.fb-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+/* Initials circle for a person in a list, as opposed to the header's own avatar */
+.fb-avatar-initials {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--fb-bg);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--fb-text-secondary);
+
+  /* The current user's own row, which the design tints */
+  &.is-self {
+    background: var(--fb-accent-soft);
+    color: var(--ion-color-primary);
+  }
+}
+
+/*
+ * Destructive / secondary actions at the foot of a form body, below the fields
+ * but above the sticky save footer. Shared by the flight, glider and place
+ * edit pages.
+ */
+.secondary-actions {
+  margin-top: 22px;
+
+  ion-button {
+    --border-radius: 10px;
+    --box-shadow: none;
+    height: 46px;
+    margin: 0 0 8px;
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: none;
+  }
+}
+
+/*
+ * Bottom-sheet modal shell (the tab bar's add sheet). Lives here rather than in
+ * tabs.page.scss because Ionic renders modals at the app root, outside any
+ * component's style scope. align-items pins the auto-height content to the
+ * bottom edge; the backdrop tint is the design's own.
+ */
+.fb-add-sheet {
+  --width: 100%;
+  --height: auto;
+  --border-radius: 18px 18px 0 0;
+  --background: var(--fb-bg);
+  --box-shadow: 0 -8px 28px rgba(16, 41, 60, 0.18);
+  --backdrop-opacity: 1;
+
+  align-items: flex-end;
+
+  &::part(backdrop) {
+    background: rgba(16, 41, 60, 0.4);
+  }
+}
+
+/*
+ * Filter sheet, shared by Flights and Statistics. A fixed height rather than
+ * sheet breakpoints, for the reason .skill-sheet-modal below carries: a
+ * breakpoint sheet is full-height and translated down, so anything past the
+ * breakpoint cannot be scrolled to.
+ */
+.flight-filter-class {
+  --width: 100%;
+  --height: 88%;
+  --background: var(--fb-bg);
+  --border-radius: 18px 18px 0 0;
+  --box-shadow: 0 -8px 28px rgba(16, 41, 60, 0.18);
+  --backdrop-opacity: 1;
+
+  align-items: flex-end;
+
+  &::part(backdrop) {
+    background: rgba(16, 41, 60, 0.4);
+  }
+}
+
+/*
+ * Control-sheet skill sheet: rating, level and coaching copy in one sheet.
+ * Global for the same reason as .fb-add-sheet - Ionic renders modals at the app
+ * root, outside component style scope. The component paints its own head, so
+ * only the shell is set here.
+ */
+.skill-sheet-modal {
+  --width: 100%;
+  --height: 82%;
+  --background: var(--fb-bg);
+  --border-radius: 18px 18px 0 0;
+  --box-shadow: 0 -8px 28px rgba(16, 41, 60, 0.18);
+  --backdrop-opacity: 1;
+
+  /* Pinned to the bottom edge, the way .fb-add-sheet does it. */
+  align-items: flex-end;
+
+  &::part(backdrop) {
+    background: rgba(16, 41, 60, 0.4);
+  }
+
+  /* Theory skills carry no coaching text - only the rating and its level. */
+  &--short {
+    --height: 46%;
+  }
+}
+
+/*
+ * Segmented control: a bordered, rounded strip of equal-width buttons with one
+ * active. Shared by the statistics period picker and the account language
+ * switcher. Separators use adjacency so the first item never gets a left edge.
+ */
+.fb-segments {
+  display: flex;
+  border: 1px solid var(--fb-border);
+  border-radius: var(--fb-radius-sm);
+  overflow: hidden;
+  background: var(--fb-surface);
+}
+
+.fb-segments__item {
+  flex: 1;
+  padding: 10px 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--fb-text-body);
+  text-align: center;
+  cursor: pointer;
+
+  & + .fb-segments__item {
+    border-left: 1px solid var(--fb-border);
+  }
+
+  &.is-active {
+    background: var(--ion-color-primary);
+    color: var(--ion-color-primary-contrast);
+    font-weight: 600;
+  }
+}
+
+/*
+ * Round initials button linking to the Account screen. Sits as the leading
+ * element in every main-tab header (Home, Flights, Stats, More), so it is here
+ * rather than duplicated four times.
+ */
+.fb-avatar-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid var(--fb-border);
+  border-radius: 50%;
+  background: transparent;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--fb-text-secondary);
+  cursor: pointer;
+}
+
+/* Square outlined icon button, used in page headers */
+.icon-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  flex: none;
+  border: 1px solid var(--fb-border);
+  border-radius: var(--fb-radius-sm);
+  background: var(--fb-surface);
+  cursor: pointer;
+
+  ion-icon {
+    font-size: 17px;
+    color: var(--fb-text-body);
+  }
+
+  /* Filled while the action it opens is doing something - e.g. an active filter */
+  &.is-active {
+    border-color: var(--ion-color-primary);
+    background: var(--ion-color-primary);
+
+    ion-icon {
+      color: #fff;
+    }
+  }
+}
+
+/*
+ * Full-screen form chrome — a static surface header, a padded body on the page
+ * background, and a sticky action footer. Shared by flight add and edit.
+ */
+.form-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: calc(env(safe-area-inset-top) + 12px) var(--fb-gutter) 12px;
+  background: var(--fb-surface);
+  border-bottom: 1px solid var(--fb-border);
+}
+
+.form-header__title {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--fb-text);
+}
+
+.form-header__meta {
+  flex: 1;
+  min-width: 0;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--fb-text-secondary);
+}
+
+.form-body {
+  padding: 16px var(--fb-gutter) 18px;
+}
+
+.form-divider {
+  margin: 14px 0 12px;
+  text-align: center;
+  font-size: 11.5px;
+  color: var(--fb-text-secondary);
+}
+
+.form-footer {
+  background: var(--fb-surface);
+  border-top: 1px solid var(--fb-border);
+  padding: 10px var(--fb-gutter) 12px;
+
+  ion-button {
+    --border-radius: 10px;
+    --box-shadow: none;
+    height: 50px;
+    margin: 0;
+    font-size: 14.5px;
+    font-weight: 600;
+    text-transform: none;
+  }
+}
+
+/*
+ * Stacked-label field rows — a micro-label above the value, as opposed to
+ * .fb-row's side labels. Used by the signed-out screens, where every row is a
+ * free-text entry and a side label would leave no room for the value.
+ *
+ * Sits inside a .fb-card--flush. Global rather than component-scoped because
+ * login and register share it; ion-input is scoped (not shadow) DOM, so its
+ * .native-input is reachable from here without ::ng-deep.
+ */
+.fb-field {
+  padding: 13px 16px;
+
+  /* Adjacency, not :last-child — @if/@for leave comment anchors behind. */
+  & + .fb-field {
+    border-top: 1px solid var(--fb-hairline);
+  }
+}
+
+/* A row with a trailing control (a reveal toggle, a unit). */
+.fb-field--split {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.fb-field__main {
+  flex: 1;
+  min-width: 0;
+}
+
+.fb-field__label {
+  display: block;
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--fb-text-secondary);
+}
+
+/* The row owns the padding, so the input contributes none of its own. */
+.fb-field ion-input {
+  --padding-start: 0;
+  --padding-end: 0;
+  --padding-top: 0;
+  --padding-bottom: 0;
+  --background: transparent;
+  /* MD draws a focus/valid underline the card's hairlines already stand in for,
+     and its green "valid" state reads as a warning here. */
+  --highlight-height: 0;
+  margin-top: 7px;
+  min-height: 0;
+  font-size: 14.5px;
+  font-weight: 500;
+  color: var(--fb-text);
+
+  .native-wrapper {
+    min-height: 0;
+  }
+
+  .native-input {
+    padding: 0;
+    min-height: 0;
+  }
+
+  .native-input::placeholder {
+    color: var(--fb-placeholder);
+    opacity: 1;
+  }
+}
+
+.fb-field__error {
+  display: block;
+  margin-top: 6px;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--ion-color-danger);
+}
+
+/*
+ * Status banner — used for read-only flight validation and tandem payment.
+ * Left edge carries the state colour.
+ */
+.fb-banner {
+  border-radius: var(--fb-radius);
+  padding: 13px 15px;
+  border: 1px solid transparent;
+  border-left-width: 3px;
+
+  &--success {
+    background: var(--fb-success-bg);
+    border-color: var(--fb-success-border);
+    border-left-color: var(--ion-color-success);
+  }
+
+  &--danger {
+    background: var(--fb-danger-bg);
+    border-color: var(--fb-danger-border);
+    border-left-color: var(--ion-color-danger);
+  }
+}
+
+.fb-banner__title {
+  font-size: 13px;
+  font-weight: 600;
+
+  .fb-banner--success & {
+    color: var(--fb-success-text);
+  }
+  .fb-banner--danger & {
+    color: var(--fb-danger-text);
+  }
+}
+
+.fb-banner__text {
+  margin-top: 6px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--fb-text-body);
+  text-wrap: pretty;
+}

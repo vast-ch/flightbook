@@ -9,6 +9,9 @@ import { School } from './school.model';
 import { ControlSheet } from 'src/app/shared/domain/control-sheet';
 import { EmergencyContact } from './emergency-contact.model';
 
+/** Which side of today an appointment list asks for. */
+export type AppointmentScope = 'upcoming' | 'past';
+
 @Injectable({
   providedIn: 'root'
 })
@@ -24,22 +27,81 @@ export class SchoolService {
     this.filtered$ = new BehaviorSubject(false);
   }
 
+  /**
+   * The in-flight promise is memoised, not just the resolved value: HomeStore
+   * asks twice in the same tick, and caching only the result let both callers
+   * miss the cache and fire their own request.
+   */
+  private schoolsRequest?: Promise<School[]>;
+
   async getSchools(): Promise<School[]> {
-    if (!this.schoolsSignal()) {
-      const schools = await firstValueFrom(this.http.get<School[]>(`${environment.baseUrl}/student/schools`));
-      this.schoolsSignal.set(schools);
+    const cached = this.schoolsSignal();
+    if (cached) {
+      return cached;
     }
-    return this.schoolsSignal()!;
+    if (!this.schoolsRequest) {
+      this.schoolsRequest = firstValueFrom(this.http.get<School[]>(`${environment.baseUrl}/student/schools`))
+        .then(schools => {
+          this.schoolsSignal.set(schools);
+          return schools;
+        })
+        .finally(() => { this.schoolsRequest = undefined; });
+    }
+    return this.schoolsRequest;
   }
 
   clearSchools() {
     this.schoolsSignal.set(null);
+    this.schoolsRequest = undefined;
   }
 
-  getAppointments({ limit = null, offset = null}: { limit?: number, offset?: number} = {}, schoolId: number ): Observable<Appointment[]> {
-    let params: HttpParams = this.createFilterParams(limit, offset);
+  /**
+   * The appointment filter is shared by every school screen and outlives the
+   * page that set it, so it has to go with the session too - the flight filter
+   * already does. Left set, the next account opened its appointment list
+   * silently narrowed by a date range and a state it never chose.
+   */
+  resetFilter() {
+    this.filter = new AppointmentFilter();
+    this.filtered$.next(false);
+  }
+
+  /**
+   * @param applyFilter pass false to ignore the shared appointment filter - the
+   * dashboard's next-appointment card has no filter control of its own, so it
+   * must not silently inherit whatever the appointment list was last narrowed by.
+   */
+  getAppointments({ limit = null, offset = null, applyFilter = true }:
+    { limit?: number, offset?: number, applyFilter?: boolean } = {}, schoolId: number, scope?: AppointmentScope ): Observable<Appointment[]> {
+    let params: HttpParams = applyFilter ? this.createFilterParams(limit, offset) : this.createPagingParams(limit, offset);
+    params = this.appendScope(params, scope, applyFilter);
 
     return this.http.get<Appointment[]>(`${environment.baseUrl}/student/schools/${schoolId}/appointments`, { params });
+  }
+
+  /**
+   * The Upcoming / Past tabs, expressed with the from/to params the endpoint
+   * already takes. A bound the user set in the filter wins - their filter is the
+   * more specific request - and the scope deliberately does not touch filtered$,
+   * or every plain list would claim to be filtered.
+   *
+   * Note both bounds are date-only, so today satisfies either scope; the page
+   * settles today's appointments against the clock.
+   */
+  private appendScope(params: HttpParams, scope: AppointmentScope | undefined, applyFilter: boolean): HttpParams {
+    if (!scope) {
+      return params;
+    }
+    const today = moment().format('YYYY-MM-DD');
+    // A bound the user set wins - unless the caller opted out of the filter, in
+    // which case there is no user bound to defer to.
+    if (scope === 'upcoming' && (!applyFilter || !this.filter.from)) {
+      return params.append('from', today);
+    }
+    if (scope === 'past' && (!applyFilter || !this.filter.to)) {
+      return params.append('to', today);
+    }
+    return params;
   }
 
   getAppointment(schoolId: number, appointmentId: number ): Observable<Appointment> {
@@ -83,6 +145,18 @@ export class SchoolService {
 
   private setFilterState(nextState: boolean) {
     this.filtered$.next(nextState);
+  }
+
+  /** Paging only - no filter read, and no filtered$ emission. */
+  private createPagingParams(limit: Number, offset: Number): HttpParams {
+    let params = new HttpParams();
+    if (limit) {
+      params = params.append('limit', limit.toString());
+    }
+    if (offset) {
+      params = params.append('offset', offset.toString());
+    }
+    return params;
   }
 
   private createFilterParams(limit: Number, offset: Number): HttpParams {

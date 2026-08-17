@@ -1,7 +1,8 @@
+// Height and framing come from the host card (see .form-card--map), so the map
+// no longer carries its own 5px border or viewport-relative height.
 .place-map {
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-    height: 50vh;
-    border: 5px solid #555;
-  }
+  display: block;
+  width: 100%;
+  height: var(--fb-place-map-height, 280px);
+  background: var(--fb-track);
+}

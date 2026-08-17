@@ -1,0 +1,84 @@
+// Row layout, labels and the ion-input reset come from .fb-field in tokens.scss,
+// shared with the login screen. Only the phone control and the reveal button
+// need anything of their own here.
+
+.fb-field__optional {
+    margin-left: 6px;
+    font-weight: 400;
+    letter-spacing: 0.06em;
+    color: var(--fb-text-muted);
+    text-transform: none;
+}
+
+.register__reveal {
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+
+    ion-icon {
+        font-size: 19px;
+        color: var(--fb-text-muted);
+    }
+}
+
+/*
+ * fb-phone-number is a shared control with its own stacked labels sized for
+ * ion-item. Restyled from the outside rather than changed, since the flight
+ * and school forms still render it in their own context.
+ */
+:host ::ng-deep .fb-field--phone {
+    fb-phone-number {
+        display: block;
+        margin-top: 7px;
+    }
+
+    // Widths stay as fb-phone-number defines them - the prefix is sized for
+    // "Switzerland (+41)", and overriding that from outside would only drift
+    // from the other forms that render the same control.
+    .phone-container {
+        align-items: baseline;
+        gap: 12px;
+    }
+
+    ion-select,
+    ion-input {
+        --padding-start: 0;
+        --padding-end: 0;
+        --padding-top: 0;
+        --padding-bottom: 0;
+        --background: transparent;
+        min-height: 0;
+        font-size: 14.5px;
+        font-weight: 500;
+        color: var(--fb-text);
+    }
+
+    // The control's own labels would repeat the row label above them.
+    ion-select::part(label),
+    .label-text-wrapper {
+        display: none;
+    }
+
+    .native-wrapper,
+    .native-input {
+        min-height: 0;
+        padding: 0;
+    }
+
+    .native-input::placeholder {
+        color: var(--fb-placeholder);
+        opacity: 1;
+    }
+
+    .error-text {
+        display: block;
+        margin-top: 6px;
+        font-size: 11.5px;
+        font-weight: 500;
+    }
+}

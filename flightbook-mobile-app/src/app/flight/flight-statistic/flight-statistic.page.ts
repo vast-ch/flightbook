@@ -1,174 +1,196 @@
-import { Component, OnInit, OnDestroy, Signal } from '@angular/core';
-import { Subject, firstValueFrom } from 'rxjs';
-import { ModalController, LoadingController, IonHeader, IonToolbar, IonButtons, IonMenuButton, IonTitle, IonButton, IonIcon, IonContent, IonCard, IonCardContent, IonSelect, IonSelectOption } from '@ionic/angular/standalone';
-import { FlightFilterComponent } from '../../form/flight-filter/flight-filter.component';
+import { Component, OnDestroy, computed, inject } from '@angular/core';
+import { Router } from '@angular/router';
+import { DatePipe, DecimalPipe } from '@angular/common';
+import { IonButton, IonContent, IonIcon, IonSkeletonText } from '@ionic/angular/standalone';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
-import { FlightStatistic } from '../shared/flightStatistic.model';
-import { FlightStore } from '../shared/flight.store';
-import { Chart, ChartData } from 'chart.js';
-
-import zoomPlugin from "chartjs-plugin-zoom";
-import { DecimalPipe } from '@angular/common';
-import { BarChartComponent } from '../../charts/bar-chart/bar-chart.component';
-import { LineChartComponent } from '../../charts/line-chart/line-chart.component';
-import { HoursFormatPipe } from '../../shared/pipes/hours-format.pipe';
-import { addIcons } from "ionicons";
-import { filterOutline } from "ionicons/icons";
-
-Chart.register(zoomPlugin);
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { ALL_TIME, StatisticPeriod, StatisticStore } from './shared/statistic.store';
+import { ActivityHeatmapComponent } from './components/activity-heatmap/activity-heatmap.component';
+import { FlightsBarsComponent } from './components/flights-bars/flights-bars.component';
+import { SeasonGridComponent } from './components/season-grid/season-grid.component';
+import { CumulativeChartComponent } from './components/cumulative-chart/cumulative-chart.component';
+import { FlightFilterComponent } from 'src/app/form/flight-filter/flight-filter.component';
+import { FilterChipsComponent } from 'src/app/form/flight-filter/filter-chips.component';
+import { FlightStore } from 'src/app/flight/shared/flight.store';
+import { ModalController } from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import { chevronForward, filterOutline, trendingUp } from 'ionicons/icons';
+import { AvatarButtonComponent } from 'src/app/shared/components/avatar-button/avatar-button.component';
+import { LanguageService } from 'src/app/shared/services/language.service';
+import { splitDistance, splitDuration, toHoursMinutes } from 'src/app/shared/util/format';
 
 @Component({
     selector: 'app-flight-statistic',
     templateUrl: './flight-statistic.page.html',
     styleUrls: ['./flight-statistic.page.scss'],
     imports: [
-        BarChartComponent,
-        LineChartComponent,
+        AvatarButtonComponent,
+        DatePipe,
         DecimalPipe,
         TranslateModule,
-        HoursFormatPipe,
-        IonHeader,
-        IonToolbar,
-        IonButtons,
-        IonMenuButton,
-        IonTitle,
+        ActivityHeatmapComponent,
+        FlightsBarsComponent,
+        SeasonGridComponent,
+        CumulativeChartComponent,
         IonButton,
-        IonIcon,
         IonContent,
-        IonCard,
-        IonCardContent,
-        IonSelect,
-        IonSelectOption
+        IonIcon,
+        IonSkeletonText,
+        FilterChipsComponent
     ]
 })
-export class FlightStatisticPage implements OnInit, OnDestroy {
-    unsubscribe$ = new Subject<void>();
-    statistics: FlightStatistic;
-    statisticsList: FlightStatistic[];
-    graphType: string;
+export class FlightStatisticPage implements OnDestroy {
+    private unsubscribe$ = new Subject<void>();
 
-    nbFlightBarChartData: ChartData<'bar'> = {
-        labels: [],
-        datasets: [
-            { data: [] }
-        ]
-    };
+    private store = inject(StatisticStore);
+    private translate = inject(TranslateService);
+    private router = inject(Router);
+    private modalCtrl = inject(ModalController);
+    private flightStore = inject(FlightStore);
+    private languageService = inject(LanguageService);
 
-    incomeBarChartData: ChartData<'bar'> = {
-        labels: [],
-        datasets: [
-            { data: [] }
-        ]
-    };
+    public filtered = this.flightStore.filtered;
 
-    averageLineChartData: ChartData<'line'> = {
-        labels: [],
-        datasets: [
-            { data: [] }
-        ]
-    };
+    public readonly ALL_TIME = ALL_TIME;
 
-    get filtered(): Signal<boolean> {
-        return this.flightStore.filtered;
+    public loaded = this.store.loaded;
+    public hasFlights = this.store.hasFlights;
+    public period = this.store.period;
+    public years = this.store.years;
+    public headline = this.store.headline;
+    public heatmap = this.store.heatmap;
+    public cumulative = this.store.cumulative;
+    public bests = this.store.bests;
+    public firstFlightDate = this.store.firstFlightDate;
+
+    /** Total airtime for the selected period, as HH:mm. */
+    public totalAirtime = computed(() => this.toHoursMinutes(this.headline().airtime));
+
+    /**
+     * Airtime and average as value + unit, so the unit can be styled smaller.
+     * Minutes below an hour, hours above - matching the home stat strip.
+     */
+    public airtimeParts = computed(() => this.splitDuration(this.headline().airtime));
+    public averageParts = computed(() => this.splitDuration(this.headline().average));
+
+    public distanceParts = computed(() => splitDistance(this.headline().distance));
+
+    /** LanguageService, not translate.currentLang: reactive, and always a locale Angular has data for. */
+    get currentLang(): string {
+        return this.languageService.lang();
     }
 
-    constructor(
-        private flightStore: FlightStore,
-        private modalCtrl: ModalController,
-        private translate: TranslateService,
-        private loadingCtrl: LoadingController
-    ) {
-        this.graphType = 'yearly';
-
-        this.statistics = new FlightStatistic();
-        this.statisticsList = [];
-        addIcons({ filterOutline });
+    constructor() {
+        addIcons({ filterOutline, trendingUp, 'chevron-forward': chevronForward });
     }
 
-    private async dataLoad() {
-        const loading = await this.loadingCtrl.create({
-            message: this.translate.instant('loading.loading')
+    public hasIncome = this.store.hasIncome;
+    public incomeSummary = this.store.incomeSummary;
+    public incomeByYear = this.store.incomeByYear;
+    public incomeByMonth = this.store.incomeByMonth;
+
+    public seasons = this.store.seasons;
+    public seasonGrid = this.store.seasonGrid;
+    public bars = this.store.bars;
+    public comparison = this.store.comparison;
+    public monthInitials = this.store.monthInitials;
+    public activeMonths = this.store.activeMonths;
+
+    /** Newest first, the way the design stacks the seasons list. */
+    public seasonsNewestFirst = computed(() => [...this.seasons()].reverse());
+
+    /** The full span of seasons - the yearly income chart always covers all of them. */
+    public seasonSpan = computed(() => {
+        const seasons = this.seasons();
+        return seasons.length > 1
+            ? `${seasons[0].year} – ${seasons[seasons.length - 1].year}`
+            : (seasons[0]?.year ?? '');
+    });
+
+    public chartMeta = computed(() => this.period() !== ALL_TIME ? this.period() : this.seasonSpan());
+
+    /** "All time" or the selected year, for card metadata. */
+    public periodLabel = computed(() => {
+        // Read so the label re-renders on a language switch; instant() does not.
+        this.languageService.lang();
+        return this.period() === ALL_TIME
+            ? this.translate.instant('statistics.allTime')
+            : this.period();
+    });
+
+    /** The design's second sentence names a specific year; only the first generalises. */
+    public chartNote = computed(() => {
+        const peak = this.store.peakLabel();
+        if (!peak) {
+            return '';
+        }
+        const key = this.period() === ALL_TIME ? 'statistics.strongestSeason' : 'statistics.busiestMonth';
+        return this.translate.instant(key, { name: peak.name, flights: peak.flights, count: peak.flights });
+    });
+
+    public comparisonText = computed(() => {
+        const compare = this.comparison();
+        if (!compare) {
+            return '';
+        }
+        if (compare.delta === null) {
+            return this.translate.instant('statistics.compareFirst', { count: compare.flights });
+        }
+        const delta = compare.delta >= 0 ? `+${compare.delta}` : String(compare.delta);
+        const rank = compare.rank === 1
+            ? this.translate.instant('statistics.rankBest')
+            : this.translate.instant('statistics.rankOrdinal', { rank: compare.rank });
+        const head = this.translate.instant('statistics.compare', {
+            count: compare.flights,
+            delta,
+            year: compare.previousYear
         });
+        return `${head} · ${rank}`;
+    });
 
-        try {
-            const promiseList = [];
-            promiseList.push(firstValueFrom(this.flightStore.getStatistics('global')));
-            promiseList.push(firstValueFrom(this.flightStore.getStatistics(this.graphType)));
-            const data = await Promise.all(promiseList);
-            this.statistics = (data[0] as FlightStatistic[])[0];
-            this.statisticsList = data[1] as FlightStatistic[];
-            this.prepareData();
-        } catch (exception: any) {
-            await loading.dismiss();
+    /**
+     * Sparkline bars share the season's own busiest month, not a global max.
+     * `max` is precomputed on the Season - derived here it was a fresh spread
+     * plus 12 comparisons per bar, i.e. ~156 per change-detection pass on a
+     * 13-season logbook, on every scroll frame.
+     */
+    sparkHeight(value: number, max: number): string {
+        return value === 0 ? '2px' : `${Math.max(3, Math.round(value / max * 22))}px`;
+    }
+
+    ionViewWillEnter() {
+        // Loaded once per session: everything below is derived, so switching
+        // period costs no requests.
+        if (!this.loaded()) {
+            this.store.load().pipe(takeUntil(this.unsubscribe$)).subscribe();
         }
     }
 
-    private async graphDataLoad() {
-        const loading = await this.loadingCtrl.create({
-            message: this.translate.instant('loading.loading')
+    async openFilter() {
+        const modal = await this.modalCtrl.create({
+            component: FlightFilterComponent,
+            cssClass: 'flight-filter-class'
         });
-
-        try {
-            const data = await firstValueFrom(this.flightStore.getStatistics(this.graphType));
-            this.statisticsList = data;
-            this.prepareData();
-        } catch (exception: any) {
-            await loading.dismiss();
+        const revision = this.flightStore.revision();
+        await modal.present();
+        await modal.onWillDismiss();
+        // Only if the sheet actually moved the filter: reload() refetches three
+        // aggregates plus the whole unpaginated logbook, and opening the sheet
+        // to look at it used to pay that price.
+        if (this.flightStore.revision() !== revision) {
+            this.reloadForFilter();
         }
     }
 
-    prepareData() {
-        // Nb flight data
-        const data: any = [];
-        const labels: any = [];
-        this.statisticsList.forEach((element: FlightStatistic) => {
-            labels.push(element.type == 'monthly' ? `${element.month} ${element.year}` : element.year)
-            data.push(element.nbFlights);
-        });
-
-        this.nbFlightBarChartData = {
-            labels: labels,
-            datasets: [
-                { data: data, label: this.translate.instant('statistics.nbflight'), borderColor: "rgb(0, 84, 233)", borderWidth: 3, borderSkipped: true, hoverBackgroundColor: "rgb(0, 84, 233)", barPercentage: 1, categoryPercentage: 0.95 }
-            ]
-        };
-
-        // Income data
-        const incomeData: any = [];
-        const incomeLabels: any = [];
-        this.statisticsList.forEach((element: FlightStatistic) => {
-            incomeLabels.push(element.type == 'monthly' ? `${element.month} ${element.year}` : element.year)
-            incomeData.push(element.income);
-        });
-
-        this.incomeBarChartData = {
-            labels: incomeLabels,
-            datasets: [
-                { data: incomeData, label: this.translate.instant('statistics.price'), borderColor: "rgb(0, 84, 233)", borderWidth: 3, borderSkipped: true, hoverBackgroundColor: "rgb(0, 84, 233)", barPercentage: 1, categoryPercentage: 0.95 }
-            ]
-        };
-
-        // Average time
-        const timeData: any = [];
-        const averageData: any = [];
-        const lineLabels: any = [];
-        this.statisticsList.forEach((element: FlightStatistic) => {
-            lineLabels.push(element.type == 'monthly' ? `${element.month} ${element.year}` : element.year)
-            timeData.push(element.time);
-            averageData.push(element.average);
-        });
-
-        this.averageLineChartData = {
-            labels: lineLabels,
-            datasets: [
-                { data: timeData, label: this.translate.instant('statistics.flighthour'), borderColor: "rgb(0, 84, 233)", pointBackgroundColor: "rgb(0, 84, 233)", pointHoverBorderColor: "rgb(0, 84, 233)" },
-                { yAxisID: 'y1', data: averageData, label: this.translate.instant('statistics.average'), borderColor: "rgb(143,187,255)", pointBackgroundColor: "rgb(143,187,255)", pointHoverBorderColor: "rgb(143,187,255)" }
-            ]
-        };
+    /** The store caches per session, so a filter change has to force a refetch. */
+    reloadForFilter() {
+        this.store.reload().pipe(takeUntil(this.unsubscribe$)).subscribe();
     }
 
-    ngOnInit() {
-        this.dataLoad();
+    clearFilter() {
+        this.flightStore.resetFilter();
+        this.reloadForFilter();
     }
 
     ngOnDestroy() {
@@ -176,31 +198,16 @@ export class FlightStatisticPage implements OnInit, OnDestroy {
         this.unsubscribe$.complete();
     }
 
-    async openFilter() {
-        const modal = await this.modalCtrl.create({
-            component: FlightFilterComponent,
-            cssClass: 'flight-filter-class',
-            componentProps: {
-                type: 'FlightStatisticPage',
-                graphType: this.graphType
-            }
-        });
-
-        this.modalOnDidDismiss(modal);
-        return await modal.present();
+    selectPeriod(period: StatisticPeriod) {
+        this.period.set(period);
     }
 
-    async modalOnDidDismiss(modal: HTMLIonModalElement) {
-        modal.onDidDismiss().then((resp: any) => {
-            this.statisticsList.splice(0, this.statisticsList.length);
-            this.statisticsList = resp.data.graphData;
-            this.statistics = resp.data.statistics;
-            this.prepareData();
-        });
+    openImport() {
+        this.router.navigate(['imports/igc']);
     }
 
-    async changeGraphType(event: CustomEvent) {
-        this.graphType = event.detail.value;
-        this.graphDataLoad();
-    }
+    /** Seconds to HH:mm. */
+    toHoursMinutes = toHoursMinutes;
+
+    private splitDuration = splitDuration;
 }

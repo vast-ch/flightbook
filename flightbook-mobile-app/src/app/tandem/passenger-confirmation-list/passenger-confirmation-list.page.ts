@@ -1,10 +1,11 @@
 import { DatePipe } from '@angular/common';
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ModalController, LoadingController, IonHeader, IonToolbar, IonButtons, IonMenuButton, IonTitle, IonButton, IonIcon, IonContent, IonItem, IonList, IonInfiniteScroll, IonInfiniteScrollContent, IonLabel, AlertController, IonGrid, IonRow, IonCol } from '@ionic/angular/standalone';
+import { Component, OnDestroy, OnInit, computed, signal } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { ModalController, LoadingController, NavController, IonIcon, IonContent, IonInfiniteScroll, IonInfiniteScrollContent, AlertController } from '@ionic/angular/standalone';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { firstValueFrom, Subject, takeUntil } from 'rxjs';
 import { addIcons } from "ionicons";
-import { add, filterOutline } from 'ionicons/icons';
+import { add, checkmark, chevronBack } from 'ionicons/icons';
 import { PassengerConfirmationFormComponent } from '../shared/components/passenger-confirmation-form/passenger-confirmation-form.component';
 import { TandemService } from '../shared/tandem.service';
 import { PassengerConfirmation } from '../shared/domain/passenger-confirmation.model';
@@ -14,6 +15,10 @@ import { XlsxExportService } from 'src/app/shared/services/xlsx-export.service';
 import { Directory, Filesystem } from '@capacitor/filesystem';
 import { FileOpener } from '@capacitor-community/file-opener';
 import { TandemSchoolService } from 'src/app/school/shared/tandem-school.service';
+import { LanguageService, resolveLanguage } from 'src/app/shared/services/language.service';
+import { Location } from '@angular/common';
+import { navigateBackOrTo } from 'src/app/shared/util/back-navigation';
+import { localDate } from 'src/app/shared/util/format';
 
 @Component({
   selector: 'app-passenger-confirmation-list',
@@ -22,20 +27,8 @@ import { TandemSchoolService } from 'src/app/school/shared/tandem-school.service
   imports: [
     TranslateModule,
     DatePipe,
-    IonHeader,
-    IonToolbar,
-    IonButtons,
-    IonMenuButton,
-    IonTitle,
-    IonButton,
     IonIcon,
     IonContent,
-    IonItem,
-    IonLabel,
-    IonList,
-    IonGrid,
-    IonRow,
-    IonCol,
     IonInfiniteScroll,
     IonInfiniteScrollContent
   ]
@@ -43,26 +36,82 @@ import { TandemSchoolService } from 'src/app/school/shared/tandem-school.service
 export class PassengerConfirmationListPage implements OnInit, OnDestroy {
 
   unsubscribe$ = new Subject<void>();
-  passengerConfirmations: PassengerConfirmation[] = [];
-  filtered: boolean;
+  passengerConfirmations = signal<PassengerConfirmation[]>([]);
   schools = this.tandemSchoolService.schools;
+  /** LanguageService, not translate.currentLang: reactive, and always a locale Angular has data for. */
+  get currentLang(): string {
+    return this.languageService.lang();
+  }
+
+  /**
+   * Grouped by month, as the design lists them. A single pass keeps the order
+   * the endpoint returned, so infinite-scroll appends land in the right group.
+   */
+  public groupedConfirmations = computed(() => {
+    const groups: { key: string; date: Date; confirmations: PassengerConfirmation[] }[] = [];
+    for (const confirmation of this.passengerConfirmations()) {
+      // localDate, not new Date(): the API sends a date-only string, which the
+      // Date constructor reads as UTC while the row's DatePipe reads it as
+      // local - so west of UTC the 1st of a month landed under the previous
+      // month's heading, next to rows the pipe had dated correctly.
+      const date = localDate(confirmation.date as unknown as string);
+      const key = `${date.getFullYear()}-${date.getMonth()}`;
+      const last = groups[groups.length - 1];
+      if (last && last.key === key) {
+        last.confirmations.push(confirmation);
+      } else {
+        groups.push({ key, date, confirmations: [confirmation] });
+      }
+    }
+    return groups;
+  });
 
   constructor(
+    private route: ActivatedRoute,
     private modalCtrl: ModalController,
+    private navCtrl: NavController,
+    private location: Location,
     private tandemService: TandemService,
     private loadingCtrl: LoadingController,
     private alertController: AlertController,
     private translate: TranslateService,
     private paymentService: PaymentService,
     private xlsxExportService: XlsxExportService,
-    private tandemSchoolService: TandemSchoolService
+    private tandemSchoolService: TandemSchoolService,
+    private languageService: LanguageService,
+    private router: Router
   ) {
-    addIcons({ filterOutline, add });
+    addIcons({ add, checkmark, 'chevron-back': chevronBack });
   }
 
   async ngOnInit() {
     await this.tandemSchoolService.getSchools();
-    this.initialDataLoad();
+    await this.initialDataLoad();
+
+    /*
+     * Arriving from the tab bar's add sheet. Subscribed, not read from the
+     * snapshot: this page is a child of the tab shell, so triggering the sheet
+     * while already standing here is a query-param-only navigation. Ionic's
+     * route-reuse strategy keeps the instance, ngOnInit never re-runs, and the
+     * sheet just closed with nothing happening.
+     *
+     * The param is cleared once handled, so the same choice works twice (the
+     * router drops a navigation to a byte-identical URL) and a later
+     * re-creation of the page does not pop the form unprompted.
+     */
+    this.route.queryParamMap
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe(params => {
+        if (params.get('new') !== '1') {
+          return;
+        }
+        this.router.navigate([], {
+          relativeTo: this.route,
+          queryParams: {},
+          replaceUrl: true
+        });
+        this.openAddPassengerConfirmation();
+      });
   }
 
   ngOnDestroy() {
@@ -70,10 +119,18 @@ export class PassengerConfirmationListPage implements OnInit, OnDestroy {
     this.unsubscribe$.complete();
   }
 
+  close() {
+    navigateBackOrTo(this.navCtrl, this.location, 'more');
+  }
+
+  initials(confirmation: PassengerConfirmation): string {
+    return `${confirmation.firstname?.charAt(0) ?? ''}${confirmation.lastname?.charAt(0) ?? ''}`.toUpperCase();
+  }
+
   async openAddPassengerConfirmation() {
     if (
-      (!this.paymentService.getPaymentStatusValue()?.active && this.passengerConfirmations.length >= 10) ||
-      (this.paymentService.getPaymentStatusValue()?.active && this.paymentService.getPaymentStatusValue()?.state == 'EXEMPTED' && this.passengerConfirmations.length >= 10)
+      (!this.paymentService.getPaymentStatusValue()?.active && this.passengerConfirmations().length >= 10) ||
+      (this.paymentService.getPaymentStatusValue()?.active && this.paymentService.getPaymentStatusValue()?.state == 'EXEMPTED' && this.passengerConfirmations().length >= 10)
     ) {
       const alert = await this.alertController.create({
         header: this.translate.instant('message.infotitle'),
@@ -85,8 +142,8 @@ export class PassengerConfirmationListPage implements OnInit, OnDestroy {
       await alert.present();
       return;
     } else if (
-      (!this.paymentService.getPaymentStatusValue()?.active && this.passengerConfirmations.length == 0) ||
-      (this.paymentService.getPaymentStatusValue()?.active && this.paymentService.getPaymentStatusValue()?.state == 'EXEMPTED' && this.passengerConfirmations.length == 0)
+      (!this.paymentService.getPaymentStatusValue()?.active && this.passengerConfirmations().length == 0) ||
+      (this.paymentService.getPaymentStatusValue()?.active && this.paymentService.getPaymentStatusValue()?.state == 'EXEMPTED' && this.passengerConfirmations().length == 0)
     ) {
       const alert = await this.alertController.create({
         header: this.translate.instant('message.infotitle'),
@@ -114,14 +171,15 @@ export class PassengerConfirmationListPage implements OnInit, OnDestroy {
     if (role == "save") {
       this.savePassengerConfirmation(modal.componentProps.passengerData);
     }
-    this.translate.use(localStorage.getItem('language') || navigator.language.split('-')[0]);
+    // The form lets the passenger read the waiver in their own language; this
+    // puts the pilot's back. Narrowed, because an unshipped device locale (es)
+    // sticks in translate.currentLang while its bundle 404s, and every
+    // date:...:currentLang binding then throws NG0701. Not setLanguage(): this
+    // restores a language, it does not choose one, so it must not persist.
+    this.translate.use(resolveLanguage(localStorage.getItem('language') || navigator.language));
   }
 
-  async openFilter() {
-
-  }
-
-  async itemTapped(event: MouseEvent, passengerConfirmation: PassengerConfirmation) {
+  async itemTapped(passengerConfirmation: PassengerConfirmation) {
     const modal = await this.modalCtrl.create({
       component: PassengerConfirmationFormComponent,
       cssClass: 'passenger-confirmation-form-class',
@@ -137,7 +195,12 @@ export class PassengerConfirmationListPage implements OnInit, OnDestroy {
     if (role == "delete") {
       this.deletePassengerConfirmation(modal.componentProps.passengerData);
     }
-    this.translate.use(localStorage.getItem('language') || navigator.language.split('-')[0]);
+    // The form lets the passenger read the waiver in their own language; this
+    // puts the pilot's back. Narrowed, because an unshipped device locale (es)
+    // sticks in translate.currentLang while its bundle 404s, and every
+    // date:...:currentLang binding then throws NG0701. Not setLanguage(): this
+    // restores a language, it does not choose one, so it must not persist.
+    this.translate.use(resolveLanguage(localStorage.getItem('language') || navigator.language));
   }
 
   private async initialDataLoad() {
@@ -147,9 +210,9 @@ export class PassengerConfirmationListPage implements OnInit, OnDestroy {
     await loading.present();
 
     try {
-      this.passengerConfirmations = await firstValueFrom(
+      this.passengerConfirmations.set(await firstValueFrom(
         this.tandemService.getPassengerConfirmations({ limit: this.tandemService.defaultLimit })
-      );
+      ));
     } catch (error) {
       console.error('Error loading passenger confirmations', error);
     } finally {
@@ -160,7 +223,7 @@ export class PassengerConfirmationListPage implements OnInit, OnDestroy {
   loadData(event: any) {
     this.tandemService.getPassengerConfirmations({
       limit: this.tandemService.defaultLimit,
-      offset: this.passengerConfirmations.length
+      offset: this.passengerConfirmations().length
     })
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe((res: PassengerConfirmation[]) => {
@@ -168,7 +231,7 @@ export class PassengerConfirmationListPage implements OnInit, OnDestroy {
         if (res.length < this.tandemService.defaultLimit) {
           event.target.disabled = true;
         }
-        this.passengerConfirmations.push(...res);
+        this.passengerConfirmations.update(current => [...current, ...res]);
       });
   }
 

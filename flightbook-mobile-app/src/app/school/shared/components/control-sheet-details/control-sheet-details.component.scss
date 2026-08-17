@@ -1,42 +1,142 @@
-.detail {
-    white-space: pre-line;
-}
+// This component runs with ViewEncapsulation.None so its styles can reach the
+// coaching copy, which arrives via [innerHTML]. Everything is therefore nested
+// under the element selector - without that, each class here would be global.
+app-control-sheet-details {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
 
-.video-container {
-    position: relative;
-    padding-bottom: 56.25%;
-}
+    // ---- Fixed head: name, rating, level ------------------------------------
+    .skill-sheet__head {
+        flex: none;
+        padding: 8px 20px 16px;
+        background: var(--fb-surface);
+        border-radius: 18px 18px 0 0;
+        border-bottom: 1px solid var(--fb-border);
+    }
 
-.video-container iframe,
-.video-container object,
-.video-container embed {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-}
+    .skill-sheet__grabber {
+        width: 38px;
+        height: 4px;
+        margin: 0 auto 14px;
+        border-radius: 2px;
+        background: #c3ddee;
+    }
 
-h2 {
-    margin-bottom: 9px;
-}
+    .skill-sheet__title {
+        margin: 0;
+        font-size: 17px;
+        font-weight: 600;
+        line-height: 1.25;
+        letter-spacing: -0.02em;
+        text-align: center;
+        color: var(--fb-text);
+        text-wrap: pretty;
+    }
 
-.content h2 {
-    margin-left: 0;
-    margin-right: 0;
-    margin-top: 20px;
-    margin-bottom: 2px;
-    font-size: 16px;
-    font-weight: normal;
-}
-.content p, .content li {
-    color: var(--ion-background-text-step-600, #666666) !important;
-    margin-left: 0;
-    margin-right: 0;
-    margin-top: 0;
-    margin-bottom: 2px;
-    font-size: 14px;
-    line-height: 20px;
-    text-overflow: inherit;
-    overflow: inherit;
+    // font-size drives the star glyphs; it is inherited, so it crosses into the
+    // rating component. The gap needs a descendant selector, which is only
+    // reachable because encapsulation is off here.
+    .skill-sheet__stars {
+        display: block;
+        margin-top: 16px;
+        font-size: 34px;
+
+        .star-rating-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .star {
+            padding: 4px;
+        }
+    }
+
+    .skill-sheet__level {
+        margin: 10px 0 0;
+        font-size: 12px;
+        font-weight: 500;
+        text-align: center;
+        color: var(--fb-text-body);
+    }
+
+    // ---- Scrolling body -----------------------------------------------------
+    .skill-sheet__body {
+        flex: 1;
+        min-height: 0;
+        --background: var(--fb-bg);
+    }
+
+    .skill-sheet__scroll {
+        padding: 18px 20px 22px;
+        /* Clears the home indicator, so the Done button is never half under it */
+        padding-bottom: max(22px, env(safe-area-inset-bottom));
+    }
+
+    .video-container {
+        position: relative;
+        margin-bottom: 18px;
+        padding-bottom: 56.25%;
+        border-radius: var(--fb-radius);
+        overflow: hidden;
+    }
+
+    .video-container iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border: 0;
+    }
+
+    // ---- Coaching copy ------------------------------------------------------
+    // The section headings ship inside the translated blob as bare <h2>, styled
+    // here as the design's eyebrow labels.
+    .skill-sheet__content h2 {
+        margin: 20px 0 8px;
+        font-size: 10px;
+        font-weight: 600;
+        line-height: 1;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--ion-color-primary);
+
+        &:first-child {
+            margin-top: 0;
+        }
+
+        // "What goes wrong" reads as a warning in the design, not a heading.
+        &.is-caution {
+            color: #b4382b;
+        }
+    }
+
+    .skill-sheet__content p,
+    .skill-sheet__content li {
+        margin: 0 0 8px;
+        font-size: 13px;
+        font-weight: 400;
+        line-height: 1.65;
+        color: var(--fb-text);
+        text-wrap: pretty;
+    }
+
+    .skill-sheet__content ul,
+    .skill-sheet__content ol {
+        margin: 0 0 8px;
+        padding-left: 20px;
+    }
+
+    .skill-sheet__done {
+        margin-top: 22px;
+        --border-radius: 10px;
+        --box-shadow: none;
+        height: 48px;
+        font-size: 14px;
+        font-weight: 600;
+        text-transform: none;
+    }
 }

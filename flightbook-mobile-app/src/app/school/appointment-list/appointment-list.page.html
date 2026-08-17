@@ -1,68 +1,167 @@
-<ion-header>
-  <ion-toolbar color='primary'>
-    <ion-buttons slot="start">
-      <ion-menu-button></ion-menu-button>
-    </ion-buttons>
-    <ion-title>{{ 'appointment.appointments' | translate }} 
+<!--
+  Surface strip rather than an ion-toolbar, as on the flight and glider lists.
+  The school is the eyebrow; the title names what the screen lists.
+-->
+<div class="list-header">
+  <button type="button" class="icon-button" (click)="close()"
+          [attr.aria-label]="'buttons.back' | translate">
+    <ion-icon name="chevron-back" aria-hidden="true"></ion-icon>
+  </button>
+
+  <div class="list-header__text">
+    <div class="list-header__eyebrow">
+      <span class="fb-section-label">{{ currentSchool()?.name }}</span>
       @if (filtered) {
-        <span>({{ 'groupname.filtered' | translate }})</span>
+        <span class="list-header__chip">{{ 'groupname.filtered' | translate }}</span>
       }
-    </ion-title>
-    <ion-buttons slot="primary">
-      <ion-button (click)="openFilter()">
-        <ion-icon name="filter-outline"></ion-icon>
-      </ion-button>
-      <ion-button id="school-menu-trigger">
-        <ion-icon name="ellipsis-vertical-outline"></ion-icon>
-      </ion-button>
-      <ion-popover trigger="school-menu-trigger" triggerAction="click" class="school-menu-popover">
-        <ng-template>
-          <ion-content>
-            <ion-list>
-              <ion-item button (click)="leaveSchool()" detail="false">
-                <ion-label class="ion-text-nowrap">{{ 'school.leaveSchool' | translate:{ schoolName: currentSchool()?.name || '' } }}</ion-label>
-              </ion-item>
-            </ion-list>
-          </ion-content>
-        </ng-template>
-      </ion-popover>
-    </ion-buttons>
-  </ion-toolbar>
-</ion-header>
+    </div>
+    <h1 class="list-header__title">{{ 'appointment.appointments' | translate }}</h1>
+  </div>
+
+  <div class="list-header__actions">
+    <button type="button" class="icon-button" (click)="openFilter()"
+            [attr.aria-label]="'buttons.filter' | translate">
+      <ion-icon name="filter-outline" aria-hidden="true"></ion-icon>
+    </button>
+    <!-- Not in the design, but the only way to leave a school -->
+    <button type="button" class="icon-button" id="school-menu-trigger"
+            [attr.aria-label]="'buttons.more' | translate">
+      <ion-icon name="ellipsis-vertical-outline" aria-hidden="true"></ion-icon>
+    </button>
+  </div>
+</div>
+
+<ion-popover trigger="school-menu-trigger" triggerAction="click" class="school-menu-popover">
+  <ng-template>
+    <ion-content>
+      <ion-list>
+        <ion-item button (click)="leaveSchool()" detail="false">
+          <ion-label class="ion-text-nowrap">{{ 'school.leaveSchool' | translate:{ schoolName: currentSchool()?.name || '' } }}</ion-label>
+        </ion-item>
+      </ion-list>
+    </ion-content>
+  </ng-template>
+</ion-popover>
+
+<!-- Upcoming / Past. The count only renders once the whole list is loaded -->
+<div class="appt-tabs">
+  <button type="button" class="appt-tabs__item" [class.is-active]="scope() === 'upcoming'"
+          (click)="setScope('upcoming')">
+    {{ 'appointment.upcoming' | translate }}
+    @if (loadedCount(); as count) {
+      <span class="appt-tabs__count">{{ count }}</span>
+    }
+  </button>
+  <button type="button" class="appt-tabs__item" [class.is-active]="scope() === 'past'"
+          (click)="setScope('past')">
+    {{ 'appointment.past' | translate }}
+  </button>
+</div>
 
 <ion-content class="no-padding language-{{currentLang}}">
-  <ion-list>
-    @for (appointment of appointments(); track appointment.id) {
-      <div class="appointmentRowWrapper">
-        <ion-toggle class="subscription"
-          [disabled]="appointment.toggleDisabled"
-          [(ngModel)]="appointment.subscribed"
-          color="primary"
-          (ionChange)="subscriptionChange($event, appointment)">
-        </ion-toggle>
-        <ion-item detail (click)="itemTapped(appointment)" class="appointmentRow" [ngClass]="{'disabled' : appointment.lineDisabled}">
-          <ion-label class="state">{{ 'appointment.stateValue.' + appointment.state| translate }}</ion-label>
-          @if(currentSchool()?.timezone) {
-            <ion-label class="scheduling">{{ appointment.scheduling | date:'EE dd.MM.yyyy HH:mm':currentSchool().timezone:currentLang}}</ion-label>
-          } @else {
-            <ion-label class="scheduling">{{ appointment.scheduling | date:'EE dd.MM.yyyy HH:mm':'UTC':currentLang}}</ion-label>
-          }
-          <ion-label class="meetingPoint">{{ appointment.meetingPoint || "-" }}</ion-label>
-          @if (appointment.instructor) {
-            <ion-label class="instructor">{{ appointment.instructor.firstname }} {{ appointment.instructor.lastname }}</ion-label>
-          } @else {
-            <ion-label class="instructor">-</ion-label>
-          }
-          <ion-icon item-end></ion-icon>
-        </ion-item>
-      </div>
-    }
-    @empty {
-      <ion-item lines="none">
-        <ion-label class="ion-text-center">{{ 'emptylist' | translate }}</ion-label>
-      </ion-item>
-    }
-  </ion-list>
+
+  <!-- Registration closing within the day, for the nearest appointment it applies to -->
+  @if (closingSoon(); as closing) {
+    <div class="appt-notice">
+      <ion-icon name="time-outline" aria-hidden="true"></ion-icon>
+      <span>
+        {{ 'appointment.closesAt' | translate:{
+             date: (closing.scheduling | date:'EEE d MMM':timezone:currentLang),
+             time: (closing.deadline | date:'HH:mm':timezone:currentLang) } }}
+      </span>
+    </div>
+  }
+
+  @for (group of groupedAppointments(); track group.key) {
+    <div class="month-heading fb-section-label">
+      {{ group.scheduling | date:'LLLL yyyy':timezone:currentLang }}
+    </div>
+
+    <div class="list-block">
+      @for (appointment of group.appointments; track appointment.id) {
+        <div class="appt-row" [class.is-dimmed]="appointment.lineDisabled">
+          <button type="button" class="appt-row__open" (click)="itemTapped(appointment)">
+            <div class="row-date">
+              <div class="row-date__day">{{ appointment.scheduling | date:'d':timezone:currentLang }}</div>
+              <div class="row-date__month">{{ appointment.scheduling | date:'LLL':timezone:currentLang }}</div>
+            </div>
+
+            <div class="appt-row__main">
+              <div class="appt-row__top">
+                <span class="appt-row__title">{{ appointment.type?.name || '–' }}</span>
+                <span class="fb-status fb-status--{{ appointment.state }}">
+                  {{ 'appointment.stateValue.' + appointment.state | translate }}
+                </span>
+              </div>
+
+              <div class="appt-row__meta">
+                <span class="appt-row__time">{{ appointment.scheduling | date:'HH:mm':timezone:currentLang }}</span>
+                <span class="appt-row__sep" aria-hidden="true"></span>
+                <ion-icon name="place" class="appt-row__place-icon" aria-hidden="true"></ion-icon>
+                <span class="appt-row__place">{{ appointment.meetingPoint || '–' }}</span>
+              </div>
+
+              <!-- Capacity, or the cancellation reason in its place -->
+              <div class="appt-row__bottom">
+                @if (appointment.state === State.CANCELED) {
+                  <ion-icon name="close" class="appt-row__canceled-icon" aria-hidden="true"></ion-icon>
+                  <span class="appt-row__canceled">{{ 'appointment.canceledBySchool' | translate }}</span>
+                } @else if (appointment.maxPeople) {
+                  <span class="spots">
+                    @for (cell of appointment.spotCells ?? []; track $index) {
+                      <span class="spots__cell" [class.is-taken]="cell === 'taken'"
+                            [class.is-full]="cell === 'full'"></span>
+                    }
+                  </span>
+                  @if (appointment.isFull) {
+                    <span class="appt-row__capacity is-full">
+                      {{ 'appointment.full' | translate:{ count: appointment.countSubscription, total: appointment.maxPeople } }}
+                    </span>
+                  } @else {
+                    <span class="appt-row__capacity">
+                      {{ 'appointment.spotsFree' | translate:{ free: appointment.freeSpots, total: appointment.maxPeople } }}
+                    </span>
+                  }
+                } @else {
+                  <span class="appt-row__capacity">
+                    {{ appointment.countSubscription }} {{ 'appointment.subscriptions' | translate }}
+                  </span>
+                }
+              </div>
+            </div>
+          </button>
+
+          <!--
+            The design has no toggle here; it shows a tick for a registration you
+            already hold. Keep the toggle where that tick goes, and fall back to
+            the tick itself when the toggle could not be used anyway.
+          -->
+          <div class="appt-row__action">
+            @if (appointment.toggleDisabled) {
+              @if (appointment.subscribed) {
+                <span class="appt-row__registered">
+                  <ion-icon name="checkmark" aria-hidden="true"></ion-icon>
+                  {{ 'appointment.registered' | translate }}
+                </span>
+              }
+            } @else {
+              <ion-toggle class="appt-row__toggle"
+                [(ngModel)]="appointment.subscribed"
+                [attr.aria-label]="'appointment.subscription' | translate"
+                (ionChange)="subscriptionChange($event, appointment)">
+              </ion-toggle>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  } @empty {
+    <div class="list-empty fb-empty-hint">{{ 'appointment.noAppointment' | translate }}</div>
+  }
+
+  @if (groupedAppointments().length > 0 && scope() === 'upcoming') {
+    <div class="appt-hint">{{ 'appointment.hint' | translate }}</div>
+  }
 
   <ion-infinite-scroll threshold="100px" (ionInfinite)="loadData($event)">
     <ion-infinite-scroll-content loadingSpinner="bubbles" loadingText="{{ 'loading.loading' | translate }}">

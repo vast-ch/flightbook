@@ -2,7 +2,9 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { Router } from '@angular/router';
-import { AlertController, LoadingController, IonHeader, IonToolbar, IonButtons, IonMenuButton, IonTitle, IonContent } from '@ionic/angular/standalone';
+import { AlertController, LoadingController, IonContent, IonFooter, IonButton, IonIcon } from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import { close } from 'ionicons/icons';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import HttpStatusCode from '../../shared/util/HttpStatusCode';
 import { FileUploadService } from 'src/app/flight/shared/fileupload.service';
@@ -27,12 +29,10 @@ import { TandemSchoolService } from 'src/app/school/shared/tandem-school.service
         FileInputComponent,
         FlightFormComponent,
         TranslateModule,
-        IonHeader,
-        IonToolbar,
-        IonButtons,
-        IonMenuButton,
-        IonTitle,
-        IonContent
+        IonContent,
+        IonFooter,
+        IonButton,
+        IonIcon
     ]
 })
 export class FlightAddPage implements OnInit, OnDestroy {
@@ -60,6 +60,11 @@ export class FlightAddPage implements OnInit, OnDestroy {
         this.flight.glider = new Glider();
         this.flight.start = new Place();
         this.flight.landing = new Place();
+        addIcons({ close });
+    }
+
+    close() {
+        this.router.navigate(['flights']);
     }
 
     ngOnInit() {

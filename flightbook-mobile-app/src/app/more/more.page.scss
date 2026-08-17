@@ -1,0 +1,349 @@
+// ---- Header -------------------------------------------------------------
+// Not an ion-toolbar: the design's header is a plain surface strip, so it sits
+// outside ion-content like the other redesigned pages.
+.more-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: calc(env(safe-area-inset-top) + 14px) var(--fb-gutter) 14px;
+  background: var(--fb-surface);
+  border-bottom: 1px solid var(--fb-border);
+}
+
+.more-header__title {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  font-size: 26px;
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+  color: var(--fb-text);
+}
+
+.more-body {
+  padding: 16px var(--fb-gutter) 18px;
+}
+
+// Adjacency, not :first-child - Angular's @if leaves comment anchor nodes
+// behind, so a positional selector would skip the wrong section.
+.more-section + .more-section {
+  margin-top: 22px;
+}
+
+// .fb-section-label carries no margin of its own, so these were rendering
+// flush against their card. The design's 9px still read tight against the card
+// border, so this is deliberately roomier than the mock.
+.more-section .fb-section-label {
+  margin-bottom: 14px;
+}
+
+// The label is already 600 and 10px, where 700 alone is all but invisible - the
+// darker colour is what actually reads as emphasis at this size. The gap is a
+// margin rather than a space in the template, so whitespace collapsing in the
+// @if block cannot swallow it.
+.more-section__name {
+  margin-left: 0.4em;
+  font-weight: 700;
+  color: var(--fb-text);
+}
+
+// ---- Rows ---------------------------------------------------------------
+// Geometry comes from the shared .fb-row primitive; these are the
+// navigation-row specifics the form-oriented .fb-row__label can't give.
+.more-row__title {
+  flex: 1;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--fb-text);
+}
+
+.more-row__stack {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+
+  .more-row__title {
+    flex: none;
+  }
+}
+
+.more-row__sub {
+  margin-top: 3px;
+  font-size: 11.5px;
+  font-weight: 400;
+  line-height: 1.35;
+  color: var(--fb-text-secondary);
+}
+
+// Leading icons only where the design shows them: Tandem and Your equipment.
+.more-row__icon {
+  flex: none;
+  font-size: 16px;
+  color: var(--fb-text-secondary);
+}
+
+.more-row--danger .more-row__title {
+  color: var(--ion-color-danger);
+}
+
+// ---- DABS: one row, both days -------------------------------------------
+.more-dabs {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex: none;
+}
+
+.more-dabs__link {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ion-color-primary);
+  cursor: pointer;
+}
+
+.more-dabs__sep {
+  font-size: 12.5px;
+  color: var(--fb-text-muted);
+}
+
+.more-footer {
+  margin-top: 18px;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--fb-text-muted);
+}
+
+// ---- Before you fly: the pilot's own links ------------------------------
+.more-section__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  // Replaces .fb-section-label's own bottom margin for this section.
+  margin-bottom: 9px;
+
+  .fb-section-label {
+    margin-bottom: 0;
+  }
+}
+
+.fb-section-action {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--ion-color-primary);
+  cursor: pointer;
+}
+
+.link-row {
+  gap: 12px;
+  cursor: pointer;
+
+  // The reorder group is a plain wrapper, so the separator is on the row.
+  & + .link-row {
+    border-top: 1px solid var(--fb-hairline);
+  }
+}
+
+// Adjacency cannot reach across the reorder group's boundary, so the first
+// custom link had no rule between it and the built-in above it.
+ion-reorder-group .link-row:first-child {
+  border-top: 1px solid var(--fb-hairline);
+}
+
+.link-row__remove {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--fb-danger-bg);
+  cursor: pointer;
+
+  ion-icon {
+    font-size: 12px;
+    color: var(--fb-danger-text);
+  }
+}
+
+.link-row__text {
+  flex: 1;
+  min-width: 0;
+}
+
+.link-row__name {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--fb-text);
+}
+
+.link-row__host {
+  display: block;
+  margin-top: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 11px;
+  font-weight: 400;
+  color: #98a4c0;
+}
+
+.link-row__handle,
+.link-row__external {
+  flex: none;
+  font-size: 15px;
+  color: #98a4c0;
+}
+
+.link-row__external {
+  font-size: 13px;
+  color: var(--fb-text-muted);
+}
+
+// ---- Inline add / edit --------------------------------------------------
+.link-draft {
+  padding: 15px 17px;
+  background: var(--fb-sunken);
+  border-top: 1px solid var(--fb-hairline);
+}
+
+.link-draft__label {
+  display: block;
+  font-size: 9.5px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--fb-text-secondary);
+
+  & + .link-draft__input {
+    margin-top: 7px;
+  }
+
+  &:not(:first-child) {
+    margin-top: 14px;
+  }
+}
+
+.link-draft__input {
+  --padding-start: 0;
+  --padding-end: 0;
+  --padding-top: 0;
+  --padding-bottom: 0;
+  --background: transparent;
+  min-height: 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--fb-text);
+}
+
+.link-draft__actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 15px;
+}
+
+.link-draft__cancel,
+.link-draft__save {
+  height: 42px;
+  border-radius: 9px;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.link-draft__cancel {
+  flex: none;
+  padding: 0 16px;
+  border: 1px solid var(--fb-border);
+  background: var(--fb-surface);
+  font-weight: 500;
+  color: var(--fb-text-body);
+}
+
+.link-draft__save {
+  flex: 1;
+  border: 0;
+  background: var(--ion-color-primary);
+  font-weight: 600;
+  color: #fff;
+
+  &[disabled] {
+    opacity: 0.45;
+    cursor: default;
+  }
+}
+
+.link-add {
+  gap: 11px;
+  appearance: none;
+  border: 0;
+  border-top: 1px solid var(--fb-hairline);
+  cursor: pointer;
+}
+
+.link-add__icon {
+  flex: none;
+  font-size: 15px;
+  color: var(--ion-color-primary);
+}
+
+.link-add__text {
+  flex: 1;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ion-color-primary);
+}
+
+.more-links-hint {
+  margin: 8px 0 0;
+  padding: 0 3px;
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--fb-text-secondary);
+  text-wrap: pretty;
+}
+
+// The design's built-in row carries a meta on the right. Ours stays tappable -
+// it is two destinations, not a caption - but takes the design's weight.
+.link-row__meta {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex: none;
+}
+
+.link-row__meta-link {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--ion-color-primary);
+  cursor: pointer;
+}
+
+.link-row__meta-sep {
+  font-size: 12px;
+  color: var(--fb-text-secondary);
+}

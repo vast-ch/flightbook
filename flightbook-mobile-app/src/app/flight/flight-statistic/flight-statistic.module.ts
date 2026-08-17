@@ -5,19 +5,16 @@ import { FlightStatisticPageRoutingModule } from './flight-statistic-routing.mod
 
 import { FlightStatisticPage } from './flight-statistic.page';
 import { TranslateModule } from '@ngx-translate/core';
-import { FormModule } from 'src/app/form/form.module';
-import { ChartsModule } from 'src/app/charts/charts.module';
-import { SharedModule } from 'src/app/shared/shared.module';
 
+// ChartsModule is deliberately not imported: the redesigned page uses its own
+// compact charts, so pulling it in would keep chartjs-plugin-zoom,
+// chartjs-plugin-datalabels and hammerjs in this lazy chunk for nothing.
 @NgModule({
     imports: [
         CommonModule,
         FormsModule,
         FlightStatisticPageRoutingModule,
         TranslateModule.forChild(),
-        FormModule,
-        ChartsModule,
-        SharedModule,
         FlightStatisticPage
     ]
 })

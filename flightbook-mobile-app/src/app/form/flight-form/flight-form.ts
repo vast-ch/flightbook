@@ -1,5 +1,9 @@
 import { Component, EventEmitter, Input, OnInit, Output, OnChanges, SimpleChanges } from '@angular/core';
-import { AlertController, IonItem, IonInput, IonTextarea, IonButton, IonModal, IonContent, IonDatetime, IonToggle, IonLabel, IonSelectOption, IonSelect, IonItemDivider } from '@ionic/angular/standalone';
+import { AlertController, IonInput, IonTextarea, IonModal, IonContent, IonDatetime, IonToggle, IonIcon, IonSelectOption, IonSelect } from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import { chevronForward } from 'ionicons/icons';
+import { FlightValidationState } from 'src/app/flight/shared/flight-validation-state';
+import { TandemSchoolPaymentState } from 'src/app/flight/shared/tandem-school-payment-state';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import moment from 'moment';
 import { NgForm, FormsModule } from '@angular/forms';
@@ -24,15 +28,13 @@ import { School, CustomFieldDefinition } from 'src/app/school/shared/school.mode
         IgcMapComponent,
         DatePipe,
         TranslateModule,
-        IonItem,
         IonInput,
         IonTextarea,
-        IonButton,
         IonModal,
         IonContent,
         IonDatetime,
         IonToggle,
-        IonLabel,
+        IonIcon,
         IonSelect,
         IonSelectOption
     ]
@@ -51,11 +53,13 @@ export class FlightFormComponent implements OnInit, OnChanges {
     igcFileEdit: any;
     @Input()
     igcFile: string
-    @Input()
-    hideSaveButton: boolean = false;
 
     @Output()
     saveFlight = new EventEmitter<Flight>();
+
+    // Exposed for the status banners
+    public FlightValidationState = FlightValidationState;
+    public TandemSchoolPaymentState = TandemSchoolPaymentState;
 
     searchStart: string;
     searchLanding: string;
@@ -69,6 +73,7 @@ export class FlightFormComponent implements OnInit, OnChanges {
         private translate: TranslateService
     ) {
         this.language = this.translate.currentLang;
+        addIcons({ chevronForward });
     }
 
     async ngOnInit() {

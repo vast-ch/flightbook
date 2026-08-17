@@ -4,7 +4,7 @@
         "fr": "Francese",
         "de": "Tedesco",
         "en": "Inglese",
-	    "it": "Italiano"
+        "it": "Italiano"
     },
     "country": {
         "switzerland": "Svizzera",
@@ -24,7 +24,9 @@
         "cancel": "Annulla",
         "clear": "Elimina",
         "back": "Indietro",
+        "more": "Altro",
         "edit": "Modifica",
+        "editDone": "Fatto",
         "add": "Aggiungi",
         "show": "Mostra",
         "news": "Novità",
@@ -45,7 +47,11 @@
         "dabsToday": "DABS Svizzera oggi",
         "dabsTomorrow": "DABS Svizzera domani",
         "emergencyContacts": "Contatto di emergenza",
-        "pasengerConfirmations": "Conferme"
+        "pasengerConfirmations": "Conferme",
+        "logFlight": "Registra un volo",
+        "export": "Esporta",
+        "play": "Riproduci",
+        "pause": "Pausa"
     },
     "login": {
         "email": "E-Mail",
@@ -53,17 +59,29 @@
         "oldpassword": "Vecchia Passwort",
         "newpassword": "Nuova Passwort",
         "confirmpassword": "Conferma Passwort",
-        "passwordlost": "Passwort dimenticata?"
+        "passwordlost": "Passwort dimenticata?",
+        "tagline": "Il tuo libro di volo in parapendio",
+        "language": "Lingua",
+        "showPassword": "Mostra password",
+        "hidePassword": "Nascondi password"
     },
     "account": {
         "register": "Iscriviti",
         "firstname": "Nome",
         "lastname": "Cognome",
         "phone": "Telefono",
+        "optional": "facoltativo",
         "prefix": "Prefisso",
         "verification": "Verifica dell'account",
+        "myData": "I miei dati",
+        "notifications": "Notifiche",
+        "emergencyContact": "Contatto di emergenza",
+        "saveChanges": "Salva le modifiche",
+        "changePassword": "Cambia password",
+        "deleteAccount": "Elimina l'account",
+        "free": "Free",
+        "premium": "Premium",
         "configuration": {
-            "dabsLinkDisabled": "Disattivare i link DABS",
             "link": "Link",
             "label": "Label",
             "url": "URL",
@@ -78,7 +96,9 @@
         "country": "Paese",
         "notes": "Note",
         "coordinates": "Coordinate",
-        "override": "Si desidera sostituire l'altitudine e il paese con i dati della mappa?"
+        "override": "Si desidera sostituire l'altitudine e il paese con i dati della mappa?",
+        "new": "Nuovo luogo",
+        "mapHint": "Tocca due volte la mappa per posizionare il segnaposto. Altitudine e paese vengono compilati da lì."
     },
     "glider": {
         "buydate": "Data d’aquisto",
@@ -92,6 +112,7 @@
         "archived": "Archiviato",
         "archive": "Archivio ?",
         "note": "Note",
+        "new": "Nuova vela",
         "check": {
             "title": "Controllo",
             "date": "Data",
@@ -139,24 +160,69 @@
             "all": "Tutti",
             "VALIDATED": "Validato",
             "REJECTED": "Rifiutato"
+        },
+        "importIgc": "Importa file IGC",
+        "importIgcHint": "Compila data, percorso, tempo e distanza",
+        "placeFlightCount": "{{count}} voli",
+        "placeFlightCountOne": "1 volo",
+        "orByHand": "oppure inserisci a mano",
+        "vario": {
+            "legendLabel": "Colore traccia: blu discesa, rosso salita",
+            "scrubLabel": "Posizione nel volo",
+            "strongSink": "Forte discesa",
+            "sink": "Discesa",
+            "neutral": "Costante",
+            "climb": "Salita",
+            "strongClimb": "Forte salita"
         }
     },
     "statistics": {
         "nbflight": "Numero di voli",
         "flighthour": "Ore di volo",
         "average": "Media",
-        "price" : "Entrate",
+        "income": "Entrate",
+        "incomeTotal": "Totale",
+        "incomePerFlight": "Per volo pagato",
+        "paidFlightsOne": "1 volo pagato",
+        "paidFlights": "{{count}} voli pagati",
+        "incomePerYear": "Entrate per anno",
+        "incomePerMonth": "Entrate per mese",
         "longset": "Volo più lungo",
         "nbStartplaces": "No. decollo",
         "nbLandingplaces": "No. atterraggio",
         "totalDistance": "Distanza totale",
         "bestDistance": "Miglior distanza",
         "unknownCountry": "Sconosciuto",
-        "type": {
-            "monthly": "Vista annuale",
-            "yearly": "Vista mensile",
-            "weekly": "Vista settimanale"
-        }
+        "allTime": "Totale",
+        "period": "Periodo",
+        "flightActivity": "Attività di volo",
+        "kickerAll": "Sempre · {{count}} voli dal {{date}}",
+        "kickerSeason": "Stagione {{year}} · {{count}} voli",
+        "flightsPerYear": "Voli per anno",
+        "flightsPerMonth": "Voli per mese",
+        "busiestMonth": "Il mese più attivo è stato {{name}} con {{count}} voli.",
+        "strongestSeason": "La tua stagione migliore è stata {{name}} con {{count}} voli.",
+        "seasonsByMonth": "{{count}} stagioni per mese",
+        "everyDayIn": "Ogni giorno nel {{year}}",
+        "seasonGridNote": "Ogni riga una stagione, ogni colonna un mese.",
+        "monthsWithFlights": "{{flights}} voli in {{months}} mesi",
+        "compare": "{{count}} voli, {{delta}} rispetto al {{year}}",
+        "compareFirst": "La tua prima stagione · {{count}} voli",
+        "rankBest": "la tua stagione migliore",
+        "rankOrdinal": "la tua {{rank}}ª stagione migliore",
+        "seasons": "Stagioni",
+        "flightCount": "{{count}} voli",
+        "seasonCount": "{{count}} stagioni",
+        "totalAirtime": "Tempo di volo totale",
+        "seasonHighlighted": "{{year}} evidenziato",
+        "less": "Meno",
+        "more": "Più",
+        "cumulativeAirtime": "Tempo di volo cumulativo",
+        "personalBests": "Record personali",
+        "longestDistance": "Distanza maggiore",
+        "longestAirtime": "Volo più lungo",
+        "placesFlown": "Luoghi volati",
+        "startLanding": "partenza / atterraggio"
     },
     "import": {
         "flights": "Voli",
@@ -213,13 +279,14 @@
         "emailEnter": "Inserire il proprio E-Mail Adresse!",
         "pwdSend": "Una nuova password verrà spedita!",
         "userExist": "Questo indirizzo e-mail è già utilizzato!",
-        "pwdNotSame": "Le password sono le stesse!",
+        "pwdNotSame": "Le password non sono le stesse!",
         "settingChanged": "Le impostazioni sono state salvate!",
         "placeExist": "Ce lieu existe déjà!",
         "error": "Si è verificato un errore. Si prega di riprovare più tardi o inviare una e-mail a: yannick.lagger@flightbook.ch",
         "deleteError": "Questa entità è collegata ad un volo e non può essere cancellata.",
         "mendatoryFields": "I campi obbligatori devono essere forniti.",
         "invalidEmail": "Si prega di inserire un indirizzo e-mail valido.",
+        "exportSavedNoViewer": "L’esportazione è stata salvata sul dispositivo, ma non è installata alcuna app in grado di aprire questo tipo di file.",
         "generationError": "Si è verificato un errore durante la generazione del file di esportazione",
         "wrongIgcFileType": "Scegliere un file IGC",
         "emptyIgcFile": "Questo file IGC è vuoto",
@@ -263,7 +330,21 @@
     },
     "filter": {
         "from": "Da",
-        "to": "a"
+        "to": "a",
+        "title": "Filtra i voli",
+        "period": "Periodo",
+        "allTime": "Sempre",
+        "last12Months": "Ultimi 12 mesi",
+        "flightType": "Tipo di volo",
+        "schoolValidation": "Validazione",
+        "descriptionContains": "La descrizione contiene",
+        "descriptionPlaceholder": "Una parola dalle note di volo",
+        "clearAll": "Cancella tutto",
+        "showFlights": "Mostra {{count}} voli",
+        "showFlight": "Mostra 1 volo",
+        "noMatch": "Nessun volo corrispondente",
+        "noMatchHint": "Prova un periodo più ampio o un'altra vela.",
+        "clearFilters": "Cancella i filtri"
     },
     "export": {
         "pilote": "Pilota",
@@ -305,14 +386,43 @@
         "subscription": "Registrazione",
         "waitingList": "Lista d'attesa",
         "noAppointment": "Al momento non ci sono date per questa scuola",
-        "type": "Tipo"
+        "type": "Tipo",
+        "upcoming": "In arrivo",
+        "past": "Passati",
+        "spotsFree": "{{free}} posti liberi su {{total}}",
+        "full": "Completo · {{count}}/{{total}} · lista d'attesa",
+        "registered": "Iscritto",
+        "canceledBySchool": "Annullato dalla scuola",
+        "closesAt": "Le iscrizioni per il {{date}} chiudono alle {{time}}",
+        "closesIn": "Chiusura iscrizioni",
+        "inHours": "tra {{hours}} h",
+        "inDays": "tra {{days}} g",
+        "notAssigned": "Non ancora assegnato",
+        "fromSchool": "Dalla tua scuola",
+        "you": "Tu",
+        "register": "Iscriviti",
+        "cancelRegistration": "Annulla iscrizione",
+        "hint": "La tua scuola pubblica le nuove date qualche settimana in anticipo. Attiva le notifiche per saperlo per primo."
     },
     "controlSheet": {
         "title": "Scheda di controllo",
+        "subtitle": "Requisiti della licenza e valutazioni degli istruttori",
+        "flights": "Voli",
+        "soloRequired": "Almeno uno richiesto",
+        "skills": "Competenze",
+        "rated": "{{rated}} di {{total}} valutate",
+        "notPassed": "Non ancora superato",
+        "passedOn": "Superato il {{date}}",
+        "level": {
+            "0": "Non ancora valutato",
+            "1": "Introdotto",
+            "2": "In esercitazione",
+            "3": "Padroneggiato"
+        },
         "exam": {
-            "title": "Esami",
-            "theory": "Teoria superata il",
-            "practice": "Pratica superata il"
+            "title": "Esami finali",
+            "theory": "Esame teorico",
+            "practice": "Esame pratico"
         },
         "trainingHill": {
             "title": "Übungshang",
@@ -620,6 +730,12 @@
     "payment": {
         "nativeNoSubscription": "<p>Stai utilizzando attualmente Flightbook Free.</p><p>Visita flightbook.ch per ulteriori informazioni.</p>",
         "noSubscription": "<p>Stai utilizzando Flightbook Free.</p><p>Per 12CHF all'anno, potete passare a Flightbook Premium!</p><ul><li>Aggiungere un numero illimitato di voli</li><li>Aggiungere un numero illimitato di conferme passeggeri</li><li>Sostiene il progetto</li></ul>",
+        "freeTitle": "Stai utilizzando Flightbook Free",
+        "freeBody": "Per 12 CHF all'anno puoi passare a Flightbook Premium.",
+        "nativeHint": "Visita flightbook.ch per ulteriori informazioni.",
+        "feature1": "Numero illimitato di voli",
+        "feature2": "Numero illimitato di conferme passeggeri",
+        "feature3": "Sostiene il progetto",
         "thanks": "Grazie mille per il vostro sostegno!",
         "information": "L'abbonamento sarà rinnovato automaticamente alla {{ date }}. Verranno addebitati CHF 12.00/anno.",
         "canceled": "L'abbonamento è stato annullato. Hai ancora accesso a tutte le funzioni fino a {{ date }}.",
@@ -650,10 +766,82 @@
         "understandRisks": "Sono consapevole dei rischi associati al volo (ad es. caduta in fase di decollo o atterraggio).",
         "canUseData": "Accetto di ricevere offerte e novità via e-mail.",
         "tandemSchool": "Azienda biplace",
-        "open": "Aprire"
+        "open": "Aprire",
+        "passenger": "Passeggero",
+        "signedCount": "{{count}} firmate",
+        "stepDetails": "Dati",
+        "stepSign": "Firma",
+        "confirmPoints": "Confermo i punti sopra",
+        "continueToSignature": "Continua alla firma",
+        "hint": "Le conferme servono come prova del briefing del passeggero."
     },
     "school": {
         "leaveSchool": "Lasciare \"{{schoolName}}\"",
         "leaveSchoolConfirm": "Vuoi davvero lasciare \"{{schoolName}}\"?"
+    },
+    "tabs": {
+        "home": "Start",
+        "flights": "Voli",
+        "stats": "Statistiche",
+        "more": "Altro"
+    },
+    "more": {
+        "equipment": "La tua attrezzatura",
+        "importExport": "Importa & esporta",
+        "passengerConfirmations": "Conferme passeggeri",
+        "dabs": "DABS Svizzera",
+        "today": "Oggi",
+        "tomorrow": "Domani",
+        "shvApp": "App meteo FSVL",
+        "beforeYouFly": "Prima di volare",
+        "addLink": "Aggiungi un link",
+        "saveLink": "Salva il link",
+        "linkName": "Nome",
+        "linkUrl": "Link",
+        "linksHint": "Tieni qui le pagine che controlli prima di volare — webcam, stazioni del vento, spazio aereo o il sito del tuo club.",
+        "importIgc": "Importa più file IGC",
+        "importData": "Importa dati del libretto",
+        "export": "Esporta in XLSX, CSV o PDF",
+        "accountSettings": "Account & impostazioni",
+        "accountSettingsHint": "I tuoi dati, contatto di emergenza, password, lingua"
+    },
+    "home": {
+        "airtime": "Tempo di volo",
+        "distance": "Distanza",
+        "nextFlight": "Prossimo volo",
+        "today": "oggi",
+        "tomorrow": "domani",
+        "inDays": "tra {{days}} giorni",
+        "trainingProgress": "Avanzamento formazione",
+        "activity": "Attività",
+        "allStatistics": "Tutte le statistiche",
+        "flightsPerMonth": "Voli al mese",
+        "bestMonth": "Mese migliore",
+        "average": "Media",
+        "fromShv": "News",
+        "emptyLogbook": "Questo è tutto il tuo libro di volo finora. Importa file IGC per aggiungere voli precedenti — ",
+        "importFromDevice": "Importa dal dispositivo",
+        "ofTotal": "di {{total}}",
+        "ofTotalRated": "di {{total}} valutati",
+        "soloFlight": "Volo da solo (SHGPA)",
+        "requirementOpen": "Aperto",
+        "requirementDone": "Completato"
+    },
+    "flightlist": {
+        "summary": "{{count}} voli · {{airtime}}",
+        "backfillHint": "Questo è tutto il tuo libro di volo finora. Importa file IGC per aggiungere voli precedenti — "
+    },
+    "addSheet": {
+        "flightHint": "Importa un file IGC o inseriscilo a mano",
+        "tandem": "Conferma tandem",
+        "tandemHint": "Briefing passeggero e firma"
+    },
+    "gliderlist": {
+        "summaryOne": "1 vela",
+        "summary": "{{count}} vele"
+    },
+    "placelist": {
+        "summaryOne": "1 luogo",
+        "summary": "{{count}} luoghi"
     }
 }

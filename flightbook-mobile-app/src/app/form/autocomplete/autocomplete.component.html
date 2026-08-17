@@ -1,10 +1,32 @@
 @if (show) {
-  <div class="autocomplete-list">
-    <ion-icon name="close" (click)="closeList()"></ion-icon>
-    <ion-list class="value-list">
-      @for (element of listElement; track element.id) {
-        <ion-item (click)=setValue(element)>{{ element.name }}</ion-item>
-      }
-    </ion-list>
+  <!--
+    Kept in normal flow: the enclosing form card uses overflow:hidden for its
+    rounded corners, which would clip an absolutely-positioned dropdown.
+  -->
+  <div class="suggestions">
+    @for (element of listElement; track element.id) {
+      <button type="button" class="suggestion" (click)="setValue(element)">
+        <span class="suggestion__name">
+          @if (matchedPrefix(element.name)) {
+            <b>{{ matchedPrefix(element.name) }}</b>{{ matchedRest(element.name) }}
+          } @else {
+            {{ element.name }}
+          }
+        </span>
+        @if (flightCounts[element.id] !== undefined) {
+          <span class="suggestion__count">
+            @if (flightCounts[element.id] === 1) {
+              {{ 'flight.placeFlightCountOne' | translate }}
+            } @else {
+              {{ 'flight.placeFlightCount' | translate:{ count: flightCounts[element.id] } }}
+            }
+          </span>
+        }
+      </button>
+    }
+    <button type="button" class="suggestion suggestion--close" (click)="closeList()">
+      <ion-icon name="close" aria-hidden="true"></ion-icon>
+      <span class="suggestion__name">{{ 'buttons.close' | translate }}</span>
+    </button>
   </div>
 }

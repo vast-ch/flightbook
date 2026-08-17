@@ -1,26 +1,213 @@
-ion-item {
-    --padding-start: 8px;
-  }
-  
-.item-value {
-    height: 13px;
-    margin-top: 8px;
+// .form-header, .form-body, .form-footer, .fb-card, .fb-card--flush, .fb-status,
+// .spots and .fb-avatar-initials all live in theme/tokens.scss.
+
+.appt-detail__eyebrow {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ion-color-primary);
 }
 
-.description {
-    white-space: pre-line;
-    height:auto;
+.appt-detail__title {
+    margin: 8px 0 0;
+    font-size: 25px;
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: -0.025em;
+    color: var(--fb-text);
 }
 
-.subscriptions {
-    height: auto;
+.appt-detail__card {
+    margin-top: 11px;
+
+    // The first card clears the title by more, as the design has it. A modifier
+    // rather than :first-of-type, which would count the eyebrow div as well.
+    &--first {
+        margin-top: 16px;
+    }
 }
 
-.subscription-item {
+// ---- Icon + stacked label rows ------------------------------------------
+.appt-detail__row {
+    display: flex;
+    align-items: flex-start;
+    gap: 11px;
+    padding: 14px 17px;
+
+    & + & {
+        border-top: 1px solid var(--fb-hairline);
+    }
+}
+
+.appt-detail__icon {
+    flex: none;
+    margin-top: 2px;
+    font-size: 12px;
+    color: var(--fb-text-muted);
+
+    &.is-accent {
+        color: var(--fb-accent);
+    }
+}
+
+.appt-detail__stack {
+    flex: 1;
+    min-width: 0;
+}
+
+.appt-detail__label {
+    font-size: 10px;
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--fb-text-secondary);
+}
+
+.appt-detail__value {
+    margin-top: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.35;
+    color: var(--fb-text);
+}
+
+.appt-detail__relative {
+    flex: none;
+    margin-top: 2px;
+    font-size: 11.5px;
+    font-weight: 500;
+    color: var(--fb-text-body);
+}
+
+// ---- Registrations ------------------------------------------------------
+.appt-detail__count {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+}
+
+.appt-detail__count-label {
+    flex: 1;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--fb-text);
+}
+
+.appt-detail__count-value {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--fb-text);
+}
+
+.appt-detail__count-of {
+    font-size: 11.5px;
+    font-weight: 400;
+    color: var(--fb-text-secondary);
+}
+
+.appt-detail__spots {
+    margin-top: 12px;
+}
+
+.appt-detail__people {
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+    margin-top: 14px;
+    padding-top: 13px;
+    border-top: 1px solid var(--fb-hairline);
+}
+
+.appt-detail__people-label {
+    margin-bottom: -2px;
+}
+
+.appt-detail__person {
     display: flex;
     align-items: center;
+    gap: 11px;
 }
 
-.subscription-item ion-icon {
-    margin-left: 5px;
+.appt-detail__person-name {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex: 1;
+    min-width: 0;
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--fb-text);
+
+    &.is-self {
+        font-weight: 500;
+    }
+
+    ion-icon {
+        font-size: 13px;
+        color: var(--fb-text-muted);
+    }
+}
+
+.appt-detail__person-you {
+    flex: none;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--fb-text-secondary);
+}
+
+// ---- Instructor / coordinator -------------------------------------------
+.appt-detail__assignee {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 17px;
+
+    & + & {
+        border-top: 1px solid var(--fb-hairline);
+    }
+}
+
+.appt-detail__assignee-label {
+    flex: none;
+    width: 104px;
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 1.3;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--fb-text-secondary);
+}
+
+.appt-detail__assignee-value {
+    flex: 1;
+    min-width: 0;
+    font-size: 13.5px;
+    font-weight: 400;
+    color: var(--fb-text);
+
+    &.is-placeholder {
+        color: var(--fb-placeholder);
+    }
+}
+
+// ---- Description --------------------------------------------------------
+.appt-detail__description {
+    margin: 8px 0 0;
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 1.6;
+    color: var(--fb-text);
+    text-wrap: pretty;
+    white-space: pre-line;
+}
+
+// ---- Footer -------------------------------------------------------------
+.appt-detail__closed {
+    margin: 0 0 8px;
+    font-size: 11.5px;
+    font-weight: 400;
+    text-align: center;
+    color: var(--fb-text-secondary);
 }

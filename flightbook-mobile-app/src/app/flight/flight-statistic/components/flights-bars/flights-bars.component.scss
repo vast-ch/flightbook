@@ -1,0 +1,80 @@
+:host {
+    display: block;
+}
+
+.bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 4px;
+    height: 96px;
+    margin-top: 16px;
+    border-bottom: 1px solid var(--fb-track);
+
+    &--tight {
+        gap: 2px;
+    }
+
+    // Headroom for the printed numbers: the tallest bar already fills 92 of
+    // the 96px, so without this its label would be clipped by the card.
+    &--valued {
+        height: 118px;
+    }
+}
+
+.bars__value {
+    margin-bottom: 4px;
+    overflow: hidden;
+    text-align: center;
+    font-size: 8.5px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+    white-space: nowrap;
+    color: var(--fb-text-secondary);
+}
+
+.bars__slot {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+}
+
+.bars__bar {
+    border-radius: 2px;
+    background: var(--fb-accent);
+
+    &.is-empty {
+        background: var(--fb-track);
+    }
+
+    &.is-peak {
+        background: var(--ion-color-primary);
+    }
+}
+
+.labels {
+    display: flex;
+    gap: 4px;
+    margin-top: 7px;
+
+    &--tight {
+        gap: 2px;
+    }
+}
+
+.labels__cell {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-align: center;
+    font-size: 9px;
+    font-weight: 500;
+    color: var(--fb-text);
+
+    &.is-quiet {
+        color: #98a4c0;
+    }
+}

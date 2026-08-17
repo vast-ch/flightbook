@@ -1,5 +1,5 @@
-import { Component, OnInit, OnDestroy, ViewChild, AfterViewInit, Signal } from '@angular/core';
-import { NavController, ModalController, LoadingController, AlertController, IonHeader, IonToolbar, IonButtons, IonMenuButton, IonTitle, IonButton, IonIcon, IonContent, IonItem, IonGrid, IonRow, IonCol, IonList, IonInfiniteScroll, IonInfiniteScrollContent, IonLabel, IonItemSliding } from '@ionic/angular/standalone';
+import { Component, OnDestroy, ViewChild, Signal } from '@angular/core';
+import { NavController, ModalController, LoadingController, AlertController, IonIcon, IonContent, IonItem, IonList, IonInfiniteScroll, IonInfiniteScrollContent } from '@ionic/angular/standalone';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { GliderFilterComponent } from '../glider-filter/glider-filter.component';
@@ -14,7 +14,7 @@ import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { HoursFormatPipe } from '../../shared/pipes/hours-format.pipe';
 import { addIcons } from "ionicons";
-import { add, filterOutline, peopleOutline, personOutline, statsChartOutline, timeOutline, archiveOutline, checkmarkDoneOutline } from "ionicons/icons";
+import { add, filterOutline, peopleOutline, personOutline, shareOutline, chevronBack, chevronForward } from "ionicons/icons";
 
 @Component({
     selector: 'app-glider-list',
@@ -25,33 +25,22 @@ import { add, filterOutline, peopleOutline, personOutline, statsChartOutline, ti
         TranslateModule,
         HoursFormatPipe,
         DatePipe,
-        IonHeader,
-        IonToolbar,
-        IonButtons,
-        IonMenuButton,
-        IonTitle,
-        IonButton,
         IonIcon,
         IonContent,
         IonItem,
-        IonGrid,
-        IonRow,
-        IonCol,
-        IonLabel,
         IonList,
         IonInfiniteScroll,
         IonInfiniteScrollContent
     ]
 })
-export class GliderListPage implements OnInit, OnDestroy, AfterViewInit {
+export class GliderListPage implements OnDestroy {
     @ViewChild(IonInfiniteScroll) infiniteScroll: IonInfiniteScroll;
-    @ViewChild(IonContent) content: IonContent;
     unsubscribe$ = new Subject<void>();
     // Use signals directly from the store
     public gliders = this.gliderStore.gliders;
     public loading = this.gliderStore.loading;
     public error = this.gliderStore.error;
-    
+
     get filtered(): Signal<boolean> {
         return this.gliderStore.filtered;
     }
@@ -70,10 +59,9 @@ export class GliderListPage implements OnInit, OnDestroy, AfterViewInit {
             'filter-outline': filterOutline,
             'person-outline': personOutline,
             'people-outline': peopleOutline,
-            'stats-chart-outline': statsChartOutline,
-            'time-outline': timeOutline,
-            'archive-outline': archiveOutline,
-            'checkmark-done-outline': checkmarkDoneOutline
+            'share-outline': shareOutline,
+            'chevron-back': chevronBack,
+            'chevron-forward': chevronForward
         });
     }
 
@@ -90,22 +78,11 @@ export class GliderListPage implements OnInit, OnDestroy, AfterViewInit {
         await loading.present();
         this.gliderStore.getGliders({ limit: this.gliderStore.defaultLimit, clearStore: true })
             .pipe(takeUntil(this.unsubscribe$))
-            .subscribe(async (res: Glider[]) => {
-                // @hack for hide export item
-                setTimeout(async () => {
-                    await this.content.scrollToPoint(0, 54);
-                    await loading.dismiss();
-                }, 1);
-            }, async (error: any) => {
+            .subscribe(async () => {
+                await loading.dismiss();
+            }, async () => {
                 await loading.dismiss();
             });
-    }
-
-    ngOnInit() {
-    }
-
-    ngAfterViewInit() {
-        this.content.scrollToPoint(0, 54);
     }
 
     ngOnDestroy() {
@@ -113,7 +90,12 @@ export class GliderListPage implements OnInit, OnDestroy, AfterViewInit {
         this.unsubscribe$.complete();
     }
 
-    itemTapped(event: MouseEvent, glider: Glider) {
+    /** Gliders hang off the More page, so that is where back leads. */
+    goBack() {
+        this.navCtrl.navigateBack('more');
+    }
+
+    itemTapped(glider: Glider) {
         this.navCtrl.navigateForward(`gliders/${glider.id}`);
     }
 
@@ -135,21 +117,12 @@ export class GliderListPage implements OnInit, OnDestroy, AfterViewInit {
     async openFilter() {
         const modal = await this.modalCtrl.create({
             component: GliderFilterComponent,
-            cssClass: 'glider-filter-class',
             componentProps: {
                 infiniteScroll: this.infiniteScroll
             }
         });
 
-        await this.modalOnDidDismiss(modal);
-
         return await modal.present();
-    }
-
-    async modalOnDidDismiss(modal: HTMLIonModalElement) {
-        modal.onDidDismiss().then((resp: any) => {
-            this.content.scrollToPoint(0, 54);
-        });
     }
 
     async xlsxExport() {
@@ -203,7 +176,7 @@ export class GliderListPage implements OnInit, OnDestroy, AfterViewInit {
                 await loading.dismiss();
                 this.xlsxExportService.saveExcelFile(data, `gliders_export_${Date.now()}.xlsx`);
             }
-        }, async (error: any) => {
+        }, async () => {
             await loading.dismiss();
         });
     }

@@ -2,7 +2,10 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { firstValueFrom, Subject } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { takeUntil } from 'rxjs/operators';
-import { AlertController, LoadingController, IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonContent, IonButton } from '@ionic/angular/standalone';
+import { AlertController, LoadingController, IonContent, IonButton, IonFooter, IonIcon } from '@ionic/angular/standalone';
+import { DatePipe } from '@angular/common';
+import { addIcons } from 'ionicons';
+import { chevronBack } from 'ionicons/icons';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import HttpStatusCode from '../../shared/util/HttpStatusCode';
 import { v4 as uuidv4 } from 'uuid';
@@ -31,13 +34,11 @@ import { TandemSchoolData } from '../shared/tandem-school-data.model';
         FileInputComponent,
         FlightFormComponent,
         TranslateModule,
-        IonHeader,
-        IonToolbar,
-        IonButtons,
-        IonBackButton,
-        IonTitle,
+        DatePipe,
         IonContent,
-        IonButton
+        IonButton,
+        IonFooter,
+        IonIcon
     ]
 })
 export class FlightEditPage implements OnInit, OnDestroy {
@@ -67,6 +68,11 @@ export class FlightEditPage implements OnInit, OnDestroy {
         private tandemSchoolService: TandemSchoolService
     ) {
         this.flightId = +this.activeRoute.snapshot.paramMap.get('id');
+        addIcons({ chevronBack });
+    }
+
+    back() {
+        this.router.navigate(['flights']);
     }
 
     private async dataLoading() {

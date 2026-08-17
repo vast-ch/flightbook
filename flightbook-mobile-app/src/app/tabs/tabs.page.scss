@@ -1,0 +1,49 @@
+.fb-tab-bar {
+  --background: var(--fb-surface);
+  --border: 1px solid var(--fb-border);
+  --color: var(--fb-text-muted);
+  --color-selected: var(--ion-color-primary);
+  height: 58px;
+  padding-top: 6px;
+  // The safe-area inset keeps the bar clear of the iOS home indicator.
+  padding-bottom: max(env(safe-area-inset-bottom), 8px);
+}
+
+ion-tab-button {
+  --padding-top: 0;
+  --padding-bottom: 0;
+
+  ion-icon {
+    font-size: 20px;
+    margin-bottom: 4px;
+  }
+
+  ion-label {
+    font-size: 9.5px;
+    font-weight: 600;
+    letter-spacing: 0;
+  }
+}
+
+// Centre action: a raised square FAB rather than a tab
+.fb-tab-button--add {
+  --ripple-color: transparent;
+  --background-focused: transparent;
+
+  .fb-fab {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    margin-top: -2px;
+    border-radius: var(--fb-radius);
+    background: var(--fb-accent);
+
+    ion-icon {
+      margin-bottom: 0;
+      font-size: 24px;
+      color: #fff;
+    }
+  }
+}

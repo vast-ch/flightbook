@@ -1,0 +1,13 @@
+<div class="chart-canvas">
+  <canvas baseChart
+          type="bar"
+          [data]="chartData()"
+          [options]="chartOptions">
+  </canvas>
+</div>
+
+<div class="chart-months">
+  @for (column of columns(); track $index) {
+    <span class="chart-months__label" [class.is-active]="column.active">{{ column.initial }}</span>
+  }
+</div>

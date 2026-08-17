@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { AlertController, IonItem, IonInput, IonSelect, IonSelectOption, IonTextarea, IonButton } from '@ionic/angular/standalone';
+import { AlertController, IonInput, IonSelect, IonSelectOption, IonTextarea } from '@ionic/angular/standalone';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { Place } from 'src/app/place/shared/place.model';
 import { Countries, Country } from 'src/app/place/shared/place.countries';
@@ -9,7 +9,8 @@ import { PlaceMapComponent } from '../../shared/components/place-map/place-map.c
 @Component({
     selector: 'place-form',
     templateUrl: 'place-form.html',
-    imports: [FormsModule, PlaceMapComponent, TranslateModule, IonItem, IonInput, IonSelect, IonSelectOption, IonTextarea, IonButton]
+    styleUrls: ['place-form.scss'],
+    imports: [FormsModule, PlaceMapComponent, TranslateModule, IonInput, IonSelect, IonSelectOption, IonTextarea]
 })
 export class PlaceFormComponent {
 
@@ -18,7 +19,9 @@ export class PlaceFormComponent {
     @Output()
     savePlace = new EventEmitter<Place>();
 
-    countries: Country[] = Countries;
+    // A copy: sorting and moveCountryToTop mutate in place, and Countries is a
+    // shared export that place-list also reads.
+    countries: Country[] = [...Countries];
     lang: string;
 
     constructor(

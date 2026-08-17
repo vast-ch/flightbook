@@ -4,7 +4,7 @@
         "fr": "French",
         "de": "German",
         "en": "English",
-	    "it": "Italian"
+        "it": "Italian"
     },
     "country": {
         "switzerland": "Switzerland",
@@ -24,7 +24,9 @@
         "cancel": "Cancel",
         "clear": "Clear",
         "back": "Back",
+        "more": "More",
         "edit": "Edit",
+        "editDone": "Done",
         "add": "Add",
         "show": "Show",
         "news": "News",
@@ -45,7 +47,11 @@
         "dabsToday": "DABS Swiss today",
         "dabsTomorrow": "DABS Swiss tomorrow",
         "emergencyContacts": "Emergency Contacts",
-        "pasengerConfirmations": "Confirmations"
+        "pasengerConfirmations": "Confirmations",
+        "logFlight": "Log a flight",
+        "export": "Export",
+        "play": "Play",
+        "pause": "Pause"
     },
     "login": {
         "email": "E-Mail",
@@ -53,17 +59,29 @@
         "oldpassword": "Old password",
         "newpassword": "New password",
         "confirmpassword": "Confirm password",
-        "passwordlost": "Forgot your password?"
+        "passwordlost": "Forgot your password?",
+        "tagline": "Your paragliding logbook",
+        "language": "Language",
+        "showPassword": "Show password",
+        "hidePassword": "Hide password"
     },
     "account": {
         "register": "Register",
         "firstname": "Firstname",
         "lastname": "Lastname",
         "phone": "Phone",
+        "optional": "optional",
         "prefix": "Prefix",
         "verification": "Account Verification",
+        "myData": "My data",
+        "notifications": "Notifications",
+        "emergencyContact": "Emergency contact",
+        "saveChanges": "Save changes",
+        "changePassword": "Change password",
+        "deleteAccount": "Delete account",
+        "free": "Free",
+        "premium": "Premium",
         "configuration": {
-            "dabsLinkDisabled": "Hide DABS Links",
             "link": "Link",
             "label": "Label",
             "url": "URL",
@@ -78,7 +96,9 @@
         "country": "Country",
         "notes": "Notes",
         "coordinates": "Coordinates",
-        "override": "Do you want to override the altitude and the country with the data from the map?"
+        "override": "Do you want to override the altitude and the country with the data from the map?",
+        "new": "New place",
+        "mapHint": "Double-tap the map to drop the marker. Altitude and country are filled in from it."
     },
     "glider": {
         "buydate": "Buy date",
@@ -92,6 +112,7 @@
         "archived": "Archived",
         "archive": "Archive ?",
         "note": "Notes",
+        "new": "New glider",
         "check": {
             "title": "Check",
             "date": "Date",
@@ -139,24 +160,69 @@
             "all": "All",
             "VALIDATED": "Validated",
             "REJECTED": "Rejected"
+        },
+        "importIgc": "Import IGC file",
+        "importIgcHint": "Fills date, route, time and distance",
+        "placeFlightCount": "{{count}} flights",
+        "placeFlightCountOne": "1 flight",
+        "orByHand": "or enter it by hand",
+        "vario": {
+            "legendLabel": "Track colour: blue sinking, red climbing",
+            "scrubLabel": "Flight position",
+            "strongSink": "Strong sink",
+            "sink": "Sink",
+            "neutral": "Level",
+            "climb": "Climb",
+            "strongClimb": "Strong climb"
         }
     },
     "statistics": {
         "nbflight": "Number of flights",
         "flighthour": "Flight hours",
         "average": "Average time",
-        "price" : "Income",
+        "income": "Income",
+        "incomeTotal": "Total",
+        "incomePerFlight": "Per paid flight",
+        "paidFlightsOne": "1 paid flight",
+        "paidFlights": "{{count}} paid flights",
+        "incomePerYear": "Income per year",
+        "incomePerMonth": "Income per month",
         "longset": "Longest flight",
         "nbStartplaces": "Nb. of starting places",
         "nbLandingplaces": "Nb. of landing places",
         "totalDistance": "Total distance",
         "bestDistance": "Best distance",
         "unknownCountry": "Unknown",
-        "type": {
-            "monthly": "Monthly view",
-            "yearly": "Yearly view",
-            "weekly": "Weekly view"
-        }
+        "allTime": "All time",
+        "period": "Period",
+        "flightActivity": "Flight activity",
+        "kickerAll": "All time · {{count}} flights since {{date}}",
+        "kickerSeason": "{{year}} season · {{count}} flights",
+        "flightsPerYear": "Flights per year",
+        "flightsPerMonth": "Flights per month",
+        "busiestMonth": "Busiest month was {{name}} with {{count}} flights.",
+        "strongestSeason": "Your strongest season was {{name}} with {{count}} flights.",
+        "seasonsByMonth": "{{count}} seasons by month",
+        "everyDayIn": "Every day in {{year}}",
+        "seasonGridNote": "Each row is a season, each column a month.",
+        "monthsWithFlights": "{{flights}} flights across {{months}} months",
+        "compare": "{{count}} flights, {{delta}} compared with {{year}}",
+        "compareFirst": "Your first season · {{count}} flights",
+        "rankBest": "your best season",
+        "rankOrdinal": "your {{rank}} best season",
+        "seasons": "Seasons",
+        "flightCount": "{{count}} flights",
+        "seasonCount": "{{count}} seasons",
+        "totalAirtime": "Total airtime",
+        "seasonHighlighted": "{{year}} highlighted",
+        "less": "Less",
+        "more": "More",
+        "cumulativeAirtime": "Cumulative airtime",
+        "personalBests": "Personal bests",
+        "longestDistance": "Longest distance",
+        "longestAirtime": "Longest airtime",
+        "placesFlown": "Places flown",
+        "startLanding": "start / landing"
     },
     "import": {
         "flights": "Flights",
@@ -213,13 +279,14 @@
         "emailEnter": "Please enter your email!",
         "pwdSend": "A new password has been sent!",
         "userExist": "This email address is already used!",
-        "pwdNotSame": "The passwords are note the same!",
+        "pwdNotSame": "The passwords are not the same!",
         "settingChanged": "The settings have been saved!",
         "placeExist": "This place already exist!",
         "error": "An error has occurred. Please try again later or send an email to: yannick.lagger@flightbook.ch",
         "deleteError": "This entity is conected with a flight and can not be deleted.",
         "mendatoryFields": "Mandatory fields must be provided.",
         "invalidEmail": "Please enter a valid email address.",
+        "exportSavedNoViewer": "The export was saved to your device, but no app is installed that can open this file type.",
         "generationError": "Unable to generate export file",
         "wrongIgcFileType": "Please choose an IGC file",
         "emptyIgcFile": "This IGC file is empty",
@@ -263,7 +330,21 @@
     },
     "filter": {
         "from": "From",
-        "to": "To"
+        "to": "To",
+        "title": "Filter flights",
+        "period": "Period",
+        "allTime": "All time",
+        "last12Months": "Last 12 months",
+        "flightType": "Flight type",
+        "schoolValidation": "School validation",
+        "descriptionContains": "Description contains",
+        "descriptionPlaceholder": "Any word from the flight notes",
+        "clearAll": "Clear all",
+        "showFlights": "Show {{count}} flights",
+        "showFlight": "Show 1 flight",
+        "noMatch": "No flights match",
+        "noMatchHint": "Try a wider period or another glider.",
+        "clearFilters": "Clear filters"
     },
     "export": {
         "pilote": "Pilot",
@@ -305,14 +386,43 @@
         "subscription": "Registration",
         "waitingList": "Waiting list",
         "noAppointment": "There are currently no dates for this flight school",
-        "type": "Type"
+        "type": "Type",
+        "upcoming": "Upcoming",
+        "past": "Past",
+        "spotsFree": "{{free}} of {{total}} spots free",
+        "full": "Full · {{count}}/{{total}} · waiting list",
+        "registered": "Registered",
+        "canceledBySchool": "Canceled by the school",
+        "closesAt": "Registration for {{date}} closes at {{time}}",
+        "closesIn": "Registration closes",
+        "inHours": "in {{hours}} h",
+        "inDays": "in {{days}} d",
+        "notAssigned": "Not assigned yet",
+        "fromSchool": "From your school",
+        "you": "You",
+        "register": "Register",
+        "cancelRegistration": "Cancel registration",
+        "hint": "Your school publishes new dates a few weeks ahead. Turn on notifications to hear about them first."
     },
     "controlSheet": {
         "title": "Control sheet",
+        "subtitle": "Licence requirements and instructor ratings",
+        "flights": "Flights",
+        "soloRequired": "At least one required",
+        "skills": "Skills",
+        "rated": "{{rated}} of {{total}} rated",
+        "notPassed": "Not passed yet",
+        "passedOn": "Passed on {{date}}",
+        "level": {
+            "0": "Not rated yet",
+            "1": "Introduced",
+            "2": "Practising",
+            "3": "Mastered"
+        },
         "exam": {
-            "title": "Exams",
-            "theory": "Theory passed on",
-            "practice": "Practice passed on"
+            "title": "Final exams",
+            "theory": "Theory exam",
+            "practice": "Practical exam"
         },
         "trainingHill": {
             "title": "Übungshang",
@@ -327,7 +437,7 @@
                 "title": "Aufzieh- und Laufübungen",
                 "content": "<h2>Ziel:</h2> <p>Der Schüler ist in der Lage, den Schirm erfolgreich aufzuziehen und anschließend über eine vorgegebene Strecke mit gefülltem Schirm kontrolliert zu laufen.</p> <h2>Inhalt:</h2> <p>Startposition des Schülers: Bremsgriffe und vordere Tragegurte liegen in den Händen, die hinteren Tragegurte über den Armen. Die Armstellung ist dabei abhängig vom Schirmtyp und individuellen Vorlieben. Der Schüler steht auf der Längsachse so vor dem Schirm, dass die vorderen Leinen locker durchhängen.</p> <p>Er läuft entschlossen an. Das Gerät wird mit der Masse des ganzen Körpers aufgezogen und nicht mit den Armen, Kaum kommt Zug auf die Fangleinen, machen die Arme eine viertelkreisrunde Bewegung bis in die Vertikale. Bei den meisten Schirmen zieht der Schirm die Arme hoch, nicht umgekehrt. Ist die Kalotte über dem Piloten, werden die Tragegurte losgelassen. Über die Bremsen wird ein Überholen des Schirms beim Kontrollblick verhindert. Der Pilot läuft nun mit angemessenem Bremseinsatz. Am Ende zieht er die Bremsen voll durch und läuft noch einige Schritte weiter, damit der Schirm hinter oder seitlich von ihm herunterfällt.</p> <p>Achtung: Piloten mit Schulterproblemen können die Arme zum Aufziehen des Schirms auch vor dem Körper halten.</p> <h2>Fehler:</h2> <ul> <li>Zu langsames Loslaufen: Schirm steigt nicht über den Schüler.</li> <li>Aufziehen des Schirms mit den Händen anstatt mit dem ganzen Körper: Schirm füllt möglicherweise schlecht oder steigt eventuell seitwärts hoch. Dadurch die Masse des Körpers nicht ausgenützt wird, fehlt oft die zum Aufziehen des Schirms nötige Energie.</li> <li>Zu schwungvolles Aufziehen mit Armen über die Vertikale hinaus nach vorne gestreckt: Einklappen.</li> <li>Sich Festklammern an den vorderen Gurten nach dem Aufziehen: Frontklapper.</li> <li>Nicht konsequentes unter die Mitte Laufen: seitliches Ausbrechen.</li> <li>Kappe steigt nicht vollständig in die Vertikale (nasser, alter, eher großer Schirm, ungünstige Startverhältnisse, geringe Pilotenmasse). Tipp: A-Leinenschlösser umklappen.</li> <li>Keine progressive Geschwindigkeitszunahme, die dem Schirm Zeit lässt, sich zu füllen</li> </ul>",
                 "order": 2
-                        },
+            },
             "slalom": {
                 "video": null,
                 "title": "Slalomlauf",
@@ -620,6 +730,12 @@
     "payment": {
         "nativeNoSubscription": "<p>You are currently using Flightbook Free.</p><p>Visit flightbook.ch for more information.</p>",
         "noSubscription": "<p>You are currently using Flightbook Free.</p><p>For 12CHF a year, you can upgrade to Flightbook Premium!</p><ul><li>Add unlimited number of flights</li><li>Add unlimited number of passenger confirmations</li><li>Supports the project</li></ul>",
+        "freeTitle": "You are on Flightbook Free",
+        "freeBody": "For CHF 12 a year you can switch to Flightbook Premium.",
+        "nativeHint": "Visit flightbook.ch for more information.",
+        "feature1": "Unlimited flights",
+        "feature2": "Unlimited passenger confirmations",
+        "feature3": "Supports the project",
         "thanks": "Thank you for your subscription!",
         "information": "Your subscription will be automatically renewed on {{ date }}. You will be charged CHF 12.00/year",
         "canceled": "Your subscription has been canceled. You still have access to all features until {{ date }}.",
@@ -650,10 +766,82 @@
         "understandRisks": "I am aware that the flight involves risks (e.g. falling during take-off or landing).",
         "canUseData": "I agree to receive offers and news by email.",
         "tandemSchool": "Tandem operator",
-        "open": "Open"
+        "open": "Open",
+        "passenger": "Passenger",
+        "signedCount": "{{count}} signed",
+        "stepDetails": "Details",
+        "stepSign": "Sign",
+        "confirmPoints": "I confirm the points above",
+        "continueToSignature": "Continue to signature",
+        "hint": "Confirmations are kept as proof of the passenger briefing."
     },
     "school": {
         "leaveSchool": "Leave \"{{schoolName}}\"",
         "leaveSchoolConfirm": "Do you really want to leave \"{{schoolName}}\"?"
+    },
+    "tabs": {
+        "home": "Home",
+        "flights": "Flights",
+        "stats": "Stats",
+        "more": "More"
+    },
+    "more": {
+        "equipment": "Your equipment",
+        "importExport": "Import & export",
+        "passengerConfirmations": "Passenger confirmations",
+        "dabs": "DABS Switzerland",
+        "today": "Today",
+        "tomorrow": "Tomorrow",
+        "shvApp": "SHV Meteo App",
+        "beforeYouFly": "Before you fly",
+        "addLink": "Add a link",
+        "saveLink": "Save link",
+        "linkName": "Name",
+        "linkUrl": "Link",
+        "linksHint": "Keep the pages you check before flying here — webcams, wind stations, airspace or your club's site.",
+        "importIgc": "Import multiple IGC files",
+        "importData": "Import logbook data",
+        "export": "Export XLSX, CSV or PDF",
+        "accountSettings": "Account & settings",
+        "accountSettingsHint": "Your data, emergency contact, password, language"
+    },
+    "home": {
+        "airtime": "Airtime",
+        "distance": "Distance",
+        "nextFlight": "Next flight",
+        "today": "today",
+        "tomorrow": "tomorrow",
+        "inDays": "in {{days}} days",
+        "trainingProgress": "Training progress",
+        "activity": "Activity",
+        "allStatistics": "All statistics",
+        "flightsPerMonth": "Flights per month",
+        "bestMonth": "Best month",
+        "average": "Avg",
+        "fromShv": "News",
+        "emptyLogbook": "That's your whole logbook so far. Import IGC files to backfill earlier flights — ",
+        "importFromDevice": "Import from device",
+        "ofTotal": "of {{total}}",
+        "ofTotalRated": "of {{total}} rated",
+        "soloFlight": "Solo flight (SHGPA)",
+        "requirementOpen": "Open",
+        "requirementDone": "Done"
+    },
+    "flightlist": {
+        "summary": "{{count}} flights · {{airtime}}",
+        "backfillHint": "That's your whole logbook so far. Import IGC files to backfill earlier flights — "
+    },
+    "addSheet": {
+        "flightHint": "Import an IGC file or enter it by hand",
+        "tandem": "Tandem confirmation",
+        "tandemHint": "Passenger briefing and signature"
+    },
+    "gliderlist": {
+        "summaryOne": "1 glider",
+        "summary": "{{count}} gliders"
+    },
+    "placelist": {
+        "summaryOne": "1 place",
+        "summary": "{{count}} places"
     }
 }

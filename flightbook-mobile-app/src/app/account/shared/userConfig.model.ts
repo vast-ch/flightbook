@@ -4,7 +4,6 @@ export class Link {
 }
 
 export class Preparation {
-  dabsLinkDisabled?: boolean;
   links?: Link[];
 }
 
