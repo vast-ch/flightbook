@@ -183,6 +183,7 @@
         "income": "Einkommen",
         "incomeTotal": "Total",
         "incomePerFlight": "Pro bezahlten Flug",
+        "paidFlightsOne": "1 bezahlter Flug",
         "paidFlights": "{{count}} bezahlte Flüge",
         "incomePerYear": "Einkommen pro Jahr",
         "incomePerMonth": "Einkommen pro Monat",

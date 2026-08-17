@@ -52,8 +52,6 @@ export class FlightsBarsComponent {
         this.valued.set(!!value);
     }
 
-    public source = computed(() => this.bars());
-
     /** A season's worth of years needs a tighter gap than twelve months. */
     public tight = computed(() => this.bars().length > 12);
 

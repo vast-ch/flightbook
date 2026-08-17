@@ -244,7 +244,11 @@
             <span class="bests__name">{{ 'statistics.incomePerFlight' | translate }}</span>
             <span class="bests__value">{{ incomeSummary().perFlight | number:'1.0-2':currentLang }}</span>
             <span class="bests__meta">
-              {{ 'statistics.paidFlights' | translate:{ count: incomeSummary().paidFlights } }}
+              @if (incomeSummary().paidFlights === 1) {
+                {{ 'statistics.paidFlightsOne' | translate }}
+              } @else {
+                {{ 'statistics.paidFlights' | translate:{ count: incomeSummary().paidFlights } }}
+              }
             </span>
           </div>
         </div>

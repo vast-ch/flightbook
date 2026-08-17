@@ -133,7 +133,9 @@ export class FlightListPage implements OnInit, OnDestroy {
         // Only when there is nothing to show or the logbook has moved: this
         // used to cost a round-trip on every single visit to the tab, to redraw
         // a header eyebrow that almost never changes.
-        if (this.totals() === null || this.totalsRevision !== this.flightStore.revision()) {
+        // dataRevision, not revision: these totals are fetched applyFilter: false,
+        // so a filter change cannot alter them and must not cost a round-trip.
+        if (this.totals() === null || this.totalsRevision !== this.flightStore.dataRevision()) {
             this.loadTotals();
         }
     }
@@ -169,12 +171,12 @@ export class FlightListPage implements OnInit, OnDestroy {
     /** FlightStore.revision the rows on screen were fetched at. */
     private listRevision = -1;
 
-    /** FlightStore.revision the header totals were fetched at. */
+    /** FlightStore.dataRevision the header totals were fetched at. */
     private totalsRevision = -1;
 
     /** applyFilter: false - the header always reports all-time totals. */
     private loadTotals() {
-        const revision = this.flightStore.revision();
+        const revision = this.flightStore.dataRevision();
         this.flightStore.getStatistics('global', false)
             .pipe(takeUntil(this.unsubscribe$))
             .subscribe({
