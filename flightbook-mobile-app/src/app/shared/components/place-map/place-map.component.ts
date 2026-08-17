@@ -11,11 +11,11 @@ import VectorLayer from 'ol/layer/Vector';
 import { fromLonLat } from 'ol/proj';
 import OSM from 'ol/source/OSM';
 import VectorSource from 'ol/source/Vector';
-import { Icon, Style } from 'ol/style';
 import { firstValueFrom } from 'rxjs';
 import { Place } from 'src/app/place/shared/place.model';
 import { PlaceStore } from 'src/app/place/shared/place.store';
 import { ConfigurationService } from '../../services/configuration.service';
+import { createMarkerStyle } from './place-marker.style';
 
 @Component({
     selector: 'fb-place-map',
@@ -61,19 +61,11 @@ export class PlaceMapComponent implements AfterViewInit, OnChanges, OnDestroy {
         private configurationService: ConfigurationService,
         private zone: NgZone
     ) {
-        const style = new Style({
-            image: new Icon({
-                anchor: [0.5, 1],
-                crossOrigin: 'anonymous',
-                src: 'assets/icon/marker.png',
-            })
-        });
-
         this.vectorSource.addFeature(this.marker);
 
         this.vectorLayer = new VectorLayer({
             source: this.vectorSource,
-            style: style
+            style: createMarkerStyle()
         });
     }
 
