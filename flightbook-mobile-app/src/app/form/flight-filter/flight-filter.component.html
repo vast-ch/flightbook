@@ -44,16 +44,26 @@
             </button>
         </div>
 
-        <!-- Glider -->
+        <!--
+          Glider. A dropdown rather than a chip per glider: the chip row grew by a
+          line for every glider owned, and a pilot with a dozen of them pushed
+          everything below off the sheet.
+        -->
         @if (gliders.length > 0) {
             <div class="fb-section-label filter-label">{{ 'groupname.glider' | translate }}</div>
-            <div class="fb-chip-row filter-chips">
-                <button type="button" class="fb-chip" [class.fb-chip--active]="!filter().glider?.id"
-                        (click)="setGlider(null)">{{ 'glider.all' | translate }}</button>
-                @for (glider of gliders; track glider.id) {
-                    <button type="button" class="fb-chip" [class.fb-chip--active]="isGliderSelected(glider)"
-                            (click)="setGlider(glider)">{{ glider.brand }} {{ glider.name }}</button>
-                }
+            <div class="filter-select">
+                <ion-select [ngModel]="selectedGliderId()" (ngModelChange)="setGliderById($event)"
+                            name="glider" interface="popover" toggleIcon="chevron-forward"
+                            [attr.aria-label]="'groupname.glider' | translate"
+                            okText="{{ 'buttons.done' | translate }}"
+                            cancelText="{{ 'buttons.cancel' | translate }}">
+                    <ion-select-option value="">{{ 'glider.all' | translate }}</ion-select-option>
+                    @for (glider of gliders; track glider.id) {
+                        <ion-select-option [value]="glider.id.toString()">
+                            {{ glider.brand }} {{ glider.name }}
+                        </ion-select-option>
+                    }
+                </ion-select>
             </div>
         }
 

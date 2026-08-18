@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit, computed, signal } from '@angular/core';
-import { ModalController, IonContent, IonIcon, IonInput, IonButton, IonModal, IonDatetime } from '@ionic/angular/standalone';
+import { ModalController, IonContent, IonIcon, IonInput, IonButton, IonModal, IonDatetime, IonSelect, IonSelectOption } from '@ionic/angular/standalone';
 import { Subject, Subscription, of } from 'rxjs';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { catchError, debounceTime, switchMap, takeUntil, tap } from 'rxjs/operators';
@@ -32,7 +32,9 @@ type PeriodKey = 'all' | 'last12' | string;
         IonInput,
         IonButton,
         IonModal,
-        IonDatetime
+        IonDatetime,
+        IonSelect,
+        IonSelectOption
     ]
 })
 export class FlightFilterComponent implements OnInit, OnDestroy {
@@ -57,6 +59,12 @@ export class FlightFilterComponent implements OnInit, OnDestroy {
         { length: YEAR_CHOICES },
         (_unused, index) => String(new Date().getFullYear() - index)
     );
+
+    /** '' when no glider is filtered on, which is the "all" option's value. */
+    public selectedGliderId = computed(() => {
+        const id = this.filter().glider?.id;
+        return id ? String(id) : '';
+    });
 
     public activePeriod = computed<PeriodKey>(() => {
         const { from, to } = this.filter();
@@ -168,12 +176,13 @@ export class FlightFilterComponent implements OnInit, OnDestroy {
 
     // ---- The other criteria ---------------------------------------------
 
-    setGlider(glider: Glider | null) {
+    /**
+     * The select trades in id strings, because ion-select matches its options by
+     * value and the filter holds a whole Glider - an empty one standing for "any".
+     */
+    setGliderById(id: string) {
+        const glider = id ? this.gliders.find(candidate => String(candidate.id) === id) : null;
         this.flightStore.updateFilter({ glider: glider ?? new Glider() });
-    }
-
-    isGliderSelected(glider: Glider): boolean {
-        return this.filter().glider?.id === glider.id;
     }
 
     setGliderType(gliderType: string) {
