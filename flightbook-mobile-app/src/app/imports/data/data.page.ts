@@ -12,7 +12,7 @@ import { ImportService } from '../shared/import.service';
 import { ImportType } from '../shared/import-type.model';
 import { navigateBackOrTo } from 'src/app/shared/util/back-navigation';
 import { addIcons } from "ionicons";
-import { chevronBack, cloudUploadOutline } from "ionicons/icons";
+import { chevronBack, chevronForward, cloudUploadOutline } from "ionicons/icons";
 
 @Component({
     selector: 'app-data',
@@ -54,7 +54,7 @@ export class DataPage implements OnInit, OnDestroy {
             this.isIos = true;
         }
         this.initialDataLoad();
-        addIcons({ 'chevron-back': chevronBack, cloudUploadOutline });
+        addIcons({ 'chevron-back': chevronBack, 'chevron-forward': chevronForward, cloudUploadOutline });
     }
 
     close() {
@@ -82,6 +82,9 @@ export class DataPage implements OnInit, OnDestroy {
 
     changeImportType(event: CustomEvent) {
         this.currentType = this.importTypes.find(element => element.type === event.detail.value);
+        // The file was validated against the old type, and the card presents it
+        // under the new one's label - so it cannot carry over.
+        this.file = undefined;
     }
 
     async onFilesSelect(event: any) {
@@ -157,6 +160,7 @@ export class DataPage implements OnInit, OnDestroy {
                 ]
             });
             await alert.present();
+            this.showButton = true;
         }
         await loading.dismiss();
     }

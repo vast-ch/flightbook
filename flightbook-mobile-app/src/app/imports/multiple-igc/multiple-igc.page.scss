@@ -61,11 +61,24 @@
 // line rather than competing with the place for the row's width.
 .igc-row__glider {
   margin-top: 4px;
+}
 
-  ion-select {
-    --padding-start: 0;
+/*
+ * The ion-select lives inside fb-glider-select's template, so an emulated-
+ * encapsulation rule from this sheet never reaches it. Restyled from the
+ * outside rather than changed, since the flight form renders the same control
+ * in its own context - same approach as account-data's .account-phone block.
+ */
+:host ::ng-deep .igc-row__glider ion-select {
+  --padding-start: 0;
+  --padding-end: 0;
+  min-height: 0;
+  width: 100%;
+  font-size: 12px;
+  color: var(--fb-text-body);
+
+  &::part(text) {
     font-size: 12px;
-    color: var(--fb-text-body);
   }
 }
 
@@ -83,8 +96,21 @@
   }
 }
 
-// A row still being parsed has no content to lay out yet
-.igc-row__spinner {
+// A row still being parsed has no content to lay out yet. The spinner keeps its
+// natural size inside a padded wrapper: ion-spinner positions its svg
+// absolutely, so padding on the spinner itself would be painted straight over.
+.igc-row__loading {
+  display: flex;
   width: 100%;
   padding: 15px var(--fb-gutter);
+}
+
+// Dropping a staged flight is immediate and cannot be undone, so the control
+// says so - .icon-button is otherwise the same neutral square as the back arrow.
+.igc-row__delete {
+  border-color: var(--fb-danger-border);
+
+  ion-icon {
+    color: var(--fb-danger-text);
+  }
 }

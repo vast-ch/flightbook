@@ -26,7 +26,9 @@
       @for (flightSate of flightStateList; track flightSate; let i = $index) {
         <ion-item detail="false" lines="none" class="igc-row" [attr.data-index]="i">
           @if (flightSate.state == state.LOADING) {
-            <ion-spinner class="igc-row__spinner" name="lines"></ion-spinner>
+            <div class="igc-row__loading">
+              <ion-spinner name="lines" aria-hidden="true"></ion-spinner>
+            </div>
           } @else {
             <div class="igc-row__inner">
               <div class="row-date">
@@ -38,6 +40,7 @@
                 <div class="igc-row__place">{{ flightSate.flight.start?.name || '–' }}</div>
 
                 <div class="igc-row__meta">
+                  <span>{{ flightSate.flight.date | date:'yyyy':undefined:currentLang }}</span>
                   <span>{{ flightSate.flight.time?.substring(0, 5) || '00:00' }}</span>
                   @if (flightSate.flight.km) {
                     <span>{{ flightSate.flight.km }} km</span>
@@ -56,7 +59,7 @@
               } @else if (flightSate.state == state.ERROR) {
                 <ion-icon name="alert" class="igc-row__state is-error" aria-hidden="true"></ion-icon>
               } @else {
-                <button type="button" class="icon-button" (click)="removeFlight(i)"
+                <button type="button" class="icon-button igc-row__delete" (click)="removeFlight(i)"
                         [attr.aria-label]="'buttons.delete' | translate">
                   <ion-icon name="trash-outline" aria-hidden="true"></ion-icon>
                 </button>
