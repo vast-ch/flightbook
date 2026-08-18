@@ -7,7 +7,7 @@
 
 <ion-content>
   <div class="form-body">
-    <fb-file-input appearance="card" (onFilesSelectEvent)="onFilesSelectEvent($event)"></fb-file-input>
+    <fb-file-input (onFilesSelectEvent)="onFilesSelectEvent($event)"></fb-file-input>
     <div class="form-divider">{{ 'flight.orByHand' | translate }}</div>
 
     <flight-form [flight]=flight [gliders]=gliders [schools]=schools [tandemSchools]="tandemSchools()" [igcFile]=igcFile (saveFlight)="saveFlight($event)"></flight-form>

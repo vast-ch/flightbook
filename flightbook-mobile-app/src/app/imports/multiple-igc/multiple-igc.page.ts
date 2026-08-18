@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { LoadingController, IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonContent, IonList, IonItem, IonSpinner, IonButton, IonIcon } from '@ionic/angular/standalone';
+import { Location } from '@angular/common';
+import { LoadingController, NavController, IonContent, IonFooter, IonList, IonItem, IonSpinner, IonButton, IonIcon } from '@ionic/angular/standalone';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -13,8 +14,10 @@ import { Flight } from 'src/app/flight/shared/flight.model';
 import { FileInputComponent } from '../../shared/components/file-input/file-input.component';
 import { DatePipe } from '@angular/common';
 import { GliderSelectComponent } from '../../shared/components/glider-select/glider-select.component';
+import { LanguageService } from 'src/app/shared/services/language.service';
+import { navigateBackOrTo } from 'src/app/shared/util/back-navigation';
 import { addIcons } from "ionicons";
-import { trashOutline, cloudDoneOutline, alert } from "ionicons/icons";
+import { trashOutline, cloudDoneOutline, alert, chevronBack } from "ionicons/icons";
 
 @Component({
     selector: 'app-multiple-igc',
@@ -25,12 +28,8 @@ import { trashOutline, cloudDoneOutline, alert } from "ionicons/icons";
         GliderSelectComponent,
         DatePipe,
         TranslateModule,
-        IonHeader,
-        IonToolbar,
-        IonButtons,
-        IonBackButton,
-        IonTitle,
         IonContent,
+        IonFooter,
         IonList,
         IonItem,
         IonSpinner,
@@ -46,15 +45,29 @@ export class MultipleIgcPage implements OnInit {
     flightStateList: FlightStatus[] = [];
     isSaved = false;
 
+    /** LanguageService, not translate.currentLang: always a locale Angular has data for. */
+    get currentLang(): string {
+        return this.languageService.lang();
+    }
+
     constructor(
         private gliderStore: GliderStore,
         private igcService: IgcService,
         private loadingCtrl: LoadingController,
         private translate: TranslateService,
         private fileUploadService: FileUploadService,
-        private flightStore: FlightStore
+        private flightStore: FlightStore,
+        private navCtrl: NavController,
+        private location: Location,
+        private languageService: LanguageService
     ) {
-        addIcons({ trashOutline, cloudDoneOutline, alert });
+        addIcons({ trashOutline, cloudDoneOutline, alert, 'chevron-back': chevronBack });
+    }
+
+    // Reached from More, Home, the flight list and Statistics, so back pops the
+    // history rather than always landing on More.
+    close() {
+        navigateBackOrTo(this.navCtrl, this.location, 'more');
     }
 
     ngOnInit() {

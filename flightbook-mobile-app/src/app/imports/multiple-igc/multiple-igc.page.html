@@ -1,49 +1,80 @@
-<ion-header>
-  <ion-toolbar color='primary'>
-    <ion-buttons slot="start">
-      <ion-back-button defaultHref="more"></ion-back-button>
-    </ion-buttons>
-    <ion-title>{{ 'buttons.multipleIgc' | translate }}</ion-title>
-  </ion-toolbar>
-</ion-header>
+<!-- Surface strip rather than an ion-toolbar; reached from More, Home and the flight list -->
+<div class="form-header">
+  <button type="button" class="icon-button" (click)="close()"
+          [attr.aria-label]="'buttons.back' | translate">
+    <ion-icon name="chevron-back" aria-hidden="true"></ion-icon>
+  </button>
+  <h1 class="form-header__title">{{ 'more.importIgc' | translate }}</h1>
+</div>
 
 <ion-content>
-  <fb-file-input [multiple]="true" (onFilesSelectEvent)="onFilesSelectEvent($event)"></fb-file-input>
+  <div class="form-body">
+    <fb-file-input [multiple]="true" titleKey="import.igcCard" hintKey="import.igcCardHint"
+                   (onFilesSelectEvent)="onFilesSelectEvent($event)"></fb-file-input>
+  </div>
 
-  @if (flightStateList && flightStateList.length > 0) {
-    <ion-list>
+  @if (flightStateList.length > 0) {
+    <div class="fb-section-label igc-heading">
+      @if (flightStateList.length === 1) {
+        {{ 'import.stagedOne' | translate }}
+      } @else {
+        {{ 'import.staged' | translate:{ count: flightStateList.length } }}
+      }
+    </div>
+
+    <ion-list class="list-block">
       @for (flightSate of flightStateList; track flightSate; let i = $index) {
-        <ion-item [attr.data-index]="i">
+        <ion-item detail="false" lines="none" class="igc-row" [attr.data-index]="i">
           @if (flightSate.state == state.LOADING) {
-            <ion-spinner class=loadingSpinner name="lines"></ion-spinner>
+            <ion-spinner class="igc-row__spinner" name="lines"></ion-spinner>
           } @else {
-            <span class="info glider">
-              <fb-glider-select [flight]=flightSate.flight [gliders]=gliders></fb-glider-select>
-            </span>
-            <span class="info date">{{ flightSate.flight.date | date:'dd.MM.yyyy' }}</span>
-            <span class="info time">{{ flightSate.flight.time }}</span>
-            <span class="info start">{{ flightSate.flight.start?.name }}</span>
-            <span class="info km">{{ flightSate.flight.km }}km</span>
-            @if (flightSate.state != state.SAVED && flightSate.state != state.ERROR) {
-              <ion-button color="danger" slot="end" (click)="removeFlight(i)">
-                <ion-icon name="trash-outline"></ion-icon>
-              </ion-button>
-            }
-            @if (flightSate.state == state.SAVED) {
-              <ion-icon slot="end" color="success" name="cloud-done-outline"></ion-icon>
-            }
-            @if (flightSate.state == state.ERROR) {
-              <ion-icon slot="end" color="danger" name="alert"></ion-icon>
-            }
+            <div class="igc-row__inner">
+              <div class="row-date">
+                <div class="row-date__day">{{ flightSate.flight.date | date:'d':undefined:currentLang }}</div>
+                <div class="row-date__month">{{ flightSate.flight.date | date:'LLL':undefined:currentLang }}</div>
+              </div>
+
+              <div class="igc-row__main">
+                <div class="igc-row__place">{{ flightSate.flight.start?.name || '–' }}</div>
+
+                <div class="igc-row__meta">
+                  <span>{{ flightSate.flight.time?.substring(0, 5) || '00:00' }}</span>
+                  @if (flightSate.flight.km) {
+                    <span>{{ flightSate.flight.km }} km</span>
+                  } @else {
+                    <span class="is-muted">&mdash; km</span>
+                  }
+                </div>
+
+                <div class="igc-row__glider">
+                  <fb-glider-select [flight]=flightSate.flight [gliders]=gliders></fb-glider-select>
+                </div>
+              </div>
+
+              @if (flightSate.state == state.SAVED) {
+                <ion-icon name="cloud-done-outline" class="igc-row__state is-saved" aria-hidden="true"></ion-icon>
+              } @else if (flightSate.state == state.ERROR) {
+                <ion-icon name="alert" class="igc-row__state is-error" aria-hidden="true"></ion-icon>
+              } @else {
+                <button type="button" class="icon-button" (click)="removeFlight(i)"
+                        [attr.aria-label]="'buttons.delete' | translate">
+                  <ion-icon name="trash-outline" aria-hidden="true"></ion-icon>
+                </button>
+              }
+            </div>
           }
         </ion-item>
       }
     </ion-list>
   }
-  @if (isSaved) {
-    <ion-button expand="block" (click)="clear()">{{ 'buttons.clear' | translate }}</ion-button>
-  } @else {
-    <ion-button expand="block" (click)="save()">{{ 'buttons.save' | translate }}</ion-button>
-  }
-
 </ion-content>
+
+@if (flightStateList.length > 0) {
+  <ion-footer class="form-footer">
+    @if (isSaved) {
+      <ion-button expand="block" (click)="clear()">{{ 'buttons.clear' | translate }}</ion-button>
+    } @else {
+      <ion-button expand="block" (click)="save()">{{ 'buttons.save' | translate }}</ion-button>
+    }
+  </ion-footer>
+}

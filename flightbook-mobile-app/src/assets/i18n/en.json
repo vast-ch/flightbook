@@ -231,7 +231,13 @@
         "result": "Result",
         "inserted": "Added",
         "updated": "Updated",
-        "existed": "Already exist"
+        "existed": "Already exist",
+        "format": "Format",
+        "chooseFile": "Choose {{fileType}} file",
+        "igcCard": "Import IGC files",
+        "igcCardHint": "Pick several at once - date, route, time and distance are filled in",
+        "staged": "{{count}} flights ready",
+        "stagedOne": "1 flight ready"
     },
     "emptylist": "This list is empty",
     "months": {

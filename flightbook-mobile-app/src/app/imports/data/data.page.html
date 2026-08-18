@@ -1,72 +1,117 @@
-<ion-header>
-  <ion-toolbar color='primary'>
-    <ion-buttons slot="start">
-      <ion-back-button defaultHref="more"></ion-back-button>
-    </ion-buttons>
-    <ion-title>{{ 'groupname.import' | translate }}</ion-title>
-  </ion-toolbar>
-</ion-header>
+<!-- Surface strip rather than an ion-toolbar; the title matches the More row that leads here -->
+<div class="form-header">
+  <button type="button" class="icon-button" (click)="close()"
+          [attr.aria-label]="'buttons.back' | translate">
+    <ion-icon name="chevron-back" aria-hidden="true"></ion-icon>
+  </button>
+  <h1 class="form-header__title">{{ 'more.importData' | translate }}</h1>
+</div>
 
-<ion-content class="ion-padding">
-  <ion-select interface="popover" value="{{ importTypes[0]?.type }}" (ionChange)="changeImportType($event)">
-    @for (type of importTypes; track type) {
-      <ion-select-option value="{{ type.type }}">{{ type.name }}</ion-select-option>
-    }
-  </ion-select>
+<ion-content>
+  <div class="form-body">
 
-  <div class="content"><p>{{ currentType?.description }}</p></div>
-
-  @if (isIos) {
-    <ion-button color="primary" class="upload-btn" (click)="onIosFilesSelect()">
-      <ion-icon name="document"></ion-icon> {{ currentType?.fileType.toUpperCase() }}
-    </ion-button>
-  } @else {
-    <ion-button color="primary" class="upload-btn" (click)="fileUpload.click()">
-      <input type="file" name="file" (change)="onFilesSelect($event)" #fileUpload />
-      <ion-icon name="document"></ion-icon> {{ currentType?.fileType.toUpperCase() }}
-    </ion-button>
-  }
-
-  @if (file) {
-    <span class="fileName">{{ file.name }}</span>
-  }
-
-  @if (showButton) {
-    <ion-button expand="block" (click)="save()">{{ 'buttons.save' | translate }}</ion-button>
-  }
-
-  @if (result) {
-    <div>
-      <!-- Glider result -->
-      @if (result.glider) {
-        <ion-card>
-          <ion-card-content>
-            <p class="title">{{ 'import.gliders' | translate }}</p>
-            <div><label>{{ 'import.inserted' | translate }}:</label><span>{{ result.glider.inserted }}</span></div>
-            <div><label>{{ 'import.existed' | translate }}:</label><span>{{ result.glider.existed }}</span></div>
-          </ion-card-content>
-        </ion-card>
-      }
-      <!-- Place result -->
-      @if (result.place) {
-        <ion-card>
-          <ion-card-content>
-            <p class="title">{{ 'import.places' | translate }}</p>
-            <div><label>{{ 'import.inserted' | translate }}:</label><span>{{ result.place.inserted }}</span></div>
-            <div><label>{{ 'import.updated' | translate }}:</label><span>{{ result.place.updated }}</span></div>
-            <div><label>{{ 'import.existed' | translate }}:</label><span>{{ result.place.existed }}</span></div>
-          </ion-card-content>
-        </ion-card>
-      }
-      <!-- Flight result -->
-      @if (result.flight) {
-        <ion-card>
-          <ion-card-content>
-            <p class="title">{{ 'import.flights' | translate }}</p>
-            <div><label>{{ 'import.inserted' | translate }}:</label><span>{{ result.flight.inserted }}</span></div>
-          </ion-card-content>
-        </ion-card>
-      }
+    <!-- Format: the row's label carries the section, as on the flight form -->
+    <div class="fb-card--flush">
+      <div class="fb-row fb-row--select">
+        <span class="fb-row__label">{{ 'import.format' | translate }}</span>
+        <span class="fb-row__value">
+          <ion-select interface="popover" toggleIcon="chevron-forward"
+                      value="{{ importTypes[0]?.type }}" (ionChange)="changeImportType($event)"
+                      [attr.aria-label]="'import.format' | translate">
+            @for (type of importTypes; track type) {
+              <ion-select-option value="{{ type.type }}">{{ type.name }}</ion-select-option>
+            }
+          </ion-select>
+        </span>
+      </div>
     </div>
-  }
+    @if (currentType?.description) {
+      <p class="import-hint">{{ currentType.description }}</p>
+    }
+
+    <!-- File. Guarded on currentType so the label never names an empty type. -->
+    @if (currentType) {
+      @if (isIos) {
+        <button type="button" class="import-card" (click)="onIosFilesSelect()">
+          <ion-icon name="cloud-upload-outline" class="import-card__icon" aria-hidden="true"></ion-icon>
+          <span class="import-card__text">
+            <span class="import-card__title">
+              {{ 'import.chooseFile' | translate:{ fileType: currentType.fileType.toUpperCase() } }}
+            </span>
+            @if (file) {
+              <span class="import-card__file">{{ file.name }}</span>
+            }
+          </span>
+        </button>
+      } @else {
+        <button type="button" class="import-card" (click)="fileUpload.click()">
+          <input type="file" name="file" (change)="onFilesSelect($event)" #fileUpload hidden />
+          <ion-icon name="cloud-upload-outline" class="import-card__icon" aria-hidden="true"></ion-icon>
+          <span class="import-card__text">
+            <span class="import-card__title">
+              {{ 'import.chooseFile' | translate:{ fileType: currentType.fileType.toUpperCase() } }}
+            </span>
+            @if (file) {
+              <span class="import-card__file">{{ file.name }}</span>
+            }
+          </span>
+        </button>
+      }
+    }
+
+    <!-- Result -->
+    @if (result) {
+      <div class="import-result">
+        <div class="fb-section-label">{{ 'import.result' | translate }}</div>
+
+        @if (result.glider) {
+          <div class="fb-card--flush import-result__block">
+            <div class="import-result__title">{{ 'import.gliders' | translate }}</div>
+            <div class="fb-row">
+              <span class="fb-row__label">{{ 'import.inserted' | translate }}</span>
+              <span class="fb-row__value">{{ result.glider.inserted }}</span>
+            </div>
+            <div class="fb-row">
+              <span class="fb-row__label">{{ 'import.existed' | translate }}</span>
+              <span class="fb-row__value">{{ result.glider.existed }}</span>
+            </div>
+          </div>
+        }
+
+        @if (result.place) {
+          <div class="fb-card--flush import-result__block">
+            <div class="import-result__title">{{ 'import.places' | translate }}</div>
+            <div class="fb-row">
+              <span class="fb-row__label">{{ 'import.inserted' | translate }}</span>
+              <span class="fb-row__value">{{ result.place.inserted }}</span>
+            </div>
+            <div class="fb-row">
+              <span class="fb-row__label">{{ 'import.updated' | translate }}</span>
+              <span class="fb-row__value">{{ result.place.updated }}</span>
+            </div>
+            <div class="fb-row">
+              <span class="fb-row__label">{{ 'import.existed' | translate }}</span>
+              <span class="fb-row__value">{{ result.place.existed }}</span>
+            </div>
+          </div>
+        }
+
+        @if (result.flight) {
+          <div class="fb-card--flush import-result__block">
+            <div class="import-result__title">{{ 'import.flights' | translate }}</div>
+            <div class="fb-row">
+              <span class="fb-row__label">{{ 'import.inserted' | translate }}</span>
+              <span class="fb-row__value">{{ result.flight.inserted }}</span>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
 </ion-content>
+
+@if (showButton && file) {
+  <ion-footer class="form-footer">
+    <ion-button expand="block" (click)="save()">{{ 'buttons.save' | translate }}</ion-button>
+  </ion-footer>
+}

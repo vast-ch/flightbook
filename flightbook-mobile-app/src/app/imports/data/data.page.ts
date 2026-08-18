@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Location } from '@angular/common';
 import { Capacitor } from '@capacitor/core';
-import { AlertController, LoadingController, IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonContent, IonSelect, IonSelectOption, IonButton, IonIcon, IonCard, IonCardContent } from '@ionic/angular/standalone';
+import { AlertController, LoadingController, NavController, IonContent, IonFooter, IonSelect, IonSelectOption, IonButton, IonIcon } from '@ionic/angular/standalone';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { Subject, firstValueFrom, takeUntil } from 'rxjs';
 import { FilePicker, PickedFile, PickFilesResult } from '@capawesome/capacitor-file-picker';
@@ -9,8 +10,9 @@ import { GliderStore } from 'src/app/glider/shared/glider.store';
 import { PlaceStore } from 'src/app/place/shared/place.store';
 import { ImportService } from '../shared/import.service';
 import { ImportType } from '../shared/import-type.model';
+import { navigateBackOrTo } from 'src/app/shared/util/back-navigation';
 import { addIcons } from "ionicons";
-import { document } from "ionicons/icons";
+import { chevronBack, cloudUploadOutline } from "ionicons/icons";
 
 @Component({
     selector: 'app-data',
@@ -18,18 +20,12 @@ import { document } from "ionicons/icons";
     styleUrls: ['./data.page.scss'],
     imports: [
         TranslateModule,
-        IonHeader,
-        IonToolbar,
-        IonButtons,
-        IonBackButton,
-        IonTitle,
         IonContent,
+        IonFooter,
         IonSelect,
         IonSelectOption,
         IonButton,
-        IonIcon,
-        IonCard,
-        IonCardContent
+        IonIcon
     ]
 })
 export class DataPage implements OnInit, OnDestroy {
@@ -50,13 +46,19 @@ export class DataPage implements OnInit, OnDestroy {
         private importService: ImportService,
         private flightStore: FlightStore,
         private gliderStore: GliderStore,
-        private placeStore: PlaceStore
+        private placeStore: PlaceStore,
+        private navCtrl: NavController,
+        private location: Location
     ) {
         if (Capacitor.getPlatform() == "ios") {
             this.isIos = true;
         }
         this.initialDataLoad();
-        addIcons({ document });
+        addIcons({ 'chevron-back': chevronBack, cloudUploadOutline });
+    }
+
+    close() {
+        navigateBackOrTo(this.navCtrl, this.location, 'more');
     }
 
     ngOnInit() {
