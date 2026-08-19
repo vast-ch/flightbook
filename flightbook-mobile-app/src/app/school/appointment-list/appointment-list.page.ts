@@ -488,13 +488,26 @@ export class AppointmentListPage implements OnInit, OnDestroy {
             cssClass: 'fb-filter-sheet'
         });
 
+        /*
+         * Compared before and after rather than read off the dismiss role: the
+         * sheet edits the shared filter as it goes, and a backdrop tap or the
+         * Android back button dismisses it without any role of ours - which
+         * left the filter armed while the list, and its "filtered" chip, still
+         * showed everything. The flight filter watches its store's revision
+         * for the same reason.
+         */
+        const before = this.filterSnapshot();
         modal.present();
-        // The sheet edits the shared filter as it goes and reports whether it
-        // touched anything, so opening and closing it untouched costs no fetch.
-        const { role } = await modal.onWillDismiss();
-        if (role === 'filter') {
+        await modal.onWillDismiss();
+        if (this.filterSnapshot() !== before) {
             this.initialDataLoad();
         }
+    }
+
+    /** The filter as a value, so an untouched sheet costs the list no fetch. */
+    private filterSnapshot(): string {
+        const { from, to, state } = this.schoolService.filter;
+        return JSON.stringify([from ?? null, to ?? null, state ?? '']);
     }
 
     async leaveSchool() {

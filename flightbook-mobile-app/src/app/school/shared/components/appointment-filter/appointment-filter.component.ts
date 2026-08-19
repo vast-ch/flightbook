@@ -3,10 +3,11 @@ import { ModalController, IonContent, IonButton, IonModal, IonDatetime } from '@
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { AppointmentFilter } from '../../appointment-filter.model';
 import { SchoolService } from '../../school.service';
+import { State } from '../../state';
 import { DatePipe } from '@angular/common';
 
 /** '' is "any state", and leads the row the way the flight filter's "All" does. */
-const STATES = ['', 'ANNOUNCED', 'CONFIRMED', 'CANCELED'];
+const STATES: string[] = ['', ...Object.values(State)];
 
 @Component({
     selector: 'fb-appointment-filter',
@@ -37,9 +38,6 @@ export class AppointmentFilterComponent {
         return !!from || !!to || !!state;
     });
 
-    /** Closing an untouched sheet must not cost the host a reload. */
-    private touched = false;
-
     constructor(
         private schoolService: SchoolService,
         private translate: TranslateService,
@@ -66,17 +64,15 @@ export class AppointmentFilterComponent {
         // header chip is cleared with it.
         this.schoolService.resetFilter();
         this.filter.set(this.schoolService.filter);
-        this.touched = true;
     }
 
     close() {
-        return this.modalCtrl.dismiss(null, this.touched ? 'filter' : undefined);
+        return this.modalCtrl.dismiss();
     }
 
     private apply(patch: Partial<AppointmentFilter>) {
         const next = Object.assign(new AppointmentFilter(), this.filter(), patch);
         this.schoolService.filter = next;
         this.filter.set(next);
-        this.touched = true;
     }
 }
