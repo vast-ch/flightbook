@@ -34,7 +34,12 @@ export function splitDuration(seconds: number): { value: string; unit: string } 
  * the two on one screen and the row says 1 March under a February heading.
  */
 export function localDate(value: string): Date {
-    const [year, month, day] = String(value ?? '').split('-').map(Number);
+    // The API is not consistent about this: a flight's date arrives as
+    // "2025-01-02", a passenger confirmation's as "2024-01-01T00:00:00.000Z".
+    // Splitting the timestamp on '-' alone left "01T00:00:00.000Z" as the day,
+    // which is NaN - and an Invalid Date thrown by a DatePipe takes the whole
+    // page's change detection with it. The calendar day is all this needs.
+    const [year, month, day] = String(value ?? '').split('T')[0].split('-').map(Number);
     return new Date(year, (month ?? 1) - 1, day ?? 1);
 }
 
