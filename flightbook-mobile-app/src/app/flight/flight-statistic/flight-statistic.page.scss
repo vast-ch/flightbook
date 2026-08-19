@@ -163,6 +163,12 @@
     &[data-level='2'] {
         background: var(--fb-accent);
     }
+
+    // The darkest step; without it the "more" end of the scale fell back to the
+    // base track colour and read lighter than the swatch before it.
+    &[data-level='3'] {
+        background: var(--ion-color-primary);
+    }
 }
 
 // ---- Cumulative airtime (inverted surface) ------------------------------
