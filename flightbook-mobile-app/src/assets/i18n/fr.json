@@ -139,13 +139,10 @@
         "diff": "Diff.",
         "orByHand": "ou saisir à la main",
         "vario": {
-            "legendLabel": "Couleur de la trace : bleu descente, rouge montée",
+            "legendLabel": "Couleur de la trace : bleu descente, vert palier, rouge ascendance",
             "scrubLabel": "Position dans le vol",
-            "strongSink": "Forte descente",
             "sink": "Descente",
-            "neutral": "Constant",
-            "climb": "Montée",
-            "strongClimb": "Forte montée"
+            "climb": "Montée"
         },
         "importIgc": "Importer un fichier IGC",
         "importIgcHint": "Remplit la date, le trajet, le temps et la distance",

@@ -167,13 +167,10 @@
         "placeFlightCountOne": "1 volo",
         "orByHand": "oppure inserisci a mano",
         "vario": {
-            "legendLabel": "Colore traccia: blu discesa, rosso salita",
+            "legendLabel": "Colore della traccia: blu discesa, verde costante, rosso salita",
             "scrubLabel": "Posizione nel volo",
-            "strongSink": "Forte discesa",
             "sink": "Discesa",
-            "neutral": "Costante",
-            "climb": "Salita",
-            "strongClimb": "Forte salita"
+            "climb": "Salita"
         }
     },
     "statistics": {

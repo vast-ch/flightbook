@@ -2,20 +2,12 @@
   <div class="map-frame">
     <div #mapEl class="igc-map"></div>
 
-    <!-- Diverging vario ramp: blue sink, gray neutral, red climb -->
+    <!-- The vario ramp as one bar, read from sinking on the left to climbing -->
     <div class="legend" role="img"
          [attr.aria-label]="'flight.vario.legendLabel' | translate">
-      <div class="legend__swatches">
-        @for (bin of varioBins; track bin.color) {
-          <span class="legend__swatch" [style.background]="bin.color"></span>
-        }
-      </div>
-      <div class="legend__scale">
-        <span>&minus;3</span>
-        <span>0</span>
-        <span>+3</span>
-        <span class="legend__unit">m/s</span>
-      </div>
+      <span class="legend__label">{{ 'flight.vario.sink' | translate }}</span>
+      <span class="legend__bar" [style.background]="varioGradient"></span>
+      <span class="legend__label">{{ 'flight.vario.climb' | translate }}</span>
     </div>
 
     <!-- Readout tracks the marker while scrubbing or replaying -->

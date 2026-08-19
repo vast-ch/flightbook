@@ -18,16 +18,23 @@ import { TranslateModule } from '@ngx-translate/core';
 import { IonRange, IonButton, IonIcon } from "@ionic/angular/standalone";
 import { addIcons } from 'ionicons';
 import { play, pause } from 'ionicons/icons';
-import { VARIO_BINS, varioBinIndex } from './vario-ramp';
+import { VARIO_STEPS, varioGradientCss, varioStepColor, varioStepIndex } from './vario-ramp';
 
 /** Whole track replays in this many ms, regardless of flight length. */
 const REPLAY_DURATION_MS = 30000;
 
-/** Half-width, in fixes, of the moving average applied to raw vario. */
-const VARIO_SMOOTHING = 2;
+/**
+ * Half-width, in fixes, of the moving average applied to raw vario. Wider than
+ * the five colours it used to feed: at 24 ramp steps the colour changes every
+ * 0.4 m/s, so raw noise would break a steady thermal into a stack of runs.
+ */
+const VARIO_SMOOTHING = 3;
 
 /** How often the slider/readout bindings are refreshed during replay. */
 const BINDING_SYNC_MS = 100;
+
+/** Mid-ramp, for a track with no usable vario. */
+const NEUTRAL_STEP = Math.floor(VARIO_STEPS / 2);
 
 @Component({
     selector: 'fb-igc-map',
@@ -52,16 +59,20 @@ export class IgcMapComponent implements AfterViewInit, OnDestroy {
     sliderInfo: any;
     playing = false;
 
-    public readonly varioBins = VARIO_BINS;
+    public readonly varioGradient = varioGradientCss();
 
-    private styleCache: { [binIndex: number]: Style[] } = {};
-    /** Raw track: one feature, used for the time range and extent maths. */
+    private styleCache: { [step: number]: Style[] } = {};
+    /** Raw track: one feature, used for the time range, extent and casing. */
     private vectorSource = new VectorSource();
-    /** Same track split into per-vario-bin runs, for colouring. */
+    /** Same track split into runs of one ramp step, for colouring. */
     private varioSource = new VectorSource();
+    /** Take-off and landing dots. */
+    private endpointSource = new VectorSource();
     private vectorSourceOverlay = new VectorSource();
     private time: any;
+    private casingLayer: VectorLayer<any>;
     private vectorLayer: VectorLayer<any>;
+    private endpointLayer: VectorLayer<any>;
     private featureOverlay: VectorLayer<any>;
     private map: Map;
     private geometry: LineString;
@@ -123,9 +134,27 @@ export class IgcMapComponent implements AfterViewInit, OnDestroy {
     ) {
         this.vectorSource.on('addfeature', this.onAddfeature);
 
+        /*
+         * The casing is the whole track in one dark stroke on its own layer,
+         * not a second style per coloured run: runs are short now, and a
+         * per-run casing painted over the neighbour that was drawn before it,
+         * breaking the line into dashes.
+         */
+        this.casingLayer = new VectorLayer({
+            source: this.vectorSource,
+            style: new Style({
+                stroke: new Stroke({ color: 'rgba(12, 32, 48, 0.38)', width: 7 })
+            })
+        });
+
         this.vectorLayer = new VectorLayer({
             source: this.varioSource,
             style: this.styleFunction,
+        });
+
+        this.endpointLayer = new VectorLayer({
+            source: this.endpointSource,
+            style: this.endpointStyle,
         });
 
         addIcons({ play, pause });
@@ -322,8 +351,9 @@ export class IgcMapComponent implements AfterViewInit, OnDestroy {
         if (fixes.length < 2 || !this.geometry) {
             // No usable vario - fall back to drawing the raw track.
             this.varioSource.addFeatures(
-                this.geometry ? [new Feature({ geometry: this.geometry, varioBin: 2 })] : []
+                this.geometry ? [new Feature({ geometry: this.geometry, varioStep: NEUTRAL_STEP })] : []
             );
+            this.buildEndpoints();
             return;
         }
 
@@ -352,44 +382,63 @@ export class IgcMapComponent implements AfterViewInit, OnDestroy {
 
         const limit = Math.min(coordinates.length, smoothed.length);
         let runStart = 0;
-        let runBin = varioBinIndex(smoothed[0]);
+        let runStep = varioStepIndex(smoothed[0]);
 
         for (let i = 1; i < limit; i++) {
-            const bin = varioBinIndex(smoothed[i]);
-            if (bin !== runBin) {
+            const step = varioStepIndex(smoothed[i]);
+            if (step !== runStep) {
                 // Include the current point so runs join seamlessly.
-                this.addVarioRun(coordinates.slice(runStart, i + 1), runBin);
+                this.addVarioRun(coordinates.slice(runStart, i + 1), runStep);
                 runStart = i;
-                runBin = bin;
+                runStep = step;
             }
         }
-        this.addVarioRun(coordinates.slice(runStart, limit), runBin);
+        this.addVarioRun(coordinates.slice(runStart, limit), runStep);
+
+        this.buildEndpoints();
     }
 
-    private addVarioRun(coordinates: number[][], binIndex: number) {
+    private addVarioRun(coordinates: number[][], step: number) {
         if (coordinates.length < 2) {
             return;
         }
         this.varioSource.addFeature(new Feature({
             geometry: new LineString(coordinates),
-            varioBin: binIndex
+            varioStep: step
         }));
     }
 
+    /** Where the track starts and where it ends, as the two dots on the map. */
+    private buildEndpoints() {
+        this.endpointSource.clear();
+        if (!this.geometry) {
+            return;
+        }
+        this.endpointSource.addFeatures([
+            new Feature({ geometry: new Point(this.geometry.getFirstCoordinate()), endpoint: 'start' }),
+            new Feature({ geometry: new Point(this.geometry.getLastCoordinate()), endpoint: 'end' })
+        ]);
+    }
+
     private styleFunction = (feature: any) => {
-        const binIndex: number = feature.get('varioBin') ?? 2;
-        let style = this.styleCache[binIndex];
+        const step: number = feature.get('varioStep') ?? NEUTRAL_STEP;
+        let style = this.styleCache[step];
         if (!style) {
-            // White casing under the colour: the ramp's mid steps sit below 3:1
-            // on a light basemap, and the track crosses very mixed terrain.
-            style = [
-                new Style({ stroke: new Stroke({ color: 'rgba(255,255,255,0.9)', width: 6 }) }),
-                new Style({ stroke: new Stroke({ color: VARIO_BINS[binIndex].color, width: 3 }) })
-            ];
-            this.styleCache[binIndex] = style;
+            // Colour only - .casingLayer carries the track's outline for all
+            // of the runs at once, one layer below this one.
+            style = [new Style({ stroke: new Stroke({ color: varioStepColor(step), width: 3.4 }) })];
+            this.styleCache[step] = style;
         }
         return style;
     };
+
+    private endpointStyle = (feature: any) => new Style({
+        image: new CircleStyle({
+            radius: 6,
+            fill: new Fill({ color: feature.get('endpoint') === 'start' ? '#22a95c' : '#e0483a' }),
+            stroke: new Stroke({ color: '#ffffff', width: 2.5 })
+        })
+    });
 
     private async initMap() {
         const config = await firstValueFrom(this.configurationService.getMapConfiguration());
@@ -415,7 +464,7 @@ export class IgcMapComponent implements AfterViewInit, OnDestroy {
         if (relief) {
             layers.push(relief);
         }
-        layers.push(this.vectorLayer);
+        layers.push(this.casingLayer, this.vectorLayer, this.endpointLayer);
 
         this.map = new Map({
             layers,

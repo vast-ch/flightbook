@@ -167,13 +167,10 @@
         "placeFlightCountOne": "1 flight",
         "orByHand": "or enter it by hand",
         "vario": {
-            "legendLabel": "Track colour: blue sinking, red climbing",
+            "legendLabel": "Track colour: blue sinking, green level, red climbing",
             "scrubLabel": "Flight position",
-            "strongSink": "Strong sink",
             "sink": "Sink",
-            "neutral": "Level",
-            "climb": "Climb",
-            "strongClimb": "Strong climb"
+            "climb": "Climb"
         }
     },
     "statistics": {
