@@ -143,17 +143,22 @@
         </div>
       </div>
 
-      <!-- Cumulative airtime, on the inverted surface -->
-      <div class="cumulative">
-        <div class="cumulative__head">
-          <span class="cumulative__title">{{ 'statistics.cumulativeAirtime' | translate }}</span>
-          <span class="cumulative__total">{{ totalAirtime() }}</span>
-        </div>
+      <!--
+        Cumulative airtime, on the inverted surface. A season with a single month
+        of flights has no line to draw, and its airtime is in the headline card
+        above anyway, so the whole card stands down rather than showing a
+        title over an empty box.
+      -->
+      @if (cumulative().length > 1) {
+        <div class="cumulative">
+          <div class="cumulative__head">
+            <span class="cumulative__title">{{ 'statistics.cumulativeAirtime' | translate }}</span>
+            <span class="cumulative__total">{{ totalAirtime() }}</span>
+          </div>
 
-        <fb-cumulative-chart [points]="cumulative()"
-                             [highlightYear]="period() === ALL_TIME ? null : period()"></fb-cumulative-chart>
+          <fb-cumulative-chart [points]="cumulative()"
+                               [highlightYear]="period() === ALL_TIME ? null : period()"></fb-cumulative-chart>
 
-        @if (cumulative().length > 1) {
           <!-- Ends, with what the line is showing between them -->
           <div class="cumulative__axis">
             <span>{{ cumulative()[0].label }}</span>
@@ -161,13 +166,13 @@
               @if (period() === ALL_TIME) {
                 {{ 'statistics.totalAirtime' | translate }}
               } @else {
-                {{ 'statistics.seasonHighlighted' | translate:{ year: period() } }}
+                {{ 'statistics.seasonLine' | translate:{ year: period() } }}
               }
             </span>
             <span>{{ cumulative()[cumulative().length - 1].label }}</span>
           </div>
-        }
-      </div>
+        </div>
+      }
 
       <!-- Personal bests -->
       <div class="fb-section-label stat-section-label">{{ 'statistics.personalBests' | translate }}</div>

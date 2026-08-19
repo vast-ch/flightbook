@@ -214,7 +214,7 @@
         "flightCount": "{{count}} vols",
         "seasonCount": "{{count}} saisons",
         "totalAirtime": "Temps de vol total",
-        "seasonHighlighted": "{{year}} en évidence",
+        "seasonLine": "Saison {{year}}",
         "less": "Moins",
         "more": "Plus",
         "cumulativeAirtime": "Temps de vol cumulé",

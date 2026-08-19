@@ -442,10 +442,12 @@ export class StatisticStore {
     public cumulative = computed<CumulativePoint[]>(() => {
         // Read as a signal so the axis labels re-render on a language switch.
         const lang = this.languageService.lang();
-        // Always the whole logbook, whatever the period: the design puts the
-        // selected season in context by highlighting its stretch of the line,
-        // which a chart cut down to that season could not show.
+        // Scoped to the period, because the card's total is: the head shows the
+        // season's airtime, so a line running to the all-time total - under
+        // axis ends naming seasons that total never covered - contradicted it.
+        const period = this.period();
         const rows = [...this.state().monthly]
+            .filter(row => period === ALL_TIME || row.year === period)
             .sort((a, b) => (a.year + a.month).localeCompare(b.year + b.month));
 
         let running = 0;

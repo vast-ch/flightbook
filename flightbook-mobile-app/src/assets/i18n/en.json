@@ -214,7 +214,7 @@
         "flightCount": "{{count}} flights",
         "seasonCount": "{{count}} seasons",
         "totalAirtime": "Total airtime",
-        "seasonHighlighted": "{{year}} highlighted",
+        "seasonLine": "Season {{year}}",
         "less": "Less",
         "more": "More",
         "cumulativeAirtime": "Cumulative airtime",
