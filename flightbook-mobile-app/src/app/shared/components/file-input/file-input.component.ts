@@ -1,17 +1,17 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
-import { AlertController, IonButton, IonIcon } from '@ionic/angular/standalone';
+import { AlertController, IonIcon } from '@ionic/angular/standalone';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { v4 as uuidv4 } from 'uuid';
 import { FilePicker, PickedFile } from '@capawesome/capacitor-file-picker';
 import { addIcons } from "ionicons";
-import { document, cloudUploadOutline } from "ionicons/icons";
+import { cloudUploadOutline } from "ionicons/icons";
 
 @Component({
     selector: 'fb-file-input',
     templateUrl: 'file-input.component.html',
     styleUrls: ['file-input.component.scss'],
-    imports: [IonButton, IonIcon, TranslateModule]
+    imports: [IonIcon, TranslateModule]
 })
 export class FileInputComponent implements OnInit {
 
@@ -21,12 +21,12 @@ export class FileInputComponent implements OnInit {
     @Input()
     multiple = false;
 
-    /**
-     * 'button' keeps the original compact button (used by imports/multiple-igc).
-     * 'card' renders the redesigned full-width import call-to-action.
-     */
+    /* The card's copy, so a caller importing many files can say so */
     @Input()
-    appearance: 'button' | 'card' = 'button';
+    titleKey = 'flight.importIgc';
+
+    @Input()
+    hintKey = 'flight.importIgcHint';
 
     progress = 0;
 
@@ -44,7 +44,7 @@ export class FileInputComponent implements OnInit {
         if (Capacitor.getPlatform() == "ios") {
             this.isIos = true;
         }
-        addIcons({ document, cloudUploadOutline });
+        addIcons({ cloudUploadOutline });
     }
 
     ngOnInit() {

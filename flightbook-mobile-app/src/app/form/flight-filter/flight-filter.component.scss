@@ -119,6 +119,38 @@
     }
 }
 
+// ---- Glider -------------------------------------------------------------
+// The same bordered box as From / To above and the description field below, so
+// the dropdown reads as one of this sheet's controls. The token rules for
+// ion-select are scoped to .fb-row, which the sheet does not use.
+.filter-select {
+    margin-top: 9px;
+    padding: 0 13px;
+    border: 1px solid var(--fb-border);
+    border-radius: 10px;
+    background: var(--fb-surface);
+
+    ion-select {
+        --padding-start: 0;
+        --padding-end: 0;
+        // Matches the height of the description box beside it: 12px of padding
+        // either side of a ~21px line.
+        min-height: 45px;
+        width: 100%;
+
+        &::part(text) {
+            font-size: 13.5px;
+            font-weight: 500;
+            color: var(--fb-text);
+        }
+
+        &::part(icon) {
+            color: var(--fb-text-muted);
+            opacity: 1;
+        }
+    }
+}
+
 // ---- Description --------------------------------------------------------
 .filter-search {
     display: flex;

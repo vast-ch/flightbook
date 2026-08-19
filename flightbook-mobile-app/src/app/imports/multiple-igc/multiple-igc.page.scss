@@ -1,7 +1,116 @@
-.info {
-    margin-right: 8px;
+// .form-header*, .form-body, .form-footer, .list-block, .row-date and
+// .icon-button live in theme/tokens.scss.
+
+// The file card owns the body padding; the staged rows are full-bleed, so the
+// heading between them sits in the gutter on its own.
+.igc-heading {
+  padding: 6px var(--fb-gutter) 8px;
 }
 
-.loadingSpinner {
-    width: 100%;
+// ---- Row ----------------------------------------------------------------
+.igc-row {
+  --padding-start: 0;
+  --inner-padding-end: 0;
+  --background: var(--fb-surface);
+  --min-height: 0;
+
+  // Separator between siblings only, so the last row never doubles up with the
+  // block's own bottom border. @for leaves comment anchors, not elements, so
+  // the adjacent-sibling combinator still pairs consecutive rows.
+  & + & {
+    border-top: 1px solid var(--fb-hairline);
+  }
+}
+
+.igc-row__inner {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  width: 100%;
+  padding: 15px var(--fb-gutter);
+}
+
+.igc-row__main {
+  flex: 1;
+  min-width: 0;
+}
+
+.igc-row__place {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--fb-text);
+}
+
+.igc-row__meta {
+  display: flex;
+  gap: 14px;
+  margin-top: 7px;
+  font-size: 11.5px;
+  color: var(--fb-text-secondary);
+
+  .is-muted {
+    color: var(--fb-text-muted);
+  }
+}
+
+// The glider picker is the one editable field on the row, so it gets its own
+// line rather than competing with the place for the row's width.
+.igc-row__glider {
+  margin-top: 4px;
+}
+
+/*
+ * The ion-select lives inside fb-glider-select's template, so an emulated-
+ * encapsulation rule from this sheet never reaches it. Restyled from the
+ * outside rather than changed, since the flight form renders the same control
+ * in its own context - same approach as account-data's .account-phone block.
+ */
+:host ::ng-deep .igc-row__glider ion-select {
+  --padding-start: 0;
+  --padding-end: 0;
+  min-height: 0;
+  width: 100%;
+  font-size: 12px;
+  color: var(--fb-text-body);
+
+  &::part(text) {
+    font-size: 12px;
+  }
+}
+
+.igc-row__state {
+  flex: none;
+  margin-top: 8px;
+  font-size: 18px;
+
+  &.is-saved {
+    color: var(--fb-success-text);
+  }
+
+  &.is-error {
+    color: var(--fb-danger-text);
+  }
+}
+
+// A row still being parsed has no content to lay out yet. The spinner keeps its
+// natural size inside a padded wrapper: ion-spinner positions its svg
+// absolutely, so padding on the spinner itself would be painted straight over.
+.igc-row__loading {
+  display: flex;
+  width: 100%;
+  padding: 15px var(--fb-gutter);
+}
+
+// Dropping a staged flight is immediate and cannot be undone, so the control
+// says so - .icon-button is otherwise the same neutral square as the back arrow.
+.igc-row__delete {
+  border-color: var(--fb-danger-border);
+
+  ion-icon {
+    color: var(--fb-danger-text);
+  }
 }

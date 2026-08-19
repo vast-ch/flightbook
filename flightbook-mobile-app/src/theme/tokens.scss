@@ -948,6 +948,61 @@ button.fb-row {
 }
 
 /*
+ * Import call-to-action — a tinted, bordered button that opens the file picker.
+ * Shared by fb-file-input (the flight forms and imports/igc) and imports/data,
+ * which picks its own file type and so cannot use that component.
+ */
+.import-card {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  width: 100%;
+  margin: 0;
+  padding: 15px 17px;
+  border: 1px solid var(--fb-accent);
+  border-radius: var(--fb-radius);
+  background: var(--fb-accent-soft);
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+}
+
+.import-card__icon {
+  flex: none;
+  font-size: 20px;
+  color: var(--ion-color-primary);
+}
+
+.import-card__text {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.import-card__title {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ion-color-tertiary);
+}
+
+.import-card__hint {
+  font-size: 11.5px;
+  color: #37698c;
+  text-wrap: pretty;
+}
+
+/* The picked file's name, shown in place of the hint once one is chosen */
+.import-card__file {
+  overflow: hidden;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: #37698c;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/*
  * Stacked-label field rows — a micro-label above the value, as opposed to
  * .fb-row's side labels. Used by the signed-out screens, where every row is a
  * free-text entry and a side label would leave no room for the value.

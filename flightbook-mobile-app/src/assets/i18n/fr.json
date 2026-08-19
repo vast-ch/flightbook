@@ -231,7 +231,13 @@
         "result": "Résultat",
         "inserted": "Inséré",
         "updated": "Mis à jour",
-        "existed": "Existant"
+        "existed": "Existant",
+        "format": "Format",
+        "chooseFile": "Choisir un fichier {{fileType}}",
+        "igcCard": "Importer des fichiers IGC",
+        "igcCardHint": "Plusieurs à la fois - la date, le trajet, le temps et la distance sont remplis",
+        "staged": "{{count}} vols prêts",
+        "stagedOne": "1 vol prêt"
     },
     "emptylist": "Cette liste est vide",
     "months": {
