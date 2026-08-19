@@ -11,6 +11,12 @@ import { PassengerConfirmation } from './domain/passenger-confirmation.model';
  * as "2024-01-01", so normalising on the way in leaves every consumer - the
  * list, its month headings, the detail sheet, the export - one shape to read.
  *
+ * The day is recoverable from the string because the API declares @Type(() =>
+ * Date) over a `date` column: the instant is always UTC midnight, whatever zone
+ * the API host runs in. Should that DTO ever send a real instant instead, this
+ * has to parse rather than cut - and the day the DTO strips the time itself,
+ * the guard below makes this a no-op.
+ *
  * The cast is the model's fault, not this function's: `date` is declared
  * `Date` while JSON only ever delivers a string.
  */

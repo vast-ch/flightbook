@@ -33,8 +33,6 @@ export interface CumulativePoint {
     label: string;
     /** Cumulative seconds up to and including this month. */
     seconds: number;
-    /** Which season this month belongs to, so one can be highlighted. */
-    year: string;
 }
 
 /** One season: the year, its totals, and flights per calendar month. */
@@ -457,8 +455,7 @@ export class StatisticStore {
             const date = new Date(Number(row.year), Number(row.month) - 1, 1);
             return {
                 label: date.toLocaleDateString(lang, { month: 'short', year: 'numeric' }),
-                seconds: running,
-                year: row.year
+                seconds: running
             };
         });
     });

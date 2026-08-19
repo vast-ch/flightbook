@@ -16,8 +16,9 @@ export const VARIO_MAX = 5;
 
 /**
  * The track is drawn as runs of one colour, so the ramp is quantised: enough
- * steps to read as a gradient, few enough that a two-hour flight is a few
- * hundred line features rather than a few thousand.
+ * steps to read as a gradient, few enough to stay in the low thousands of line
+ * features on a long flight - a two-hour one lands around 1500. Raise this and
+ * the replay is what pays for it, a frame redrawing every run.
  */
 export const VARIO_STEPS = 24;
 

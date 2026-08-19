@@ -157,7 +157,7 @@
           </div>
 
           <fb-cumulative-chart [points]="cumulative()"
-                               [highlightYear]="period() === ALL_TIME ? null : period()"></fb-cumulative-chart>
+                               [highlighted]="period() !== ALL_TIME"></fb-cumulative-chart>
 
           <!-- Ends, with what the line is showing between them -->
           <div class="cumulative__axis">

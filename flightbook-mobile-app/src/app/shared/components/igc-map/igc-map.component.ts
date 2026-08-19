@@ -340,9 +340,10 @@ export class IgcMapComponent implements AfterViewInit, OnDestroy {
     }
 
     /**
-     * Split the track into runs of constant vario bin, so the line can be drawn
-     * in climb/sink colours. Consecutive fixes in the same bin collapse into one
-     * LineString, which turns ~10k fixes into a few hundred features.
+     * Split the track into runs of one ramp step, so the line can be drawn in
+     * climb/sink colours. Consecutive fixes on the same step collapse into one
+     * LineString - on the order of 1500 features for a two-hour flight, each
+     * carrying a single stroke now that the casing is its own layer.
      */
     private buildVarioTrack() {
         this.varioSource.clear();
@@ -432,9 +433,13 @@ export class IgcMapComponent implements AfterViewInit, OnDestroy {
         return style;
     };
 
+    /*
+     * A shade larger than the replay marker, which rests exactly on the take-off
+     * dot at position zero - at the same radius it hid it until the pilot scrubbed.
+     */
     private endpointStyle = (feature: any) => new Style({
         image: new CircleStyle({
-            radius: 6,
+            radius: 8,
             fill: new Fill({ color: feature.get('endpoint') === 'start' ? '#22a95c' : '#e0483a' }),
             stroke: new Stroke({ color: '#ffffff', width: 2.5 })
         })
