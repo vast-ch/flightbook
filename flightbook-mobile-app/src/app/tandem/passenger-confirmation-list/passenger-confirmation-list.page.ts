@@ -50,11 +50,9 @@ export class PassengerConfirmationListPage implements OnInit, OnDestroy {
   public groupedConfirmations = computed(() => {
     const groups: { key: string; date: Date; confirmations: PassengerConfirmation[] }[] = [];
     for (const confirmation of this.passengerConfirmations()) {
-      // localDate, not new Date(): this endpoint sends a full ISO timestamp,
-      // which the Date constructor reads as UTC while the row's DatePipe reads
-      // it as local - so west of UTC the 1st of a month landed under the
-      // previous month's heading, next to rows the pipe had dated correctly.
-      const date = localDate(confirmation.date as unknown as string);
+      // localDate, not new Date(): the heading has to land in the same calendar
+      // day the row's DatePipe renders, whatever zone the device is in.
+      const date = localDate(confirmation.date);
       const key = `${date.getFullYear()}-${date.getMonth()}`;
       const last = groups[groups.length - 1];
       if (last && last.key === key) {

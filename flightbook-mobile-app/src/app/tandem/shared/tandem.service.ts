@@ -1,8 +1,26 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, firstValueFrom, Observable } from 'rxjs';
+import { BehaviorSubject, firstValueFrom, Observable, map } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { PassengerConfirmation } from './domain/passenger-confirmation.model';
+
+/**
+ * `date` is a calendar day, but this endpoint serialises it as UTC midnight
+ * ("2024-01-01T00:00:00.000Z"), and a DatePipe renders that instant in the
+ * device's zone - a day early for everyone west of UTC. Flights already arrive
+ * as "2024-01-01", so normalising on the way in leaves every consumer - the
+ * list, its month headings, the detail sheet, the export - one shape to read.
+ *
+ * The cast is the model's fault, not this function's: `date` is declared
+ * `Date` while JSON only ever delivers a string.
+ */
+function toCalendarDay(confirmation: PassengerConfirmation): PassengerConfirmation {
+  const date = confirmation.date as unknown;
+  if (typeof date !== 'string' || !date.includes('T')) {
+    return confirmation;
+  }
+  return { ...confirmation, date: date.substring(0, 10) as unknown as Date };
+}
 
 @Injectable({
   providedIn: 'root'
@@ -19,7 +37,8 @@ export class TandemService {
 
   getPassengerConfirmations({ limit = null, offset = null }: { limit?: number, offset?: number } = {}): Observable<PassengerConfirmation[]> {
     let params: HttpParams = this.createFilterParams(limit, offset);
-    return this.http.get<PassengerConfirmation[]>(`${environment.baseUrl}/passenger-confirmations`, { params });
+    return this.http.get<PassengerConfirmation[]>(`${environment.baseUrl}/passenger-confirmations`, { params })
+      .pipe(map(confirmations => confirmations.map(toCalendarDay)));
   }
 
   postPassengerConfirmations(passengerConfirmation: PassengerConfirmation): Observable<PassengerConfirmation> {

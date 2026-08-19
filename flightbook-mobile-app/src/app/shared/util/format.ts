@@ -27,20 +27,27 @@ export function splitDuration(seconds: number): { value: string; unit: string } 
 }
 
 /**
- * Parses a YYYY-MM-DD date from the API as local midnight.
+ * Reads the calendar day out of an API date and returns it as local midnight,
+ * so a month heading built from it agrees with the DatePipe rendering the row.
  *
  * `new Date('2025-01-01')` is parsed as UTC, so west of UTC it lands on the
  * previous day - while Angular's DatePipe parses the same string as local. Mix
  * the two on one screen and the row says 1 March under a February heading.
+ *
+ * Unreadable input yields an Invalid Date rather than a plausible one: the
+ * arithmetic form silently turned '' into the year 1900, because `Number('')`
+ * is 0 and `new Date(0, ...)` maps years 0-99 into the 1900s.
  */
-export function localDate(value: string): Date {
-    // The API is not consistent about this: a flight's date arrives as
-    // "2025-01-02", a passenger confirmation's as "2024-01-01T00:00:00.000Z".
-    // Splitting the timestamp on '-' alone left "01T00:00:00.000Z" as the day,
-    // which is NaN - and an Invalid Date thrown by a DatePipe takes the whole
-    // page's change detection with it. The calendar day is all this needs.
-    const [year, month, day] = String(value ?? '').split('T')[0].split('-').map(Number);
-    return new Date(year, (month ?? 1) - 1, day ?? 1);
+export function localDate(value: string | Date): Date {
+    if (value instanceof Date) {
+        return new Date(value.getFullYear(), value.getMonth(), value.getDate());
+    }
+    const match = /^(\d{4})(?:-(\d{1,2})(?:-(\d{1,2}))?)?/.exec(String(value ?? ''));
+    if (!match) {
+        return new Date(NaN);
+    }
+    const [, year, month, day] = match;
+    return new Date(Number(year), Number(month ?? 1) - 1, Number(day ?? 1));
 }
 
 /** Distance split the same way: no decimal once it stops fitting. */
