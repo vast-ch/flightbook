@@ -1,37 +1,30 @@
-<ion-header>
-    <ion-toolbar color='primary'>
-        <ion-title>{{ 'update.title' | translate }}</ion-title>
-    </ion-toolbar>
-</ion-header>
+<!--
+  No back or close affordance in the header: a forced update has nothing to
+  close to - the guard has already refused the route behind this - and an
+  optional one is dismissed by its own "later" button.
+-->
+<div class="form-header">
+  <h1 class="form-header__title">{{ 'update.title' | translate }}</h1>
+</div>
 
-<ion-content class="ion-padding">
-    <div class="update-content">
-        <div class="update-icon">
-            @if (isForceUpdate) {
-                <ion-icon name="alert-circle" color="danger" style="font-size: 64px;"></ion-icon>
-            } @else {
-                <ion-icon name="information-circle" color="primary" style="font-size: 64px;"></ion-icon>
-            }
-        </div>
-
-        <div class="update-message">
-            <p>{{ updateInfo?.message }}</p>
-        </div>
+<ion-content>
+  <div class="form-body update-body">
+    <div class="update-icon" [class.is-forced]="isForceUpdate" aria-hidden="true">
+      <ion-icon [name]="isForceUpdate ? 'alert-circle' : 'information-circle'"></ion-icon>
     </div>
+
+    <p class="update-message">{{ updateInfo?.message }}</p>
+  </div>
 </ion-content>
 
-<ion-footer>
-    <ion-toolbar>
-        <div class="button-container ion-padding">
-            <ion-button expand="block" [color]="isForceUpdate ? 'danger' : 'primary'" (click)="updateNow()">
-                {{ 'update.updateNow' | translate }}
-            </ion-button>
+<ion-footer class="form-footer update-footer">
+  <ion-button expand="block" [color]="isForceUpdate ? 'danger' : 'primary'" (click)="updateNow()">
+    {{ 'update.updateNow' | translate }}
+  </ion-button>
 
-            @if (isOptionalUpdate) {
-            <ion-button expand="block" fill="clear" (click)="dismiss()">
-                {{ 'update.later' | translate }}
-            </ion-button>
-            }
-        </div>
-    </ion-toolbar>
+  @if (isOptionalUpdate) {
+    <ion-button expand="block" fill="clear" (click)="dismiss()">
+      {{ 'update.later' | translate }}
+    </ion-button>
+  }
 </ion-footer>
