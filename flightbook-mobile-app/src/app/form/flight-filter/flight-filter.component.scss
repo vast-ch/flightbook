@@ -1,122 +1,12 @@
-// .fb-chip, .fb-chip-row, .fb-section-label and .form-footer live in
-// theme/tokens.scss. The modal shell is .flight-filter-class, also there,
-// because Ionic renders modals at the app root.
+// The sheet's head, body and date pair live in theme/tokens.scss with
+// .fb-chip, .fb-section-label and .form-footer - the appointment filter draws
+// them too. The modal shell is .fb-filter-sheet, also there, because Ionic
+// renders modals at the app root. Only this sheet's own controls are here.
 :host {
     display: flex;
     flex-direction: column;
     flex: 1;
     min-height: 0;
-}
-
-.filter-head {
-    flex: none;
-    padding: 8px 18px 14px;
-    background: var(--fb-surface);
-    border-radius: 18px 18px 0 0;
-    border-bottom: 1px solid var(--fb-border);
-}
-
-.filter-head__grabber {
-    width: 38px;
-    height: 4px;
-    margin: 0 auto 12px;
-    border-radius: 2px;
-    background: #c3ddee;
-}
-
-.filter-head__row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.filter-head__title {
-    flex: 1;
-    margin: 0;
-    font-size: 19px;
-    font-weight: 600;
-    line-height: 1.1;
-    letter-spacing: -0.02em;
-    color: var(--fb-text);
-}
-
-// Greyed until there is something to clear, as the design has it.
-.filter-head__clear {
-    flex: none;
-    padding: 0;
-    border: 0;
-    background: transparent;
-    font: inherit;
-    font-size: 12.5px;
-    font-weight: 600;
-    color: #a9b7c6;
-    cursor: default;
-
-    &.is-enabled {
-        color: var(--ion-color-primary);
-        cursor: pointer;
-    }
-}
-
-.filter-body {
-    flex: 1;
-    min-height: 0;
-    --background: var(--fb-bg);
-}
-
-.filter-scroll {
-    padding: 16px 18px 18px;
-}
-
-.filter-label {
-    display: block;
-    margin-top: 22px;
-}
-
-.filter-chips {
-    margin-top: 9px;
-}
-
-// ---- From / To ----------------------------------------------------------
-.filter-dates {
-    display: flex;
-    gap: 9px;
-    margin-top: 11px;
-}
-
-.filter-date {
-    flex: 1;
-    min-width: 0;
-    padding: 11px 13px;
-    appearance: none;
-    border: 1px solid var(--fb-border);
-    border-radius: 10px;
-    background: var(--fb-surface);
-    font: inherit;
-    text-align: left;
-    cursor: pointer;
-}
-
-.filter-date__label {
-    display: block;
-    font-size: 9.5px;
-    font-weight: 500;
-    line-height: 1;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--fb-text-secondary);
-}
-
-.filter-date__value {
-    display: block;
-    margin-top: 7px;
-    font-size: 13.5px;
-    font-weight: 500;
-    color: var(--fb-text);
-
-    &.is-placeholder {
-        color: var(--fb-placeholder);
-    }
 }
 
 // ---- Glider -------------------------------------------------------------

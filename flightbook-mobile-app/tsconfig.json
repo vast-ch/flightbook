@@ -1,13 +1,5 @@
 {
   "compileOnSave": false,
-  // archive/ holds pages the redesign retired. They are not built (the app
-  // project starts from src/main.ts) but with no `exclude` they still land in
-  // this project, where their moved-up relative imports and the chart plugins
-  // that went with them produce 20+ phantom errors in the editor and in
-  // `tsc --noEmit`.
-  "exclude": [
-    "archive"
-  ],
   "compilerOptions": {
     "baseUrl": "./",
     "outDir": "./dist/out-tsc",

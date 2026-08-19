@@ -5,7 +5,7 @@ import { HTTP_INTERCEPTORS, HttpClient, provideHttpClient, withInterceptorsFromD
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 
-import { IonicRouteStrategy, provideIonicAngular, IonApp, IonSplitPane, IonMenu, IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonMenuToggle, IonItem, IonRouterOutlet, isPlatform } from '@ionic/angular/standalone';
+import { IonicRouteStrategy, provideIonicAngular, IonApp, IonRouterOutlet, isPlatform } from '@ionic/angular/standalone';
 
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
@@ -58,15 +58,6 @@ function getIonicConfig() {
         AppRoutingModule,
         ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
         IonApp,
-        IonSplitPane,
-        IonMenu,
-        IonHeader,
-        IonToolbar,
-        IonTitle,
-        IonContent,
-        IonList,
-        IonMenuToggle,
-        IonItem,
         IonRouterOutlet
     ], providers: [
         { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },

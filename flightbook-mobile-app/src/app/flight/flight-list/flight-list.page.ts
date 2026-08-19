@@ -252,7 +252,7 @@ export class FlightListPage implements OnInit, OnDestroy {
     async openFilter() {
         const modal = await this.modalCtrl.create({
             component: FlightFilterComponent,
-            cssClass: 'flight-filter-class'
+            cssClass: 'fb-filter-sheet'
         });
 
         const revision = this.flightStore.revision();

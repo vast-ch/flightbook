@@ -485,15 +485,14 @@ export class AppointmentListPage implements OnInit, OnDestroy {
     async openFilter() {
         const modal = await this.modalCtrl.create({
             component: AppointmentFilterComponent,
-            cssClass: 'appointment-filter-class',
-            componentProps: {
-                infiniteScroll: this.infiniteScroll
-            }
+            cssClass: 'fb-filter-sheet'
         });
 
         modal.present();
+        // The sheet edits the shared filter as it goes and reports whether it
+        // touched anything, so opening and closing it untouched costs no fetch.
         const { role } = await modal.onWillDismiss();
-        if (role == "filter" || role == "clear") {
+        if (role === 'filter') {
             this.initialDataLoad();
         }
     }
