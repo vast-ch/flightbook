@@ -340,9 +340,15 @@
     }
 }
 
+/*
+ * min-width, not width: 32px is a hair under four digits at the larger text
+ * sizes iOS hands out, and the year then wrapped to two lines. Every year is
+ * four digits, so sizing to content keeps the sparklines aligned anyway.
+ */
 .season-row__year {
     flex: none;
-    width: 32px;
+    min-width: 32px;
+    white-space: nowrap;
     font-size: 13px;
     font-weight: 600;
     color: var(--fb-text);
