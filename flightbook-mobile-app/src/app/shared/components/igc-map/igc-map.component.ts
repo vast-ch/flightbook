@@ -19,6 +19,7 @@ import { IonRange, IonButton, IonIcon } from "@ionic/angular/standalone";
 import { addIcons } from 'ionicons';
 import { play, pause } from 'ionicons/icons';
 import { VARIO_STEPS, varioGradientCss, varioStepColor, varioStepIndex } from './vario-ramp';
+import { themeColor, withAlpha } from '../../util/theme-color';
 
 /** Whole track replays in this many ms, regardless of flight length. */
 const REPLAY_DURATION_MS = 30000;
@@ -35,6 +36,14 @@ const BINDING_SYNC_MS = 100;
 
 /** Mid-ramp, for a track with no usable vario. */
 const NEUTRAL_STEP = Math.floor(VARIO_STEPS / 2);
+
+/*
+ * Where the track begins and ends. Map colours rather than theme tokens, like
+ * the vario ramp: the theme's success and danger are text greens and reds, too
+ * dark to read as dots on aerial imagery.
+ */
+const TAKEOFF_COLOR = '#22a95c';
+const LANDING_COLOR = '#e0483a';
 
 @Component({
     selector: 'fb-igc-map',
@@ -143,7 +152,7 @@ export class IgcMapComponent implements AfterViewInit, OnDestroy {
         this.casingLayer = new VectorLayer({
             source: this.vectorSource,
             style: new Style({
-                stroke: new Stroke({ color: 'rgba(12, 32, 48, 0.38)', width: 7 })
+                stroke: new Stroke({ color: withAlpha(themeColor('--fb-text', '#10293c'), 0.38), width: 7 })
             })
         });
 
@@ -443,8 +452,8 @@ export class IgcMapComponent implements AfterViewInit, OnDestroy {
     private endpointStyle = (feature: any) => new Style({
         image: new CircleStyle({
             radius: 6,
-            fill: new Fill({ color: feature.get('endpoint') === 'start' ? '#22a95c' : '#e0483a' }),
-            stroke: new Stroke({ color: '#ffffff', width: 2.5 })
+            fill: new Fill({ color: feature.get('endpoint') === 'start' ? TAKEOFF_COLOR : LANDING_COLOR }),
+            stroke: new Stroke({ color: themeColor('--fb-surface', '#ffffff'), width: 2.5 })
         })
     });
 
@@ -492,10 +501,10 @@ export class IgcMapComponent implements AfterViewInit, OnDestroy {
                 image: new CircleStyle({
                     radius: 6,
                     fill: new Fill({
-                        color: '#10293c',
+                        color: themeColor('--fb-text', '#10293c'),
                     }),
                     stroke: new Stroke({
-                        color: '#ffffff',
+                        color: themeColor('--fb-surface', '#ffffff'),
                         width: 2.5
                     })
                 }),

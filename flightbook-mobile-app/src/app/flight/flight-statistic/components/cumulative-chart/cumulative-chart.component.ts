@@ -2,6 +2,7 @@ import { Component, Input, computed, signal } from '@angular/core';
 import { ChartConfiguration, ChartData } from 'chart.js';
 import { NgChartsModule } from 'ng2-charts';
 import { CumulativePoint } from '../../shared/statistic.store';
+import { themeColor, withAlpha } from 'src/app/shared/util/theme-color';
 
 /**
  * Cumulative airtime as a filled line on the inverted card.
@@ -41,16 +42,19 @@ export class CumulativeChartComponent {
          * callback, from when the season was a stretch of the whole run.
          */
         const highlighted = this.highlight();
+        const line = highlighted
+            ? themeColor('--fb-inverse-text', '#ffffff')
+            : themeColor('--fb-accent', '#45b1fd');
         return {
             labels: points.map(p => p.label),
             datasets: [
                 {
                     data: points.map(p => p.seconds / 3600),
-                    borderColor: highlighted ? '#ffffff' : '#45b1fd',
+                    borderColor: line,
                     borderWidth: highlighted ? 3.4 : 2.6,
                     // The wash goes with the line: a white stroke over the
                     // all-time blue read as two series in one chart.
-                    backgroundColor: highlighted ? 'rgba(255, 255, 255, 0.16)' : 'rgba(69, 177, 253, 0.22)',
+                    backgroundColor: withAlpha(line, highlighted ? 0.16 : 0.22),
                     fill: 'origin',
                     pointRadius: 0,
                     pointHoverRadius: 4,
@@ -79,9 +83,9 @@ export class CumulativeChartComponent {
             // nothing to switch off here.
             legend: { display: false },
             tooltip: {
-                backgroundColor: '#ffffff',
-                titleColor: '#10293c',
-                bodyColor: '#37556b',
+                backgroundColor: themeColor('--fb-surface', '#ffffff'),
+                titleColor: themeColor('--fb-text', '#10293c'),
+                bodyColor: themeColor('--fb-text-body', '#37556b'),
                 displayColors: false,
                 padding: 8,
                 callbacks: {

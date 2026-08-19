@@ -3,6 +3,7 @@ import { ChartConfiguration, ChartData } from 'chart.js';
 import { NgChartsModule } from 'ng2-charts';
 import { FlightStatistic } from '../../../flight/shared/flightStatistic.model';
 import { LanguageService } from '../../../shared/services/language.service';
+import { themeColor } from 'src/app/shared/util/theme-color';
 
 const MONTHS_SHOWN = 12;
 
@@ -79,7 +80,11 @@ export class ActivityChartComponent {
                     data: series.map(m => m.nbFlights),
                     // The busiest months get the solid accent, quieter ones a tint.
                     backgroundColor: series.map(m =>
-                        m.nbFlights === 0 ? '#e1ecf4' : (m.nbFlights >= peak ? '#45b1fd' : '#a7dafe')
+                        m.nbFlights === 0
+                            ? themeColor('--fb-track', '#e1ecf4')
+                            : (m.nbFlights >= peak
+                                ? themeColor('--fb-accent', '#45b1fd')
+                                : themeColor('--fb-accent-weak', '#a7dafe'))
                     ),
                     borderRadius: 2,
                     barPercentage: 0.72,
@@ -90,10 +95,10 @@ export class ActivityChartComponent {
                     type: 'line' as const,
                     label: 'airtime',
                     data: series.map(m => m.hours),
-                    borderColor: '#10293c',
+                    borderColor: themeColor('--fb-text', '#10293c'),
                     borderWidth: 1.6,
                     pointRadius: series.map(m => (m.hours > 0 ? 3 : 0)),
-                    pointBackgroundColor: '#10293c',
+                    pointBackgroundColor: themeColor('--fb-text', '#10293c'),
                     tension: 0,
                     yAxisID: 'airtime',
                     order: 1
@@ -116,7 +121,7 @@ export class ActivityChartComponent {
             // nothing to switch off here.
             legend: { display: false },
             tooltip: {
-                backgroundColor: '#10293c',
+                backgroundColor: themeColor('--fb-text', '#10293c'),
                 padding: 8,
                 displayColors: false,
                 callbacks: {
