@@ -48,12 +48,13 @@ export class CumulativeChartComponent {
                     data: points.map(p => p.seconds / 3600),
                     borderColor: highlighted ? '#ffffff' : '#45b1fd',
                     borderWidth: highlighted ? 3.4 : 2.6,
-                    backgroundColor: 'rgba(69, 177, 253, 0.22)',
+                    // The wash goes with the line: a white stroke over the
+                    // all-time blue read as two series in one chart.
+                    backgroundColor: highlighted ? 'rgba(255, 255, 255, 0.16)' : 'rgba(69, 177, 253, 0.22)',
                     fill: 'origin',
-                    tension: 0,
                     pointRadius: 0,
-                    // Mark only where the line ends.
-                    pointHoverRadius: 4
+                    pointHoverRadius: 4,
+                    tension: 0
                 }
             ]
         };
@@ -62,6 +63,13 @@ export class CumulativeChartComponent {
     public chartOptions: ChartConfiguration<'line'>['options'] = {
         responsive: true,
         maintainAspectRatio: false,
+        /*
+         * Chart.js defaults to hitting a point only where the touch intersects
+         * it, and every point here has radius 0 - so the tooltip was reachable
+         * within about a pixel, which on a phone is not at all. Index mode
+         * takes the nearest month on the x axis instead.
+         */
+        interaction: { mode: 'index', intersect: false },
         scales: {
             x: { display: false },
             y: { display: false, beginAtZero: true }

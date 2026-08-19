@@ -434,12 +434,15 @@ export class IgcMapComponent implements AfterViewInit, OnDestroy {
     };
 
     /*
-     * A shade larger than the replay marker, which rests exactly on the take-off
-     * dot at position zero - at the same radius it hid it until the pilot scrubbed.
+     * The replay marker covers whichever of these it sits on - it is drawn on an
+     * unmanaged layer, so it is always on top. That is the marker saying where
+     * the pilot is, and no radius short of a conspicuously large dot gets the
+     * fill out from under it: the marker is opaque to 7.25, and a dot of radius
+     * r only shows colour out to r - 1.25.
      */
     private endpointStyle = (feature: any) => new Style({
         image: new CircleStyle({
-            radius: 8,
+            radius: 6,
             fill: new Fill({ color: feature.get('endpoint') === 'start' ? '#22a95c' : '#e0483a' }),
             stroke: new Stroke({ color: '#ffffff', width: 2.5 })
         })
