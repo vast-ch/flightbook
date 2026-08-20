@@ -25,7 +25,9 @@ platform :ios do
       output_name: "Flightbook.ipa",
       export_options: {
         signingStyle: "automatic"
-      }
+      },
+      xcargs: "-allowProvisioningUpdates",
+      export_xcargs: "-allowProvisioningUpdates"
     )
 
     upload_to_testflight(
