@@ -36,8 +36,7 @@ platform :ios do
       export_options: {
         signingStyle: "automatic"
       },
-      xcargs: provisioning_xcargs,
-      export_xcargs: provisioning_xcargs
+      xcargs: provisioning_xcargs
     )
 
     upload_to_testflight(
