@@ -15,9 +15,12 @@ platform :ios do
       build_number: ENV["BUILD_NUMBER"]
     )
 
+    project_root = File.expand_path("..", Dir.pwd)
+    authentication_key_path = File.expand_path(ENV["APP_STORE_CONNECT_API_KEY_FILEPATH"], project_root)
+
     provisioning_xcargs = [
       "-allowProvisioningUpdates",
-      "-authenticationKeyPath #{File.expand_path(ENV['APP_STORE_CONNECT_API_KEY_FILEPATH'])}",
+      "-authenticationKeyPath #{authentication_key_path}",
       "-authenticationKeyID #{ENV['APP_STORE_CONNECT_API_KEY_ID']}",
       "-authenticationKeyIssuerID #{ENV['APP_STORE_CONNECT_API_ISSUER_ID']}"
     ].join(" ")
