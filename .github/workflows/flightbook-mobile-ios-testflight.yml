@@ -11,6 +11,8 @@ on:
 jobs:
   testflight:
     runs-on: macos-26
+    env:
+      BUNDLE_GEMFILE: ${{ github.workspace }}/flightbook-mobile-app/ios/App/Gemfile
     steps:
       - name: Checkout
         uses: actions/checkout@v6
