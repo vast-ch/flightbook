@@ -28,7 +28,7 @@ import { AppointmentTypeDto } from "../src/training/appointment/interface/appoin
 import { PassengerConfirmation } from "../src/tandem/passenger-confirmation/passenger-confirmation.entity";
 import { PassengerConfirmationDto } from "../src/tandem/passenger-confirmation/interface/passenger-confirmation-dto";
 import { TandemPilot } from "../src/training/tandem-pilot/tandem-pilot.entity";
-import { CustomFieldType } from "../src/training/school/domain/school-config";
+import { CustomFieldType } from "../src/shared/domain/custom-field";
 
 export class Testdata {
     public static EMAIL = "test@user.com";

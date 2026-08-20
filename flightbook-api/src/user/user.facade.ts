@@ -122,10 +122,7 @@ export class UserFacade {
         user.lastname = userWriteDto.lastname;
         user.phone = userWriteDto.phone;
 
-        user.config = plainToClass(UserConfig, userWriteDto.config);
-        if (user.config && Object.keys(user.config).length === 0) {
-            user.config = null;
-        }
+        user.mergeConfiguration(plainToClass(UserConfig, userWriteDto.config));
 
         if (user.keycloakId) {
             await this.keycloakService.updateUser(user.keycloakId, user);

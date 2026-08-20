@@ -26,6 +26,8 @@ import { SchoolRepository } from '../training/school/school.repository';
 import { TandemSchoolPaymentState } from './domain/tandem-school-payment-state';
 import { TandemSchoolData } from './domain/tandem-school-data.entity';
 import { TandemSchoolDataDto } from './interface/tandem-school-data-dto';
+import { CustomFieldDefinition, CustomFieldType } from '../shared/domain/custom-field';
+import { CustomValue } from './domain/custom-value';
 
 @Injectable()
 export class FlightFacade {
@@ -120,7 +122,8 @@ export class FlightFacade {
             if (flightDto.tandemSchoolData?.schoolCustomValues) {
                 this.validateCustomValues(
                     flightDto.tandemSchoolData.schoolCustomValues,
-                    flight.tandemSchoolData.tandemSchool
+                    flight.tandemSchoolData.tandemSchool.configuration?.tandemModule?.flightConfig?.customFields,
+                    'school'
                 );
             }
             
@@ -129,6 +132,18 @@ export class FlightFacade {
             flight.tandemSchoolData.paymentState = null;
             flight.tandemSchoolData.paymentTimestamp = null;
             flight.tandemSchoolData.instructor = null;
+        }
+
+        // Validate userCustomValues against user configuration
+        if (flightDto.userCustomValues && flightDto.userCustomValues.length > 0) {
+            this.validateCustomValues(
+                flightDto.userCustomValues,
+                user.config?.flightConfig?.customFields,
+                'user'
+            );
+            flight.userCustomValues = flightDto.userCustomValues;
+        } else {
+            flight.userCustomValues = null;
         }
 
         const flightResp: Flight = await this.flightRepository.save(flight);
@@ -175,16 +190,32 @@ export class FlightFacade {
         }
 
         // Handle schoolCustomValues update or removal
-        if (flightDto.tandemSchoolData?.schoolCustomValues && flight.tandemSchoolData?.tandemSchool) {
+        if (flightDto.tandemSchoolData?.schoolCustomValues && flightDto.tandemSchoolData.schoolCustomValues.length > 0 && flight.tandemSchoolData?.tandemSchool) {
             this.validateCustomValues(
                 flightDto.tandemSchoolData.schoolCustomValues,
-                flight.tandemSchoolData.tandemSchool
+                flight.tandemSchoolData.tandemSchool.configuration?.tandemModule?.flightConfig?.customFields,
+                'school'
             );
             // Assign validated custom values to flight
             flight.tandemSchoolData.schoolCustomValues = flightDto.tandemSchoolData.schoolCustomValues;
         } else if (flightDto.tandemSchoolData && Array.isArray(flightDto.tandemSchoolData.schoolCustomValues) && flightDto.tandemSchoolData.schoolCustomValues.length === 0) {
-            // Explicitly clear schoolCustomValues when set to empty array
-            flight.tandemSchoolData.schoolCustomValues = [];
+            // Explicitly clear schoolCustomValues when set to null instead of empty array
+            flight.tandemSchoolData.schoolCustomValues = null;
+        }
+
+        // Handle userCustomValues update or removal
+        if (flightDto.userCustomValues && flightDto.userCustomValues.length > 0) {
+            const user: User = await this.userRepository.getUserById(token.userId);
+            this.validateCustomValues(
+                flightDto.userCustomValues,
+                user.config?.flightConfig?.customFields,
+                'user'
+            );
+            // Assign validated custom values to flight
+            flight.userCustomValues = flightDto.userCustomValues;
+        } else if (Array.isArray(flightDto.userCustomValues) && flightDto.userCustomValues.length === 0) {
+            // Explicitly clear userCustomValues when set to null instead of empty array
+            flight.userCustomValues = null;
         }
 
         const flightResp: Flight = await this.flightRepository.save(flight);
@@ -344,18 +375,15 @@ export class FlightFacade {
         return plainToClass(FlightDto, flightResp);
     }
 
-    private validateCustomValues(customValues: any[], school: School): void {
-        const flightConfig = school.configuration?.tandemModule?.flightConfig;
-        
-        if (!flightConfig || !flightConfig.customFields || flightConfig.customFields.length === 0) {
-            // School has no custom fields configured, reject any custom values
+    private validateCustomValues(customValues: CustomValue[], fieldDefinitions: CustomFieldDefinition[] | undefined, scope: 'school' | 'user'): void {
+        if (!fieldDefinitions || fieldDefinitions.length === 0) {
+            // No custom fields configured, reject any custom values
             if (customValues && customValues.length > 0) {
-                FlightException.invalidCustomFieldKeyException(customValues[0].key);
+                FlightException.invalidCustomFieldKeyException(customValues[0].key, scope);
             }
             return;
         }
 
-        const fieldDefinitions = flightConfig.customFields;
         const activeFields = fieldDefinitions.filter(f => !f.disabled);
         
         // Check all provided values have valid keys
@@ -363,7 +391,7 @@ export class FlightFacade {
             const fieldDef = fieldDefinitions.find(f => f.key === customValue.key);
             
             if (!fieldDef) {
-                FlightException.invalidCustomFieldKeyException(customValue.key);
+                FlightException.invalidCustomFieldKeyException(customValue.key, scope);
             }
             
             // Only validate active fields
@@ -372,7 +400,7 @@ export class FlightFacade {
                 this.validateCustomValueType(customValue, fieldDef);
                 
                 // Dropdown options validation
-                if (fieldDef.type === 'dropdown' && fieldDef.options) {
+                if (fieldDef.type === CustomFieldType.DROPDOWN && fieldDef.options) {
                     if (!fieldDef.options.includes(customValue.value)) {
                         FlightException.invalidDropdownValueException(customValue.key, customValue.value, fieldDef.options);
                     }
@@ -389,28 +417,28 @@ export class FlightFacade {
         }
     }
 
-    private validateCustomValueType(customValue: any, fieldDef: any): void {
+    private validateCustomValueType(customValue: CustomValue, fieldDef: CustomFieldDefinition): void {
         const value = customValue.value;
         const type = fieldDef.type;
         
         switch (type) {
-            case 'text':
-            case 'dropdown':
+            case CustomFieldType.TEXT:
+            case CustomFieldType.DROPDOWN:
                 if (typeof value !== 'string') {
                     FlightException.invalidCustomFieldTypeException(fieldDef.key, type, value);
                 }
                 break;
-            case 'number':
+            case CustomFieldType.NUMBER:
                 if (typeof value !== 'number') {
                     FlightException.invalidCustomFieldTypeException(fieldDef.key, type, value);
                 }
                 break;
-            case 'boolean':
+            case CustomFieldType.BOOLEAN:
                 if (typeof value !== 'boolean') {
                     FlightException.invalidCustomFieldTypeException(fieldDef.key, type, value);
                 }
                 break;
-            case 'date':
+            case CustomFieldType.DATE:
                 // Accept string dates (ISO format)
                 if (typeof value !== 'string' || isNaN(Date.parse(value))) {
                     FlightException.invalidCustomFieldTypeException(fieldDef.key, type, value);

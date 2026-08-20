@@ -5,6 +5,7 @@ import { User } from "../../user/domain/user.entity";
 import { Igc } from "../interface/igc";
 import { FlightValidation } from "../flight-validation.entity";
 import { TandemSchoolData } from "./tandem-school-data.entity";
+import { CustomValue } from "./custom-value";
 
 @Index("idx_16389_glider_id", ["gliderId"], {})
 @Index("idx_16586_glider_id", ["gliderId"], {})
@@ -97,4 +98,7 @@ export class Flight {
 
   @Column(() => TandemSchoolData, { prefix: false })
   tandemSchoolData: TandemSchoolData;
+
+  @Column("jsonb", { name: "user_custom_values", nullable: true })
+  userCustomValues: CustomValue[] | null;
 }

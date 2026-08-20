@@ -22,8 +22,8 @@ export class FlightException {
         throw new BadRequestException("Cannot set schoolCustomValues without specifying tandemSchool");
     }
 
-    public static invalidCustomFieldKeyException(key: string) {
-        throw new BadRequestException(`Custom field key '${key}' is not defined in school configuration`);
+    public static invalidCustomFieldKeyException(key: string, scope: 'school' | 'user' = 'school') {
+        throw new BadRequestException(`Custom field key '${key}' is not defined in ${scope} configuration`);
     }
 
     public static requiredCustomFieldMissingException(key: string) {

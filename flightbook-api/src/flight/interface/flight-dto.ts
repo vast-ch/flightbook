@@ -7,6 +7,7 @@ import { Igc } from "./igc";
 import { FlightValidationDto } from "./flight-validation-dto";
 import { TandemSchoolDataDto } from "./tandem-school-data-dto";
 import { UserReadDto } from "../../user/interface/user-read-dto";
+import { CustomValueDto } from "./custom-value-dto";
 
 @Exclude()
 export class FlightDto {
@@ -67,6 +68,11 @@ export class FlightDto {
     @Expose()
     @Type(() => TandemSchoolDataDto)
     readonly tandemSchoolData: TandemSchoolDataDto;
+
+    @ApiPropertyOptional({ type: [CustomValueDto] })
+    @Expose()
+    @Type(() => CustomValueDto)
+    readonly userCustomValues?: CustomValueDto[];
     
     @ApiPropertyOptional()
     @Expose()

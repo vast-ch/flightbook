@@ -40,6 +40,7 @@ exports[`Flights (e2e) /flights (POST) 1`] = `
     "schoolCustomValues": null,
   },
   "time": "01:30",
+  "userCustomValues": null,
   "validation": {
     "comment": null,
     "state": null,
@@ -65,6 +66,7 @@ exports[`Flights (e2e) /flights (POST) 2`] = `
   },
   "time": "01:30:00",
   "timestamp": {},
+  "userCustomValues": null,
   "userId": 1,
   "validation": {
     "comment": null,
@@ -147,6 +149,7 @@ exports[`Flights (e2e) /flights (PUT) 1`] = `
     "schoolCustomValues": null,
   },
   "time": "02:15",
+  "userCustomValues": null,
   "validation": {
     "comment": null,
     "state": null,
@@ -172,6 +175,7 @@ exports[`Flights (e2e) /flights (PUT) 2`] = `
   },
   "time": "02:15:00",
   "timestamp": {},
+  "userCustomValues": null,
   "userId": 1,
   "validation": {
     "comment": null,
@@ -225,6 +229,7 @@ exports[`Flights (e2e) /flights/:id (GET) 1`] = `
     "tandemSchool": null,
   },
   "time": "01:30:00",
+  "userCustomValues": null,
   "validation": {
     "comment": null,
     "instructor": null,
@@ -293,6 +298,7 @@ exports[`Instructor Flight Validation (e2e) /instructor/schools/:school_id/stude
     "tandemSchool": null,
   },
   "time": "01:30:00",
+  "userCustomValues": null,
   "validation": {
     "comment": "Validated",
     "instructor": {
@@ -395,6 +401,7 @@ exports[`V2 Flights (e2e) /v2/flights (GET) 1`] = `
         "notes": "notice",
       },
       "time": "01:30:00",
+      "userCustomValues": null,
     },
     {
       "date": "2025-01-02",
@@ -428,6 +435,7 @@ exports[`V2 Flights (e2e) /v2/flights (GET) 1`] = `
         "notes": "notice",
       },
       "time": "01:30:00",
+      "userCustomValues": null,
     },
     {
       "date": "2025-01-01",
@@ -461,6 +469,7 @@ exports[`V2 Flights (e2e) /v2/flights (GET) 1`] = `
         "notes": "notice",
       },
       "time": "01:30:00",
+      "userCustomValues": null,
     },
     {
       "date": "2025-01-01",
@@ -494,6 +503,7 @@ exports[`V2 Flights (e2e) /v2/flights (GET) 1`] = `
         "notes": "notice",
       },
       "time": "01:30:00",
+      "userCustomValues": null,
     },
   ],
   "itemCount": 4,

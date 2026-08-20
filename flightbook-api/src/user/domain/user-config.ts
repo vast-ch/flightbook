@@ -1,3 +1,5 @@
+import { FlightConfig } from "../../shared/domain/custom-field";
+
 export class UserConfig {
   preparation: {
     shvLinkDisabled: boolean;
@@ -9,4 +11,5 @@ export class UserConfig {
       appointment: boolean;
     };
   };
+  flightConfig?: FlightConfig;
 }

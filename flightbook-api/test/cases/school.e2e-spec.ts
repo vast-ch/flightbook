@@ -8,7 +8,7 @@ import { removeIds } from '../utils/snapshot-utils';
 import { EnrollmentWriteDto } from '../../src/training/enrollment/interface/enrollment-write-dto';
 import { EnrollmentType } from '../../src/training/enrollment/enrollment-type';
 import { TandemSchoolPaymentState } from '../../src/flight/domain/tandem-school-payment-state';
-import { CustomFieldType } from '../../src/training/school/domain/school-config';
+import { CustomFieldType } from '../../src/shared/domain/custom-field';
 
 describe('Schools (e2e)', () => {
   const testInstance = new BaseE2ETest();

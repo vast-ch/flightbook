@@ -79,7 +79,11 @@ export class FlightRepository extends Repository<Flight> {
                         }
                     } else {
                         const name = key.substring(7, key.length);
-                        data[name] = raw[key];
+                        if (name === 'user_custom_values') {
+                            data.userCustomValues = raw[key] as unknown as any[];
+                        } else {
+                            data[name] = raw[key];
+                        }
                     }
                 }
                 if (key.startsWith('glider')) {

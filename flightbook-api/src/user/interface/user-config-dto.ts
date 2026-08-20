@@ -1,6 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { Expose, Type } from "class-transformer";
 import { IsNotEmpty, IsOptional, ValidateNested } from "class-validator";
+import { FlightConfig } from "../../shared/domain/custom-field";
 
 @Expose()
 export class LinkDto {
@@ -36,4 +37,10 @@ export class UserConfigDto {
   @ValidateNested()
   @Type(() => PreparationDto)
   preparation?: PreparationDto;
+
+  @ApiPropertyOptional({ type: FlightConfig })
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => FlightConfig)
+  flightConfig?: FlightConfig;
 }

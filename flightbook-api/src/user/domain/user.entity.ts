@@ -9,6 +9,7 @@ import {Appointment} from "../../training/appointment/appointment.entity";
 import { Subscription } from "../../training/subscription/subscription.entity";
 import { EmergencyContact } from "../../training/emergency-contact/emergency-contact.entity";
 import { UserConfig } from "./user-config";
+import { UserException } from "../exception/user.exception";
 import { TandemPilot } from "../../training/tandem-pilot/tandem-pilot.entity";
 
 @Index("idx_16606_idx_e12875dfb3b1d92d7d7c5377e2", ["email"], { unique: true })
@@ -130,5 +131,49 @@ export class User {
 
   isAppointmentEmailNotificationEnabled(): boolean {
     return this.config?.notifications?.email?.appointment ?? true;
+  }
+
+  mergeConfiguration(update: UserConfig | null | undefined): void {
+    if (update === null || update === undefined) {
+      return;
+    }
+
+    const existingFlightConfig = this.config?.flightConfig;
+
+    // Handle flightConfig with immutability rules
+    if (update.flightConfig) {
+      const existingFields = existingFlightConfig?.customFields || [];
+      const updatedFields = update.flightConfig.customFields || [];
+
+      // Validate immutability: key and type cannot change
+      for (const updatedField of updatedFields) {
+        const existingField = existingFields.find(f => f.key === updatedField.key);
+        if (existingField) {
+          // Field exists - validate immutability
+          if (existingField.type !== updatedField.type) {
+            UserException.customFieldTypeImmutableException(updatedField.key);
+          }
+          // Note: key is used for matching, so it can't change by definition
+        }
+      }
+
+      // Check for duplicate keys in the update
+      const keys = updatedFields.map(f => f.key);
+      const duplicates = keys.filter((key, index) => keys.indexOf(key) !== index);
+      if (duplicates.length > 0) {
+        UserException.customFieldDuplicateKeysException(duplicates);
+      }
+    }
+
+    this.config = update;
+
+    // Preserve existing flightConfig if not provided in update
+    if (!this.config.flightConfig && existingFlightConfig) {
+      this.config.flightConfig = existingFlightConfig;
+    }
+
+    if (Object.keys(this.config).length === 0) {
+      this.config = null;
+    }
   }
 }

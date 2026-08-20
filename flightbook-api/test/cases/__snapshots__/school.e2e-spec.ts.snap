@@ -331,6 +331,7 @@ exports[`Schools tandem pilots (e2e) /schools/:id/tandem-pilots/:tandemPilotId/f
       },
     },
     "time": "01:30:00",
+    "userCustomValues": null,
   },
   {
     "date": "2025-01-02",
@@ -376,6 +377,7 @@ exports[`Schools tandem pilots (e2e) /schools/:id/tandem-pilots/:tandemPilotId/f
       },
     },
     "time": "01:30:00",
+    "userCustomValues": null,
   },
   {
     "date": "2025-01-01",
@@ -421,6 +423,7 @@ exports[`Schools tandem pilots (e2e) /schools/:id/tandem-pilots/:tandemPilotId/f
       },
     },
     "time": "01:30:00",
+    "userCustomValues": null,
   },
   {
     "date": "2025-01-01",
@@ -466,6 +469,7 @@ exports[`Schools tandem pilots (e2e) /schools/:id/tandem-pilots/:tandemPilotId/f
       },
     },
     "time": "01:30:00",
+    "userCustomValues": null,
   },
 ]
 `;
@@ -570,6 +574,7 @@ exports[`Schools tandem pilots (e2e) /schools/:id/tandem-pilots/:tandemPilotId/f
     },
   },
   "time": "01:30:00",
+  "userCustomValues": null,
   "validation": {
     "comment": null,
     "instructor": null,

@@ -12,4 +12,12 @@ export class UserException {
     public static invalidEmailTokenVerificationException() {
         throw new BadRequestException('Invalid verification token')
     }
+
+    public static customFieldTypeImmutableException(fieldKey: string) {
+        throw new BadRequestException(`Cannot change type of custom field '${fieldKey}'. Type is immutable.`)
+    }
+
+    public static customFieldDuplicateKeysException(duplicateKeys: string[]) {
+        throw new BadRequestException(`Duplicate custom field keys found: ${duplicateKeys.join(', ')}`)
+    }
 }
