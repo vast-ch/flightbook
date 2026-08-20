@@ -1,0 +1,78 @@
+name: Flightbook Mobile App - iOS Testflight
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to build'
+        required: true
+        default: 'main'
+
+jobs:
+  testflight:
+    runs-on: macos-26
+    env:
+      BUNDLE_GEMFILE: ${{ github.workspace }}/flightbook-mobile-app/ios/App/Gemfile
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.branch }}
+
+      - name: Select Xcode version
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '26.6'
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: 'npm'
+          cache-dependency-path: flightbook-mobile-app/package-lock.json
+
+      - name: Install web app dependencies
+        working-directory: flightbook-mobile-app
+        run: npm ci
+
+      - name: Build Angular app for production
+        working-directory: flightbook-mobile-app
+        run: npx ng build --configuration production
+
+      - name: Sync Capacitor iOS project
+        working-directory: flightbook-mobile-app
+        run: npx cap sync ios
+
+      - name: Write GoogleService-Info.plist
+        working-directory: flightbook-mobile-app
+        run: echo "$IOS_GOOGLE_SERVICE_INFO_PLIST_BASE64" | base64 --decode > ios/App/App/GoogleService-Info.plist
+        env:
+          IOS_GOOGLE_SERVICE_INFO_PLIST_BASE64: ${{ secrets.IOS_GOOGLE_SERVICE_INFO_PLIST_BASE64 }}
+
+      - name: Set production push entitlement for release build
+        working-directory: flightbook-mobile-app
+        run: plutil -replace aps-environment -string production ios/App/Flightbook.entitlements
+
+      - name: Set up Ruby / Bundler
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
+          working-directory: flightbook-mobile-app/ios/App
+
+      - name: Write App Store Connect API key
+        working-directory: flightbook-mobile-app/ios/App
+        run: |
+          mkdir -p fastlane/private_keys
+          echo "$APP_STORE_CONNECT_API_KEY_CONTENT" | base64 --decode > fastlane/private_keys/AuthKey.p8
+        env:
+          APP_STORE_CONNECT_API_KEY_CONTENT: ${{ secrets.APP_STORE_CONNECT_API_KEY_CONTENT }}
+
+      - name: Build and upload to TestFlight
+        working-directory: flightbook-mobile-app/ios/App
+        run: bundle exec fastlane testflight
+        env:
+          BUILD_NUMBER: ${{ github.run_number }}
+          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
+          APP_STORE_CONNECT_API_KEY_FILEPATH: fastlane/private_keys/AuthKey.p8
