@@ -68,6 +68,25 @@
             "label": "Bezeichnung",
             "url": "URL",
             "appointmentEmailNotification": "Schulungs-E-Mail-Benachrichtigungen"
+        },
+        "flightCustomFields": {
+            "description": "Verwalte deine benutzerdefinierten Felder für Flüge. Diese Felder werden bei jedem Flug angezeigt.",
+            "field": "Benutzerdefinierte Felder",
+            "fieldTitle": "Benutzerdefiniertes Feld",
+            "label": "Bezeichnung",
+            "type": "Typ",
+            "options": "Optionen",
+            "option": "Option",
+            "optionsPlaceholder": "Option 1\nOption 2\nOption 3",
+            "required": "Erforderlich",
+            "disabled": "Deaktiviert",
+            "types": {
+                "text": "Text",
+                "number": "Zahl",
+                "date": "Datum",
+                "boolean": "Ja/Nein",
+                "dropdown": "Auswahl"
+            }
         }
     },
     "place": {

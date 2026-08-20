@@ -68,6 +68,25 @@
             "label": "Label",
             "url": "URL",
             "appointmentEmailNotification": "E-mail per le giornate di formazione"
+        },
+        "flightCustomFields": {
+            "description": "Gestisci i tuoi campi personalizzati per i voli. Questi campi appariranno su ogni volo.",
+            "field": "Campi personalizzati",
+            "fieldTitle": "Campo personalizzato",
+            "label": "Etichetta",
+            "type": "Tipo",
+            "options": "Opzioni",
+            "option": "Opzione",
+            "optionsPlaceholder": "Opzione 1\nOpzione 2\nOpzione 3",
+            "required": "Obbligatorio",
+            "disabled": "Disabilitato",
+            "types": {
+                "text": "Testo",
+                "number": "Numero",
+                "date": "Data",
+                "boolean": "Sì/No",
+                "dropdown": "Menu a tendina"
+            }
         }
     },
     "place": {
@@ -119,6 +138,7 @@
         "shvAlone": "FSVL volo da solo",
         "tandemSchool": "Azienda biplace",
         "customSchoolFields": "Informazioni aggiuntive {{schoolName}}",
+        "customUserFields": "I tuoi campi personalizzati",
         "paymentState": {
             "name": "Stato di pagamento",
             "amount": "Importo",

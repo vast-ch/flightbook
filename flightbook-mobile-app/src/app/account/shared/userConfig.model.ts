@@ -1,3 +1,5 @@
+import { FlightConfig } from "src/app/shared/domain/custom-field.model";
+
 export class Link {
   url: string;
   label: string;
@@ -17,4 +19,5 @@ export class notifications {
 export class UserConfig {
   preparation?: Preparation;
   notifications?: notifications;
+  flightConfig?: FlightConfig;
 }

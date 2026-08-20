@@ -1,0 +1,69 @@
+<ion-header>
+    <ion-toolbar color='primary'>
+        <ion-title>{{ 'account.flightCustomFields.fieldTitle' | translate }}</ion-title>
+        <ion-buttons slot="end">
+            <ion-button (click)="closeModal()"><ion-icon name="close"></ion-icon></ion-button>
+        </ion-buttons>
+    </ion-toolbar>
+</ion-header>
+<ion-content class="ion-padding">
+    <form #form="ngForm">
+        <ion-item class="error-item">
+            <ion-input label="{{ 'account.flightCustomFields.label' | translate }}" labelPlacement="stacked" [(ngModel)]="field.label"
+                #inputLabel="ngModel" required name="inputLabel" type="text" (ngModelChange)="onLabelChange()"></ion-input>
+            @if (inputLabel.invalid && (inputLabel.dirty || inputLabel.touched)) {
+                <ion-text color="danger" class="error-text">{{ 'message.required' | translate }}</ion-text>
+            }
+        </ion-item>
+        <ion-item>
+            <ion-select label="{{ 'account.flightCustomFields.type' | translate }}" labelPlacement="stacked" [(ngModel)]="field.type"
+                name="inputType" [disabled]="!isNew" okText="{{ 'buttons.done' | translate }}" cancelText="{{ 'buttons.cancel' | translate }}">
+                @for (type of fieldTypes; track type) {
+                    <ion-select-option [value]="type">{{ 'account.flightCustomFields.types.' + type | translate }}</ion-select-option>
+                }
+            </ion-select>
+        </ion-item>
+        @if (isDropdown()) {
+            <div class="options-wrapper">
+                <div class="options-header">
+                    <ion-label>{{ 'account.flightCustomFields.options' | translate }}</ion-label>
+                    <ion-button size="small" shape="round" (click)="addOption()">
+                        <ion-icon slot="icon-only" name="add"></ion-icon>
+                    </ion-button>
+                </div>
+                @for (option of options; track $index) {
+                    <ion-item class="option-item">
+                        <ion-input 
+                            label="{{ 'account.flightCustomFields.option' | translate }} {{ $index + 1 }} *" 
+                            labelPlacement="stacked"
+                            [(ngModel)]="options[$index]"
+                            [name]="'option_' + $index"
+                            type="text"
+                            required>
+                        </ion-input>
+                        @if (options.length > 1) {
+                            <ion-button slot="end" fill="clear" color="danger" (click)="removeOption($index)">
+                                <ion-icon slot="icon-only" name="trash"></ion-icon>
+                            </ion-button>
+                        }
+                    </ion-item>
+                }
+            </div>
+        }
+        <ion-item>
+            <div class="toggle-wrapper-custom">
+                <ion-text color="primary">{{ 'account.flightCustomFields.required' | translate }}</ion-text>
+                <ion-toggle [(ngModel)]="field.required" name="inputRequired"></ion-toggle>
+            </div>
+        </ion-item>
+        @if (!isNew) {
+            <ion-item>
+                <div class="toggle-wrapper-custom">
+                    <ion-text color="primary">{{ 'account.flightCustomFields.disabled' | translate }}</ion-text>
+                    <ion-toggle [(ngModel)]="field.disabled" name="inputDisabled"></ion-toggle>
+                </div>
+            </ion-item>
+        }
+        <ion-button [disabled]="!isValid()" (click)="saveField()" expand="block">{{ 'buttons.save' | translate }}</ion-button>
+    </form>
+</ion-content>

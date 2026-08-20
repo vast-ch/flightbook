@@ -17,6 +17,13 @@
           <ion-toggle [(ngModel)]="user.config.preparation.dabsLinkDisabled" name="dabsLinkDisabled"></ion-toggle>
         </div>
       </ion-item>
+      <ion-item>
+        <div class="toggle-wrapper-custom">
+          <ion-label color="primary" position="stacked">{{ 'account.configuration.appointmentEmailNotification' | translate
+            }}</ion-label>
+          <ion-toggle [(ngModel)]="user.config.notifications.email.appointment" name="appointmentEmailNotification"></ion-toggle>
+        </div>
+      </ion-item>
 
       <div class="links-wrapper">
         <div class="links-header">
@@ -48,13 +55,38 @@
         </ion-list>
       </div>
 
-      <ion-item>
-        <div class="toggle-wrapper-custom">
-          <ion-label color="primary" position="stacked">{{ 'account.configuration.appointmentEmailNotification' | translate
-            }}</ion-label>
-          <ion-toggle [(ngModel)]="user.config.notifications.email.appointment" name="appointmentEmailNotification"></ion-toggle>
+      <div class="fields-wrapper">
+        <div class="fields-header">
+          <ion-button size="small" shape="round" (click)="fieldAddButton()">
+            <ion-icon slot="icon-only" name="add"></ion-icon>
+          </ion-button>
+          <ion-label lines="none">{{ 'account.flightCustomFields.field' | translate }}</ion-label>
         </div>
-      </ion-item>
+        <ion-label>
+          <p>{{ 'account.flightCustomFields.description' | translate }}</p>
+        </ion-label>
+        <ion-list>
+          <ion-reorder-group [disabled]="false" (ionReorderEnd)="handleFieldReorderEnd($any($event))">
+            @for (field of customFields; track field.key) {
+              <ion-item button detail (click)="manageFieldModal(field, 'edit')">
+                <ion-reorder slot="start"></ion-reorder>
+                <ion-label [class.disabled-field]="field.disabled">
+                  <h3>
+                    {{ field.label }}
+                    @if (field.required) {
+                      <span> *</span>
+                    }
+                  </h3>
+                  <p>{{ 'account.flightCustomFields.types.' + field.type | translate }}</p>
+                </ion-label>
+                @if (field.disabled) {
+                  <ion-icon slot="end" name="eye-off"></ion-icon>
+                }
+              </ion-item>
+            }
+          </ion-reorder-group>
+        </ion-list>
+      </div>
 
       <ion-button expand="block" type="submit">{{ 'buttons.save' | translate }}</ion-button>
     </form>

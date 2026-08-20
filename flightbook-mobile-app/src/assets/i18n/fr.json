@@ -68,6 +68,25 @@
             "label": "Label",
             "url": "URL",
             "appointmentEmailNotification": "E-mail pour les journées de formation"
+        },
+        "flightCustomFields": {
+            "description": "Gère tes champs personnalisés pour les vols. Ces champs apparaîtront sur chaque vol.",
+            "field": "Champs personnalisés",
+            "fieldTitle": "Champ personnalisé",
+            "label": "Libellé",
+            "type": "Type",
+            "options": "Options",
+            "option": "Option",
+            "optionsPlaceholder": "Option 1\nOption 2\nOption 3",
+            "required": "Obligatoire",
+            "disabled": "Désactivé",
+            "types": {
+                "text": "Texte",
+                "number": "Nombre",
+                "date": "Date",
+                "boolean": "Oui/Non",
+                "dropdown": "Liste déroulante"
+            }
         }
     },
     "place": {
@@ -119,6 +138,7 @@
         "shvAlone": "FSVL vol autonome",
         "tandemSchool": "Entreprise biplace",
         "customSchoolFields": "Informations supplémentaires {{schoolName}}",
+        "customUserFields": "Vos champs personnalisés",
         "paymentState": {
             "name": "Statut de paiement",
             "amount": "Montant",

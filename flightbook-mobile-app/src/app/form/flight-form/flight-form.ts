@@ -11,7 +11,9 @@ import { DatePipe } from '@angular/common';
 import { GliderSelectComponent } from '../../shared/components/glider-select/glider-select.component';
 import { AutocompleteComponent } from '../autocomplete/autocomplete.component';
 import { IgcMapComponent } from '../../shared/components/igc-map/igc-map.component';
-import { School, CustomFieldDefinition } from 'src/app/school/shared/school.model';
+import { School } from 'src/app/school/shared/school.model';
+import { CustomFieldDefinition } from 'src/app/shared/domain/custom-field.model';
+import { AccountService } from 'src/app/account/shared/account.service';
 
 @Component({
     selector: 'flight-form',
@@ -63,10 +65,12 @@ export class FlightFormComponent implements OnInit, OnChanges {
     uploadSuccessful = false;
     language;
     customFieldValues: { [key: string]: any } = {};
+    userCustomFieldValues: { [key: string]: any } = {};
 
     constructor(
         private alertController: AlertController,
-        private translate: TranslateService
+        private translate: TranslateService,
+        private accountService: AccountService
     ) {
         this.language = this.translate.currentLang;
     }
@@ -108,11 +112,14 @@ export class FlightFormComponent implements OnInit, OnChanges {
     }
     
     private validateCustomFields(): boolean {
-        const activeFields = this.getActiveCustomFields();
-        
+        return this.validateFieldValues(this.getActiveCustomFields(), (key) => this.getCustomFieldValue(key))
+            && this.validateFieldValues(this.getActiveUserCustomFields(), (key) => this.getUserCustomFieldValue(key));
+    }
+
+    private validateFieldValues(activeFields: CustomFieldDefinition[], getValue: (key: string) => any): boolean {
         for (const field of activeFields) {
             if (field.required && !field.disabled) {
-                const value = this.getCustomFieldValue(field.key);
+                const value = getValue(field.key);
 
                 // For boolean fields, false is a valid value
                 if (field.type === 'boolean') {
@@ -214,6 +221,45 @@ export class FlightFormComponent implements OnInit, OnChanges {
         return customValue ? customValue.value : null;
     }
 
+    getActiveUserCustomFields(): CustomFieldDefinition[] {
+        const fields = this.accountService.currentUser$()?.config?.flightConfig?.customFields;
+        if (!fields) {
+            return [];
+        }
+
+        return fields.filter(field => {
+            if (!field.disabled) {
+                return true;
+            }
+            
+            const existingValue = this.getUserCustomFieldValue(field.key);
+            return existingValue !== null && existingValue !== undefined;
+        });
+    }
+
+    getUserCustomFieldValue(key: string): any {
+        if (!this.flight.userCustomValues) {
+            return null;
+        }
+        
+        const customValue = this.flight.userCustomValues.find(cv => cv.key === key);
+        return customValue ? customValue.value : null;
+    }
+
+    setUserCustomFieldValue(key: string, value: any): void {
+        if (!this.flight.userCustomValues) {
+            this.flight.userCustomValues = [];
+        }
+        
+        const existingIndex = this.flight.userCustomValues.findIndex(cv => cv.key === key);
+        
+        if (existingIndex >= 0) {
+            this.flight.userCustomValues[existingIndex].value = value;
+        } else {
+            this.flight.userCustomValues.push({ key, value });
+        }
+    }
+
     setCustomFieldValue(key: string, value: any): void {
         if (!this.flight.tandemSchoolData) {
             this.flight.tandemSchoolData = new TandemSchoolData();
@@ -249,6 +295,23 @@ export class FlightFormComponent implements OnInit, OnChanges {
                 }
             }
         });
+
+        // Ensure userCustomValues array exists
+        if (this.flight && !this.flight.userCustomValues) {
+            this.flight.userCustomValues = [];
+        }
+
+        // Initialize only REQUIRED boolean user fields to false if not set
+        const allUserFields = this.accountService.currentUser$()?.config?.flightConfig?.customFields || [];
+        allUserFields.forEach(field => {
+            if (field.type === 'boolean' && field.required && !field.disabled) {
+                const existingValue = this.getUserCustomFieldValue(field.key);
+                if (existingValue === null || existingValue === undefined) {
+                    this.userCustomFieldValues[field.key] = false;
+                    this.setUserCustomFieldValue(field.key, false);
+                }
+            }
+        });
     }
 
     private initializeCustomValues(): void {
@@ -260,6 +323,16 @@ export class FlightFormComponent implements OnInit, OnChanges {
             this.customFieldValues = newValues;
         } else {
             this.customFieldValues = {};
+        }
+
+        if (this.flight?.userCustomValues) {
+            const newUserValues: { [key: string]: any } = {};
+            this.flight.userCustomValues.forEach(cv => {
+                newUserValues[cv.key] = cv.value;
+            });
+            this.userCustomFieldValues = newUserValues;
+        } else {
+            this.userCustomFieldValues = {};
         }
     }
 }

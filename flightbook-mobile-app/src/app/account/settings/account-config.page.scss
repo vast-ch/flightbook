@@ -25,3 +25,29 @@
         padding-top: 0;
     }
 }
+
+.fields-wrapper {
+    margin-top: 16px;
+
+    .fields-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding-left: 16px;
+        padding-right: 16px;
+        
+        ion-label {
+            font-size: 16px;
+            font-weight: 500;
+        }
+    }
+
+    ion-list {
+        padding-left: 0px;
+        padding-top: 0;
+    }
+}
+
+.disabled-field {
+    opacity: 0.5;
+}

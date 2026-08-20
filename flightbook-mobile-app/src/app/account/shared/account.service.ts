@@ -154,5 +154,10 @@ export class AccountService {
                   appointment: true
               };
         }
+          if (!user.config.flightConfig) {
+              user.config.flightConfig = {
+                  customFields: []
+              };
+          }
       }
 }

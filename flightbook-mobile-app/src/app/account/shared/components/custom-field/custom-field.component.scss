@@ -1,0 +1,43 @@
+.error-item {
+    display: flex;
+    flex-direction: column;
+
+    .error-text {
+        font-size: 12px;
+        width: 100%;
+    }
+}
+
+.toggle-wrapper-custom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 8px 0;
+}
+
+.options-wrapper {
+    margin-top: 16px;
+    margin-bottom: 16px;
+
+    .options-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding-left: 16px;
+        padding-right: 16px;
+        margin-bottom: 8px;
+        
+        ion-label {
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--ion-color-primary);
+        }
+    }
+
+    .option-item {
+        ion-button {
+            margin-top: 20px;
+        }
+    }
+}

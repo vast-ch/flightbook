@@ -68,6 +68,25 @@
             "label": "Label",
             "url": "URL",
             "appointmentEmailNotification": "Training Email Notifications"
+        },
+        "flightCustomFields": {
+            "description": "Manage your custom fields for flights. These fields will appear on every flight.",
+            "field": "Custom Fields",
+            "fieldTitle": "Custom Field",
+            "label": "Label",
+            "type": "Type",
+            "options": "Options",
+            "option": "Option",
+            "optionsPlaceholder": "Option 1\nOption 2\nOption 3",
+            "required": "Required",
+            "disabled": "Disabled",
+            "types": {
+                "text": "Text",
+                "number": "Number",
+                "date": "Date",
+                "boolean": "Yes/No",
+                "dropdown": "Dropdown"
+            }
         }
     },
     "place": {
@@ -119,6 +138,7 @@
         "shvAlone": "SHGPA alone flight",
         "tandemSchool": "Tandem operator",
         "customSchoolFields": "Additional {{schoolName}} Information",
+        "customUserFields": "Your Custom Fields",
         "paymentState": {
             "name": "Payment state",
             "amount": "Amount",

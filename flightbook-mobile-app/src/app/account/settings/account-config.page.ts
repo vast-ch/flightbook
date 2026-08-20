@@ -7,9 +7,11 @@ import { AccountService } from '../shared/account.service';
 import { Subject, takeUntil } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 import { addIcons } from 'ionicons';
-import { add, close, trash } from 'ionicons/icons';
+import { add, close, trash, eyeOff } from 'ionicons/icons';
 import { Link } from '../shared/userConfig.model';
 import { LinkComponent } from '../shared/components/link/link.component';
+import { CustomFieldDefinition, CustomFieldType } from 'src/app/shared/domain/custom-field.model';
+import { CustomFieldComponent } from '../shared/components/custom-field/custom-field.component';
 
 @Component({
     selector: 'app-account-config',
@@ -44,10 +46,14 @@ export class AccountConfigPage implements OnInit, OnDestroy {
             this.user = structuredClone(this.accountService.currentUser$());
         });
 
-        addIcons({ close, trash, add });
+        addIcons({ close, trash, add, eyeOff });
     }
 
     ngOnInit() { }
+
+    get customFields(): CustomFieldDefinition[] {
+        return this.user?.config?.flightConfig?.customFields || [];
+    }
 
     async saveSettings() {
         let loading = await this.loadingCtrl.create({
@@ -81,6 +87,10 @@ export class AccountConfigPage implements OnInit, OnDestroy {
         this.user.config.preparation.links = event.detail.complete(this.user.config.preparation.links);
     }
 
+    handleFieldReorderEnd(event: ReorderEndCustomEvent) {
+        this.user.config.flightConfig.customFields = event.detail.complete(this.user.config.flightConfig.customFields);
+    }
+
     async linkAddButton() {
         const link = new Link();
         this.manageLinkModal(link, 'add');
@@ -112,6 +122,45 @@ export class AccountConfigPage implements OnInit, OnDestroy {
         }
 
         await modal.dismiss();
+    }
+
+    async fieldAddButton() {
+        const field: CustomFieldDefinition = {
+            key: '',
+            label: '',
+            type: CustomFieldType.TEXT,
+            required: false,
+            disabled: false
+        };
+        this.manageFieldModal(field, 'add');
+    }
+
+    async manageFieldModal(field: CustomFieldDefinition, type: 'add' | 'edit') {
+        const copyField = { ...field };
+        const modal = await this.modalController.create({
+            component: CustomFieldComponent,
+            componentProps: {
+                field: copyField,
+                isNew: type === 'add'
+            }
+        });
+        await modal.present();
+
+        const { data } = await modal.onWillDismiss();
+        if (!data || data.type === 'close') {
+            return;
+        }
+
+        if (!this.user.config.flightConfig) {
+            this.user.config.flightConfig = { customFields: [] };
+        }
+
+        if (type === 'add') {
+            // UUID keys are guaranteed unique, no need to check for duplicates
+            this.user.config.flightConfig.customFields.push(data.field);
+        } else if (type === 'edit') {
+            Object.assign(field, data.field);
+        }
     }
 
     ngOnDestroy() {

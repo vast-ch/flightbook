@@ -3,6 +3,7 @@ import { Place } from "src/app/place/shared/place.model";
 import { Igc } from "../../shared/domain/igc.model";
 import { FlightValidation } from "./flight-validation.model";
 import { TandemSchoolData } from "./tandem-school-data.model";
+import { CustomValue } from "../../shared/domain/custom-field.model";
 
 export class Flight {
     id: number;
@@ -21,4 +22,5 @@ export class Flight {
     shvAlone?: boolean;
     validation?: FlightValidation;
     tandemSchoolData?: TandemSchoolData;
+    userCustomValues?: CustomValue[];
 }
