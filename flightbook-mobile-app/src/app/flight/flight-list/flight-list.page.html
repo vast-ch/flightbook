@@ -74,6 +74,21 @@
                   @if (flight.igc) {
                     <ion-icon name="attach-outline" class="flight-row__igc" aria-hidden="true"></ion-icon>
                   }
+                  <!--
+                    Only the two states a school has actually ruled on. A flight
+                    with no validation record is not a pending one - most pilots
+                    are enrolled in no school at all - and the amber dot that
+                    used to stand for it read as a warning on a perfectly good
+                    logbook, which is why the old indicator was dropped. Rejected
+                    is included because it is the state worth acting on: it is
+                    the only one the API notifies about.
+                  -->
+                  @if (flight.validation?.state === FlightValidationState.VALIDATED
+                        || flight.validation?.state === FlightValidationState.REJECTED) {
+                    <span class="flight-row__dot"
+                          [class.is-rejected]="flight.validation.state === FlightValidationState.REJECTED"
+                          [attr.aria-label]="('flight.validationState.' + flight.validation.state) | translate"></span>
+                  }
                 </div>
 
                 <div class="flight-row__meta">

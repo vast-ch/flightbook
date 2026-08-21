@@ -53,6 +53,23 @@
   color: var(--fb-text);
 }
 
+/*
+ * School validation, for the flights a school has ruled on. Rendered only for
+ * VALIDATED or REJECTED - see the template; there is deliberately no third
+ * colour for "not reviewed", which is the normal state of most logbooks.
+ */
+.flight-row__dot {
+  flex: none;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--ion-color-success);
+
+  &.is-rejected {
+    background: var(--ion-color-danger);
+  }
+}
+
 .flight-row__igc {
   flex: none;
   font-size: 13px;

@@ -21,6 +21,7 @@ import {
     shareOutline
 } from "ionicons/icons";
 import { BASE_PAGE_SIZE, FlightStore } from '../shared/flight.store';
+import { FlightValidationState } from '../shared/flight-validation-state';
 import { AvatarButtonComponent } from 'src/app/shared/components/avatar-button/avatar-button.component';
 import { LanguageService } from 'src/app/shared/services/language.service';
 import { toHoursMinutes } from 'src/app/shared/util/format';
@@ -51,6 +52,9 @@ export class FlightListPage implements OnInit, OnDestroy {
     @ViewChild(IonInfiniteScroll) infiniteScroll: IonInfiniteScroll;
     @ViewChild(IonContent) content: IonContent;
     unsubscribe$ = new Subject<void>();
+
+    /** Exposed for the row's validation dot. */
+    public readonly FlightValidationState = FlightValidationState;
     // Use signals directly from the store
     public flights = this.flightStore.flights;
     public loading = this.flightStore.loading;
