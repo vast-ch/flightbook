@@ -98,7 +98,7 @@
           <span class="activity__hint">{{ chartMeta() }}</span>
         </div>
 
-        <fb-flights-bars [data]="bars()"></fb-flights-bars>
+        <fb-flights-bars [data]="bars()" [showValues]="true"></fb-flights-bars>
 
         @if (chartNote(); as note) {
           <p class="activity__note">{{ note }}</p>

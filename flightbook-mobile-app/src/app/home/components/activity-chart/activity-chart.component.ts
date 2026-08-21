@@ -1,11 +1,41 @@
 import { Component, Input, computed, inject, signal } from '@angular/core';
-import { ChartConfiguration, ChartData } from 'chart.js';
+import { Chart, ChartConfiguration, ChartData, Plugin } from 'chart.js';
 import { NgChartsModule } from 'ng2-charts';
 import { FlightStatistic } from '../../../flight/shared/flightStatistic.model';
 import { LanguageService } from '../../../shared/services/language.service';
 import { themeColor } from 'src/app/shared/util/theme-color';
 
 const MONTHS_SHOWN = 12;
+
+/**
+ * Prints the flight count above each bar.
+ *
+ * An inline plugin rather than chartjs-plugin-datalabels, which this app does not
+ * ship - one number per column does not justify a dependency. Empty months print
+ * nothing, matching fb-flights-bars: a row of zeroes is noise, and the month
+ * labels underneath already dim them.
+ */
+const BAR_VALUES: Plugin<'bar'> = {
+    id: 'barValues',
+    afterDatasetsDraw(chart: Chart<'bar'>) {
+        const meta = chart.getDatasetMeta(0);
+        const values = chart.data.datasets[0]?.data ?? [];
+        const ctx = chart.ctx;
+        ctx.save();
+        ctx.font = `600 8.5px ${getComputedStyle(chart.canvas).fontFamily}`;
+        ctx.fillStyle = themeColor('--fb-text-secondary', '#5b7284');
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'bottom';
+        meta.data.forEach((bar, index) => {
+            const value = Number(values[index] ?? 0);
+            if (value > 0) {
+                ctx.fillText(String(value), bar.x, bar.y - 3);
+            }
+        });
+        ctx.restore();
+    }
+};
+
 
 export interface MonthColumn {
     /** Single-letter month initial shown under the chart. */
@@ -107,14 +137,18 @@ export class ActivityChartComponent {
         };
     });
 
+    public readonly chartPlugins = [BAR_VALUES];
+
     public chartOptions: ChartConfiguration<'bar'>['options'] = {
         responsive: true,
         maintainAspectRatio: false,
         // Axes are hidden: the design labels months in markup underneath.
         scales: {
             x: { display: false },
-            y: { display: false, beginAtZero: true },
-            airtime: { display: false, beginAtZero: true, position: 'right' }
+            // grace: the printed values sit above the bars, and without headroom
+            // the tallest column's number is clipped by the top of the canvas.
+            y: { display: false, beginAtZero: true, grace: '22%' },
+            airtime: { display: false, beginAtZero: true, grace: '22%', position: 'right' }
         },
         plugins: {
             // chartjs-plugin-datalabels is no longer loaded, so there is
