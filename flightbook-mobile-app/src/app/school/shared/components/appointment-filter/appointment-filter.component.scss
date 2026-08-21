@@ -1,14 +1,12 @@
 // .filter-head*, .filter-body, .filter-scroll, .filter-dates, .filter-date*,
 // .fb-chip and .form-footer live in theme/tokens.scss, shared with the flight
-// filter. The modal shell is .fb-filter-sheet, also there, because Ionic
-// renders modals at the app root.
+// filter. So do the modal shells - .fb-filter-sheet and .filterDateModal -
+// because Ionic renders modals at the app root, outside component style scope.
+// A .filterDateModal rule lived here and built as
+// ion-modal.filterDateModal[_ngcontent-%COMP%], which never matched anything.
 :host {
     display: flex;
     flex-direction: column;
     flex: 1;
     min-height: 0;
-}
-
-ion-modal.filterDateModal {
-    --backdrop-opacity: 0.3 !important;
 }

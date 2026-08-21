@@ -774,6 +774,39 @@ button.fb-row {
 }
 
 /*
+ * The date picker a filter sheet opens, for From and To.
+ *
+ * .dateModal in theme/variables.scss makes every picker transparent, which
+ * passes over a white form page but not over a filter sheet: the sheet's own
+ * --fb-bg showed straight through, so the wheel appeared to float among the
+ * sheet's own controls with nothing marking it as a separate thing to dismiss.
+ * A surface of its own, a radius, elevation and a dimmed backdrop say otherwise.
+ *
+ * Global for the same reason .fb-filter-sheet is - Ionic renders modals at the
+ * app root, outside component style scope. The appointment filter previously
+ * carried a --backdrop-opacity rule in its own component styles, where Angular
+ * scoped it to [_ngcontent] and it could never match.
+ */
+/*
+ * Both classes, deliberately: theme/variables.scss carries
+ * `ion-modal.dateModal { --background: transparent }`, which is (0,1,1) and
+ * loads after this file, so a single .filterDateModal class would lose on
+ * specificity and on order. The elements carry both classes, so matching both
+ * wins outright and does not need !important.
+ */
+ion-modal.dateModal.filterDateModal {
+  --background: var(--fb-surface);
+  --border-radius: 16px;
+  --box-shadow: 0 14px 34px rgba(16, 41, 60, 0.26);
+  --backdrop-opacity: 1;
+
+  /* Centred, not pinned to an edge: this one sits above a sheet, not the page. */
+  &::part(backdrop) {
+    background: rgba(16, 41, 60, 0.32);
+  }
+}
+
+/*
  * ---- Filter sheet contents ----------------------------------------------
  * The head, scroll body and date pair a filter sheet is built from. Global
  * because two components draw them - the flight/statistics filter and the
