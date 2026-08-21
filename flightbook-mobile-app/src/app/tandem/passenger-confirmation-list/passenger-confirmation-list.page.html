@@ -1,4 +1,4 @@
-<!-- Surface strip rather than an ion-toolbar; the add action is the design's blue square -->
+<!-- Surface strip rather than an ion-toolbar, with the same actions row as the other lists -->
 <div class="list-header">
   <button type="button" class="icon-button" (click)="close()"
           [attr.aria-label]="'buttons.back' | translate">
@@ -14,10 +14,12 @@
     <h1 class="list-header__title">{{ 'buttons.pasengerConfirmations' | translate }}</h1>
   </div>
 
-  <button type="button" class="confirm-add" (click)="openAddPassengerConfirmation()"
-          [attr.aria-label]="'buttons.add' | translate">
-    <ion-icon name="add" aria-hidden="true"></ion-icon>
-  </button>
+  <div class="list-header__actions">
+    <button type="button" class="icon-button" (click)="openAddPassengerConfirmation()"
+            [attr.aria-label]="'buttons.add' | translate">
+      <ion-icon name="add" aria-hidden="true"></ion-icon>
+    </button>
+  </div>
 </div>
 
 <ion-content class="no-padding">
