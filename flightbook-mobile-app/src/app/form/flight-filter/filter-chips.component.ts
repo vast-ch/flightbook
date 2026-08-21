@@ -36,23 +36,9 @@ type Chip = { label: string; clear: () => void };
                 </button>
             </div>
         }
-    `,
-    styles: [`
-        .filter-summary {
-            padding: 13px var(--fb-gutter) 0;
-        }
-
-        .filter-summary__clear {
-            padding: 6px 10px;
-            border: 0;
-            background: transparent;
-            font: inherit;
-            font-size: 11.5px;
-            font-weight: 600;
-            color: var(--fb-text-secondary);
-            cursor: pointer;
-        }
-    `]
+    `
+    // .filter-summary* moved to tokens.scss when the glider list grew the same
+    // row: two components draw it now, and neither owns the pattern.
 })
 export class FilterChipsComponent {
     private flightStore = inject(FlightStore);

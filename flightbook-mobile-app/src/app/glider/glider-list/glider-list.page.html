@@ -29,8 +29,8 @@
             [attr.aria-label]="'buttons.add' | translate">
       <ion-icon name="add" aria-hidden="true"></ion-icon>
     </button>
-    <button type="button" class="icon-button" (click)="openFilter()"
-            [attr.aria-label]="'buttons.filter' | translate">
+    <button type="button" class="icon-button" [class.is-active]="filtered()"
+            (click)="openFilter()" [attr.aria-label]="'buttons.filter' | translate">
       <ion-icon name="filter-outline" aria-hidden="true"></ion-icon>
     </button>
     <button type="button" class="icon-button" (click)="xlsxExport()"
@@ -41,6 +41,8 @@
 </div>
 
 <ion-content>
+  <fb-glider-filter-chips (changed)="reloadForFilter()"></fb-glider-filter-chips>
+
   @if (gliders().length > 0) {
     <ion-list class="list-block">
       @for (glider of gliders(); track glider.id) {

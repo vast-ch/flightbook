@@ -774,6 +774,27 @@ button.fb-row {
 }
 
 /*
+ * ---- Active filter summary ----------------------------------------------
+ * The removable chip row a list shows above its rows while a filter is on.
+ * Drawn by fb-filter-chips (Flights, Statistics) and fb-glider-filter-chips,
+ * so it lives here rather than in either component.
+ */
+.filter-summary {
+  padding: 13px var(--fb-gutter) 0;
+}
+
+.filter-summary__clear {
+  padding: 6px 10px;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--fb-text-secondary);
+  cursor: pointer;
+}
+
+/*
  * The date picker a filter sheet opens, for From and To.
  *
  * .dateModal in theme/variables.scss makes every picker transparent, which

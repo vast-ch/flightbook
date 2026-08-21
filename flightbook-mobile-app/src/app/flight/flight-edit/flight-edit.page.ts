@@ -117,14 +117,12 @@ export class FlightEditPage implements OnInit, OnDestroy {
                 this.flight.landing = new Place();
             }
 
-            const archivedValue = this.gliderStore.filter.archived;
-            this.gliderStore.filter.archived = "0";
-            this.gliderStore.getGliders({ store: false }).pipe(takeUntil(this.unsubscribe$)).subscribe((resp: Glider[]) => {
+            // archived: "0" for this request only - see flight-add.
+            this.gliderStore.getGliders({ store: false, archived: "0" }).pipe(takeUntil(this.unsubscribe$)).subscribe((resp: Glider[]) => {
                 this.gliders = resp;
                 if (!this.gliders.find(glider => glider.id === this.flight.glider.id)) {
                     this.gliders.push(this.flight.glider);
                 }
-                this.gliderStore.filter.archived = archivedValue;
             });
             this.loadIgcData();
 

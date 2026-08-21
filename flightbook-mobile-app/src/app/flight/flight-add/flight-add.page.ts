@@ -88,11 +88,11 @@ export class FlightAddPage implements OnInit, OnDestroy {
                 });
         }
 
-        const archivedValue = this.gliderStore.filter.archived;
-        this.gliderStore.filter.archived = "0";
-        this.gliderStore.getGliders({ store: false }).pipe(takeUntil(this.unsubscribe$)).subscribe((resp: Glider[]) => {
+        // archived: "0" for this request only - assigning the shared filter and
+        // restoring it in the handler left the glider list filtered whenever the
+        // request failed.
+        this.gliderStore.getGliders({ store: false, archived: "0" }).pipe(takeUntil(this.unsubscribe$)).subscribe((resp: Glider[]) => {
             this.gliders = resp;
-            this.gliderStore.filter.archived = archivedValue;
             this.noGliderCheck();
         });
     }

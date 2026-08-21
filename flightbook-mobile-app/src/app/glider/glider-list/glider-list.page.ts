@@ -3,6 +3,7 @@ import { NavController, ModalController, LoadingController, AlertController, Ion
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { GliderFilterComponent } from '../glider-filter/glider-filter.component';
+import { GliderFilterChipsComponent } from '../glider-filter/glider-filter-chips.component';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { Capacitor } from '@capacitor/core';
 import { Filesystem, Directory } from '@capacitor/filesystem';
@@ -30,7 +31,8 @@ import { add, filterOutline, peopleOutline, personOutline, shareOutline, chevron
         IonItem,
         IonList,
         IonInfiniteScroll,
-        IonInfiniteScrollContent
+        IonInfiniteScrollContent,
+        GliderFilterChipsComponent
     ]
 })
 export class GliderListPage implements OnDestroy {
@@ -83,6 +85,21 @@ export class GliderListPage implements OnDestroy {
             }, async () => {
                 await loading.dismiss();
             });
+    }
+
+    /**
+     * A chip cleared from the summary row. Re-arms the scroller and refetches
+     * from page one, the way the filter sheet does on apply - the rows on screen
+     * were fetched at the old filter's offsets.
+     */
+    reloadForFilter() {
+        if (this.infiniteScroll) {
+            this.infiniteScroll.disabled = false;
+        }
+        this.gliderStore.isGliderlistComplete = false;
+        this.gliderStore.getGliders({ limit: this.gliderStore.defaultLimit, clearStore: true })
+            .pipe(takeUntil(this.unsubscribe$))
+            .subscribe();
     }
 
     ngOnDestroy() {

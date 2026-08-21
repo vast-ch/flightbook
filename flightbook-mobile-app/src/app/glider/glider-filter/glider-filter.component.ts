@@ -39,7 +39,7 @@ export class GliderFilterComponent implements OnDestroy {
     ) {
         // A copy, not the store's own object: editing the fields and then
         // dismissing must not leave the store filtered by what was typed.
-        this.filter = Object.assign(new GliderFilter(), this.gliderStore.filter);
+        this.filter = Object.assign(new GliderFilter(), this.gliderStore.filter());
         addIcons({ close, 'chevron-forward': chevronForward });
     }
 
@@ -54,13 +54,13 @@ export class GliderFilterComponent implements OnDestroy {
     }
 
     async filterElement() {
-        this.gliderStore.filter = this.filter;
+        this.gliderStore.filter.set(this.filter);
         this.applyAndClose();
     }
 
     clearFilter() {
         this.filter = new GliderFilter();
-        this.gliderStore.filter = this.filter;
+        this.gliderStore.resetFilter();
         this.applyAndClose();
     }
 
