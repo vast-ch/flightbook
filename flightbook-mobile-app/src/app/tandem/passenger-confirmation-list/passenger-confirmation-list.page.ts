@@ -238,7 +238,7 @@ export class PassengerConfirmationListPage implements OnInit, OnDestroy {
       message: this.translate.instant('loading.save')
     });
     await loading.present();
-    this.tandemService.postPassengerConfirmations(passengerData).subscribe({
+    this.tandemService.postPassengerConfirmations(passengerData).pipe(takeUntil(this.unsubscribe$)).subscribe({
       next: (response) => {
         this.initialDataLoad();
       },
@@ -256,12 +256,12 @@ export class PassengerConfirmationListPage implements OnInit, OnDestroy {
       message: this.translate.instant('loading.delete')
     });
     await loading.present();
-    this.tandemService.deletePassengerConfirmation(passengerData.id).subscribe({
+    this.tandemService.deletePassengerConfirmation(passengerData.id).pipe(takeUntil(this.unsubscribe$)).subscribe({
       next: (response) => {
         this.initialDataLoad();
       },
       error: (error) => {
-        console.error('Error saving passenger confirmation:', error);
+        console.error('Error deleting passenger confirmation:', error);
       },
       complete: async () => {
         await loading.dismiss();
@@ -289,22 +289,22 @@ export class PassengerConfirmationListPage implements OnInit, OnDestroy {
 
                 await loading.dismiss();
 
+                // Opening is a separate step from writing, as in
+                // FlightExportService: a device with no viewer for the file must
+                // not be reported as a failed export, which is what re-throwing
+                // into the generation catch below did off Android.
                 try {
                     await FileOpener.open({
                         filePath: result.uri,
                         contentType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
                     });
-                } catch (error) {
-                    if (Capacitor.getPlatform() == "android") {
-                        const alert = await this.alertController.create({
-                            header: this.translate.instant('message.infotitle'),
-                            message: this.translate.instant('message.downloadExcel'),
-                            buttons: [this.translate.instant('buttons.done')]
-                        });
-                        await alert.present();
-                    } else {
-                        throw error;
-                    }
+                } catch {
+                    const alert = await this.alertController.create({
+                        header: this.translate.instant('message.infotitle'),
+                        message: this.translate.instant('message.downloadExcel'),
+                        buttons: [this.translate.instant('buttons.done')]
+                    });
+                    await alert.present();
                 }
             } catch (e) {
                 await loading.dismiss();

@@ -113,8 +113,12 @@ function timeToSeconds(time?: string): number {
 }
 
 /**
- * The design's four-level intensity scale, shared by both activity grids:
- * nothing, then thirds of the busiest cell.
+ * The design's four-level intensity scale for the season grid: nothing, then
+ * thirds of the busiest cell.
+ *
+ * The day heatmap deliberately does not share this - GitHub-style, its levels
+ * are absolute counts (none / 1 / 2 / 3+), so one cell means the same thing
+ * whatever else is in the logbook. See ActivityHeatmapComponent.cells.
  */
 function shade(value: number, max: number): number {
     if (!value || max <= 0) {
@@ -231,7 +235,11 @@ export class StatisticStore {
      * and income charts, which differ only in the numbers they are given.
      */
     private toBars(values: number[], label: (index: number) => string): Bar[] {
-        const max = Math.max(...values, 1);
+        // Seeded only when nothing was recorded, not floored at 1: the income
+        // charts share this and their values are decimals, so a flat `, 1`
+        // mis-scaled every bar and left `peak` matching nothing.
+        const highest = Math.max(...values, 0);
+        const max = highest > 0 ? highest : 1;
         return values.map((value, index) => ({
             value,
             ratio: value / max,
@@ -498,6 +506,14 @@ export class StatisticStore {
      * it now, and a chip bar that says what is narrowing the numbers.
      */
     load(): Observable<StatisticState> {
+        const previous = this.state();
+        /*
+         * Read now, not in the map() below. Stamped on arrival, a filter applied
+         * while these four requests were in flight was recorded as already
+         * included: `loaded` stayed true and the page kept the unfiltered
+         * figures under the new filter's chips for the rest of the session.
+         */
+        const revision = this.flightStore.revision();
         const global$: Observable<FlightStatistic[] | null> = this.flightStore.getStatistics('global').pipe(catchError(() => of(null)));
         const yearly$ = this.flightStore.getStatistics('yearly').pipe(catchError(() => of([] as FlightStatistic[])));
         const monthly$ = this.flightStore.getStatistics('monthly').pipe(catchError(() => of([] as FlightStatistic[])));
@@ -513,10 +529,42 @@ export class StatisticStore {
                 // caching it would pin the empty state for the whole session,
                 // because the page only refetches while `loaded` is false.
                 loaded: global !== null,
-                revision: this.flightStore.revision()
+                revision
             })),
-            tap(state => this.state.set(state))
+            tap(next => this.commit(next, previous))
         );
+    }
+
+    /**
+     * The one place a fetched snapshot lands, so both entry points get the same
+     * two guarantees.
+     *
+     * A load that reached nothing keeps the figures already on screen: committed
+     * as-is, the empty snapshot replaced them and the page - which only reloads
+     * while `loaded` is false and the user never leaves it - showed skeletons for
+     * the rest of the visit. The kept snapshot is re-stamped with the current
+     * revision, or `loaded` would still evaluate false and the figures it just
+     * put back would not be shown either.
+     *
+     * And a filter can narrow the logbook to years the selected season is not
+     * among. Left pointing at it, the headline reads 0/0/0 with no chip
+     * highlighted and no way back.
+     */
+    private commit(next: StatisticState, previous: StatisticState): void {
+        // A failed load keeps the figures on screen rather than blanking them, and
+        // leaves `loaded` false so the next visit retries - the shape HomeStore
+        // uses. The revision must NOT be re-stamped to the current one: `loaded`
+        // compares it against the store's, so stale figures carrying a current
+        // revision read as fresh, gate out every later retry, and stay on screen
+        // for the rest of the session.
+        this.state.set(next.loaded || !previous.loaded
+            ? next
+            : { ...this.state(), loaded: false });
+
+        const period = this.period();
+        if (period !== ALL_TIME && !this.years().includes(period)) {
+            this.period.set(ALL_TIME);
+        }
     }
 
     /**
@@ -524,28 +572,12 @@ export class StatisticStore {
      * a filter change has to refetch even though the page never left.
      */
     reload(): Observable<StatisticState> {
-        const previous = this.state();
-        this.state.update(state => ({ ...state, loaded: false }));
-        return this.load().pipe(
-            tap(next => {
-                if (!next.loaded && previous.loaded) {
-                    // The refetch reached nothing (offline, expired token). Put
-                    // the figures that were on screen back rather than leaving
-                    // the empty snapshot: the page only reloads while `loaded`
-                    // is false and the user never leaves it, so that pinned the
-                    // skeletons for the rest of the session.
-                    this.state.set(previous);
-                    return;
-                }
-                // A filter can narrow the logbook to years the selected season
-                // is not among. Left pointing at it, the headline reads 0/0/0
-                // with no chip highlighted and no way back.
-                const period = this.period();
-                if (period !== ALL_TIME && !this.years().includes(period)) {
-                    this.period.set(ALL_TIME);
-                }
-            })
-        );
+        // Nothing to reset first: reload only follows a filter change, which
+        // bumps the revision the snapshot is compared against, so `loaded` is
+        // already false. Both guards live in commit(), which load() runs either
+        // way - the cold path needs them too, because entering the tab after the
+        // filter moved on the Flights tab takes load(), not this.
+        return this.load();
     }
 
     clear(): void {

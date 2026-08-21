@@ -148,6 +148,12 @@ export class DataPage implements OnInit, OnDestroy {
             this.flightStore.clearFlights();
             this.gliderStore.clearGliders();
             this.placeStore.clearPlaces();
+            // Emptying the caches is not enough: Home and Statistics gate their
+            // reload on `revision === flightStore.dataRevision()`, and an import
+            // that left it untouched read as "your copy is current" - so the
+            // dashboard kept the pre-import totals while the Flights tab, whose
+            // list was simply empty, refetched and disagreed with them.
+            this.flightStore.markDataChanged();
         } catch (error) {
             const alert = await this.alertController.create({
                 header: this.translate.instant('message.errortitle'),

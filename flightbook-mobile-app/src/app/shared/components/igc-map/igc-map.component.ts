@@ -109,7 +109,13 @@ export class IgcMapComponent implements AfterViewInit, OnDestroy {
                 featureProjection: 'EPSG:3857',
             });
 
-            this.geometry = features[0].getGeometry() as LineString;
+            // Guarded: ol's IGC reader returns [] for a track whose B-records
+            // are unreadable (a truncated upload, a file that is not really
+            // IGC), and this runs inside an @Input setter - so the TypeError
+            // aborted the flight form's change-detection pass instead of just
+            // leaving the map out. It is also what made the `!this.geometry`
+            // branches below reachable.
+            this.geometry = (features[0]?.getGeometry() as LineString) ?? null;
 
             if (this.vectorSource) {
                 this.vectorSource.clear();

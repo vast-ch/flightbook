@@ -38,9 +38,6 @@ export class GliderStore {
   // Default limit for pagination
   public defaultLimit = 40;
   
-  // Flag for list completion
-  public isGliderlistComplete = false;
-  
   // Flag to disable list
   public disableList = false;
   
@@ -149,7 +146,6 @@ export class GliderStore {
           loading: false,
           error: null
         }));
-        this.isGliderlistComplete = false;
       }),
       // After posting the glider, get the updated glider list
       concatMap((response: Glider) => {
@@ -220,7 +216,6 @@ export class GliderStore {
           loading: false,
           error: null
         }));
-        this.isGliderlistComplete = false;
       }),
       // After deleting the glider, get the updated glider list
       concatMap((response: any) => {

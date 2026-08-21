@@ -105,9 +105,14 @@ export class FlightExportService {
         let flights: Flight[];
         let stat: FlightStatistic;
         try {
-            const stats = <FlightStatistic[]>await firstValueFrom(this.flightStore.getStatistics('global'));
+            // Neither feeds the other, and the logbook is the unpaginated one -
+            // sequential awaits put a whole round trip in front of the download.
+            const [stats, logbook] = await Promise.all([
+                firstValueFrom(this.flightStore.getStatistics('global')) as Promise<FlightStatistic[]>,
+                firstValueFrom(this.flightStore.getFlights({ store: false }))
+            ]);
             stat = stats[0];
-            flights = await firstValueFrom(this.flightStore.getFlights({ store: false }));
+            flights = logbook;
         } catch {
             await loading.dismiss();
             return;
@@ -121,8 +126,15 @@ export class FlightExportService {
         // leaving an overlay the user could only escape by killing the app.
         let pdfObj: TCreatedPdf;
         try {
-            const user = await firstValueFrom(this.accountService.currentUser());
-            const schools = await this.schoolService.getSchools();
+            // The signal first: AppComponent populates it once at session
+            // bootstrap and every screen reads it for free, so re-GETting /users
+            // on each export bought nothing. The request stays as the fallback
+            // for an export started before the bootstrap landed.
+            const cached = this.accountService.currentUser$();
+            const [user, schools] = await Promise.all([
+                cached ? Promise.resolve(cached) : firstValueFrom(this.accountService.currentUser()),
+                this.schoolService.getSchools()
+            ]);
             pdfObj = await this.pdfExportService.generatePdf(flights, stat, user, schools.length !== 0, 'https://m.flightbook.ch');
         } catch {
             await loading.dismiss();

@@ -77,10 +77,12 @@ export class SessionService {
         // Entitlements are per account, and the paywalls read them
         // synchronously before the next user's refresh can land.
         this.paymentService.clear();
-        // The filters are shared by the flight list and the statistics page,
-        // and by every school screen, so leaving them set would narrow the next
-        // account's logbook by a glider it does not own.
+        // The filters are shared by the flight list and the statistics page, by
+        // the glider list, and by every school screen, so leaving them set would
+        // narrow the next account's logbook by a glider it does not own - and
+        // draw a summary chip for a criterion that pilot never chose.
         this.flightStore.resetFilter();
+        this.gliderStore.resetFilter();
         this.schoolService.resetFilter();
         // Home and Statistics register themselves here once constructed. They
         // gate their reloads on a `loaded` flag, so leaving them would show the

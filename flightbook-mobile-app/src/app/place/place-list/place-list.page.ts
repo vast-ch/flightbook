@@ -14,6 +14,8 @@ import { json2csv } from 'json-2-csv';
 import * as fileSaver from 'file-saver';
 import { MapUtil } from 'src/app/shared/util/MapUtil';
 import { RouterLink } from '@angular/router';
+import { Location } from '@angular/common';
+import { navigateBackOrTo } from 'src/app/shared/util/back-navigation';
 import { FlagsModule } from 'nxt-flags';
 import { addIcons } from "ionicons";
 import { add, locationOutline, shareOutline, chevronBack, chevronForward } from "ionicons/icons";
@@ -48,6 +50,7 @@ export class PlaceListPage implements OnDestroy {
 
     constructor(
         public navCtrl: NavController,
+        private location: Location,
         private alertController: AlertController,
         private actionSheetCtrl: ActionSheetController,
         private placeStore: PlaceStore,
@@ -91,9 +94,13 @@ export class PlaceListPage implements OnDestroy {
         this.unsubscribe$.complete();
     }
 
-    /** Places hang off the More page, so that is where back leads. */
+    /**
+     * More is only the fallback. The list is also reached by saving a place
+     * added from the flight form, and a hardcoded navigateBack('more') dropped
+     * the pilot on a tab they never came from.
+     */
     goBack() {
-        this.navCtrl.navigateBack('more');
+        navigateBackOrTo(this.navCtrl, this.location, 'more');
     }
 
     itemTapped(place: Place) {

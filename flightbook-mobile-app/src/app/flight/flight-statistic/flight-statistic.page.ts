@@ -121,6 +121,9 @@ export class FlightStatisticPage implements OnDestroy {
 
     /** The design's second sentence names a specific year; only the first generalises. */
     public chartNote = computed(() => {
+        // Read so the sentence re-renders on a language switch; instant() is a
+        // plain call and would otherwise keep the wording it was built with.
+        this.languageService.lang();
         const peak = this.store.peakLabel();
         if (!peak) {
             return '';
@@ -130,6 +133,8 @@ export class FlightStatisticPage implements OnDestroy {
     });
 
     public comparisonText = computed(() => {
+        // As above: three instant() calls, none of them a signal read.
+        this.languageService.lang();
         const compare = this.comparison();
         if (!compare) {
             return '';

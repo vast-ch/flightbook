@@ -633,7 +633,7 @@ button.fb-row {
   &--active {
     border-color: var(--fb-accent);
     background: var(--fb-accent-soft);
-    color: #0a5e9b;
+    color: var(--ion-color-tertiary);
   }
 
   /* Summary of an applied criterion; tapping it clears that one */
@@ -642,7 +642,7 @@ button.fb-row {
     border-color: var(--fb-accent);
     background: var(--fb-accent-soft);
     font-size: 11.5px;
-    color: #0a5e9b;
+    color: var(--ion-color-tertiary);
 
     ion-icon {
       font-size: 10px;

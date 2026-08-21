@@ -11,11 +11,12 @@ import { FileOpener } from '@capacitor-community/file-opener';
 import { XlsxExportService } from 'src/app/shared/services/xlsx-export.service';
 import { Glider } from '../shared/glider.model';
 import { GliderStore } from '../shared/glider.store';
-import { DatePipe } from '@angular/common';
+import { DatePipe, Location } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { HoursFormatPipe } from '../../shared/pipes/hours-format.pipe';
 import { addIcons } from "ionicons";
 import { add, filterOutline, peopleOutline, personOutline, shareOutline, chevronBack, chevronForward } from "ionicons/icons";
+import { navigateBackOrTo } from 'src/app/shared/util/back-navigation';
 
 @Component({
     selector: 'app-glider-list',
@@ -49,6 +50,7 @@ export class GliderListPage implements OnDestroy {
 
     constructor(
         public navCtrl: NavController,
+        private location: Location,
         private gliderStore: GliderStore,
         public modalCtrl: ModalController,
         private alertController: AlertController,
@@ -96,7 +98,6 @@ export class GliderListPage implements OnDestroy {
         if (this.infiniteScroll) {
             this.infiniteScroll.disabled = false;
         }
-        this.gliderStore.isGliderlistComplete = false;
         this.gliderStore.getGliders({ limit: this.gliderStore.defaultLimit, clearStore: true })
             .pipe(takeUntil(this.unsubscribe$))
             .subscribe();
@@ -107,9 +108,13 @@ export class GliderListPage implements OnDestroy {
         this.unsubscribe$.complete();
     }
 
-    /** Gliders hang off the More page, so that is where back leads. */
+    /**
+     * More is only the fallback. The list is also reached by saving a glider
+     * added from the flight form ("you have no gliders yet"), and a hardcoded
+     * navigateBack('more') dropped the pilot on a tab they never came from.
+     */
     goBack() {
-        this.navCtrl.navigateBack('more');
+        navigateBackOrTo(this.navCtrl, this.location, 'more');
     }
 
     itemTapped(glider: Glider) {
@@ -126,7 +131,6 @@ export class GliderListPage implements OnDestroy {
                 event.target.complete();
                 if (res.length < this.gliderStore.defaultLimit) {
                     event.target.disabled = true;
-                    this.gliderStore.isGliderlistComplete = true;
                 }
             });
     }

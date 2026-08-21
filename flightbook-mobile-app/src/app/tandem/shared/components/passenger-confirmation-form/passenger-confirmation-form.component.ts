@@ -10,9 +10,14 @@ import SignaturePad from 'signature_pad';
 import { PassengerConfirmation } from '../../domain/passenger-confirmation.model';
 import { ColorService } from 'src/app/shared/services/color.service';
 import { School } from 'src/app/school/shared/school.model';
+import { SUPPORTED_LANGUAGES, resolveLanguage } from 'src/app/shared/services/language.service';
 
-/** The languages a passenger can be handed the declaration in. */
-const LANGUAGES = ['de', 'fr', 'it', 'en'];
+/**
+ * The languages a passenger can be handed the declaration in - the app's own
+ * list, not a second copy of it that can drift out of step with the bundles
+ * actually shipped.
+ */
+const LANGUAGES = SUPPORTED_LANGUAGES;
 
 @Component({
   selector: 'app-passenger-confirmation-form',
@@ -129,7 +134,10 @@ export class PassengerConfirmationFormComponent implements OnDestroy {
   }
 
   setLanguage(lang: string) {
-    this.translate.use(lang)
+    // Narrowed like every other switch in the app: an unshipped code sticks in
+    // translate.currentLang while its bundle 404s, and every date binding given
+    // that locale then throws NG0701 on each change-detection pass.
+    this.translate.use(resolveLanguage(lang));
   }
 
   // ---- Signature ------------------------------------------------------

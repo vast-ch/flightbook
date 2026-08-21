@@ -96,14 +96,18 @@ export class FlightFilterComponent implements OnInit, OnDestroy {
         this.language = translate.currentLang;
         addIcons({ search });
 
-        if (this.gliderStore.isGliderlistComplete) {
-            this.gliders = this.gliderStore.gliders();
-        } else {
-            this.gliderStore.getGliders({ clearStore: true }).pipe(takeUntil(this.unsubscribe$)).subscribe(() => {
-                this.gliderStore.isGliderlistComplete = true;
-                this.gliders = this.gliderStore.gliders();
+        // store/applyFilter false, as the brand dropdown does: this select has to
+        // offer every glider the pilot owns. Read through the store it was
+        // narrowed by whatever the Gliders tab was filtered by - so the wing the
+        // flight was actually flown on could not be picked - and `clearStore`
+        // replaced that tab's own paged list with this unpaginated answer.
+        this.gliderStore.getGliders({ store: false, applyFilter: false })
+            .pipe(takeUntil(this.unsubscribe$))
+            .subscribe({
+                next: (gliders: Glider[]) => { this.gliders = gliders; },
+                // The rest of the sheet still works; only the choices are missing.
+                error: () => { }
             });
-        }
     }
 
     ngOnInit() {

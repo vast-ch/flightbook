@@ -279,17 +279,26 @@ export class AppointmentListPage implements OnInit, OnDestroy {
     }
 
     async itemTapped(appointment: Appointment) {
+        /*
+         * A shared flag rather than the dismiss payload alone: `dismiss({...})`
+         * only carries data when the sheet's own chevron closed it, so a
+         * backdrop tap or the Android back button after a registration left this
+         * list showing the old toggle state and spot count. The sheet writes
+         * through to this object as it goes, whatever closes it.
+         */
+        const outcome = { changed: false };
         const modal = await this.modalCtrl.create({
             component: AppointmentDetailsComponent,
             componentProps: {
                 appointment,
                 currentUser: this.currentUser(),
-                school: this.currentSchool()
+                school: this.currentSchool(),
+                outcome
             }
         });
         modal.present();
         const resp = await modal.onWillDismiss();
-        if (resp.data?.hasChange) {
+        if (resp.data?.hasChange || outcome.changed) {
             this.initialDataLoad();
         }
     }

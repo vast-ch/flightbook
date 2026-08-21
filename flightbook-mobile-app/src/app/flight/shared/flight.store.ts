@@ -53,6 +53,16 @@ export class FlightStore {
    */
   public dataRevision = signal(0);
 
+  /**
+   * The logbook moved by some route other than this store's own post/put/delete
+   * - the bulk data import, which uploads a file and then empties the caches.
+   * Without this, Home and Statistics compared their snapshot against an
+   * unchanged counter and kept serving pre-import figures for the session.
+   */
+  public markDataChanged(): void {
+    this.bumpDataRevision();
+  }
+
   /** A flight was created, edited or deleted. */
   private bumpDataRevision(): void {
     this.dataRevision.update(value => value + 1);

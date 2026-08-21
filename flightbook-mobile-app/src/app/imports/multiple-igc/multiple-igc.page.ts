@@ -71,14 +71,16 @@ export class MultipleIgcPage implements OnInit {
     }
 
     ngOnInit() {
-        if (this.gliderStore.isGliderlistComplete) {
-            this.gliders = this.gliderStore.gliders();
-        } else {
-            this.gliderStore.getGliders({ clearStore: true }).pipe(takeUntil(this.unsubscribe$)).subscribe((resp: Glider[]) => {
-                this.gliderStore.isGliderlistComplete = true;
-                this.gliders = this.gliderStore.gliders();
+        // store/applyFilter false: every imported flight needs the full choice of
+        // wings, and reading the shared store handed this dropdown whatever the
+        // Gliders tab was filtered by - or an empty list, after a sign-out or a
+        // data import had cleared it while the "complete" flag stayed true.
+        this.gliderStore.getGliders({ store: false, applyFilter: false })
+            .pipe(takeUntil(this.unsubscribe$))
+            .subscribe({
+                next: (gliders: Glider[]) => { this.gliders = gliders; },
+                error: () => { }
             });
-        }
     }
 
     async onFilesSelectEvent($event: File[]) {

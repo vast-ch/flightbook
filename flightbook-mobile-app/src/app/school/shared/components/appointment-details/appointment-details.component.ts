@@ -40,6 +40,16 @@ export class AppointmentDetailsComponent implements OnInit {
     waitingList: Subscription[] = [];
     hasChanges = false;
 
+    /**
+     * Written through to the host, because `dismiss({ hasChange })` only reaches
+     * it when close() is what dismissed the sheet. A backdrop tap or the Android
+     * hardware back button dismisses the modal itself, with no data - and the
+     * list then kept a row whose registration had just changed, so its toggle
+     * and free-spots count were stale and toggling it asked the pilot to confirm
+     * a registration they already held.
+     */
+    outcome?: { changed: boolean };
+
     /** LanguageService, not translate.currentLang: reactive, and always a locale Angular has data for. */
     get currentLang(): string {
         return this.languageService.lang();
@@ -84,8 +94,22 @@ export class AppointmentDetailsComponent implements OnInit {
         return this.school?.timezone || 'UTC';
     }
 
+    private spotCellsCache: { key: string; cells: SpotCell[] } | null = null;
+
+    /**
+     * Memoised on the two numbers it is built from. The template calls this
+     * twice - once to test the length, once to iterate - so an unmemoised call
+     * allocated two fresh arrays of up to 20 on every change-detection pass, and
+     * the new identity made `@for` re-diff every cell. The list row reads a
+     * precomputed `appointment.spotCells` for the same reason.
+     */
     spotCells(): SpotCell[] {
-        return spotCells(this.appointment.countSubscription ?? this.subscribed.length, this.appointment.maxPeople);
+        const taken = this.appointment.countSubscription ?? this.subscribed.length;
+        const key = `${taken}/${this.appointment.maxPeople}`;
+        if (this.spotCellsCache?.key !== key) {
+            this.spotCellsCache = { key, cells: spotCells(taken, this.appointment.maxPeople) };
+        }
+        return this.spotCellsCache.cells;
     }
 
     initials(subscription: Subscription): string {
@@ -153,7 +177,7 @@ export class AppointmentDetailsComponent implements OnInit {
                         handler: async () => {
                             await firstValueFrom(this.schoolService.subscribeToAppointment(this.school.id, this.appointment.id));
                             this.appointment = this.normalizeSchedule(await firstValueFrom(this.schoolService.getAppointment(this.school.id, this.appointment.id)));
-                            this.hasChanges = true;
+                            this.markChanged();
                             this.ngOnInit();
                             const subscription = this.appointment.subscriptions.find((subscription: Subscription) => subscription.user.email === this.currentUser.email);
                             if (subscription.waitingList) {
@@ -192,7 +216,7 @@ export class AppointmentDetailsComponent implements OnInit {
                             this.appointment = this.normalizeSchedule(await firstValueFrom(this.schoolService.getAppointment(this.school.id, this.appointment.id)));
                             this.ngOnInit();
                             this.isSubscribed = false;
-                            this.hasChanges = true;
+                            this.markChanged();
                         }
                     },
                     {
@@ -271,7 +295,7 @@ export class AppointmentDetailsComponent implements OnInit {
         // device's. Reading it as device-local made a closed registration look
         // open to a pilot abroad - the same contradiction the migrated path just
         // lost, and the reason deadlineAt is deliberately ignored here.
-        if (!this.school.timezone) {
+        if (!this.school?.timezone) {
             const deadlineWithoutTimezone = moment.utc(appointment.deadline).tz('Europe/Zurich', true);
             const nowWithoutTimezone = moment.tz('Europe/Zurich');
             return deadlineWithoutTimezone.isBefore(nowWithoutTimezone);
@@ -283,6 +307,13 @@ export class AppointmentDetailsComponent implements OnInit {
         // An unparseable deadline leaves NaN, which is neither past nor future -
         // stated rather than left to NaN comparisons happening to return false.
         return Number.isFinite(closesAt) && closesAt < Date.now();
+    }
+
+    private markChanged(): void {
+        this.hasChanges = true;
+        if (this.outcome) {
+            this.outcome.changed = true;
+        }
     }
 
     close() {

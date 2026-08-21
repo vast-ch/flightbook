@@ -6,6 +6,7 @@ import { FlightStore } from '../../flight/shared/flight.store';
 import { SchoolService } from '../../school/shared/school.service';
 import { FlightStatistic } from '../../flight/shared/flightStatistic.model';
 import { Appointment } from '../../school/shared/appointment.model';
+import { State } from '../../school/shared/state';
 import { School } from '../../school/shared/school.model';
 import { ControlSheet } from '../../shared/domain/control-sheet';
 import { SessionTeardownRegistry } from 'src/app/shared/services/session-teardown.registry';
@@ -112,7 +113,6 @@ export class HomeStore {
             : { ratedSkills: rated, totalSkills: total, schoolName: this.state().schools?.[0]?.name ?? null };
     });
 
-    /** Percentage of control-sheet skills rated, for the progress bar. */
     /**
      * What Home shows: the same progress, but only while training is still
      * running. A passed practical exam ends it, and a licensed pilot has no use
@@ -126,6 +126,7 @@ export class HomeStore {
         this.state().controlSheet?.passPracticeExam ? null : this.trainingProgress()
     );
 
+    /** Percentage of control-sheet skills rated, for the progress bar. */
     public controlSheetPercent = computed(() => {
         const progress = this.trainingProgress();
         if (!progress || progress.totalSkills === 0) {
@@ -152,6 +153,13 @@ export class HomeStore {
 
     load(): Observable<HomeState> {
         const previous = this.state();
+        /*
+         * Read now, not in the map() below. Stamped on arrival, a flight logged
+         * from the + sheet while these five requests were in flight was counted
+         * as already included, `loaded` stayed true for the rest of the session
+         * and Home kept showing the totals from before the flight.
+         */
+        const revision = this.flightStore.dataRevision();
         // applyFilter: false - the dashboard always shows all-time totals,
         // never whatever the user last filtered the flight list by.
         const global$: Observable<FlightStatistic[] | null> =
@@ -182,12 +190,16 @@ export class HomeStore {
                 // dashboard for the session - the page's `if (!loaded())` guard
                 // would never retry it.
                 loaded: global !== null,
-                revision: this.flightStore.dataRevision()
+                revision
             })),
             // A load that reached nothing keeps the last good snapshot rather
             // than blanking a dashboard that was already filled - the flag is
             // still false, so the next visit to the tab retries either way.
-            tap(state => this.state.set(state.loaded ? state : { ...previous, loaded: false }))
+            // `this.state()`, not the `previous` captured above: the control-sheet
+            // page pushes a saved sheet in through setControlSheet() while these
+            // requests are in flight, and writing the call-time snapshot back
+            // rolled that save off the screen it was made on.
+            tap(state => this.state.set(state.loaded ? state : { ...this.state(), loaded: false }))
         );
     }
 
@@ -219,7 +231,13 @@ export class HomeStore {
     private pickNext(entries: { appointment: Appointment; school: School }[]): UpcomingAppointment | null {
         const now = moment();
         const upcoming = entries
-            .filter(entry => entry.appointment?.scheduling && moment.utc(entry.appointment.scheduling).isSameOrAfter(now))
+            // CANCELED excluded: the `upcoming` scope only appends `from=today`,
+            // so a cancelled appointment still comes back - and Home has no
+            // struck-through state to show it with. Advertising one as the next
+            // flight sends the pilot to a meeting point nobody will be at.
+            .filter(entry => entry.appointment?.scheduling
+                && entry.appointment.state !== State.CANCELED
+                && moment.utc(entry.appointment.scheduling).isSameOrAfter(now))
             .sort((a, b) => moment.utc(a.appointment.scheduling).valueOf() - moment.utc(b.appointment.scheduling).valueOf());
 
         if (upcoming.length === 0) {
@@ -243,7 +261,9 @@ export class HomeStore {
                 scheduling: new Date(scheduled.format('YYYY-MM-DD HH:mm:ss'))
             } as Appointment,
             school: next.school,
-            daysUntil: scheduled.startOf('day').diff(moment().tz(zone).startOf('day'), 'days')
+            // clone(): startOf mutates in place, and `scheduled` is what the
+            // displayed start time above is formatted from.
+            daysUntil: scheduled.clone().startOf('day').diff(moment().tz(zone).startOf('day'), 'days')
         };
     }
 

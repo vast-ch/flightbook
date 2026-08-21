@@ -79,8 +79,18 @@ export class AccountDataPage implements OnInit, OnDestroy {
         addIcons({ 'chevron-back': chevronBack, 'eye-outline': eyeOutline, 'eye-off-outline': eyeOffOutline, checkmark });
 
         // Deep clone: edits must not touch the signal until a save succeeds.
+        //
+        // Seeded once, not on every emission. A successful save writes the server
+        // response back into currentUser$, which re-ran this and replaced the
+        // model the inputs are bound to - so anything typed while the PUT was in
+        // flight vanished from the form with no message, looking saved.
         effect(() => {
-            this.user = this.withConfig(structuredClone(this.accountService.currentUser$()));
+            const user = this.accountService.currentUser$();
+            if (this.seeded || !user) {
+                return;
+            }
+            this.seeded = true;
+            this.user = this.withConfig(structuredClone(user));
         });
 
         this.paymentService.getPaymentStatus().pipe(takeUntil(this.unsubscribe$)).subscribe((paymentStatus: PaymentStatus) => {
@@ -161,23 +171,21 @@ export class AccountDataPage implements OnInit, OnDestroy {
         });
     }
 
+    /** Whether the form has been filled from currentUser$ yet. */
+    private seeded = false;
+
     /**
      * Saves the profile and the emergency contact. Two endpoints, so each
      * reports its own failure rather than one aborting the other.
      */
     async saveChanges() {
-        // Checked before anything is sent: the emergency-contact page this block
-        // replaced marked firstname/lastname/phone `required` and disabled
-        // submit. Those columns are NOT NULL, so a half-filled block used to
-        // POST a row the database rejects, surfacing as a generic error with no
-        // hint which field was missing.
-        if (this.emergencyContactState === 'partial') {
-            await this.alert(
-                this.translate.instant('message.errortitle'),
-                this.translate.instant('message.mendatoryFields')
-            );
-            return;
-        }
+        // The emergency-contact page this block replaced marked
+        // firstname/lastname/phone `required` and disabled submit. Those columns
+        // are NOT NULL, so a half-filled block must not be POSTed - but it must
+        // not take the profile down with it either: returning here threw away an
+        // unrelated name, e-mail or notification change, and the block carries no
+        // required markers to say which field the alert meant.
+        const contactIncomplete = this.emergencyContactState === 'partial';
 
         const loading = await this.loadingCtrl.create({
             message: this.translate.instant('loading.saveaccount')
@@ -214,6 +222,15 @@ export class AccountDataPage implements OnInit, OnDestroy {
 
         if (contactError) {
             await this.alert(this.translate.instant('message.infotitle'), this.translate.instant('message.error'));
+            return;
+        }
+
+        // Last, so it reads as "the profile is saved, the contact is not".
+        if (contactIncomplete) {
+            await this.alert(
+                this.translate.instant('message.errortitle'),
+                this.translate.instant('message.mendatoryFields')
+            );
         }
     }
 

@@ -280,6 +280,17 @@ export class FlightListPage implements OnInit, OnDestroy {
                 next: (res: Flight[]) => {
                     this.listComplete.set(res.length < this.flightStore.defaultLimit);
                     this.listRevision = revision;
+                },
+                // The rows on screen are still the previous filter's, fetched at
+                // its offsets, and the scroller was just re-armed. Another page
+                // from here would come back filtered, land at the old offset and
+                // append flights already listed - duplicate `track flight.id`,
+                // i.e. NG0955. listRevision is left stale on purpose, so
+                // ionViewDidEnter refetches on the next visit to the tab.
+                error: () => {
+                    if (this.infiniteScroll) {
+                        this.infiniteScroll.disabled = true;
+                    }
                 }
             });
     }

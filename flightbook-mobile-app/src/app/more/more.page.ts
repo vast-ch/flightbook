@@ -241,8 +241,11 @@ export class MorePage implements OnDestroy {
         event.stopPropagation();
         const links = [...this.customLinks()];
         links.splice(index, 1);
-        await this.persistLinks(links);
-        if (links.length === 0) {
+        // Only once the write landed: persistLinks deliberately leaves the user
+        // signal alone on failure, so closing the editor on the local splice
+        // dropped the pilot back to a list still showing the link they had just
+        // been told could not be removed.
+        if (await this.persistLinks(links) && links.length === 0) {
             this.editingLinks.set(false);
         }
     }
