@@ -6,7 +6,8 @@
 // ---- Upcoming / Past ----------------------------------------------------
 .appt-tabs {
     display: flex;
-    padding: 0 var(--fb-gutter) 12px;
+    /* The tabs sat straight against the header's bottom border. */
+    padding: 6px var(--fb-gutter) 12px;
     background: var(--fb-surface);
     border-bottom: 1px solid var(--fb-border);
 }
