@@ -783,6 +783,15 @@ button.fb-row {
   padding: 13px var(--fb-gutter) 0;
 }
 
+/*
+ * Bottom gap, for a list whose rows start right below. The flight list gets it
+ * for free from its month heading's padding; .list-block has none, so the chips
+ * would otherwise rest on its top border.
+ */
+.filter-summary--spaced {
+  padding-bottom: 13px;
+}
+
 .filter-summary__clear {
   padding: 6px 10px;
   border: 0;

@@ -24,7 +24,7 @@ type Chip = { label: string; clear: () => void };
     imports: [TranslateModule, IonIcon],
     template: `
         @if (chips().length > 0) {
-            <div class="fb-chip-row filter-summary">
+            <div class="fb-chip-row filter-summary filter-summary--spaced">
                 @for (chip of chips(); track chip.label) {
                     <button type="button" class="fb-chip fb-chip--removable"
                             (click)="chip.clear(); changed.emit()">
