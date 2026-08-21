@@ -1274,6 +1274,14 @@ ion-modal.dateModal.filterDateModal {
 .fb-field__error {
   display: block;
   margin-top: 6px;
+  /*
+   * Inset from the field's own content edge, matching the gap above it. Sharing
+   * the label's exact left edge read as crowding the card border - red text
+   * carries more weight than a grey caption does, so the same alignment does not
+   * buy it the same breathing room. Symmetric, which also keeps a long message
+   * off the right gutter where the error sits in a narrow value column.
+   */
+  padding-inline: 6px;
   font-size: 11.5px;
   font-weight: 500;
   color: var(--ion-color-danger);
