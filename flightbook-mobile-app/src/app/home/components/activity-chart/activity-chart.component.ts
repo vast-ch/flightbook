@@ -15,6 +15,10 @@ const MONTHS_SHOWN = 12;
  * nothing, matching fb-flights-bars: a row of zeroes is noise, and the month
  * labels underneath already dim them.
  */
+/** Font size of the printed value, and the gap between it and the bar top. */
+const VALUE_SIZE = 8.5;
+const VALUE_GAP = 7;
+
 const BAR_VALUES: Plugin<'bar'> = {
     id: 'barValues',
     afterDatasetsDraw(chart: Chart<'bar'>) {
@@ -22,14 +26,14 @@ const BAR_VALUES: Plugin<'bar'> = {
         const values = chart.data.datasets[0]?.data ?? [];
         const ctx = chart.ctx;
         ctx.save();
-        ctx.font = `600 8.5px ${getComputedStyle(chart.canvas).fontFamily}`;
+        ctx.font = `600 ${VALUE_SIZE}px ${getComputedStyle(chart.canvas).fontFamily}`;
         ctx.fillStyle = themeColor('--fb-text-secondary', '#5b7284');
         ctx.textAlign = 'center';
         ctx.textBaseline = 'bottom';
         meta.data.forEach((bar, index) => {
             const value = Number(values[index] ?? 0);
             if (value > 0) {
-                ctx.fillText(String(value), bar.x, bar.y - 3);
+                ctx.fillText(String(value), bar.x, bar.y - VALUE_GAP);
             }
         });
         ctx.restore();
@@ -146,9 +150,11 @@ export class ActivityChartComponent {
         scales: {
             x: { display: false },
             // grace: the printed values sit above the bars, and without headroom
-            // the tallest column's number is clipped by the top of the canvas.
-            y: { display: false, beginAtZero: true, grace: '22%' },
-            airtime: { display: false, beginAtZero: true, grace: '22%', position: 'right' }
+            // the tallest column's number is clipped by the top of the canvas. It
+            // has to cover VALUE_GAP plus the glyph height - about 16px of a 78px
+            // canvas, so a fifth is not enough once the gap grew to 7.
+            y: { display: false, beginAtZero: true, grace: '30%' },
+            airtime: { display: false, beginAtZero: true, grace: '30%', position: 'right' }
         },
         plugins: {
             // chartjs-plugin-datalabels is no longer loaded, so there is
