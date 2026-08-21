@@ -980,6 +980,8 @@ ion-modal.dateModal.filterDateModal {
 .skill-sheet-modal {
   --width: 100%;
   --height: 82%;
+  /* How far the drag gesture has pulled the sheet down; see the component. */
+  --fb-sheet-drag: 0px;
   --background: var(--fb-bg);
   --border-radius: 18px 18px 0 0;
   --box-shadow: 0 -8px 28px rgba(16, 41, 60, 0.18);
@@ -990,6 +992,22 @@ ion-modal.dateModal.filterDateModal {
 
   &::part(backdrop) {
     background: rgba(16, 41, 60, 0.4);
+  }
+
+  /*
+   * The swipe-down-to-close drag, through the public part rather than the
+   * modal's shadow root. Transforming the ion-modal host itself would take the
+   * backdrop with it, and this sheet cannot use Ionic's own breakpoint gesture:
+   * a breakpoint sheet is full height and translated, which is what put the
+   * bottom of the coaching text off-screen (see control-sheet.page.ts).
+   */
+  &::part(content) {
+    transform: translateY(var(--fb-sheet-drag));
+  }
+
+  /* Only while snapping back - during the drag the sheet must track the finger. */
+  &.is-snapping::part(content) {
+    transition: transform 220ms cubic-bezier(0.32, 0.72, 0, 1);
   }
 
   /* Theory skills carry no coaching text - only the rating and its level. */

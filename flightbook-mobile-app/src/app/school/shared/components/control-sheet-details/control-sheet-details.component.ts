@@ -1,6 +1,6 @@
-import { Component, Input, OnInit, ViewEncapsulation } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, Input, OnDestroy, OnInit, ViewEncapsulation, inject } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-import { ModalController, IonContent, IonButton } from '@ionic/angular/standalone';
+import { ModalController, IonContent, IonButton, createGesture, Gesture, GestureDetail } from '@ionic/angular/standalone';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { StarRatingComponent } from 'src/app/shared/components/star-rating/star-rating.component';
 
@@ -10,6 +10,11 @@ import { StarRatingComponent } from 'src/app/shared/components/star-rating/star-
  * have for which section to tint - and the SHV copy is German in every locale.
  */
 const CAUTION_HEADING = /^(fehler|gefahr|mistake|erreur|risque|danger|errori|pericol)/i;
+
+/** How far the sheet must be pulled down to close on release, in pixels. */
+const DISMISS_DISTANCE = 90;
+/** Or how fast, so a short flick closes it too. */
+const DISMISS_VELOCITY = 0.4;
 
 @Component({
     selector: 'app-control-sheet-details',
@@ -26,7 +31,9 @@ const CAUTION_HEADING = /^(fehler|gefahr|mistake|erreur|risque|danger|errori|per
         IonButton
     ]
 })
-export class ControlSheetDetailsComponent implements OnInit {
+export class ControlSheetDetailsComponent implements OnInit, AfterViewInit, OnDestroy {
+
+    private host = inject(ElementRef<HTMLElement>);
 
     @Input() type: string;
     @Input() key: string;
@@ -94,6 +101,62 @@ export class ControlSheetDetailsComponent implements OnInit {
 
     close() {
         return this.modalCtrl.dismiss();
+    }
+
+    /**
+     * Swipe the head down to close, besides the Done button.
+     *
+     * Hand-rolled rather than Ionic's sheet gesture, which comes with
+     * `breakpoints` - and a breakpoint sheet is full height and translated down,
+     * so the bottom of the coaching text could never be scrolled to. This drives
+     * --fb-sheet-drag on the modal host instead, which tokens.scss applies to
+     * ::part(content): the sheet follows the finger while the backdrop stays put.
+     */
+    ngAfterViewInit(): void {
+        const modal = this.host.nativeElement.closest('ion-modal') as HTMLElement | null;
+        const head = this.host.nativeElement.querySelector('.skill-sheet__head') as HTMLElement | null;
+        if (!modal || !head) {
+            return;
+        }
+        this.modal = modal;
+
+        this.gesture = createGesture({
+            el: head,
+            gestureName: 'skill-sheet-drag',
+            direction: 'y',
+            threshold: 6,
+            // Not from the stars: dragging across them is how a rating is given.
+            canStart: (detail: GestureDetail) =>
+                !(detail.event.target as HTMLElement)?.closest('fb-star-rating'),
+            onStart: () => modal.classList.remove('is-snapping'),
+            // Downwards only. Pulling up on a sheet already at its full height
+            // would just detach it from the bottom edge.
+            onMove: (detail: GestureDetail) =>
+                this.setDrag(Math.max(0, detail.deltaY)),
+            onEnd: (detail: GestureDetail) => {
+                if (detail.deltaY > DISMISS_DISTANCE || detail.velocityY > DISMISS_VELOCITY) {
+                    // Reset first: Ionic's leave animation drives the same
+                    // element, and it should start from where the sheet sits.
+                    this.setDrag(0);
+                    this.close();
+                    return;
+                }
+                modal.classList.add('is-snapping');
+                this.setDrag(0);
+            }
+        });
+        this.gesture.enable(true);
+    }
+
+    ngOnDestroy(): void {
+        this.gesture?.destroy();
+    }
+
+    private gesture?: Gesture;
+    private modal?: HTMLElement;
+
+    private setDrag(px: number): void {
+        this.modal?.style.setProperty('--fb-sheet-drag', `${px}px`);
     }
 
     private buildContent(): string | null {

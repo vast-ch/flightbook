@@ -14,6 +14,8 @@ app-control-sheet-details {
         background: var(--fb-surface);
         border-radius: 18px 18px 0 0;
         border-bottom: 1px solid var(--fb-border);
+        /* The drag zone: the browser must not claim the vertical pan itself. */
+        touch-action: none;
     }
 
     .skill-sheet__grabber {
