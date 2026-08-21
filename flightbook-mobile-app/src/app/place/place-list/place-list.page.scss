@@ -35,14 +35,9 @@
   min-width: 0;
 }
 
-.place-row__top {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
+/* The name is the only thing on this line now; the pin moved to row level. */
 .place-row__name {
-  flex: 1;
+  display: block;
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;

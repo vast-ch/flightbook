@@ -43,13 +43,7 @@
             <ion-icon class="place-row__icon" name="place" aria-hidden="true"></ion-icon>
 
             <div class="place-row__main">
-              <div class="place-row__top">
-                <span class="place-row__name">{{ place.name }}</span>
-                @if (place.coordinates) {
-                  <ion-icon class="place-row__pin" name="location-outline"
-                            [attr.aria-label]="'place.coordinates' | translate"></ion-icon>
-                }
-              </div>
+              <span class="place-row__name">{{ place.name }}</span>
               <div class="place-row__meta">
                 @if (place.altitude) {
                   <span>{{ place.altitude }} {{ 'place.meters' | translate }}</span>
@@ -64,6 +58,17 @@
                 }
               </div>
             </div>
+
+            <!--
+              Row level, not beside the name: on the name line the pin sat 10px
+              above the row's centre, which read as misaligned against the
+              leading icon and the chevron - both of which .place-row__inner
+              centres. It marks the place, not the name.
+            -->
+            @if (place.coordinates) {
+              <ion-icon class="place-row__pin" name="location-outline"
+                        [attr.aria-label]="'place.coordinates' | translate"></ion-icon>
+            }
 
             <ion-icon class="fb-row__chevron" name="chevron-forward" aria-hidden="true"></ion-icon>
           </div>
