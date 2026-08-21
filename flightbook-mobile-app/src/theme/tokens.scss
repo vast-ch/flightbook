@@ -816,14 +816,33 @@ button.fb-row {
  * wins outright and does not need !important.
  */
 ion-modal.dateModal.filterDateModal {
+  /*
+   * Inset rather than edge to edge. Full width read as one more band of the
+   * sheet, whatever the surface behind it; leaving a margin is what makes it a
+   * card sitting on top of something.
+   */
+  --width: calc(100% - 40px);
+  --max-width: 360px;
   --background: var(--fb-surface);
-  --border-radius: 16px;
-  --box-shadow: 0 14px 34px rgba(16, 41, 60, 0.26);
+  --border-radius: 18px;
+  --box-shadow: 0 18px 44px rgba(16, 41, 60, 0.34);
   --backdrop-opacity: 1;
 
   /* Centred, not pinned to an edge: this one sits above a sheet, not the page. */
   &::part(backdrop) {
-    background: rgba(16, 41, 60, 0.32);
+    background: rgba(16, 41, 60, 0.45);
+  }
+
+  /*
+   * The colour that actually made it blend, and it was exact rather than close.
+   * ion-datetime paints its own background from --ion-color-light, which this
+   * theme remaps to #f2f7fb (see the Ionic roles above) - the very value of
+   * --fb-bg, which the filter sheet is painted in. So the wheel was rendering
+   * itself in the background colour, and no radius, shadow or backdrop on the
+   * shell around it could separate the two.
+   */
+  ion-datetime {
+    --background: var(--fb-surface);
   }
 }
 
