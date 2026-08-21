@@ -10,11 +10,18 @@
   <div class="form-body">
     <form id="gliderFilterForm" (ngSubmit)="filterElement()">
       <div class="fb-card--flush">
-        <div class="fb-row">
+        <div class="fb-row fb-row--select">
           <span class="fb-row__label" id="lbl-filter-brand">{{ 'glider.brand' | translate }}</span>
           <span class="fb-row__value">
-            <ion-input clearInput type="text" [(ngModel)]="filter.brand" name="brand"
-                       aria-labelledby="lbl-filter-brand"></ion-input>
+            <ion-select [(ngModel)]="filter.brand" name="brand" interface="popover"
+                        toggleIcon="chevron-forward" aria-labelledby="lbl-filter-brand"
+                        okText="{{ 'buttons.done' | translate }}"
+                        cancelText="{{ 'buttons.cancel' | translate }}">
+              <ion-select-option value="">{{ 'glider.all' | translate }}</ion-select-option>
+              @for (brand of brands(); track brand) {
+                <ion-select-option [value]="brand">{{ brand }}</ion-select-option>
+              }
+            </ion-select>
           </span>
         </div>
 

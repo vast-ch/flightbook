@@ -53,6 +53,10 @@ export class GliderStore {
   constructor() {}
   
   /**
+   * @param applyFilter pass false to ignore the shared filter for this request.
+   * The manufacturer dropdown needs every brand the pilot owns: filtered by the
+   * brand already chosen, the list would collapse to that one and there would be
+   * no way to pick another.
    * @param archived overrides the filter's own archived value for this request
    * only, without writing to the shared filter and without marking the glider
    * list as filtered. The flight forms need active gliders for their dropdown;
@@ -61,12 +65,12 @@ export class GliderStore {
    * error, and - now that the list draws its filter - showed a chip for a filter
    * the pilot never set.
    */
-  getGliders({ limit = null, offset = null, store = true, clearStore = false, archived = null }:
-    { limit?: number, offset?: number, store?: boolean, clearStore?: boolean, archived?: string } = {}): Observable<Glider[]> {
+  getGliders({ limit = null, offset = null, store = true, clearStore = false, archived = null, applyFilter = true }:
+    { limit?: number, offset?: number, store?: boolean, clearStore?: boolean, archived?: string, applyFilter?: boolean } = {}): Observable<Glider[]> {
 
     this.state.update(state => ({ ...state, loading: true }));
 
-    let params: HttpParams = this.createFilterParams(limit, offset, archived);
+    let params: HttpParams = this.createFilterParams(limit, offset, archived, applyFilter);
     
     return this.http.get<Glider[]>(`${environment.baseUrl}/gliders`, { params }).pipe(
       tap({
@@ -249,9 +253,11 @@ export class GliderStore {
     this.filter.set(new GliderFilter());
   }
 
-  private createFilterParams(limit: number, offset: number, archived: string | null = null): HttpParams {
+  private createFilterParams(limit: number, offset: number, archived: string | null = null, applyFilter = true): HttpParams {
     let params = new HttpParams();
-    const stored = this.filter();
+    // Opting out starts from an empty filter rather than reaching for the stored
+    // one, so every branch below reads the same way.
+    const stored = applyFilter ? this.filter() : new GliderFilter();
     // The override applies to the request, never to what the list reports as
     // filtered - the pilot did not ask for it.
     const effective = archived === null ? stored : Object.assign(new GliderFilter(), stored, { archived });
@@ -280,8 +286,10 @@ export class GliderStore {
       params = params.append('offset', offset.toString());
     }
 
-    if (archived === null) {
-      this.setFilterState(this.isFilterActive(stored));
+    // Neither an override nor an opt-out changes what the list reports as
+    // filtered - the pilot asked for neither.
+    if (archived === null && applyFilter) {
+      this.setFilterState(this.isFilterActive(this.filter()));
     }
     return params;
   }
