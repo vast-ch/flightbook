@@ -819,8 +819,6 @@
         "activity": "Attività",
         "allStatistics": "Tutte le statistiche",
         "flightsPerMonth": "Voli al mese",
-        "bestMonth": "Mese migliore",
-        "average": "Media",
         "fromShv": "News",
         "emptyLogbook": "Questo è tutto il tuo libro di volo finora. Importa file IGC per aggiungere voli precedenti — ",
         "importFromDevice": "Importa dal dispositivo",
@@ -828,7 +826,9 @@
         "ofTotalRated": "di {{total}} valutati",
         "soloFlight": "Volo da solo (SHGPA)",
         "requirementOpen": "Aperto",
-        "requirementDone": "Completato"
+        "requirementDone": "Completato",
+        "avgAirtime": "Tempo medio",
+        "flightsPerMonthAvg": "Voli / mese"
     },
     "flightlist": {
         "summary": "{{count}} voli · {{airtime}}",

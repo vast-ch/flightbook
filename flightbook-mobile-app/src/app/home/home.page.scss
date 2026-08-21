@@ -318,6 +318,14 @@
   .fb-stat {
     flex: 1;
   }
+
+  // A shade smaller and tighter than the headline strip's labels: two figures
+  // sharing the foot of a card, not a row spanning the page.
+  .fb-stat__label {
+    margin-top: 6px;
+    font-size: 9px;
+    letter-spacing: 0.09em;
+  }
 }
 
 .activity__footer-value {

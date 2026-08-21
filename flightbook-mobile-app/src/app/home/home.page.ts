@@ -65,30 +65,36 @@ export class HomePage implements OnDestroy {
 
     public distance = computed(() => splitDistance(Number(this.globalStats()?.totalDistance ?? 0)));
 
-    /** Best month and average airtime, derived from the monthly rows. */
+    /**
+     * The two figures under the chart.
+     *
+     * Airtime is averaged per flight, not per month - the figure beside it
+     * already answers how often, so a monthly total would say the same thing
+     * twice and neither would say how long a flight tends to last.
+     *
+     * Flights per month divides by the months that have rows, not by twelve: the
+     * API returns a row only for a month that was flown, so this is the rate
+     * while flying rather than a rate diluted by a winter off.
+     */
     public activitySummary = computed(() => {
         const rows = this.monthlyStats();
-        if (rows.length === 0) {
+        const flights = rows.reduce((sum, r) => sum + Number(r.nbFlights ?? 0), 0);
+        if (rows.length === 0 || flights === 0) {
             return null;
         }
-        const best = rows.reduce((a, b) => (b.nbFlights > a.nbFlights ? b : a));
         const totalTime = rows.reduce((sum, r) => sum + Number(r.time ?? 0), 0);
-        const bestDate = new Date(Number(best.year), Number(best.month) - 1, 1);
         return {
-            bestMonthFlights: best.nbFlights,
-            bestMonthTime: Number(best.time ?? 0),
-            // The design labels this column with the month itself, not a caption.
-            bestMonthLabel: bestDate.toLocaleDateString(this.languageService.lang(), { month: 'long' }),
-            averageTime: Math.round(totalTime / rows.length)
+            averageAirtime: toHoursMinutes(Math.round(totalTime / flights)),
+            flightsPerMonth: new Intl.NumberFormat(this.languageService.lang(), {
+                minimumFractionDigits: 1,
+                maximumFractionDigits: 1
+            }).format(flights / rows.length)
         };
     });
 
     constructor() {
         addIcons({ chevronForward, checkmark });
     }
-
-    /** Seconds to HH:mm - the chart footer format from the design. */
-    toHoursMinutes = toHoursMinutes;
 
     // ionViewWillEnter, not ngOnInit: Ionic caches pages, so this is what runs
     // again when the user comes back to the tab.

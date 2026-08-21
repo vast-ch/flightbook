@@ -819,8 +819,6 @@
         "activity": "Activity",
         "allStatistics": "All statistics",
         "flightsPerMonth": "Flights per month",
-        "bestMonth": "Best month",
-        "average": "Avg",
         "fromShv": "News",
         "emptyLogbook": "That's your whole logbook so far. Import IGC files to backfill earlier flights — ",
         "importFromDevice": "Import from device",
@@ -828,7 +826,9 @@
         "ofTotalRated": "of {{total}} rated",
         "soloFlight": "Solo flight (SHGPA)",
         "requirementOpen": "Open",
-        "requirementDone": "Done"
+        "requirementDone": "Done",
+        "avgAirtime": "Avg airtime",
+        "flightsPerMonthAvg": "Flights / month"
     },
     "flightlist": {
         "summary": "{{count}} flights · {{airtime}}",

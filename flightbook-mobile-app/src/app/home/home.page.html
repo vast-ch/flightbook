@@ -152,16 +152,12 @@
         @if (activitySummary(); as summary) {
           <div class="activity__footer fb-divider">
             <div class="fb-stat">
-              <div class="fb-stat__value activity__footer-value">{{ summary.bestMonthFlights }}</div>
-              <div class="fb-stat__label">{{ 'home.bestMonth' | translate }}</div>
+              <div class="fb-stat__value activity__footer-value">{{ summary.averageAirtime }}</div>
+              <div class="fb-stat__label">{{ 'home.avgAirtime' | translate }}</div>
             </div>
             <div class="fb-stat">
-              <div class="fb-stat__value activity__footer-value">{{ toHoursMinutes(summary.bestMonthTime) }}</div>
-              <div class="fb-stat__label">{{ summary.bestMonthLabel }}</div>
-            </div>
-            <div class="fb-stat">
-              <div class="fb-stat__value activity__footer-value">{{ toHoursMinutes(summary.averageTime) }}</div>
-              <div class="fb-stat__label">{{ 'home.average' | translate }}</div>
+              <div class="fb-stat__value activity__footer-value">{{ summary.flightsPerMonth }}</div>
+              <div class="fb-stat__label">{{ 'home.flightsPerMonthAvg' | translate }}</div>
             </div>
           </div>
         }

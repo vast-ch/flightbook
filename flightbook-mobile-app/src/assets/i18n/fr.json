@@ -821,11 +821,11 @@
         "soloFlight": "Vol autonome (FSVL)",
         "requirementOpen": "Ouvert",
         "requirementDone": "Rempli",
+        "avgAirtime": "Temps moy.",
+        "flightsPerMonthAvg": "Vols / mois",
         "activity": "Activité",
         "allStatistics": "Toutes les statistiques",
         "flightsPerMonth": "Vols par mois",
-        "bestMonth": "Meilleur mois",
-        "average": "Moy.",
         "fromShv": "News",
         "emptyLogbook": "C'est tout ton carnet de vol pour l'instant. Importe des fichiers IGC pour ajouter des vols antérieurs — ",
         "importFromDevice": "Importer depuis l'appareil"

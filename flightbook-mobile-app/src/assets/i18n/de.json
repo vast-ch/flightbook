@@ -819,8 +819,6 @@
         "activity": "Aktivität",
         "allStatistics": "Alle Statistiken",
         "flightsPerMonth": "Flüge pro Monat",
-        "bestMonth": "Bester Monat",
-        "average": "Ø",
         "fromShv": "News",
         "emptyLogbook": "Das ist bisher dein ganzes Flugbuch. Importiere IGC-Dateien, um frühere Flüge zu ergänzen — ",
         "importFromDevice": "Vom Gerät importieren",
@@ -828,7 +826,9 @@
         "ofTotalRated": "von {{total}} bewertet",
         "soloFlight": "Alleinflug (SHV)",
         "requirementOpen": "Offen",
-        "requirementDone": "Erfüllt"
+        "requirementDone": "Erfüllt",
+        "avgAirtime": "Ø Flugzeit",
+        "flightsPerMonthAvg": "Flüge / Monat"
     },
     "flightlist": {
         "summary": "{{count}} Flüge · {{airtime}}",
