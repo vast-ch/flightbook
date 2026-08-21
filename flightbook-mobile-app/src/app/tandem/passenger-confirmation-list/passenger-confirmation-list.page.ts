@@ -5,7 +5,7 @@ import { ModalController, LoadingController, NavController, IonIcon, IonContent,
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { firstValueFrom, Subject, takeUntil } from 'rxjs';
 import { addIcons } from "ionicons";
-import { add, checkmark, chevronBack } from 'ionicons/icons';
+import { add, checkmark, chevronBack, shareOutline } from 'ionicons/icons';
 import { PassengerConfirmationFormComponent } from '../shared/components/passenger-confirmation-form/passenger-confirmation-form.component';
 import { TandemService } from '../shared/tandem.service';
 import { PassengerConfirmation } from '../shared/domain/passenger-confirmation.model';
@@ -79,7 +79,7 @@ export class PassengerConfirmationListPage implements OnInit, OnDestroy {
     private languageService: LanguageService,
     private router: Router
   ) {
-    addIcons({ add, checkmark, 'chevron-back': chevronBack });
+    addIcons({ add, checkmark, 'chevron-back': chevronBack, 'share-outline': shareOutline });
   }
 
   async ngOnInit() {
