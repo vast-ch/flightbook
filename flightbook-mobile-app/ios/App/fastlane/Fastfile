@@ -1,0 +1,49 @@
+default_platform(:ios)
+
+platform :ios do
+  desc "Build and upload a release build to TestFlight"
+  lane :testflight do
+    api_key = app_store_connect_api_key(
+      key_id: ENV["APP_STORE_CONNECT_API_KEY_ID"],
+      issuer_id: ENV["APP_STORE_CONNECT_API_ISSUER_ID"],
+      key_filepath: ENV["APP_STORE_CONNECT_API_KEY_FILEPATH"],
+      in_house: false
+    )
+
+    increment_build_number(
+      xcodeproj: "App.xcodeproj",
+      build_number: ENV["BUILD_NUMBER"]
+    )
+
+    project_root = File.expand_path("..", Dir.pwd)
+    authentication_key_path = File.expand_path(ENV["APP_STORE_CONNECT_API_KEY_FILEPATH"], project_root)
+
+    provisioning_xcargs = [
+      "-allowProvisioningUpdates",
+      "-authenticationKeyPath #{authentication_key_path}",
+      "-authenticationKeyID #{ENV['APP_STORE_CONNECT_API_KEY_ID']}",
+      "-authenticationKeyIssuerID #{ENV['APP_STORE_CONNECT_API_ISSUER_ID']}"
+    ].join(" ")
+
+    build_app(
+      project: "App.xcodeproj",
+      scheme: "Flightbook",
+      configuration: "Release",
+      export_method: "app-store",
+      clean: true,
+      output_directory: "./build",
+      output_name: "Flightbook.ipa",
+      export_options: {
+        signingStyle: "automatic"
+      },
+      xcargs: provisioning_xcargs
+    )
+
+    upload_to_testflight(
+      api_key: api_key,
+      skip_waiting_for_build_processing: true,
+      skip_submission: true,
+      distribute_external: false
+    )
+  end
+end
