@@ -17,6 +17,22 @@ import { PlaceStore } from 'src/app/place/shared/place.store';
 import { ConfigurationService } from '../../services/configuration.service';
 import { createMarkerStyle } from './place-marker.style';
 
+/**
+ * Where the map starts for a place that has no coordinates yet.
+ *
+ * The previous default was zoom 1 on [0, 0]: the whole globe, centred in the
+ * Gulf of Guinea, leaving the pilot to find the Alps before they could place
+ * anything.
+ *
+ * Fractional on purpose. Switzerland is about 348km east to west, and at this
+ * latitude an integer zoom of 7 spans only 314km on a 375px phone - clipping
+ * Geneva and the eastern Grisons, the two ends you would zoom out to find. 6.7
+ * spans 387km wide and 289km down the map's 280px height, so the whole country
+ * fits with a margin on every phone size.
+ */
+const DEFAULT_CENTER_LON_LAT = [8.23, 46.8];
+const DEFAULT_ZOOM = 6.7;
+
 @Component({
     selector: 'fb-place-map',
     templateUrl: './place-map.component.html',
@@ -205,8 +221,8 @@ export class PlaceMapComponent implements AfterViewInit, OnChanges, OnDestroy {
             collapsed: true
         })
 
-        let zoom = 1;
-        let mapPoition = [0, 0];
+        let zoom = DEFAULT_ZOOM;
+        let mapPoition = fromLonLat(DEFAULT_CENTER_LON_LAT);
 
         if (position && position != null) {
             this.marker.setGeometry(new Point(position));
