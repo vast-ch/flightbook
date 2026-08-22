@@ -53,10 +53,16 @@ const { data, currentLocale = 'de' } = Astro.props;
       </div>
     </div>
 
-    <nav class="hidden items-center gap-5 md:flex" aria-label="Main navigation">
+    <nav
+      class="hidden flex-col items-stretch gap-1 md:flex md:flex-row md:items-center md:gap-5"
+      aria-label="Main navigation"
+    >
       {
         data.links.map((link) => (
-          <a href={link.href} class="text-[14.5px] font-medium text-white/70 hover:text-white">
+          <a
+            href={link.href}
+            class="px-4 py-3 text-xl font-medium text-white/70 hover:text-white md:px-0 md:py-0 md:text-[14.5px]"
+          >
             {link.text}
           </a>
         ))

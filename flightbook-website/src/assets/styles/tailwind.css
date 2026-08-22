@@ -122,6 +122,19 @@
   box-shadow: none;
 }
 
+/*
+ * BasicScripts.astro's legacy mobile-toggle handler (shared with other pages, not ours to
+ * change) adds `bg-page` to #header when the menu opens. `bg-page` and the header's own
+ * bg-[rgba(5,16,29,0.72)] are both class-selector utilities of equal specificity, so which one
+ * wins depends on their order in the compiled stylesheet — fragile, and today `bg-page` wins,
+ * turning the open header white behind `text-white/70` nav links. Pin it down with an ID
+ * selector: it outranks any class utility regardless of build order, so the header's own dark
+ * background always wins while expanded.
+ */
+#header.expanded {
+  background-color: rgba(5, 16, 29, 0.72);
+}
+
 #header.expanded nav {
   position: fixed;
   top: 70px;

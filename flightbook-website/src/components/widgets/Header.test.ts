@@ -159,4 +159,44 @@ describe('Header', () => {
     const menu = dropdown!.children.find((n) => n.tag === 'ul');
     expect(menu?.attrs).toMatch(/\bdropdown-menu\b/);
   });
+
+  // N2(b) REGRESSION: the nav was `hidden items-center gap-5 md:flex` — no unprefixed `flex`,
+  // so when BasicScripts.astro's toggle removes `.hidden` the browser falls back to the nav's
+  // *default* display (`block`), rendering five inline, unspaced links with no tap targets.
+  // This is deliberately a class-string assertion, not the usual "assert content/structure, not
+  // Tailwind classes" — for a purely visual failure like this one, the class IS the contract, so
+  // a future reader should not "fix" this test by loosening it back to a content check.
+  it('gives the nav a base flex layout (not only a md:-prefixed one) so the mobile panel is not display:block', async () => {
+    const html = await render(Header, { data, currentLocale: 'de' as Locale });
+    const navTag = html.match(/<nav\b[^>]*>/)?.[0];
+    expect(navTag).toBeDefined();
+
+    const classAttr = navTag!.match(/class="([^"]*)"/)?.[1] ?? '';
+    const classes = classAttr.split(/\s+/);
+
+    // An unprefixed (mobile-first) display/flow class must be present — not just `md:flex`.
+    expect(classes).toContain('flex-col');
+    // And it must not be display:none once `.hidden` is toggled off — i.e. `hidden` alone must
+    // not be the only display-affecting base class; `flex-col` only takes effect once `hidden`
+    // is removed, which is exactly the toggle script's job.
+    expect(classes).toContain('hidden');
+    expect(classes).toContain('md:flex');
+  });
+
+  it('gives each nav link mobile-sized tap targets while leaving the md: desktop styling untouched', async () => {
+    const html = await render(Header, { data, currentLocale: 'de' as Locale });
+    const roots = parseHtml(html);
+    const nav = find(roots, (n) => n.tag === 'nav');
+    expect(nav).toBeDefined();
+
+    const links = nav!.children.filter((n) => n.tag === 'a');
+    expect(links.length).toBe(data.links.length);
+    for (const link of links) {
+      // Adequate mobile tap target (44px guideline): vertical padding plus a readable size.
+      expect(link.attrs).toMatch(/\bpy-3\b/);
+      expect(link.attrs).toMatch(/\btext-xl\b/);
+      // The existing desktop row must be untouched.
+      expect(link.attrs).toMatch(/\bmd:text-\[14\.5px\]/);
+    }
+  });
 });
