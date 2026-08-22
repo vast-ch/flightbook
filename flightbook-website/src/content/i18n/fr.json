@@ -1,133 +1,206 @@
 {
   "nav": {
-    "offer": "Offre",
-    "premium": "Flightbook Premium",
-    "schools": "Flightbook Écoles",
+    "features": "Fonctionnalités",
+    "pricing": "Tarifs",
+    "schools": "Schools",
+    "tandem": "Tandem",
+    "faq": "FAQ",
     "login": "Connexion",
-    "loginInstructor": "Connexion Instructeur",
+    "loginPilot": "Flightbook",
+    "loginPilotSub": "Pour les pilotes",
+    "loginSchool": "Flightbook Schools",
+    "loginSchoolSub": "Pour les écoles de vol",
     "register": "S'inscrire",
     "skipToContent": "Aller au contenu"
   },
   "hero": {
-    "title": "Flightbook",
-    "subtitle": "Le carnet de vol numérique pour parapente et deltaplane - approuvé FSVL",
+    "eyebrow": "Pour les futurs pilotes · les expert:es · les écoles de vol",
+    "titleLine1": "Ton carnet de vol",
+    "titleLine2": "vole avec toi.",
+    "subtitle": "Le carnet de vol numérique pour parapente et delta - homologué SHV",
     "ios": "iOS",
     "android": "Android",
-    "subscribePremium": "S'abonner à Flightbook Premium"
+    "subscribePremium": "S'abonner à Flightbook Premium →",
+    "stats": [
+      { "value": "Homologué SHV", "label": "reconnu à l'examen" },
+      { "value": "Saisir les vols", "label": "gérer le carnet de vol" },
+      { "value": "Suivre la progression", "label": "pour les futurs pilotes" },
+      { "value": "Organiser les grands vols", "label": "pour les écoles de vol" }
+    ]
+  },
+  "features": {
+    "title": "Fonctionnalités",
+    "intro": "Tout ce dont tu as besoin après l'atterrissage — dans une seule app.",
+    "cta": "S'inscrire",
+    "items": [
+      {
+        "title": "Saisir les vols",
+        "description": "Enregistre tous tes vols : décollages et atterrissages avec les informations qui comptent pour toi. Et gère toutes tes ailes, pour garder à tout moment une vue sur leur âge et le nombre de vols effectués."
+      },
+      {
+        "title": "Visualiser les traces",
+        "description": "Tu peux téléverser tes fichiers IGC directement depuis ton vario ou ton tracker, les rassembler et analyser tes vols sans devoir les publier quelque part."
+      },
+      {
+        "title": "Analyser les statistiques",
+        "description": "Nombre de vols par année, heures de vol ou revenus des vols tandem : dans l'app, tu filtres et ajustes tes chiffres comme tu veux."
+      },
+      {
+        "title": "Exporter des données",
+        "description": "Pour ne jamais perdre tes données, tu peux les exporter à tout moment au format Excel. Et à l'examen SHV, l'export PDF te sert de carnet de vol homologué."
+      },
+      {
+        "title": "Importer des données",
+        "description": "Tu viens d'un autre carnet de vol ? Vols, ailes et lieux s'importent depuis d'autres formats — avec un rapport indiquant ce qui a été ajouté, mis à jour ou déjà présent."
+      },
+      {
+        "title": "Lire les traces sur la carte",
+        "description": "La trace IGC s'affiche sur un fond de carte en relief, les montées et descentes sont codées par couleur, et le vol peut être rejoué."
+      },
+      {
+        "title": "Décollages et atterrissages",
+        "description": "Choisis le site par recherche de nom, l'altitude et le pays se remplissent automatiquement. Chaque lieu apparaît avec sa carte dans ta liste."
+      },
+      {
+        "title": "Vue d'ensemble des ailes",
+        "description": "Ailes solo et tandem avec âge, nombre de vols et contrôles. Le matériel retiré part aux archives sans disparaître du carnet de vol."
+      }
+    ],
+    "captions": [
+      "Accueil - Vue d'ensemble de la gestion des vols",
+      "Statistiques - Analyse des données de vol",
+      "Ajouter un vol - Saisir de nouveaux vols",
+      "Gérer les sites - Décollages et atterrissages"
+    ]
   },
   "pricing": {
-    "title": "Offre",
+    "title": "Tarifs",
+    "intro": "Les 25 premiers vols sont gratuits et peuvent être ajoutés sans frais.",
     "free": {
       "badge": "Pilote",
-      "title": "Flightbook GRATUIT",
-      "price": "GRATUIT",
+      "title": "Flightbook FREE",
+      "price": "FREE",
       "features": [
-        "Gérer les vols (Max 25 vols)",
-        "Confirmations passagers (Max 10)",
+        "Gérer les vols (max. 25 vols)",
+        "Confirmations passagers (max. 10)",
         "Gérer les parapentes",
-        "Upload IGC",
+        "Téléversement IGC",
         "Statistiques"
       ],
       "cta": "S'inscrire"
     },
     "premium": {
-      "badge": "Pilote",
+      "badge": "Pilote · Recommandé",
       "title": "Flightbook Premium",
       "price": "CHF 12.-",
       "period": "/ an",
-      "features": ["Gérer les vols", "Confirmations passagers", "Gérer les parapentes", "Upload IGC", "Statistiques"],
-      "cta": "S'abonner maintenant"
+      "features": [
+        "Gérer les vols",
+        "Confirmations passagers",
+        "Gérer les parapentes",
+        "Téléversement IGC",
+        "Statistiques"
+      ],
+      "cta": "S'abonner"
     },
     "schools": {
-      "badge": "Instructeur",
-      "title": "Flightbook Écoles",
-      "price": "GRATUIT",
+      "badge": "École de vol",
+      "title": "Flightbook Schools",
+      "price": "FREE",
       "features": [
-        "Progression d'apprentissage transparente",
-        "Gestion simple des participations",
-        "Fiche de contrôle individuelle",
+        "Progression transparente",
+        "Gestion simple des inscriptions",
+        "Feuille de contrôle individuelle",
         "Notifications push"
       ],
-      "cta": "Créer une école de vol"
+      "cta": "Créer une école"
     },
     "notes": [
       "Les 25 premiers vols sont gratuits et peuvent être ajoutés sans frais.",
-      "Changement de prix à partir du 1er février 2023 pour les nouveaux utilisateurs. L'augmentation des coûts de serveur m'oblige à rendre l'application payante.",
-      "L'ensemble de l'application reste Open Source. Pour tous ceux qui souhaitent participer au développement de l'application, il existe un compte gratuit qui reste bien sûr disponible à vie."
+      "Changement de prix dès le 1er février 2023 pour les nouveaux utilisateurs. La hausse des coûts de serveur m'oblige à rendre l'application payante.",
+      "L'application reste entièrement open source. Toute personne qui souhaite participer au développement reçoit un compte gratuit, à vie bien sûr."
     ]
-  },
-  "premium": {
-    "title": "Flightbook Premium",
-    "features": [
-      {
-        "title": "Collecter les vols",
-        "description": "Suivez tous vos vols : sites de décollage et d'atterrissage avec des informations importantes pour vous. Et : Gérez toutes vos voiles, afin que vous ayez toujours une vue d'ensemble de l'âge et du nombre de vols sur vos équipements."
-      },
-      {
-        "title": "Visualiser les traces",
-        "description": "Vous pouvez télécharger directement vos fichiers IGC depuis votre vario ou tracker, les collecter et analyser vos vols, sans avoir à les soumettre publiquement quelque part."
-      },
-      {
-        "title": "Analyser les statistiques",
-        "description": "Que ce soit le nombre de vols par année, les heures de vol ou les revenus du tandem : Dans l'application, vous pouvez filtrer et ajuster vos chiffres de vol de manière ciblée."
-      },
-      {
-        "title": "Justificatif FSVL portable",
-        "description": "Pour que vous ne perdiez jamais les données, vous pouvez les exporter à tout moment au format Excel. De plus, vous pouvez facilement présenter votre Flightbook via l'export PDF comme carnet de vol approuvé à l'examen FSVL."
-      }
-    ],
-    "cta": "S'inscrire"
   },
   "schools": {
-    "title": "Flightbook Écoles",
-    "features": [
+    "title": "Flightbook Schools",
+    "eyebrow": "Pour les écoles de vol",
+    "cta": "Créer une école",
+    "items": [
       {
-        "title": "Progression d'apprentissage transparente",
-        "description": "En tant qu'instructeur de vol, vous pouvez consulter les données de vos élèves. Vous avez ainsi toujours une vue d'ensemble de qui a combien de vols et qui doit encore s'améliorer dans quel domaine. Vous avez donc la progression d'apprentissage de votre équipe toujours transparente sous les yeux."
+        "title": "Progression transparente",
+        "description": "En tant que moniteur, tu consultes les données de tes élèves. Tu sais donc toujours qui a combien de vols et qui doit encore progresser dans quel domaine. La progression de ton groupe reste transparente à tout moment."
       },
       {
-        "title": "Gestion simple des participations",
-        "description": "Vous gérez les vols en altitude, les sessions de gonflage ou les unités théoriques directement dans l'outil. Vos élèves acceptent ou refusent et vous savez toujours qui participe à quel cours. Vous n'avez donc plus besoin de parcourir de longs chats, mais générez votre liste de participants en un clic."
+        "title": "Gestion simple des inscriptions",
+        "description": "Tu gères les grands vols, les sessions de gonflage ou les cours de théorie directement dans l'outil. Tes élèves confirment ou annulent, et tu sais toujours qui participe à quel cours. Plus besoin de fouiller d'interminables discussions : la liste des participants se génère en un clic."
       },
       {
-        "title": "Top pour les élèves pilotes",
-        "description": "Vos élèves bénéficieront également si vous passez à Flightbook Pro : Ils utilisent l'application pour suivre leurs vols et manœuvres, sites de décollage et d'atterrissage. Même le carnet de vol FSVL pour l'examen peut être généré directement depuis l'application. De plus, ils sont toujours informés de quand a lieu le prochain cours et qui vient. Ils peuvent utiliser Flightbook Basic pour seulement 12 francs par an (même après la formation) pour suivre leurs progrès en tant que pilotes."
-      }
-    ],
-    "cta": "Créer une école de vol"
-  },
-  "footer": {
-    "brand": "Flightbook",
-    "switchLanguage": "Deutsch"
-  },
-  "faq": {
-    "title": "Questions fréquemment posées",
-    "questions": [
-      {
-        "question": "Flightbook est-il approuvé pour les examens FSVL?",
-        "answer": "Oui, Flightbook est officiellement approuvé pour les examens FSVL. Vous pouvez exporter votre carnet de vol directement depuis l'application au format PDF et le présenter lors de l'examen."
-      },
-      {
-        "question": "Flightbook fonctionne-t-il pour le parapente et le deltaplane?",
-        "answer": "Oui, Flightbook convient aussi bien aux pilotes de parapente qu'aux pilotes de deltaplane. Vous pouvez gérer tous vos vols, équipements et statistiques."
-      },
-      {
-        "question": "Puis-je télécharger mes fichiers IGC?",
-        "answer": "Oui, vous pouvez télécharger des fichiers IGC directement depuis votre vario ou tracker GPS et visualiser et analyser vos vols."
-      },
-      {
-        "question": "Flightbook existe-t-il pour iOS et Android?",
-        "answer": "Oui, Flightbook est disponible en tant qu'application native pour iOS (iPhone/iPad) et Android. Vous pouvez télécharger l'application gratuitement sur l'App Store ou Google Play Store."
-      },
-      {
-        "question": "Qu'est-ce que Flightbook Schools?",
-        "answer": "Flightbook Schools est une solution gratuite pour les écoles de vol. Les instructeurs peuvent suivre la progression de leurs élèves, gérer les cours et créer des fiches de contrôle individuelles. Les rendez-vous peuvent être créés directement, les élèves reçoivent des notifications push et peuvent s'inscrire aux rendez-vous. Cela permet aux instructeurs d'avoir une vue d'ensemble parfaite des élèves participants."
-      },
-      {
-        "question": "Comment puis-je commencer en tant qu'école de vol?",
-        "answer": "C'est très simple :<ol style='margin-top: 1rem; margin-bottom: 1rem; padding-left: 1.5rem; list-style-type: decimal;'><li style='margin-bottom: 0.5rem; display: list-item;'>Créez votre école de vol</li><li style='margin-bottom: 0.5rem; display: list-item;'>Ajoutez vos élèves</li><li style='margin-bottom: 0.5rem; display: list-item;'>Commencez!</li></ol><a href='https://instructor.flightbook.ch/school/register' target='_blank' class='inline-block px-6 py-3 text-white bg-primary rounded-lg hover:bg-primary/90 transition-colors font-semibold'>Créer une école de vol</a>"
+        "title": "Suivi de progression pour les élèves",
+        "description": "Tes élèves aussi profiteront du passage à Flightbook Pro : ils utilisent l'app pour suivre leurs vols et manœuvres, décollages et atterrissages. Le carnet de vol SHV pour l'examen peut même être généré directement depuis l'app. Ils sont aussi toujours informés de la date du prochain cours et de qui y participe. Ils peuvent utiliser Flightbook Basic pour seulement 12 francs par année (même après la formation) pour suivre leur progression en tant que pilotes."
       }
     ]
+  },
+  "tandem": {
+    "eyebrow": "Pour les pilotes tandem",
+    "title": "Flightbook pour les pilotes tandem",
+    "intro": "Voler à titre professionnel demande plus que la gestion des vols. Flightbook couvre l'administration liée au tandem directement dans l'app.",
+    "cta": "S'inscrire",
+    "items": [
+      {
+        "title": "Saisir la confirmation passager",
+        "description": "Saisis directement sur le téléphone la confirmation exigée par la FSVL concernant l'instruction du passager : données personnelles, points du briefing et signature du passager à l'écran."
+      },
+      {
+        "title": "Suivre les recettes",
+        "description": "Indique le montant pour chaque vol tandem et garde une vue sur tes recettes — par saison, par mois ou filtrées par période."
+      },
+      {
+        "title": "Exporter les confirmations",
+        "description": "Toutes les confirmations restent enregistrées dans ton compte et s'exportent à tout moment en PDF ou Excel — pour tes archives ou sur demande."
+      },
+      {
+        "title": "Briefer en plusieurs langues",
+        "description": "Tes passagers lisent et signent la confirmation dans leur langue. Tu choisis la langue avant de leur tendre le téléphone."
+      }
+    ]
+  },
+  "faq": {
+    "title": "Questions fréquentes",
+    "questions": [
+      {
+        "question": "Flightbook est-il homologué pour les examens FSVL ?",
+        "answer": "Oui, Flightbook est officiellement homologué pour les examens FSVL. Tu exportes ton carnet de vol en PDF depuis l'app et tu le présentes à l'examen."
+      },
+      {
+        "question": "Flightbook fonctionne-t-il pour le parapente et le delta ?",
+        "answer": "Oui, Flightbook convient aux pilotes de parapente comme de delta. Tu gères tous tes vols, ton matériel et tes statistiques."
+      },
+      {
+        "question": "Puis-je téléverser mes fichiers IGC ?",
+        "answer": "Oui, tu peux téléverser les fichiers IGC directement depuis ton vario ou ton traceur GPS, puis visualiser et analyser tes vols."
+      },
+      {
+        "question": "Flightbook existe-t-il pour iOS et Android ?",
+        "answer": "Oui, Flightbook est disponible comme app native pour iOS (iPhone/iPad) et Android. Le téléchargement est gratuit sur l'App Store et Google Play."
+      },
+      {
+        "question": "Qu'est-ce que Flightbook Schools ?",
+        "answer": "Flightbook Schools est une solution gratuite pour les écoles de vol. Les moniteurs suivent la progression de leurs élèves, gèrent les cours et créent des feuilles de contrôle individuelles. Les rendez-vous se créent directement, les élèves reçoivent une notification push et peuvent s'inscrire. Les moniteurs gardent ainsi une vue parfaite sur les participants."
+      },
+      {
+        "question": "Comment démarrer en tant qu'école de vol ?",
+        "answer": "Le démarrage est très simple :",
+        "steps": ["Crée ton école de vol", "Ajoute tes élèves", "C'est parti !"]
+      }
+    ]
+  },
+  "footer": {
+    "ctaTitle": "Les 25 premiers vols sont gratuits.",
+    "ctaButton": "Commencer gratuitement",
+    "openSource": "Open source",
+    "github": "GitHub",
+    "legal": "Mentions légales",
+    "privacy": "Protection des données"
   },
   "meta": {
     "title": "Carnet de vol parapente - approuvé FSVL | Flightbook",
