@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, signal } from '@angular/core';
 import moment from 'moment';
-import { BehaviorSubject, firstValueFrom, Observable } from 'rxjs';
+import { firstValueFrom, Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { AppointmentFilter } from './appointment-filter.model';
 import { Appointment } from './appointment.model';
@@ -17,14 +17,24 @@ export type AppointmentScope = 'upcoming' | 'past';
 })
 export class SchoolService {
 
-  filter: AppointmentFilter;
-  filtered$: BehaviorSubject<boolean>;
+  /**
+   * A signal, as the flight and glider filters are: the list draws a removable
+   * chip per criterion, and a plain object cannot tell those chips that one was
+   * dropped - `filtered` stays true while others remain, so nothing recomputes.
+   */
+  filter = signal<AppointmentFilter>(new AppointmentFilter());
+
+  /** Whether the last filtered request actually narrowed anything. */
+  filtered = signal(false);
+
   defaultLimit = 20;
   schoolsSignal = signal<School[] | null>(null);
 
-  constructor(private http: HttpClient) {
-    this.filter = new AppointmentFilter();
-    this.filtered$ = new BehaviorSubject(false);
+  constructor(private http: HttpClient) { }
+
+  /** Patches the shared filter in place, the way FlightStore.updateFilter does. */
+  updateFilter(patch: Partial<AppointmentFilter>): void {
+    this.filter.update(current => Object.assign(new AppointmentFilter(), current, patch));
   }
 
   /**
@@ -62,8 +72,8 @@ export class SchoolService {
    * silently narrowed by a date range and a state it never chose.
    */
   resetFilter() {
-    this.filter = new AppointmentFilter();
-    this.filtered$.next(false);
+    this.filter.set(new AppointmentFilter());
+    this.filtered.set(false);
   }
 
   /**
@@ -82,7 +92,7 @@ export class SchoolService {
   /**
    * The Upcoming / Past tabs, expressed with the from/to params the endpoint
    * already takes. A bound the user set in the filter wins - their filter is the
-   * more specific request - and the scope deliberately does not touch filtered$,
+   * more specific request - and the scope deliberately does not touch `filtered`,
    * or every plain list would claim to be filtered.
    *
    * Note both bounds are date-only, so today satisfies either scope; the page
@@ -92,13 +102,14 @@ export class SchoolService {
     if (!scope) {
       return params;
     }
+    const filter = this.filter();
     const today = moment().format('YYYY-MM-DD');
     // A bound the user set wins - unless the caller opted out of the filter, in
     // which case there is no user bound to defer to.
-    if (scope === 'upcoming' && (!applyFilter || !this.filter.from)) {
+    if (scope === 'upcoming' && (!applyFilter || !filter.from)) {
       return params.append('from', today);
     }
-    if (scope === 'past' && (!applyFilter || !this.filter.to)) {
+    if (scope === 'past' && (!applyFilter || !filter.to)) {
       return params.append('to', today);
     }
     return params;
@@ -144,10 +155,10 @@ export class SchoolService {
   }
 
   private setFilterState(nextState: boolean) {
-    this.filtered$.next(nextState);
+    this.filtered.set(nextState);
   }
 
-  /** Paging only - no filter read, and no filtered$ emission. */
+  /** Paging only - no filter read, and no change to `filtered`. */
   private createPagingParams(limit: Number, offset: Number): HttpParams {
     let params = new HttpParams();
     if (limit) {
@@ -162,16 +173,17 @@ export class SchoolService {
   private createFilterParams(limit: Number, offset: Number): HttpParams {
     let params = new HttpParams();
     let filterState = false;
-    if (this.filter.from && this.filter.from !== null) {
-      params = params.append('from', moment(this.filter.from).format('YYYY-MM-DD'));
+    const filter = this.filter();
+    if (filter.from && filter.from !== null) {
+      params = params.append('from', moment(filter.from).format('YYYY-MM-DD'));
       filterState = true;
     }
-    if (this.filter.to && this.filter.to !== null) {
-      params = params.append('to', moment(this.filter.to).format('YYYY-MM-DD'));
+    if (filter.to && filter.to !== null) {
+      params = params.append('to', moment(filter.to).format('YYYY-MM-DD'));
       filterState = true;
     }
-    if (this.filter.state) {
-      params = params.append('state', this.filter.state);
+    if (filter.state) {
+      params = params.append('state', filter.state);
       filterState = true
     }
 

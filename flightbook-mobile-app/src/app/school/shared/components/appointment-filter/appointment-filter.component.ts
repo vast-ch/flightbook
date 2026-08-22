@@ -1,4 +1,4 @@
-import { Component, computed, signal } from '@angular/core';
+import { Component, computed } from '@angular/core';
 import { ModalController, IonContent, IonButton, IonModal, IonDatetime } from '@ionic/angular/standalone';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { AppointmentFilter } from '../../appointment-filter.model';
@@ -27,11 +27,11 @@ export class AppointmentFilterComponent {
     public language: string;
 
     /**
-     * The sheet edits the service's filter as it goes and has no Cancel, so the
-     * signal is only what the template renders from - SchoolService.filter is a
-     * plain object, and mutating it would not repaint anything.
+     * The service's own signal. The sheet edits it as it goes and has no Cancel,
+     * so there is nothing to mirror locally - and a mirror would now drift from
+     * the chips the list draws off the same signal.
      */
-    public filter = signal<AppointmentFilter>(this.schoolService.filter);
+    public filter = this.schoolService.filter;
 
     public isFiltered = computed(() => {
         const { from, to, state } = this.filter();
@@ -63,7 +63,6 @@ export class AppointmentFilterComponent {
         // The service's own reset, so the filtered flag it keeps for the list's
         // header chip is cleared with it.
         this.schoolService.resetFilter();
-        this.filter.set(this.schoolService.filter);
     }
 
     close() {
@@ -71,8 +70,6 @@ export class AppointmentFilterComponent {
     }
 
     private apply(patch: Partial<AppointmentFilter>) {
-        const next = Object.assign(new AppointmentFilter(), this.filter(), patch);
-        this.schoolService.filter = next;
-        this.filter.set(next);
+        this.schoolService.updateFilter(patch);
     }
 }

@@ -11,7 +11,7 @@
   <div class="list-header__text">
     <div class="list-header__eyebrow">
       <span class="fb-section-label">{{ currentSchool()?.name }}</span>
-      @if (filtered) {
+      @if (filtered()) {
         <span class="list-header__chip">{{ 'groupname.filtered' | translate }}</span>
       }
     </div>
@@ -19,8 +19,8 @@
   </div>
 
   <div class="list-header__actions">
-    <button type="button" class="icon-button" (click)="openFilter()"
-            [attr.aria-label]="'buttons.filter' | translate">
+    <button type="button" class="icon-button" [class.is-active]="filtered()"
+            (click)="openFilter()" [attr.aria-label]="'buttons.filter' | translate">
       <ion-icon name="filter-outline" aria-hidden="true"></ion-icon>
     </button>
     <!-- Not in the design, but the only way to leave a school -->
@@ -59,6 +59,8 @@
 </div>
 
 <ion-content class="no-padding language-{{currentLang}}">
+
+  <fb-appointment-filter-chips (changed)="reloadForFilter()"></fb-appointment-filter-chips>
 
   <!-- Registration closing within the day, for the nearest appointment it applies to -->
   @if (closingSoon(); as closing) {

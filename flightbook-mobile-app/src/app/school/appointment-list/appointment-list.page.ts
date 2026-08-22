@@ -11,6 +11,7 @@ import { AppointmentScope, SchoolService } from '../shared/school.service';
 import { Subscription } from '../shared/subscription.model';
 import { AppointmentDetailsComponent } from '../shared/components/appointment-details/appointment-details.component';
 import { AppointmentFilterComponent } from '../shared/components/appointment-filter/appointment-filter.component';
+import { AppointmentFilterChipsComponent } from '../shared/components/appointment-filter/appointment-filter-chips.component';
 import { State } from '../shared/state';
 import { freeSpots, isFull, spotCells } from '../shared/spots';
 import { DatePipe } from '@angular/common';
@@ -45,7 +46,8 @@ const MAX_UPCOMING_PAGES = 10;
         IonInfiniteScroll,
         IonInfiniteScrollContent,
         IonPopover,
-        FormsModule
+        FormsModule,
+        AppointmentFilterChipsComponent
     ]
 })
 export class AppointmentListPage implements OnInit, OnDestroy {
@@ -55,7 +57,8 @@ export class AppointmentListPage implements OnInit, OnDestroy {
     appointments = signal<Appointment[]>([]);
     currentUser = signal<User | null>(null);
     currentSchool = signal<School | null>(null);
-    filtered: boolean;
+    /** The service's own signal, as Flights and Gliders read theirs. */
+    filtered = this.schoolService.filtered;
     private readonly schoolId: number;
     private appointmentId: number;
 
@@ -124,11 +127,6 @@ export class AppointmentListPage implements OnInit, OnDestroy {
         private languageService: LanguageService,
         private homeStore: HomeStore
     ) {
-        this.filtered = this.schoolService.filtered$.getValue();
-        this.schoolService.filtered$.pipe(takeUntil(this.unsubscribe$))
-            .subscribe((res: boolean) => {
-                this.filtered = res;
-            });
         this.schoolId = +this.activeRoute.snapshot.paramMap.get('id');
         this.appointmentId = +this.activeRoute.snapshot.queryParamMap.get('appointmentId');
         addIcons({
@@ -491,6 +489,14 @@ export class AppointmentListPage implements OnInit, OnDestroy {
         return Number.isFinite(closesAt) && closesAt < Date.now();
     }
 
+    /**
+     * A chip cleared from the summary row. The same refetch the sheet triggers on
+     * apply - the rows on screen were fetched at the old filter's offsets.
+     */
+    reloadForFilter() {
+        this.initialDataLoad();
+    }
+
     async openFilter() {
         const modal = await this.modalCtrl.create({
             component: AppointmentFilterComponent,
@@ -515,7 +521,7 @@ export class AppointmentListPage implements OnInit, OnDestroy {
 
     /** The filter as a value, so an untouched sheet costs the list no fetch. */
     private filterSnapshot(): string {
-        const { from, to, state } = this.schoolService.filter;
+        const { from, to, state } = this.schoolService.filter();
         return JSON.stringify([from ?? null, to ?? null, state ?? '']);
     }
 

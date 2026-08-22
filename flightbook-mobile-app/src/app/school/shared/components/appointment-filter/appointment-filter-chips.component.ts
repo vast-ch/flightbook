@@ -1,0 +1,99 @@
+import { Component, EventEmitter, Output, computed, inject } from '@angular/core';
+import { DatePipe } from '@angular/common';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { IonIcon } from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import { close } from 'ionicons/icons';
+import { SchoolService } from '../../school.service';
+import { LanguageService } from 'src/app/shared/services/language.service';
+
+type Chip = { label: string; clear: () => void };
+
+/**
+ * What the appointment filter is narrowing by, one removable chip per criterion -
+ * the counterpart to fb-filter-chips on Flights and fb-glider-filter-chips on
+ * Gliders. Without it the only sign of a filter was the word "filtered" in the
+ * eyebrow, which named nothing and offered no way back but reopening the sheet.
+ *
+ * Third component of the same shape now. The row itself lives in tokens.scss;
+ * only the labels and the clears are specific to this filter.
+ */
+@Component({
+    selector: 'fb-appointment-filter-chips',
+    standalone: true,
+    imports: [TranslateModule, IonIcon],
+    template: `
+        @if (chips().length > 0) {
+            <div class="fb-chip-row filter-summary">
+                @for (chip of chips(); track chip.label) {
+                    <button type="button" class="fb-chip fb-chip--removable"
+                            (click)="chip.clear(); changed.emit()">
+                        {{ chip.label }}
+                        <ion-icon name="close" aria-hidden="true"></ion-icon>
+                    </button>
+                }
+                <button type="button" class="filter-summary__clear" (click)="clearAll()">
+                    {{ 'filter.clearAll' | translate }}
+                </button>
+            </div>
+        }
+    `
+})
+export class AppointmentFilterChipsComponent {
+    private schoolService = inject(SchoolService);
+    private translate = inject(TranslateService);
+    private languageService = inject(LanguageService);
+    private datePipe = new DatePipe('en-US');
+
+    /** Fires after a criterion is dropped, so the host can refetch. */
+    @Output() changed = new EventEmitter<void>();
+
+    constructor() {
+        addIcons({ close });
+    }
+
+    public chips = computed<Chip[]>(() => {
+        const filter = this.schoolService.filter();
+        // The labels come from translate.instant(), a plain call - without reading
+        // the language signal they keep the previous language after a switch.
+        this.languageService.lang();
+        const chips: Chip[] = [];
+
+        // One chip for the range: two would let a pilot clear an end and leave a
+        // half-open period whose remaining chip reads as the whole filter.
+        if (filter.from || filter.to) {
+            chips.push({
+                label: this.periodLabel(filter.from, filter.to),
+                clear: () => this.schoolService.updateFilter({ from: null, to: null })
+            });
+        }
+
+        if (filter.state) {
+            chips.push({
+                label: this.translate.instant(`appointment.stateValue.${filter.state}`),
+                clear: () => this.schoolService.updateFilter({ state: '' })
+            });
+        }
+
+        return chips;
+    });
+
+    clearAll() {
+        this.schoolService.resetFilter();
+        this.changed.emit();
+    }
+
+    /** A range if both ends are set, otherwise the one end that is. */
+    private periodLabel(from: Date | null, to: Date | null): string {
+        if (from && to) {
+            return `${this.short(from)} – ${this.short(to)}`;
+        }
+        const label = from ? 'filter.from' : 'filter.to';
+        return `${this.translate.instant(label)} ${this.short(from ?? to)}`;
+    }
+
+    /** dd.MM.yyyy is numeric, so the pipe's own locale does not matter. */
+    private short(date: Date | null): string {
+        return date ? this.datePipe.transform(date, 'dd.MM.yyyy') ?? '' : '';
+    }
+}
