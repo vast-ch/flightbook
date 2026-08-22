@@ -5,58 +5,56 @@ import { getHomePermalink } from '~/utils/permalinks';
 interface Link {
   text?: string;
   href?: string;
-  ariaLabel?: string;
-  icon?: string;
 }
 
-interface Links {
+interface Column {
   title?: string;
   links: Array<Link>;
 }
 
 export interface Props {
-  columns: Array<Links>;
-  // Not yet rendered — Task 12 builds the gradient CTA band that consumes this.
-  cta?: { title: string; button: string; href: string };
-  theme?: string;
+  cta: { title: string; button: string; href: string };
+  columns: Array<Column>;
 }
 
-const { columns = [], theme = 'light' } = Astro.props;
+const { cta, columns = [] } = Astro.props;
 ---
 
-<footer class:list={[{ dark: theme === 'dark' }, 'relative border-t border-gray-200 dark:border-slate-800 not-prose']}>
-  <div class="dark:bg-dark absolute inset-0 pointer-events-none" aria-hidden="true"></div>
-  <div
-    class="relative max-w-7xl mx-auto px-4 sm:px-6 dark:text-slate-300 intersect-once intersect-quarter intersect-no-queue motion-safe:md:opacity-0 motion-safe:md:intersect:animate-fade"
-  >
-    <div class="grid grid-cols-12 gap-4 gap-y-8 sm:gap-8 py-8 md:py-12">
-      <div class="col-span-12 lg:col-span-4">
-        <div class="mb-2">
-          <a class="inline-block font-bold text-xl" href={getHomePermalink()}>{SITE?.name}</a>
-        </div>
+<footer class="bg-ink px-7 pb-11 pt-18 text-white/70">
+  <div class="mx-auto flex max-w-[1240px] flex-col gap-12">
+    <div
+      class="flex flex-wrap items-center justify-between gap-8 rounded-[26px] border border-white/12 px-10 py-9"
+      style="background:linear-gradient(120deg,rgba(56,189,248,.14),rgba(47,109,246,.06))"
+    >
+      <h3 class="font-heading max-w-[520px] text-[32px] text-white">{cta.title}</h3>
+      <a
+        href={cta.href}
+        target="_blank"
+        rel="noopener"
+        class="rounded-full bg-white px-7 py-3.5 text-base font-semibold text-ink transition hover:bg-sky-pale"
+      >
+        {cta.button}
+      </a>
+    </div>
+    <div class="flex flex-wrap items-start justify-between gap-10 border-t border-white/10 pt-8">
+      <a href={getHomePermalink()} class="flex items-center gap-[10px] text-white">
+        <img src="/flightbook-icon.png" alt="Flightbook" class="h-[30px] w-[30px] rounded-[9px]" />
+        <span class="font-heading text-[17px] font-bold">{SITE?.name}</span>
+      </a>
+      <div class="flex flex-wrap gap-14">
+        {
+          columns.map(({ title, links }) => (
+            <div class="flex flex-col gap-[10px]">
+              <span class="text-xs font-bold uppercase tracking-[0.14em] text-white/45">{title}</span>
+              {links.map(({ text, href }) => (
+                <a href={href} class="text-[15px] text-white/75 hover:text-white">
+                  {text}
+                </a>
+              ))}
+            </div>
+          ))
+        }
       </div>
-      {
-        columns.map(({ title, links }) => (
-          <div class="col-span-6 md:col-span-3 lg:col-span-2">
-            <div class="dark:text-gray-300 font-medium mb-2">{title}</div>
-            {links && Array.isArray(links) && links.length > 0 && (
-              <ul class="text-sm">
-                {links.map(({ text, href, ariaLabel }) => (
-                  <li class="mb-2">
-                    <a
-                      class="text-muted hover:text-gray-700 hover:underline dark:text-gray-400 transition duration-150 ease-in-out"
-                      href={href}
-                      aria-label={ariaLabel}
-                    >
-                      <Fragment set:html={text} />
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        ))
-      }
     </div>
   </div>
 </footer>
