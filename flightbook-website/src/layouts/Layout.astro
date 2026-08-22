@@ -17,17 +17,19 @@ import StructuredData from '~/components/common/StructuredData.astro';
 import { ClientRouter } from 'astro:transitions';
 
 import type { MetaData as MetaDataType } from '~/types';
+import type { Locale } from '~/utils/i18n';
 
 export interface Props {
   metadata?: MetaDataType;
+  locale?: Locale;
 }
 
-const { metadata = {} } = Astro.props;
-const { language, textDirection } = I18N;
+const { metadata = {}, locale = 'de' } = Astro.props;
+const { textDirection } = I18N;
 ---
 
 <!doctype html>
-<html lang={language} dir={textDirection} class="2xl:text-[20px]">
+<html lang={locale} dir={textDirection} class="2xl:text-[20px]">
   <head>
     <CommonMeta />
     <Favicons />
@@ -36,7 +38,7 @@ const { language, textDirection } = I18N;
     <Metadata {...metadata} />
     <SiteVerification />
     <Analytics />
-    <StructuredData locale={language as 'de' | 'fr'} />
+    <StructuredData locale={locale} />
 
     <link rel="preconnect" href="https://images.unsplash.com" />
 

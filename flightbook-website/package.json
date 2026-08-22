@@ -18,7 +18,9 @@
     "check:prettier": "prettier --check .",
     "fix": "npm run fix:eslint && npm run fix:prettier",
     "fix:eslint": "eslint --fix .",
-    "fix:prettier": "prettier -w ."
+    "fix:prettier": "prettier -w .",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@astrojs/rss": "^4.0.18",
@@ -60,7 +62,8 @@
     "tailwind-merge": "^3.6.0",
     "tailwindcss": "^4.3.0",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.59.2"
+    "typescript-eslint": "^8.59.2",
+    "vitest": "^4.1.11"
   },
   "overrides": {
     "yaml": ">=2.8.3"

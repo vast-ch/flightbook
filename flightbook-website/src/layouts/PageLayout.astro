@@ -19,7 +19,7 @@ const navData = currentLocale === 'fr' ? headerDataFr : headerData;
 const footerNavData = currentLocale === 'fr' ? footerDataFr : footerData;
 ---
 
-<Layout metadata={metadata}>
+<Layout metadata={metadata} locale={currentLocale}>
   <slot name="announcement">
     <Announcement />
   </slot>
