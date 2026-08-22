@@ -13,6 +13,20 @@
   --color-default: var(--aw-color-text-default);
   --color-muted: var(--aw-color-text-muted);
 
+  --color-ink: #05101d;
+  --color-surface-dark: #0a1626;
+  --color-card-dark: #0d1b2d;
+  --color-surface-light: #f5f8fc;
+  --color-heading: #0b1626;
+  --color-body: #4b5c6e;
+  --color-muted-light: #7b8ea3;
+  --color-hairline: #e4ebf3;
+  --color-hairline-strong: #cbd8e6;
+  --color-sky: #38bdf8;
+  --color-sky-soft: #7dd3fc;
+  --color-sky-pale: #bae6fd;
+  --color-brand: #2f6df6;
+
   --font-sans:
     'var(--aw-font-sans, ui-sans-serif)', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
     'Segoe UI Symbol', 'Noto Color Emoji';
@@ -29,6 +43,18 @@
     100% {
       opacity: 1;
       transform: translateY(0);
+    }
+  }
+
+  --animate-float: floatY 7s ease-in-out infinite;
+
+  @keyframes floatY {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-14px);
     }
   }
 }
@@ -67,6 +93,23 @@
 
 @utility btn-tertiary {
   @apply btn border-none shadow-none text-muted hover:text-gray-900 dark:text-gray-400 dark:hover:text-white;
+}
+
+@utility btn-gradient {
+  @apply inline-flex items-center justify-center rounded-full border-0 px-7 py-3.5 text-base font-semibold text-white transition;
+  background-image: linear-gradient(120deg, #38bdf8, #2f6df6);
+  box-shadow: 0 10px 24px -12px rgb(56 189 248 / 0.9);
+}
+@utility btn-gradient-hover {
+  filter: brightness(1.08);
+}
+
+@utility btn-on-dark {
+  @apply inline-flex items-center justify-center rounded-full border border-white/30 bg-white/10 px-7 py-3.5 text-base font-semibold text-white transition hover:bg-white/20;
+}
+
+@utility btn-outline-light {
+  @apply inline-flex items-center justify-center rounded-full border border-hairline-strong px-6 py-3.5 text-[15px] font-semibold text-heading transition hover:border-brand hover:text-brand;
 }
 
 #header.scroll > div:first-child {

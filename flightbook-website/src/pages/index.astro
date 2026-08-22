@@ -67,7 +67,7 @@ const pricingPlans = [
 
 <Layout metadata={metadata}>
   <FlightbookHero
-    title={t.hero.title}
+    title={t.hero.titleLine1}
     subtitle={t.hero.subtitle}
     iosText={t.hero.ios}
     androidText={t.hero.android}
@@ -76,9 +76,9 @@ const pricingPlans = [
 
   <FlightbookPricing title={t.pricing.title} plans={pricingPlans} notes={t.pricing.notes} />
 
-  <FlightbookPremiumFeatures title={t.premium.title} features={t.premium.features} cta={t.premium.cta} />
+  <FlightbookPremiumFeatures title={t.features.title} features={t.features.items.slice(0, 4)} cta={t.features.cta} />
 
-  <FlightbookSchoolsFeatures title={t.schools.title} features={t.schools.features} cta={t.schools.cta} />
+  <FlightbookSchoolsFeatures title={t.schools.title} features={t.schools.items} cta={t.schools.cta} />
 
   <FlightbookFAQ title={t.faq.title} faqs={t.faq.questions} />
 </Layout>

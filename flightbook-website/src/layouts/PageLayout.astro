@@ -24,7 +24,7 @@ const footerNavData = currentLocale === 'fr' ? footerDataFr : footerData;
     <Announcement />
   </slot>
   <slot name="header">
-    <Header {...navData} isSticky showToggleTheme showLanguageSwitcher currentLocale={currentLocale} />
+    <Header {...navData} isSticky showLanguageSwitcher currentLocale={currentLocale} />
   </slot>
   <main>
     <slot />
