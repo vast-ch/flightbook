@@ -1,173 +1,127 @@
 ---
-import { Icon } from 'astro-icon/components';
-import Logo from '~/components/Logo.astro';
 import ToggleMenu from '~/components/common/ToggleMenu.astro';
-import Button from '~/components/ui/Button.astro';
 import LanguageSwitcher from '~/components/common/LanguageSwitcher.astro';
-
-import { getHomePermalink } from '~/utils/permalinks';
-import { trimSlash, getAsset } from '~/utils/permalinks';
-import type { CallToAction } from '~/types';
 import type { Locale } from '~/utils/i18n';
 
-interface Link {
-  text?: string;
-  href?: string;
-  ariaLabel?: string;
-  icon?: string;
-  target?: string;
+interface HeaderNavLink {
+  text: string;
+  href: string;
 }
 
-interface MenuLink extends Link {
-  links?: Array<MenuLink>;
+interface HeaderLoginLink {
+  text: string;
+  sub: string;
+  href: string;
+  icon: 'wing' | 'cap';
+}
+
+interface HeaderData {
+  links: HeaderNavLink[];
+  login: { text: string; links: HeaderLoginLink[] };
+  action: { text: string; href: string };
 }
 
 export interface Props {
-  id?: string;
-  links?: Array<MenuLink>;
-  actions?: Array<CallToAction>;
-  isSticky?: boolean;
-  isDark?: boolean;
-  isFullWidth?: boolean;
-  showRssFeed?: boolean;
-  showLanguageSwitcher?: boolean;
+  data: HeaderData;
   currentLocale?: Locale;
-  position?: string;
 }
 
-const {
-  id = 'header',
-  links = [],
-  actions = [],
-  isSticky = false,
-  isDark = false,
-  isFullWidth = false,
-  showRssFeed = false,
-  showLanguageSwitcher = true,
-  currentLocale = 'de',
-  position = 'center',
-} = Astro.props;
-
-const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
+const { data, currentLocale = 'de' } = Astro.props;
 ---
 
 <header
-  class:list={[
-    { sticky: isSticky, relative: !isSticky, dark: isDark },
-    'top-0 z-40 flex-none mx-auto w-full border-b border-gray-50/0 transition-[opacity] ease-in-out',
-  ]}
-  {...isSticky ? { 'data-aw-sticky-header': true } : {}}
-  {...id ? { id } : {}}
+  class="sticky top-0 z-60 w-full border-b border-white/10 bg-[rgba(5,16,29,0.72)] backdrop-blur-[14px] backdrop-saturate-150"
+  id="header"
 >
-  <div class="absolute inset-0"></div>
-  <div
-    class:list={[
-      'relative text-default py-3 px-3 md:px-6 mx-auto w-full',
-      {
-        'md:flex md:justify-between': position !== 'center',
-      },
-      {
-        'md:grid md:grid-cols-3 md:items-center': position === 'center',
-      },
-      {
-        'max-w-7xl': !isFullWidth,
-      },
-    ]}
-  >
-    <div class:list={[{ 'mr-auto rtl:mr-0 rtl:ml-auto': position === 'right' }, 'flex justify-between']}>
-      <a class="flex items-center" href={getHomePermalink()}>
-        <Logo />
+  <div class="mx-auto flex max-w-[1240px] items-center justify-between gap-4 px-7 py-3.5">
+    <div class="flex items-center justify-between gap-3">
+      <a href="#top" class="flex items-center gap-[11px] text-white">
+        <img src="/flightbook-icon.png" alt="Flightbook" class="h-[34px] w-[34px] rounded-[10px]" />
+        <span class="font-heading text-[19px] font-bold tracking-[-0.02em] text-white">Flightbook</span>
       </a>
       <div class="flex items-center md:hidden">
         <ToggleMenu />
       </div>
     </div>
-    <nav
-      class="items-center w-full md:w-auto hidden md:flex md:mx-5 text-default overflow-y-auto overflow-x-hidden md:overflow-visible md:justify-self-center"
-      aria-label="Main navigation"
-    >
-      <ul
-        class="flex flex-col md:flex-row md:self-center w-full md:w-auto text-xl md:text-[0.9375rem] tracking-[0.01rem] font-medium md:justify-center"
-      >
-        {
-          links.map(({ text, href, links, target }) => (
-            <li class={links?.length ? 'dropdown' : ''}>
-              {links?.length ? (
-                <>
-                  <button
-                    type="button"
-                    class="hover:text-link dark:hover:text-white px-4 py-3 flex items-center whitespace-nowrap"
-                  >
-                    {text}{' '}
-                    <Icon name="tabler:chevron-down" class="w-3.5 h-3.5 ml-0.5 rtl:ml-0 rtl:mr-0.5 hidden md:inline" />
-                  </button>
-                  <ul class="dropdown-menu md:backdrop-blur-md dark:md:bg-dark rounded md:absolute pl-4 md:pl-0 md:hidden font-medium md:bg-white/90 md:min-w-[200px] drop-shadow-xl">
-                    {links.map(({ text: text2, href: href2, target: target2 }) => (
-                      <li>
-                        <a
-                          class:list={[
-                            'first:rounded-t last:rounded-b md:hover:bg-gray-100 hover:text-link dark:hover:text-white dark:hover:bg-gray-700 py-2 px-5 block whitespace-no-wrap',
-                            { 'aw-link-active': href2 === currentPath },
-                          ]}
-                          href={href2}
-                          {...(target2 ? { target: target2, rel: 'noopener noreferrer' } : {})}
-                        >
-                          {text2}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                </>
-              ) : (
-                <a
-                  class:list={[
-                    'hover:text-link dark:hover:text-white px-4 py-3 flex items-center whitespace-nowrap',
-                    { 'aw-link-active': href === currentPath },
-                  ]}
-                  href={href}
-                  {...(target ? { target: target, rel: 'noopener noreferrer' } : {})}
-                >
-                  {text}
-                </a>
-              )}
-            </li>
-          ))
-        }
-      </ul>
+
+    <nav class="hidden items-center gap-5 md:flex" aria-label="Main navigation">
+      {
+        data.links.map((link) => (
+          <a href={link.href} class="text-[14.5px] font-medium text-white/70 hover:text-white">
+            {link.text}
+          </a>
+        ))
+      }
     </nav>
-    <div
-      class:list={[
-        { 'ml-auto rtl:ml-0 rtl:mr-auto': position === 'left' },
-        'hidden md:self-center md:flex items-center md:mb-0 fixed w-full md:w-auto md:static justify-end left-0 rtl:left-auto rtl:right-0 bottom-0 p-3 md:p-0 md:justify-self-end',
-      ]}
-    >
-      <div class="items-center flex justify-between w-full md:w-auto">
-        <div class="flex gap-2 items-center">
-          {showLanguageSwitcher && <LanguageSwitcher currentLocale={currentLocale} />}
+
+    <div class="flex items-center gap-3">
+      <LanguageSwitcher currentLocale={currentLocale} />
+
+      <div class="dropdown relative hidden md:block">
+        <button
+          type="button"
+          tabindex="0"
+          class="flex items-center gap-1.5 rounded-full border border-white/25 bg-white/5 px-4.5 py-2.5 text-[14.5px] font-semibold text-white transition hover:bg-white/15"
+        >
+          <span>{data.login.text}</span>
+          <span class="text-[10px] opacity-70">▾</span>
+        </button>
+        <ul
+          class="dropdown-menu absolute right-0 top-[calc(100%+10px)] hidden w-[268px] rounded-2xl border border-white/15 bg-card-dark p-2 shadow-[0_26px_50px_-22px_rgba(0,0,0,0.8)]"
+        >
           {
-            showRssFeed && (
-              <a
-                class="text-muted dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5 inline-flex items-center"
-                aria-label="RSS Feed"
-                href={getAsset('/rss.xml')}
-              >
-                <Icon name="tabler:rss" class="w-5 h-5" />
-              </a>
-            )
+            data.login.links.map((item) => (
+              <li>
+                <a
+                  href={item.href}
+                  class="flex items-center gap-3 rounded-[11px] px-3.5 py-3 text-white hover:bg-white/10"
+                >
+                  <span class="flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-[10px] bg-sky/15">
+                    {item.icon === 'wing' ? (
+                      <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="#7dd3fc"
+                        stroke-width="1.9"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path d="M12 4c-4.4 0-8 3.2-8 7.2L12 20l8-8.8C20 7.2 16.4 4 12 4Z" />
+                        <path d="M12 4v16" />
+                        <path d="M4.6 11.2 12 20l7.4-8.8" />
+                      </svg>
+                    ) : (
+                      <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="#7dd3fc"
+                        stroke-width="1.9"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path d="M3 9.5 12 5l9 4.5-9 4.5-9-4.5Z" />
+                        <path d="M7 12v4.2c0 1.3 2.2 2.3 5 2.3s5-1 5-2.3V12" />
+                      </svg>
+                    )}
+                  </span>
+                  <span class="flex flex-col gap-0.5">
+                    <span class="text-[14.5px] font-semibold">{item.text}</span>
+                    <span class="text-[12.5px] text-white/55">{item.sub}</span>
+                  </span>
+                </a>
+              </li>
+            ))
           }
-        </div>
-        {
-          actions?.length ? (
-            <span class="ml-4 rtl:ml-0 rtl:mr-4">
-              {actions.map((btnProps) => (
-                <Button {...btnProps} class="ml-2 py-2.5 px-5.5 md:px-6 font-semibold shadow-none text-sm w-auto" />
-              ))}
-            </span>
-          ) : (
-            ''
-          )
-        }
+        </ul>
       </div>
+
+      <a href={data.action.href} class="btn-gradient px-5 py-2.5 text-[14.5px]">
+        {data.action.text}
+      </a>
     </div>
   </div>
 </header>

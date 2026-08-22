@@ -4,7 +4,7 @@ import Header from '~/components/widgets/Header.astro';
 import Footer from '~/components/widgets/Footer.astro';
 import Announcement from '~/components/widgets/Announcement.astro';
 
-import { headerData, headerDataFr, footerData, footerDataFr } from '~/navigation';
+import { getHeaderData, getFooterData } from '~/navigation';
 import { getLocaleFromUrl } from '~/utils/i18n';
 
 import type { MetaData } from '~/types';
@@ -15,8 +15,8 @@ export interface Props {
 
 const { metadata } = Astro.props;
 const currentLocale = getLocaleFromUrl(Astro.url);
-const navData = currentLocale === 'fr' ? headerDataFr : headerData;
-const footerNavData = currentLocale === 'fr' ? footerDataFr : footerData;
+const headerData = getHeaderData(currentLocale);
+const footerNavData = getFooterData(currentLocale);
 ---
 
 <Layout metadata={metadata} locale={currentLocale}>
@@ -24,7 +24,7 @@ const footerNavData = currentLocale === 'fr' ? footerDataFr : footerData;
     <Announcement />
   </slot>
   <slot name="header">
-    <Header {...navData} isSticky showLanguageSwitcher currentLocale={currentLocale} />
+    <Header data={headerData} currentLocale={currentLocale} />
   </slot>
   <main>
     <slot />
