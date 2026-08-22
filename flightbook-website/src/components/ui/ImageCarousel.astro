@@ -14,11 +14,19 @@ interface Props {
   theme?: 'dark' | 'light';
   showCaption?: boolean;
   autoAdvanceMs?: number;
-  frame?: 'lg' | 'md' | 'sm';
+  frame?: 'lg' | 'md' | 'sm' | 'figure';
   class?: string;
 }
 
 const { images, theme = 'dark', showCaption = false, autoAdvanceMs = 5000, frame, class: className = '' } = Astro.props;
+
+// Shared with any bare (non-carousel) figure that needs to match this shell exactly —
+// e.g. FlightbookSchoolsFeatures' static row-1 image — so the two can't drift apart.
+export const FIGURE_SHELL_CLASSES =
+  'w-full overflow-hidden rounded-[18px] border border-hairline bg-white shadow-[0_26px_50px_-30px_rgba(11,22,38,0.55)]';
+
+const isPhoneFrame = frame === 'lg' || frame === 'md' || frame === 'sm';
+const isFigureFrame = frame === 'figure';
 
 const arrow =
   theme === 'dark'
@@ -35,8 +43,8 @@ const captionClass = theme === 'dark' ? 'text-white/50' : 'text-muted-light';
   data-active-dot={dotOn}
 >
   {
-    frame ? (
-      <PhoneFrame radius={frame}>
+    isPhoneFrame ? (
+      <PhoneFrame radius={frame as 'lg' | 'md' | 'sm'}>
         <div class="w-full">
           {images.map((img, i) => (
             <div data-slide class:list={[i === 0 ? 'block' : 'hidden']}>
@@ -52,6 +60,23 @@ const captionClass = theme === 'dark' ? 'text-white/50' : 'text-muted-light';
           ))}
         </div>
       </PhoneFrame>
+    ) : isFigureFrame ? (
+      <div class={FIGURE_SHELL_CLASSES} data-figure-frame>
+        <div class="w-full">
+          {images.map((img, i) => (
+            <div data-slide class:list={[i === 0 ? 'block' : 'hidden']}>
+              <Image
+                src={img.src}
+                alt={img.alt}
+                class="block w-full"
+                loading="lazy"
+                widths={[300, 600]}
+                sizes="(max-width: 768px) 300px, 600px"
+              />
+            </div>
+          ))}
+        </div>
+      </div>
     ) : (
       <div class="w-full">
         {images.map((img, i) => (

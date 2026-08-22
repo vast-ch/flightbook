@@ -149,9 +149,10 @@ describe('ImageCarousel', () => {
   // FIX ROUND 3: FlightbookPremiumFeatures needed the phone-bezel frame around only the
   // slides, with controls/caption as siblings below it. `frame` is opt-in specifically so
   // Tasks 9 and 10's existing (unframed) carousels keep their current shape unchanged.
-  it('renders no PhoneFrame bezel when frame is omitted (guards other consumers against regression)', async () => {
+  it('renders no PhoneFrame bezel and no figure shell when frame is omitted (guards other consumers against regression)', async () => {
     const html = await render(ImageCarousel, { images });
     expect(html).not.toContain('data-phone-frame');
+    expect(html).not.toContain('data-figure-frame');
   });
 
   it('wraps only the slides in the PhoneFrame bezel when frame is set; controls and caption stay outside it', async () => {
@@ -168,6 +169,33 @@ describe('ImageCarousel', () => {
     expect(frameHtml).not.toContain('data-next');
     expect(frameHtml).not.toContain('data-dot');
     expect(frameHtml).not.toContain('data-caption-text');
+
+    // A phone-bezel carousel must not also render the figure shell.
+    expect(html).not.toContain('data-figure-frame');
+  });
+
+  // FIX ROUND 4 (RULING R19): browser/app screenshots that need a bordered white card —
+  // not a phone bezel — get a second frame variant. It must be a genuine alternative to
+  // `lg`/`md`/`sm`, not an addition, so a figure-framed carousel must never also carry the
+  // PhoneFrame bezel, and vice versa (asserted above).
+  it('wraps only the slides in the figure shell when frame="figure"; controls and caption stay outside it', async () => {
+    const html = await render(ImageCarousel, { images, frame: 'figure', showCaption: true });
+
+    // Exactly one shell, and it actually contains every slide.
+    expect(count(html, /data-figure-frame/g)).toBe(1);
+    const shellHtml = extractDiv(html, 'data-figure-frame');
+    expect(count(shellHtml, /data-slide/g)).toBe(images.length);
+
+    // Containment, not mere presence: controls and caption must NOT be nested inside the
+    // shell element, only positioned after it as siblings — the same guarantee `frame="md"`
+    // gets, so a figure-framed carousel can't regress into re-nesting them.
+    expect(shellHtml).not.toContain('data-prev');
+    expect(shellHtml).not.toContain('data-next');
+    expect(shellHtml).not.toContain('data-dot');
+    expect(shellHtml).not.toContain('data-caption-text');
+
+    // A figure-framed carousel must not also render the phone bezel.
+    expect(html).not.toContain('data-phone-frame');
   });
 
   // FIX ROUND 2, FINDING 1: nothing cleared a running `setInterval` before ClientRouter (enabled

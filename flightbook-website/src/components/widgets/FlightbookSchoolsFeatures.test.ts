@@ -3,6 +3,7 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { render, count } from '~/test/render';
 import FlightbookSchoolsFeatures from '~/components/widgets/FlightbookSchoolsFeatures.astro';
+import { FIGURE_SHELL_CLASSES } from '~/components/ui/ImageCarousel.astro';
 
 const componentPath = fileURLToPath(new URL('./FlightbookSchoolsFeatures.astro', import.meta.url));
 const source = fs.readFileSync(componentPath, 'utf-8');
@@ -56,6 +57,25 @@ describe('FlightbookSchoolsFeatures', () => {
     for (const slide of props.studentSlides) {
       expect(html).toContain(slide.alt);
     }
+  });
+
+  // RULING R19: both carousels use ImageCarousel's `frame="figure"` variant so the carousel
+  // slides get the same bordered white shell as row 1's static image (the design wraps the
+  // carousel image, not the nav controls, in that shell). Both get the shell, neither gets
+  // the unrelated phone bezel.
+  it('wraps both carousels in the figure shell, not the phone bezel', async () => {
+    const html = await render(FlightbookSchoolsFeatures, props);
+    expect(count(html, /data-figure-frame/g)).toBe(2);
+    expect(html).not.toContain('data-phone-frame');
+  });
+
+  // Row 1's static image is not routed through ImageCarousel at all, so nothing enforces
+  // that its wrapper matches the carousels' shell except sharing the same constant. Import
+  // that constant here (rather than pinning its class string) so this test fails if the two
+  // are ever built from different literals, without becoming a Tailwind-class-string pin.
+  it("reuses ImageCarousel's exported shell classes for row 1's static figure, so all three shells can't drift apart", () => {
+    expect(source).toContain('FIGURE_SHELL_CLASSES');
+    expect(FIGURE_SHELL_CLASSES.length).toBeGreaterThan(0);
   });
 
   it('links the CTA to the school registration page', async () => {

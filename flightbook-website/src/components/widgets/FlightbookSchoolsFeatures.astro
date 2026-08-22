@@ -1,7 +1,7 @@
 ---
 import { Image } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
-import ImageCarousel from '~/components/ui/ImageCarousel.astro';
+import ImageCarousel, { FIGURE_SHELL_CLASSES } from '~/components/ui/ImageCarousel.astro';
 
 interface Item {
   title: string;
@@ -39,9 +39,7 @@ const { eyebrow, title, cta, items, studentImg, schoolSlides, studentSlides } = 
         <h3 class="font-heading text-[26px]">{items[0].title}</h3>
         <p class="max-w-[620px] text-[16.5px] leading-[1.75] text-body text-pretty">{items[0].description}</p>
       </div>
-      <div
-        class="w-full overflow-hidden rounded-[18px] border border-hairline bg-white shadow-[0_26px_50px_-30px_rgba(11,22,38,0.55)]"
-      >
+      <div class={FIGURE_SHELL_CLASSES}>
         <Image
           src={studentImg}
           alt={items[0].title}
@@ -54,7 +52,7 @@ const { eyebrow, title, cta, items, studentImg, schoolSlides, studentSlides } = 
     </div>
 
     <div class="grid items-center gap-14 lg:grid-cols-[1.15fr_1fr]">
-      <ImageCarousel images={schoolSlides} theme="light" />
+      <ImageCarousel images={schoolSlides} theme="light" frame="figure" />
       <div class="flex flex-col gap-3.5">
         <h3 class="font-heading text-[26px]">{items[1].title}</h3>
         <p class="max-w-[620px] text-[16.5px] leading-[1.75] text-body text-pretty">{items[1].description}</p>
@@ -72,7 +70,7 @@ const { eyebrow, title, cta, items, studentImg, schoolSlides, studentSlides } = 
           {cta}
         </a>
       </div>
-      <ImageCarousel images={studentSlides} theme="light" />
+      <ImageCarousel images={studentSlides} theme="light" frame="figure" />
     </div>
   </div>
 </section>
