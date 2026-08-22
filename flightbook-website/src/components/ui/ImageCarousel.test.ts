@@ -69,4 +69,37 @@ describe('ImageCarousel', () => {
     expect(html).toContain('aria-label="Next slide"');
     expect(count(html, /aria-label="Go to slide \d"/g)).toBe(3);
   });
+
+  // FIX ROUND 1 REGRESSION: dots carry `data-caption` (their per-slide caption *source*, read
+  // by the script when captions is built), and the caption <p> used to carry that same
+  // `data-caption` attribute as its own marker. Since dots precede the <p> in DOM order,
+  // `root.querySelector('[data-caption]')` resolved to the FIRST DOT, not the paragraph — so
+  // advancing the carousel wrote caption text into a 7x7px dot button and the real paragraph
+  // never updated past its server-rendered first value. Fixed by giving the paragraph its own
+  // attribute (`data-caption-text`) so the two selectors can never resolve to the same element.
+  it('reads the caption element with a selector that cannot resolve to a dot button (source check)', () => {
+    const captionQuery = source.match(/const caption = root\.querySelector<HTMLElement>\(([^)]*)\)/)?.[1];
+    expect(captionQuery).toBeDefined();
+    // Must not be the bare selector the dots also carry — that's exactly the collision that shipped.
+    expect(captionQuery).not.toBe("'[data-caption]'");
+    expect(captionQuery).toContain('data-caption-text');
+  });
+
+  it('gives the caption paragraph a selector disjoint from the dots (render check)', async () => {
+    const html = await render(ImageCarousel, { images, showCaption: true });
+
+    // Exactly one element in the whole render carries data-caption-text, and it's a <p>.
+    expect(count(html, /data-caption-text/g)).toBe(1);
+    const captionTag = html.match(/<[a-z]+[^>]*\bdata-caption-text\b[^>]*>/)?.[0];
+    expect(captionTag).toMatch(/^<p\b/);
+
+    // Every dot carries the per-slide `data-caption` source attribute, but never the
+    // paragraph's `data-caption-text` marker — the two selectors are disjoint by construction.
+    const dotTags = html.match(/<button[^>]*\bdata-dot\b[^>]*>/g) ?? [];
+    expect(dotTags.length).toBe(3);
+    for (const tag of dotTags) {
+      expect(tag).toContain('data-caption=');
+      expect(tag).not.toContain('data-caption-text');
+    }
+  });
 });

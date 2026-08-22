@@ -65,7 +65,7 @@ const captionClass = theme === 'dark' ? 'text-white/50' : 'text-muted-light';
 
   {
     showCaption && (
-      <p class:list={['text-center text-[13px]', captionClass]} data-caption>
+      <p class:list={['text-center text-[13px]', captionClass]} data-caption-text>
         {images[0].caption}
       </p>
     )
@@ -80,7 +80,7 @@ const captionClass = theme === 'dark' ? 'text-white/50' : 'text-muted-light';
 
       const slides = Array.from(root.querySelectorAll<HTMLElement>('[data-slide]'));
       const dots = Array.from(root.querySelectorAll<HTMLElement>('[data-dot]'));
-      const caption = root.querySelector<HTMLElement>('[data-caption]');
+      const caption = root.querySelector<HTMLElement>('[data-caption-text]');
       const captions = slides.map((_, i) => dots[i]?.getAttribute('data-caption') ?? '');
       if (slides.length < 2) return;
 
