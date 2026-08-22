@@ -33,8 +33,17 @@ const { data, currentLocale = 'de' } = Astro.props;
   class="sticky top-0 z-60 w-full border-b border-white/10 bg-[rgba(5,16,29,0.72)] backdrop-blur-[14px] backdrop-saturate-150"
   id="header"
 >
-  <div class="mx-auto flex max-w-[1240px] items-center justify-between gap-4 px-7 py-3.5">
-    <div class="flex items-center justify-between gap-3">
+  <div class="mx-auto flex max-w-[1240px] items-center gap-5 px-7 py-3.5">
+    <!--
+      Deliberately NOT one shared "actions" div for the pill/dropdown/register trio: the legacy
+      mobile toggle handler in BasicScripts.astro does
+        document.querySelector('#header > div > div:last-child')?.classList.toggle('hidden')
+      on every hamburger click. If the pill and Registrieren lived inside that last div, they'd
+      blink hidden whenever the menu opens. Splitting them into separate direct children — with a
+      plain `<a>` (not a `<div>`) as the actual last child — makes that selector match nothing, so
+      it's a harmless no-op and the pill/Registrieren stay visible regardless of menu state.
+    -->
+    <div class="mr-auto flex items-center justify-between gap-3">
       <a href="#top" class="flex items-center gap-[11px] text-white">
         <img src="/flightbook-icon.png" alt="Flightbook" class="h-[34px] w-[34px] rounded-[10px]" />
         <span class="font-heading text-[19px] font-bold tracking-[-0.02em] text-white">Flightbook</span>
@@ -54,74 +63,72 @@ const { data, currentLocale = 'de' } = Astro.props;
       }
     </nav>
 
-    <div class="flex items-center gap-3">
-      <LanguageSwitcher currentLocale={currentLocale} />
+    <LanguageSwitcher currentLocale={currentLocale} />
 
-      <div class="dropdown relative hidden md:block">
-        <button
-          type="button"
-          tabindex="0"
-          class="flex items-center gap-1.5 rounded-full border border-white/25 bg-white/5 px-4.5 py-2.5 text-[14.5px] font-semibold text-white transition hover:bg-white/15"
-        >
-          <span>{data.login.text}</span>
-          <span class="text-[10px] opacity-70">▾</span>
-        </button>
-        <ul
-          class="dropdown-menu absolute right-0 top-[calc(100%+10px)] hidden w-[268px] rounded-2xl border border-white/15 bg-card-dark p-2 shadow-[0_26px_50px_-22px_rgba(0,0,0,0.8)]"
-        >
-          {
-            data.login.links.map((item) => (
-              <li>
-                <a
-                  href={item.href}
-                  class="flex items-center gap-3 rounded-[11px] px-3.5 py-3 text-white hover:bg-white/10"
-                >
-                  <span class="flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-[10px] bg-sky/15">
-                    {item.icon === 'wing' ? (
-                      <svg
-                        width="18"
-                        height="18"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="#7dd3fc"
-                        stroke-width="1.9"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      >
-                        <path d="M12 4c-4.4 0-8 3.2-8 7.2L12 20l8-8.8C20 7.2 16.4 4 12 4Z" />
-                        <path d="M12 4v16" />
-                        <path d="M4.6 11.2 12 20l7.4-8.8" />
-                      </svg>
-                    ) : (
-                      <svg
-                        width="18"
-                        height="18"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="#7dd3fc"
-                        stroke-width="1.9"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      >
-                        <path d="M3 9.5 12 5l9 4.5-9 4.5-9-4.5Z" />
-                        <path d="M7 12v4.2c0 1.3 2.2 2.3 5 2.3s5-1 5-2.3V12" />
-                      </svg>
-                    )}
-                  </span>
-                  <span class="flex flex-col gap-0.5">
-                    <span class="text-[14.5px] font-semibold">{item.text}</span>
-                    <span class="text-[12.5px] text-white/55">{item.sub}</span>
-                  </span>
-                </a>
-              </li>
-            ))
-          }
-        </ul>
-      </div>
-
-      <a href={data.action.href} class="btn-gradient px-5 py-2.5 text-[14.5px]">
-        {data.action.text}
-      </a>
+    <div class="dropdown relative hidden md:block">
+      <button
+        type="button"
+        tabindex="0"
+        class="flex items-center gap-1.5 rounded-full border border-white/25 bg-white/5 px-4.5 py-2.5 text-[14.5px] font-semibold text-white transition hover:bg-white/15"
+      >
+        <span>{data.login.text}</span>
+        <span class="text-[10px] opacity-70">▾</span>
+      </button>
+      <ul
+        class="dropdown-menu absolute right-0 top-[calc(100%+10px)] hidden w-[268px] rounded-2xl border border-white/15 bg-card-dark p-2 shadow-[0_26px_50px_-22px_rgba(0,0,0,0.8)]"
+      >
+        {
+          data.login.links.map((item) => (
+            <li>
+              <a
+                href={item.href}
+                class="flex items-center gap-3 rounded-[11px] px-3.5 py-3 text-white hover:bg-white/10"
+              >
+                <span class="flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-[10px] bg-sky/15">
+                  {item.icon === 'wing' ? (
+                    <svg
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="#7dd3fc"
+                      stroke-width="1.9"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M12 4c-4.4 0-8 3.2-8 7.2L12 20l8-8.8C20 7.2 16.4 4 12 4Z" />
+                      <path d="M12 4v16" />
+                      <path d="M4.6 11.2 12 20l7.4-8.8" />
+                    </svg>
+                  ) : (
+                    <svg
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="#7dd3fc"
+                      stroke-width="1.9"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M3 9.5 12 5l9 4.5-9 4.5-9-4.5Z" />
+                      <path d="M7 12v4.2c0 1.3 2.2 2.3 5 2.3s5-1 5-2.3V12" />
+                    </svg>
+                  )}
+                </span>
+                <span class="flex flex-col gap-0.5">
+                  <span class="text-[14.5px] font-semibold">{item.text}</span>
+                  <span class="text-[12.5px] text-white/55">{item.sub}</span>
+                </span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
     </div>
+
+    <a href={data.action.href} class="btn-gradient px-5 py-2.5 text-[14.5px]">
+      {data.action.text}
+    </a>
   </div>
 </header>
