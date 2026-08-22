@@ -85,6 +85,21 @@ describe('FlightbookFAQ', () => {
     expect(schema.mainEntity).toHaveLength(faqs.length);
   });
 
+  it('renders the three step numerals in order, each hidden from screen readers', async () => {
+    const html = await render(FlightbookFAQ, baseProps);
+    const olMatch = html.match(/<ol\b[^>]*>(.*?)<\/ol>/s);
+    expect(olMatch).not.toBeNull();
+
+    const liBlocks = olMatch![1].match(/<li\b[^>]*>.*?<\/li>/gs) ?? [];
+    expect(liBlocks).toHaveLength(3);
+
+    liBlocks.forEach((li, i) => {
+      const numeral = li.match(/<span[^>]*aria-hidden="true"[^>]*>\s*(\d+)\s*<\/span>/);
+      expect(numeral).not.toBeNull();
+      expect(numeral![1]).toBe(String(i + 1));
+    });
+  });
+
   it('includes the step strings in the stepped question schema text, with no HTML tags anywhere in the schema', async () => {
     const html = await render(FlightbookFAQ, baseProps);
     const match = html.match(/<script type="application\/ld\+json">(.*?)<\/script>/s);

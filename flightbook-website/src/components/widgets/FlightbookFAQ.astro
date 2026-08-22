@@ -46,8 +46,13 @@ const faqSchema = {
               {faq.steps && (
                 <>
                   <ol class="flex flex-col gap-2 text-[15.5px] text-body">
-                    {faq.steps.map((step) => (
-                      <li class="flex gap-2.5">{step}</li>
+                    {faq.steps.map((step, i) => (
+                      <li class="flex gap-2.5">
+                        <span class="font-bold text-brand" aria-hidden="true">
+                          {i + 1}
+                        </span>
+                        {step}
+                      </li>
                     ))}
                   </ol>
                   <a
