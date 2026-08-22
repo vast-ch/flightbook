@@ -80,8 +80,8 @@
   animation: fb-splash-slide 1400ms ease-in-out infinite;
 }
 
-// Named globally on purpose: emulated encapsulation does not scope @keyframes,
-// so the prefix is what keeps it from colliding with a later animation.
+// Angular prefixes component @keyframes with the encapsulation id, so this
+// ships as _ngcontent-<id>_fb-splash-slide and cannot collide.
 @keyframes fb-splash-slide {
   0% {
     transform: translateX(-100%);
