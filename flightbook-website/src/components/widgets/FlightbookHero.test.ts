@@ -24,6 +24,7 @@ const baseProps = {
   stats,
   photo,
   screenshot,
+  screenshotAlt: 'Flightbook App Startseite',
 };
 
 describe('FlightbookHero', () => {
@@ -40,9 +41,9 @@ describe('FlightbookHero', () => {
     expect(html).toContain(baseProps.subtitle);
   });
 
-  it('renders one stat cell per entry, each with its value and label', async () => {
+  it('renders one stat list item per entry, each with its value and label', async () => {
     const html = await render(FlightbookHero, baseProps);
-    expect(count(html, /flex flex-col gap-1/)).toBe(4);
+    expect(count(html, /<li[ >]/)).toBe(4);
     for (const stat of stats) {
       expect(html).toContain(stat.value);
       expect(html).toContain(stat.label);
@@ -51,7 +52,7 @@ describe('FlightbookHero', () => {
 
   it('renders a partial stat strip when fewer stats are passed', async () => {
     const html = await render(FlightbookHero, { ...baseProps, stats: stats.slice(0, 3) });
-    expect(count(html, /flex flex-col gap-1/)).toBe(3);
+    expect(count(html, /<li[ >]/)).toBe(3);
   });
 
   it('renders the three CTA links with the exact hrefs and store-link attributes', async () => {
@@ -73,6 +74,12 @@ describe('FlightbookHero', () => {
     const imgTag = html.match(/<img[^>]*photo\.jpg[^>]*>/)?.[0] ?? '';
     expect(imgTag).toContain('loading="eager"');
     expect(imgTag).toContain('fetchpriority="high"');
+  });
+
+  it('gives the phone screenshot a real, translated alt text', async () => {
+    const html = await render(FlightbookHero, baseProps);
+    const imgTag = html.match(/<img[^>]*screenshot\.png[^>]*>/)?.[0] ?? '';
+    expect(imgTag).toContain(`alt="${baseProps.screenshotAlt}"`);
   });
 
   it('does not carry the old header-offset margin', async () => {

@@ -21,6 +21,7 @@
     "ios": "iOS",
     "android": "Android",
     "subscribePremium": "Subscribe to Flightbook Premium →",
+    "screenshotAlt": "Flightbook app home screen",
     "stats": [
       { "value": "SHV approved", "label": "accepted at the exam" },
       { "value": "Log flights", "label": "manage your logbook" },

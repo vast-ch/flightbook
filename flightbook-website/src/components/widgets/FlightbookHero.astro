@@ -19,9 +19,11 @@ interface Props {
   stats: Stat[];
   photo: ImageMetadata;
   screenshot: ImageMetadata;
+  screenshotAlt: string;
 }
 
-const { eyebrow, titleLine1, titleLine2, subtitle, ios, android, premium, stats, photo, screenshot } = Astro.props;
+const { eyebrow, titleLine1, titleLine2, subtitle, ios, android, premium, stats, photo, screenshot, screenshotAlt } =
+  Astro.props;
 ---
 
 <section id="top" class="relative overflow-hidden bg-ink">
@@ -39,11 +41,13 @@ const { eyebrow, titleLine1, titleLine2, subtitle, ios, android, premium, stats,
   />
   <div
     class="absolute inset-0 pointer-events-none"
+    aria-hidden="true"
     style="background:linear-gradient(100deg,rgba(5,16,29,.94) 0%,rgba(5,16,29,.74) 46%,rgba(5,16,29,.42) 100%)"
   >
   </div>
   <div
     class="absolute inset-0 pointer-events-none"
+    aria-hidden="true"
     style="background:linear-gradient(180deg,rgba(5,16,29,.35) 0%,transparent 35%,rgba(5,16,29,.75) 100%)"
   >
   </div>
@@ -88,25 +92,26 @@ const { eyebrow, titleLine1, titleLine2, subtitle, ios, android, premium, stats,
     <div class="flex justify-center relative">
       <div
         class="absolute h-[340px] w-[340px] rounded-full blur-[12px]"
+        aria-hidden="true"
         style="background:radial-gradient(circle,rgba(56,189,248,.42),transparent 65%)"
       >
       </div>
       <PhoneFrame radius="lg" float class="relative w-72">
-        <Image src={screenshot} alt="" class="w-full" />
+        <Image src={screenshot} alt={screenshotAlt} class="w-full" />
       </PhoneFrame>
     </div>
   </div>
 
   <div class="relative border-t border-white/10">
-    <div class="mx-auto max-w-[1240px] px-7 py-6 grid gap-6 grid-cols-2 lg:grid-cols-4">
+    <ul class="mx-auto max-w-[1240px] px-7 py-6 grid gap-6 grid-cols-2 lg:grid-cols-4">
       {
         stats.map((stat) => (
-          <div class="flex flex-col gap-1">
+          <li class="flex flex-col gap-1">
             <span class="font-heading text-[21px] leading-tight text-white">{stat.value}</span>
             <span class="text-[13px] uppercase tracking-[0.12em] text-white/50">{stat.label}</span>
-          </div>
+          </li>
         ))
       }
-    </div>
+    </ul>
   </div>
 </section>

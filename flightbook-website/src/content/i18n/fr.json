@@ -21,6 +21,7 @@
     "ios": "iOS",
     "android": "Android",
     "subscribePremium": "S'abonner à Flightbook Premium →",
+    "screenshotAlt": "Page d'accueil de l'app Flightbook",
     "stats": [
       { "value": "Homologué SHV", "label": "reconnu à l'examen" },
       { "value": "Saisir les vols", "label": "gérer le carnet de vol" },

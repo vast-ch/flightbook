@@ -21,6 +21,7 @@
     "ios": "iOS",
     "android": "Android",
     "subscribePremium": "Flightbook Premium abonnieren →",
+    "screenshotAlt": "Flightbook App Startseite",
     "stats": [
       { "value": "SHV zugelassen", "label": "an der Prüfung anerkannt" },
       { "value": "Flüge erfassen", "label": "Flugbuch verwalten" },
