@@ -139,6 +139,17 @@
         "title": "Suivi de progression pour les élèves",
         "description": "Tes élèves aussi profiteront du passage à Flightbook Pro : ils utilisent l'app pour suivre leurs vols et manœuvres, décollages et atterrissages. Le carnet de vol SHV pour l'examen peut même être généré directement depuis l'app. Ils sont aussi toujours informés de la date du prochain cours et de qui y participe. Ils peuvent utiliser Flightbook Basic pour seulement 12 francs par année (même après la formation) pour suivre leur progression en tant que pilotes."
       }
+    ],
+    "schoolCaptions": [
+      "Gestion des inscriptions – Aperçu des abonnements",
+      "Gestion des inscriptions – Gérer les cours",
+      "Gestion des inscriptions – Créer un cours"
+    ],
+    "studentCaptions": [
+      "App élève – Accueil",
+      "App élève – Cours",
+      "App élève – Détails du cours",
+      "App élève – Sites de vol"
     ]
   },
   "tandem": {

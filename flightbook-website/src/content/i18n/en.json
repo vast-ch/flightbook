@@ -133,6 +133,17 @@
         "title": "Progress tracking for students",
         "description": "Your students benefit too once you switch to Flightbook Pro: they use the app to track their flights and manoeuvres, take-off and landing sites. Even the SHV logbook for the exam can be generated directly from the app. They're also always informed about when the next course takes place and who's coming. They can use Flightbook Basic for just 12 francs a year (even after training) to track their progress as pilots."
       }
+    ],
+    "schoolCaptions": [
+      "Attendance management – Subscriptions overview",
+      "Attendance management – Manage courses",
+      "Attendance management – Create a course"
+    ],
+    "studentCaptions": [
+      "Student app – Home",
+      "Student app – Courses",
+      "Student app – Course details",
+      "Student app – Flying sites"
     ]
   },
   "tandem": {

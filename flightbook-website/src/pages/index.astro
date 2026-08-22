@@ -12,12 +12,33 @@ import featureHomeImg from '~/assets/images/flightbook/home.png';
 import featureStatisticImg from '~/assets/images/flightbook/statistic.png';
 import featureAddFlightImg from '~/assets/images/flightbook/add-flight.png';
 import featurePlaceImg from '~/assets/images/flightbook/place.png';
+import schoolsStudentImg from '~/assets/images/flightbook/student.png';
+import schoolsSubscriptionImg from '~/assets/images/flightbook/subscription.png';
+import schoolsAppointmentImg from '~/assets/images/flightbook/appointment.png';
+import schoolsAppointmentCreateImg from '~/assets/images/flightbook/appointment-create.png';
+import schoolsHomeMobileImg from '~/assets/images/flightbook/home-mobile.png';
+import schoolsAppointmentMobileImg from '~/assets/images/flightbook/appointment-mobile.png';
+import schoolsAppointmentDetailImg from '~/assets/images/flightbook/appointment-detail.png';
+import schoolsPlaceMobileImg from '~/assets/images/flightbook/place-mobile.png';
 
 const t = getTranslations('de');
 
 const featureScreenshots = [featureHomeImg, featureStatisticImg, featureAddFlightImg, featurePlaceImg].map(
   (src, i) => ({ src, alt: t.features.captions[i], caption: t.features.captions[i] })
 );
+
+const schoolSlides = [schoolsSubscriptionImg, schoolsAppointmentImg, schoolsAppointmentCreateImg].map((src, i) => ({
+  src,
+  alt: t.schools.schoolCaptions[i],
+  caption: t.schools.schoolCaptions[i],
+}));
+
+const studentSlides = [
+  schoolsHomeMobileImg,
+  schoolsAppointmentMobileImg,
+  schoolsAppointmentDetailImg,
+  schoolsPlaceMobileImg,
+].map((src, i) => ({ src, alt: t.schools.studentCaptions[i], caption: t.schools.studentCaptions[i] }));
 
 const metadata = {
   title: t.meta.title,
@@ -100,7 +121,15 @@ const pricingPlans = [
     screenshots={featureScreenshots}
   />
 
-  <FlightbookSchoolsFeatures title={t.schools.title} features={t.schools.items} cta={t.schools.cta} />
+  <FlightbookSchoolsFeatures
+    eyebrow={t.schools.eyebrow}
+    title={t.schools.title}
+    cta={t.schools.cta}
+    items={t.schools.items}
+    studentImg={schoolsStudentImg}
+    schoolSlides={schoolSlides}
+    studentSlides={studentSlides}
+  />
 
   <FlightbookFAQ title={t.faq.title} faqs={t.faq.questions} />
 </Layout>

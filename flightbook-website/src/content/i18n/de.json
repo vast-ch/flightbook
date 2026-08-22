@@ -133,6 +133,17 @@
         "title": "Fortschritt tracken für Flugschüler",
         "description": "Auch deine Schüler werden profitieren, wenn du auf Flightbook Pro umstellst: Sie nutzen die App, um ihre Flüge und Manöver, Start- und Landeplätze zu tracken. Sogar das SHV-Flugbuch für die Prüfung kann direkt aus der App generiert werden. Ausserdem sind sie immer informiert, wann der nächste Kurs stattfindet und wer alles kommt. Sie können Flightbook Basic für nur 12 Franken pro Jahr (auch nach der Schulung) nutzen, um ihre Fortschritte als Flieger*innen zu tracken."
       }
+    ],
+    "schoolCaptions": [
+      "Teilnahmeverwaltung – Abonnements im Überblick",
+      "Teilnahmeverwaltung – Kurstermine verwalten",
+      "Teilnahmeverwaltung – Neuen Kurstermin erstellen"
+    ],
+    "studentCaptions": [
+      "Flugschüler-App – Startseite",
+      "Flugschüler-App – Kurstermine",
+      "Flugschüler-App – Termindetails",
+      "Flugschüler-App – Flugplätze"
     ]
   },
   "tandem": {
