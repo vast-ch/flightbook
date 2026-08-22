@@ -1,6 +1,7 @@
 ---
 import ToggleMenu from '~/components/common/ToggleMenu.astro';
 import LanguageSwitcher from '~/components/common/LanguageSwitcher.astro';
+import { prefix } from '~/navigation';
 import type { Locale } from '~/utils/i18n';
 
 interface HeaderNavLink {
@@ -27,6 +28,10 @@ export interface Props {
 }
 
 const { data, currentLocale = 'de' } = Astro.props;
+
+// N3: the logo used to link to `#top`, which only exists on the three homepages - on /help,
+// /privacy-policy and their locale variants it was a dead link. Point to the locale's own home.
+const homeHref = prefix(currentLocale) || '/';
 ---
 
 <header
@@ -44,7 +49,7 @@ const { data, currentLocale = 'de' } = Astro.props;
       it's a harmless no-op and the pill/Registrieren stay visible regardless of menu state.
     -->
     <div class="mr-auto flex items-center justify-between gap-3">
-      <a href="#top" class="flex items-center gap-[11px] text-white">
+      <a href={homeHref} class="flex items-center gap-[11px] text-white">
         <img src="/flightbook-icon.png" alt="Flightbook" class="h-[34px] w-[34px] rounded-[10px]" />
         <span class="font-heading text-[19px] font-bold tracking-[-0.02em] text-white">Flightbook</span>
       </a>

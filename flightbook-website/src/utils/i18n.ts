@@ -4,7 +4,9 @@ import enTrans from '~/content/i18n/en.json';
 
 export type Locale = 'de' | 'fr' | 'en';
 
-const translations = {
+// Typed against de's structure so a structural divergence (a missing key, or an array of a
+// different length) in fr/en is a compile error, not a silent `undefined` at render time.
+const translations: Record<Locale, typeof deTrans> = {
   de: deTrans,
   fr: frTrans,
   en: enTrans,

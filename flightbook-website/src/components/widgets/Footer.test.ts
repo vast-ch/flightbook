@@ -55,4 +55,18 @@ describe('Footer', () => {
     expect(html).not.toContain('intersect-once');
     expect(html).not.toMatch(/motion-safe:/);
   });
+
+  // N4 REGRESSION: the footer logo used getHomePermalink() -> '/' unconditionally, so a French
+  // or English visitor's logo click always landed on the German homepage. It must follow
+  // currentLocale the same way Header.astro's logo link does (N3), and default to German when
+  // no locale is passed, so existing callers that omit it are unaffected.
+  it("links the logo to the current locale's home, defaulting to German", async () => {
+    const de = await render(Footer, { cta, columns });
+    const fr = await render(Footer, { cta, columns, currentLocale: 'fr' });
+    const en = await render(Footer, { cta, columns, currentLocale: 'en' });
+
+    expect(de).toContain('href="/" class="flex items-center gap-[10px] text-white"');
+    expect(fr).toContain('href="/fr" class="flex items-center gap-[10px] text-white"');
+    expect(en).toContain('href="/en" class="flex items-center gap-[10px] text-white"');
+  });
 });

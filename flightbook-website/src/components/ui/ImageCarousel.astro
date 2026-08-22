@@ -160,6 +160,10 @@ const captionClass = theme === 'dark' ? 'text-white/50' : 'text-muted-light';
         }
       }
       function start() {
+        // WCAG 2.2.2: auto-advance must be possible to disable. The existing pause was
+        // mouseenter-only (unreachable by keyboard/touch); a full pause control is a separate
+        // piece of work, but honoring reduced-motion is not optional, so guard it here too.
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
         const ms = Number(root.dataset.interval ?? 5000);
         if (ms > 0) {
           timer = window.setInterval(() => show(current + 1), ms);

@@ -2,7 +2,9 @@
 
 import { getTranslations, type Locale } from '~/utils/i18n';
 
-const prefix = (locale: Locale) => (locale === 'de' ? '' : `/${locale}`);
+// Exported so Header.astro and Footer.astro can compute a locale-aware home link the same
+// way (N3/N4 are the same affordance - keep them consistent rather than reimplementing).
+export const prefix = (locale: Locale) => (locale === 'de' ? '' : `/${locale}`);
 
 export function getHeaderData(locale: Locale) {
   const t = getTranslations(locale);

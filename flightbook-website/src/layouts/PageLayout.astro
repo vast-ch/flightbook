@@ -30,6 +30,6 @@ const footerNavData = getFooterData(currentLocale);
     <slot />
   </main>
   <slot name="footer">
-    <Footer {...footerNavData} />
+    <Footer {...footerNavData} currentLocale={currentLocale} />
   </slot>
 </Layout>

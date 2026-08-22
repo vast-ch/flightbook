@@ -215,4 +215,24 @@ describe('ImageCarousel', () => {
     const handlerBody = source.match(new RegExp(`function ${handlerName}\\s*\\([^)]*\\)\\s*\\{([\\s\\S]*?)\\n  \\}`));
     expect(handlerBody?.[1]).toMatch(/clearInterval/);
   });
+
+  // N6 (WCAG 2.2.2): auto-advance had no way to disable it - pause was mouseenter-only, so it
+  // was unreachable by keyboard or touch. This is client-only behaviour that `renderToString`
+  // cannot exercise (same reasoning as the source checks above), so we check the source: the
+  // function that arms the interval must bail out under prefers-reduced-motion, before it ever
+  // calls setInterval.
+  it('does not auto-advance under prefers-reduced-motion (source check)', () => {
+    const startMatch = source.match(/function start\s*\(\)\s*\{([\s\S]*?)\n {6}\}/);
+    expect(startMatch).not.toBeNull();
+    const startBody = startMatch![1];
+
+    expect(startBody).toMatch(/matchMedia\(\s*['"]\(prefers-reduced-motion:\s*reduce\)['"]\s*\)/);
+
+    // The reduced-motion check must come before setInterval is armed, not after.
+    const matchMediaIndex = startBody.indexOf('matchMedia');
+    const setIntervalIndex = startBody.indexOf('setInterval');
+    expect(matchMediaIndex).toBeGreaterThan(-1);
+    expect(setIntervalIndex).toBeGreaterThan(-1);
+    expect(matchMediaIndex).toBeLessThan(setIntervalIndex);
+  });
 });

@@ -199,4 +199,16 @@ describe('Header', () => {
       expect(link.attrs).toMatch(/\bmd:text-\[14\.5px\]/);
     }
   });
+
+  // N3 REGRESSION: the logo linked to `#top`, which only exists on the three homepages - on
+  // /help, /privacy-policy and their locale variants (6 of 11 routes) it was a dead link.
+  it("links the logo to the current locale's home, not the frozen #top anchor", async () => {
+    const de = await render(Header, { data, currentLocale: 'de' as Locale });
+    const fr = await render(Header, { data, currentLocale: 'fr' as Locale });
+    const en = await render(Header, { data, currentLocale: 'en' as Locale });
+
+    expect(de).toContain('href="/" class="flex items-center gap-[11px] text-white"');
+    expect(fr).toContain('href="/fr" class="flex items-center gap-[11px] text-white"');
+    expect(en).toContain('href="/en" class="flex items-center gap-[11px] text-white"');
+  });
 });

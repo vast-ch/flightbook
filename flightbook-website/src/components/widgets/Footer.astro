@@ -1,6 +1,7 @@
 ---
 import { SITE } from 'astrowind:config';
-import { getHomePermalink } from '~/utils/permalinks';
+import { prefix } from '~/navigation';
+import type { Locale } from '~/utils/i18n';
 
 interface Link {
   text?: string;
@@ -15,9 +16,14 @@ interface Column {
 export interface Props {
   cta: { title: string; button: string; href: string };
   columns: Array<Column>;
+  currentLocale?: Locale;
 }
 
-const { cta, columns = [] } = Astro.props;
+const { cta, columns = [], currentLocale = 'de' } = Astro.props;
+
+// N4: this used to be getHomePermalink() -> '/', which always sent fr/en visitors to the
+// German homepage. Compute it the same way Header.astro does (N3/N4 are the same affordance).
+const homeHref = prefix(currentLocale) || '/';
 ---
 
 <footer class="bg-ink px-7 pb-11 pt-18 text-white/70">
@@ -37,7 +43,7 @@ const { cta, columns = [] } = Astro.props;
       </a>
     </div>
     <div class="flex flex-wrap items-start justify-between gap-10 border-t border-white/10 pt-8">
-      <a href={getHomePermalink()} class="flex items-center gap-[10px] text-white">
+      <a href={homeHref} class="flex items-center gap-[10px] text-white">
         <img src="/flightbook-icon.png" alt="Flightbook" class="h-[30px] w-[30px] rounded-[9px]" />
         <span class="font-heading text-[17px] font-bold">{SITE?.name}</span>
       </a>
