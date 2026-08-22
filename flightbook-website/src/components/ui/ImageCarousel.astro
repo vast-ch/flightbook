@@ -1,0 +1,133 @@
+---
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
+interface Slide {
+  src: ImageMetadata;
+  alt: string;
+  caption?: string;
+}
+
+interface Props {
+  images: Slide[];
+  theme?: 'dark' | 'light';
+  showCaption?: boolean;
+  autoAdvanceMs?: number;
+  class?: string;
+}
+
+const { images, theme = 'dark', showCaption = false, autoAdvanceMs = 5000, class: className = '' } = Astro.props;
+
+const arrow =
+  theme === 'dark'
+    ? 'h-[42px] w-[42px] rounded-full border border-white/20 bg-white/5 text-white transition hover:bg-white/15'
+    : 'h-10 w-10 rounded-full border border-hairline-strong bg-white text-body transition hover:border-brand hover:text-brand';
+const dotOn = theme === 'dark' ? 'bg-sky' : 'bg-brand';
+const captionClass = theme === 'dark' ? 'text-white/50' : 'text-muted-light';
+---
+
+<div class:list={['flex flex-col items-center gap-5', className]} data-carousel data-interval={autoAdvanceMs}>
+  <div class="w-full">
+    {
+      images.map((img, i) => (
+        <div data-slide class:list={[i === 0 ? 'block' : 'hidden']}>
+          <Image
+            src={img.src}
+            alt={img.alt}
+            class="block w-full"
+            loading="lazy"
+            widths={[300, 600]}
+            sizes="(max-width: 768px) 300px, 600px"
+          />
+        </div>
+      ))
+    }
+  </div>
+
+  <div class="flex items-center gap-3.5">
+    <button type="button" data-prev class={arrow} aria-label="Previous slide">&#10094;</button>
+    <div class="flex gap-[7px]">
+      {
+        images.map((img, i) => (
+          <button
+            type="button"
+            data-dot
+            data-index={i}
+            data-caption={showCaption ? (img.caption ?? '') : undefined}
+            aria-label={`Go to slide ${i + 1}`}
+            class:list={['block h-[7px] w-[7px] rounded-full transition', i === 0 ? dotOn : 'bg-slate-400/45']}
+          />
+        ))
+      }
+    </div>
+    <button type="button" data-next class={arrow} aria-label="Next slide">&#10095;</button>
+  </div>
+
+  {
+    showCaption && (
+      <p class:list={['text-center text-[13px]', captionClass]} data-caption>
+        {images[0].caption}
+      </p>
+    )
+  }
+</div>
+
+<script>
+  function initCarousels() {
+    document.querySelectorAll<HTMLElement>('[data-carousel]').forEach((root) => {
+      if (root.dataset.carouselReady === 'true') return;
+      root.dataset.carouselReady = 'true';
+
+      const slides = Array.from(root.querySelectorAll<HTMLElement>('[data-slide]'));
+      const dots = Array.from(root.querySelectorAll<HTMLElement>('[data-dot]'));
+      const caption = root.querySelector<HTMLElement>('[data-caption]');
+      const captions = slides.map((_, i) => dots[i]?.getAttribute('data-caption') ?? '');
+      if (slides.length < 2) return;
+
+      const activeDot = dots[0]?.className.match(/bg-(sky|brand)/)?.[0] ?? 'bg-sky';
+      let current = 0;
+      let timer: number | undefined;
+
+      function show(next: number) {
+        current = (next + slides.length) % slides.length;
+        slides.forEach((s, i) => s.classList.toggle('hidden', i !== current));
+        dots.forEach((d, i) => {
+          d.classList.toggle(activeDot, i === current);
+          d.classList.toggle('bg-slate-400/45', i !== current);
+        });
+        if (caption && captions[current]) caption.textContent = captions[current];
+      }
+
+      function start() {
+        const ms = Number(root.dataset.interval ?? 5000);
+        if (ms > 0) timer = window.setInterval(() => show(current + 1), ms);
+      }
+      function restart() {
+        window.clearInterval(timer);
+        start();
+      }
+
+      root.querySelector('[data-prev]')?.addEventListener('click', () => {
+        show(current - 1);
+        restart();
+      });
+      root.querySelector('[data-next]')?.addEventListener('click', () => {
+        show(current + 1);
+        restart();
+      });
+      dots.forEach((dot, i) =>
+        dot.addEventListener('click', () => {
+          show(i);
+          restart();
+        })
+      );
+
+      root.addEventListener('mouseenter', () => window.clearInterval(timer));
+      root.addEventListener('mouseleave', start);
+      start();
+    });
+  }
+
+  initCarousels();
+  document.addEventListener('astro:page-load', initCarousels);
+</script>
