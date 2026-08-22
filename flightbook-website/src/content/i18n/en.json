@@ -151,6 +151,7 @@
     "title": "Flightbook for tandem pilots",
     "intro": "Flying commercially means more than logging flights. Flightbook covers the admin around tandem operations right in the app.",
     "cta": "Sign up",
+    "screenshotAlt": "Flightbook app home screen",
     "items": [
       {
         "title": "Capture passenger confirmations",

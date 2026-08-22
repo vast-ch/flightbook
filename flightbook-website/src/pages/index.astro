@@ -4,10 +4,13 @@ import FlightbookHero from '~/components/widgets/FlightbookHero.astro';
 import FlightbookPricing from '~/components/widgets/FlightbookPricing.astro';
 import FlightbookPremiumFeatures from '~/components/widgets/FlightbookPremiumFeatures.astro';
 import FlightbookSchoolsFeatures from '~/components/widgets/FlightbookSchoolsFeatures.astro';
+import FlightbookTandem from '~/components/widgets/FlightbookTandem.astro';
 import FlightbookFAQ from '~/components/widgets/FlightbookFAQ.astro';
 import { getTranslations } from '~/utils/i18n';
 import heroPhoto from '~/assets/images/Paraglider_Main.jpg';
 import heroScreenshot from '~/assets/images/flightbook/home.png';
+import tandemPhoto from '~/assets/images/Tandem.jpg';
+import tandemScreenshot from '~/assets/images/flightbook/home.png';
 import featureHomeImg from '~/assets/images/flightbook/home.png';
 import featureStatisticImg from '~/assets/images/flightbook/statistic.png';
 import featureAddFlightImg from '~/assets/images/flightbook/add-flight.png';
@@ -129,6 +132,17 @@ const pricingPlans = [
     studentImg={schoolsStudentImg}
     schoolSlides={schoolSlides}
     studentSlides={studentSlides}
+  />
+
+  <FlightbookTandem
+    eyebrow={t.tandem.eyebrow}
+    title={t.tandem.title}
+    intro={t.tandem.intro}
+    cta={t.tandem.cta}
+    items={t.tandem.items}
+    photo={tandemPhoto}
+    screenshot={tandemScreenshot}
+    screenshotAlt={t.tandem.screenshotAlt}
   />
 
   <FlightbookFAQ title={t.faq.title} faqs={t.faq.questions} />

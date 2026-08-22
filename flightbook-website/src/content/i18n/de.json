@@ -151,6 +151,7 @@
     "title": "Flightbook für Tandem Piloten",
     "intro": "Wer gewerblich fliegt, hat mehr zu verwalten als nur Flüge. Flightbook deckt die Administration rund um den Tandembetrieb direkt in der App ab.",
     "cta": "Registrieren",
+    "screenshotAlt": "Flightbook App Startseite",
     "items": [
       {
         "title": "Passagierbestätigung erfassen",
