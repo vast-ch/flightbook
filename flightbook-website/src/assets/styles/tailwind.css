@@ -112,16 +112,6 @@
   @apply inline-flex items-center justify-center rounded-full border border-hairline-strong px-6 py-3.5 text-[15px] font-semibold text-heading transition hover:border-brand hover:text-brand;
 }
 
-#header.scroll > div:first-child {
-  @apply bg-page md:bg-white/90 md:backdrop-blur-md;
-  box-shadow: 0 0.375rem 1.5rem 0 rgb(140 152 164 / 13%);
-}
-.dark #header.scroll > div:first-child,
-#header.scroll.dark > div:first-child {
-  @apply bg-page md:bg-[#030621e6] border-b border-gray-500/20;
-  box-shadow: none;
-}
-
 /*
  * BasicScripts.astro's legacy mobile-toggle handler (shared with other pages, not ours to
  * change) adds `bg-page` to #header when the menu opens. `bg-page` and the header's own
