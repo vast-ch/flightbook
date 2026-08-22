@@ -102,4 +102,41 @@ describe('ImageCarousel', () => {
       expect(tag).not.toContain('data-caption-text');
     }
   });
+
+  // FIX ROUND 2, FINDING 2: the script used to derive the active-dot class by pattern-matching
+  // `dots[0].className` for `/bg-(sky|brand)/` — reading the component's own Tailwind class back
+  // out of the DOM. If `dotOn`'s literal values ever changed, that regex would silently fall
+  // back to the wrong theme's class, and no test could catch it (the testing standard forbids
+  // pinning Tailwind class strings). Fixed by passing the value as data from the server — the
+  // same variable used in the dot's class:list — so the two can never diverge.
+  it('passes the active-dot class as data on the root instead of deriving it from a dot (render check)', async () => {
+    const dark = await render(ImageCarousel, { images, theme: 'dark' });
+    const light = await render(ImageCarousel, { images, theme: 'light' });
+    expect(dark).toMatch(/data-active-dot="bg-sky"/);
+    expect(light).toMatch(/data-active-dot="bg-brand"/);
+    expect(dark).not.toContain(light.match(/data-active-dot="[^"]*"/)?.[0]);
+  });
+
+  it("no longer derives the active dot class by reading a dot's own className (source check)", () => {
+    expect(source).not.toMatch(/\.className\.match\(/);
+    expect(source).toContain('root.dataset.activeDot');
+  });
+
+  // FIX ROUND 2, FINDING 1: nothing cleared a running `setInterval` before ClientRouter (enabled
+  // site-wide via <ClientRouter /> in Layout.astro) swaps the DOM out for a view transition, so
+  // an auto-advancing carousel kept ticking against detached nodes after every navigation — and
+  // this compounds, since the homepage carries three carousels. This is client-only behaviour
+  // that `renderToString` cannot exercise, so the coverage is a source check: the script must
+  // register an `astro:before-swap` teardown, and that teardown must actually call
+  // `clearInterval` (not just observe the event) so it isn't a vacuous assertion.
+  it('sweeps active timers on astro:before-swap so intervals do not leak across view transitions (source check)', () => {
+    expect(source).toMatch(/document\.addEventListener\(\s*['"]astro:before-swap['"]/);
+    const beforeSwapIndex = source.indexOf('astro:before-swap');
+    expect(beforeSwapIndex).toBeGreaterThan(-1);
+    const registration = source.slice(beforeSwapIndex, beforeSwapIndex + 200);
+    const handlerName = registration.match(/astro:before-swap['"]\s*,\s*(\w+)/)?.[1];
+    expect(handlerName).toBeDefined();
+    const handlerBody = source.match(new RegExp(`function ${handlerName}\\s*\\([^)]*\\)\\s*\\{([\\s\\S]*?)\\n  \\}`));
+    expect(handlerBody?.[1]).toMatch(/clearInterval/);
+  });
 });

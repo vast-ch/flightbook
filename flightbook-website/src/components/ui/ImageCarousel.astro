@@ -26,7 +26,12 @@ const dotOn = theme === 'dark' ? 'bg-sky' : 'bg-brand';
 const captionClass = theme === 'dark' ? 'text-white/50' : 'text-muted-light';
 ---
 
-<div class:list={['flex flex-col items-center gap-5', className]} data-carousel data-interval={autoAdvanceMs}>
+<div
+  class:list={['flex flex-col items-center gap-5', className]}
+  data-carousel
+  data-interval={autoAdvanceMs}
+  data-active-dot={dotOn}
+>
   <div class="w-full">
     {
       images.map((img, i) => (
@@ -84,7 +89,10 @@ const captionClass = theme === 'dark' ? 'text-white/50' : 'text-muted-light';
       const captions = slides.map((_, i) => dots[i]?.getAttribute('data-caption') ?? '');
       if (slides.length < 2) return;
 
-      const activeDot = dots[0]?.className.match(/bg-(sky|brand)/)?.[0] ?? 'bg-sky';
+      // Passed as data from the server (the same value used in the dot's own class:list),
+      // rather than re-derived by pattern-matching the dot's className back out of the DOM —
+      // that regex silently produced the wrong theme's class if the literal ever changed.
+      const activeDot = root.dataset.activeDot ?? 'bg-sky';
       let current = 0;
       let timer: number | undefined;
 
@@ -98,12 +106,22 @@ const captionClass = theme === 'dark' ? 'text-white/50' : 'text-muted-light';
         if (caption && captions[current]) caption.textContent = captions[current];
       }
 
+      function clearTimer() {
+        if (timer !== undefined) {
+          window.clearInterval(timer);
+          activeTimers.delete(timer);
+          timer = undefined;
+        }
+      }
       function start() {
         const ms = Number(root.dataset.interval ?? 5000);
-        if (ms > 0) timer = window.setInterval(() => show(current + 1), ms);
+        if (ms > 0) {
+          timer = window.setInterval(() => show(current + 1), ms);
+          activeTimers.add(timer);
+        }
       }
       function restart() {
-        window.clearInterval(timer);
+        clearTimer();
         start();
       }
 
@@ -122,12 +140,24 @@ const captionClass = theme === 'dark' ? 'text-white/50' : 'text-muted-light';
         })
       );
 
-      root.addEventListener('mouseenter', () => window.clearInterval(timer));
+      root.addEventListener('mouseenter', clearTimer);
       root.addEventListener('mouseleave', start);
       start();
     });
   }
 
+  // Module-scope so a teardown triggered by an incoming view transition can sweep every
+  // running interval, regardless of which carousel's closure created it — without this, an
+  // auto-advancing carousel keeps ticking against DOM nodes that ClientRouter is about to
+  // discard, compounding with every navigation.
+  const activeTimers = new Set<number>();
+
+  function teardownCarousels() {
+    activeTimers.forEach((id) => window.clearInterval(id));
+    activeTimers.clear();
+  }
+
   initCarousels();
   document.addEventListener('astro:page-load', initCarousels);
+  document.addEventListener('astro:before-swap', teardownCarousels);
 </script>
