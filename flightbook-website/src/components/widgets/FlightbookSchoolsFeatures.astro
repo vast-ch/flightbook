@@ -75,7 +75,9 @@ const studentSliderImages = [
         </div>
         <div class="md:order-1 flex justify-center items-center">
           <div class="max-w-md w-full">
-            <div class="schools-slideshow-container relative rounded-lg overflow-hidden shadow-lg bg-gray-100 dark:bg-gray-800">
+            <div
+              class="schools-slideshow-container relative rounded-lg overflow-hidden shadow-lg bg-gray-100 dark:bg-gray-800"
+            >
               {
                 sliderImages.map((img, index) => (
                   <div class:list={['schools-slide', index === 0 && 'active']}>
@@ -94,7 +96,11 @@ const studentSliderImages = [
               <button class="schools-next" aria-label="Next slide">&#10095;</button>
             </div>
             <div class="schools-dots-container text-center mt-4">
-              {sliderImages.map((_, index) => <span class:list={['schools-dot', index === 0 && 'active']} data-slide={index}></span>)}
+              {
+                sliderImages.map((_, index) => (
+                  <span class:list={['schools-dot', index === 0 && 'active']} data-slide={index} />
+                ))
+              }
             </div>
           </div>
         </div>
@@ -108,7 +114,9 @@ const studentSliderImages = [
         </div>
         <div class="flex justify-center">
           <div class="max-w-[250px] w-full">
-            <div class="student-slideshow-container relative rounded-lg overflow-hidden shadow-lg bg-gray-100 dark:bg-gray-800">
+            <div
+              class="student-slideshow-container relative rounded-lg overflow-hidden shadow-lg bg-gray-100 dark:bg-gray-800"
+            >
               {
                 studentSliderImages.map((img, index) => (
                   <div class:list={['student-slide', index === 0 && 'active']}>
@@ -127,7 +135,11 @@ const studentSliderImages = [
               <button class="student-next" aria-label="Next slide">&#10095;</button>
             </div>
             <div class="student-dots-container text-center mt-4">
-              {studentSliderImages.map((_, index) => <span class:list={['student-dot', index === 0 && 'active']} data-slide={index}></span>)}
+              {
+                studentSliderImages.map((_, index) => (
+                  <span class:list={['student-dot', index === 0 && 'active']} data-slide={index} />
+                ))
+              }
             </div>
           </div>
         </div>

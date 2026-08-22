@@ -19,7 +19,7 @@ Settled with Joel before this spec was written:
    own colors for all visitors. The light/dark theme machinery comes out.
 2. **Three locales.** Add `en`, and replace the existing French copy with the
    design's rewritten French.
-3. **Design copy verbatim,** with two corrections (see *Copy*).
+3. **Design copy verbatim,** with two corrections (see _Copy_).
 4. **Photos are Joel's to supply.** Build against committed placeholders.
 
 ## Approach
@@ -52,20 +52,20 @@ twice. Section boundaries in the design map almost 1:1 onto the existing files.
 
 Added as `@theme` tokens in `src/assets/styles/tailwind.css`.
 
-| Role | Value |
-| --- | --- |
-| Ink / hero ground | `#05101d` |
-| Dark section | `#0a1626` |
-| Dark card | `#0d1b2d` |
-| Light section | `#f5f8fc` |
-| Page white | `#ffffff` |
-| Heading on light | `#0b1626` |
-| Body on light | `#4b5c6e` |
-| Muted on light | `#7b8ea3`, `#5a6b7d` |
-| Hairline on light | `#e4ebf3`, `#cbd8e6`, `#d5dfea` |
-| Accent sky | `#38bdf8`, `#7dd3fc`, `#bae6fd` |
-| Accent blue | `#2f6df6` |
-| CTA gradient | `linear-gradient(120deg, #38bdf8, #2f6df6)` |
+| Role              | Value                                       |
+| ----------------- | ------------------------------------------- |
+| Ink / hero ground | `#05101d`                                   |
+| Dark section      | `#0a1626`                                   |
+| Dark card         | `#0d1b2d`                                   |
+| Light section     | `#f5f8fc`                                   |
+| Page white        | `#ffffff`                                   |
+| Heading on light  | `#0b1626`                                   |
+| Body on light     | `#4b5c6e`                                   |
+| Muted on light    | `#7b8ea3`, `#5a6b7d`                        |
+| Hairline on light | `#e4ebf3`, `#cbd8e6`, `#d5dfea`             |
+| Accent sky        | `#38bdf8`, `#7dd3fc`, `#bae6fd`             |
+| Accent blue       | `#2f6df6`                                   |
+| CTA gradient      | `linear-gradient(120deg, #38bdf8, #2f6df6)` |
 
 Text on dark uses white at `.74 / .62 / .6 / .5 / .45` opacity, per the design.
 
@@ -90,16 +90,16 @@ render-blocking third-party request.
 
 ### Rewritten
 
-| File | Change |
-| --- | --- |
-| `widgets/FlightbookHero.astro` | Full-bleed photo, two gradient scrims, eyebrow pill, headline with gradient-clipped second line, iOS/Android/Premium CTAs, floating phone, 4-up stat strip |
-| `widgets/FlightbookPremiumFeatures.astro` | Eight cards in a 2-col hairline grid + full-width CTA cell; sticky phone carousel with per-slide caption |
-| `widgets/FlightbookPricing.astro` | Light section; three cards, middle one dark and elevated with a radial glow |
-| `widgets/FlightbookSchoolsFeatures.astro` | Three alternating text/figure rows, two carrying carousels |
-| `widgets/FlightbookFAQ.astro` | Custom `+`/`−` accordion, single-open; retains the existing `FAQPage` JSON-LD |
-| `widgets/Header.astro` | Dark glass sticky bar, logo, five anchors, Login dropdown, language pill, Registrieren button |
-| `widgets/Footer.astro` | Gradient CTA band above the existing link columns |
-| `common/LanguageSwitcher.astro` | Three-way DE/FR/EN pill |
+| File                                      | Change                                                                                                                                                     |
+| ----------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `widgets/FlightbookHero.astro`            | Full-bleed photo, two gradient scrims, eyebrow pill, headline with gradient-clipped second line, iOS/Android/Premium CTAs, floating phone, 4-up stat strip |
+| `widgets/FlightbookPremiumFeatures.astro` | Eight cards in a 2-col hairline grid + full-width CTA cell; sticky phone carousel with per-slide caption                                                   |
+| `widgets/FlightbookPricing.astro`         | Light section; three cards, middle one dark and elevated with a radial glow                                                                                |
+| `widgets/FlightbookSchoolsFeatures.astro` | Three alternating text/figure rows, two carrying carousels                                                                                                 |
+| `widgets/FlightbookFAQ.astro`             | Custom `+`/`−` accordion, single-open; retains the existing `FAQPage` JSON-LD                                                                              |
+| `widgets/Header.astro`                    | Dark glass sticky bar, logo, five anchors, Login dropdown, language pill, Registrieren button                                                              |
+| `widgets/Footer.astro`                    | Gradient CTA band above the existing link columns                                                                                                          |
+| `common/LanguageSwitcher.astro`           | Three-way DE/FR/EN pill                                                                                                                                    |
 
 ### New
 
@@ -151,7 +151,7 @@ Extend `Locale` in `src/utils/i18n.ts` to `'de' | 'fr' | 'en'`.
 ### Existing locale bug, fixed here
 
 `Layout.astro` sets `<html lang={language}>` and passes `locale={language}` to
-`StructuredData`, where `language` is the *global* `I18N.language` from `config.yaml`
+`StructuredData`, where `language` is the _global_ `I18N.language` from `config.yaml`
 — always `de`. `/fr` therefore ships `lang="de"` and German structured data today.
 Adding a third locale makes this more visible, so `Layout.astro` gains a `locale`
 prop that `PageLayout` derives from the URL and passes down.

@@ -57,7 +57,10 @@ const faqSchema = {
                 </svg>
               </span>
             </summary>
-            <div class="mt-4 text-gray-600 dark:text-gray-400 leading-relaxed prose prose-sm dark:prose-invert max-w-none" set:html={faq.answer} />
+            <div
+              class="mt-4 text-gray-600 dark:text-gray-400 leading-relaxed prose prose-sm dark:prose-invert max-w-none"
+              set:html={faq.answer}
+            />
           </details>
         ))
       }
