@@ -23,6 +23,41 @@
 - `npm run check` runs `prettier --check`. **Always run `npm run fix` before `npm run check`** or formatting will fail the gate.
 - Never edit the mobile app or its API. This repo only.
 
+### Testing standard
+
+Every task that creates or rewrites an `.astro` component ships render tests
+alongside it, using Astro's Container API (confirmed available in the installed
+Astro 6.3.1 as `experimental_AstroContainer` from `astro/container`). Test files sit
+next to the code: `Foo.astro` → `Foo.test.ts`.
+
+The shared harness, created in Task 1 Step 2b as `src/test/render.ts`:
+
+```ts
+import { experimental_AstroContainer as AstroContainer } from 'astro/container';
+import type { AstroComponentFactory } from 'astro/runtime/server/index.js';
+
+/** Renders an .astro component to an HTML string for assertion. */
+export async function render(
+  Component: AstroComponentFactory,
+  props: Record<string, unknown> = {},
+  slots: Record<string, string> = {}
+): Promise<string> {
+  const container = await AstroContainer.create();
+  return container.renderToString(Component, { props, slots });
+}
+
+/** Counts non-overlapping matches — handy for "how many slides did it emit". */
+export function count(html: string, pattern: RegExp): number {
+  return (html.match(new RegExp(pattern, pattern.flags.includes('g') ? pattern.flags : pattern.flags + 'g')) ?? []).length;
+}
+```
+
+Assert on **behaviour and contract**, not on Tailwind class strings — a test that
+pins `px-7` breaks on every design tweak and catches no real defect. Good
+assertions: element counts, `href` targets, `aria-*` values, conditional branches
+(rendered vs. absent), and text drawn from the i18n table. Components taking an
+`ImageMetadata` prop can be fed a stub: `{ src: '/x.png', width: 1, height: 1, format: 'png' }`.
+
 ---
 
 ### Task 1: Locale plumbing — three locales, correct `lang`, unit tests
@@ -65,24 +100,47 @@ Then in `package.json`, add to `scripts`:
 
 - [ ] **Step 2: Create the Vitest config**
 
-Create `vitest.config.ts`:
+Create `vitest.config.ts`. Use `getViteConfig` from `astro/config` rather than a plain
+`defineConfig` — it is what makes `.astro` files compilable inside Vitest, which every
+component test from Task 3 onward depends on.
 
 ```ts
-import { defineConfig } from 'vitest/config';
-import { fileURLToPath } from 'node:url';
+import { getViteConfig } from 'astro/config';
 
-export default defineConfig({
-  resolve: {
-    alias: {
-      '~': fileURLToPath(new URL('./src', import.meta.url)),
-    },
-  },
+export default getViteConfig({
   test: {
     environment: 'node',
     include: ['src/**/*.test.ts'],
   },
 });
 ```
+
+`getViteConfig` inherits the project's `~/` alias and Tailwind plugin from
+`astro.config.ts`, so no manual `resolve.alias` is needed.
+
+- [ ] **Step 2b: Create the shared render harness**
+
+Create `src/test/render.ts` with the `render` and `count` helpers exactly as given in
+**Global Constraints → Testing standard** above. Then prove the harness works before
+any component depends on it — create `src/test/render.test.ts`:
+
+```ts
+import { describe, expect, it } from 'vitest';
+import { render } from '~/test/render';
+import Announcement from '~/components/widgets/Announcement.astro';
+
+describe('render harness', () => {
+  it('renders an .astro component to a string', async () => {
+    const html = await render(Announcement);
+    expect(typeof html).toBe('string');
+  });
+});
+```
+
+Run: `npm test -- src/test/render.test.ts`
+Expected: PASS. If it fails with a Vite resolution error, the `getViteConfig` wiring in
+Step 2 is wrong — fix it here rather than in a later task, because Tasks 3 and 5-12 all
+build on this.
 
 - [ ] **Step 3: Write the failing tests for locale resolution**
 
@@ -726,15 +784,102 @@ Place it on the `<button data-dot>` element alongside `data-index`.
 
 The script block needs no imports — it is inline client JavaScript, not a module with Astro dependencies.
 
-- [ ] **Step 3: Verify it compiles**
+- [ ] **Step 3: Write the render tests**
+
+Create `src/components/ui/ImageCarousel.test.ts`. These assertions encode the contract
+that prevents the cross-carousel bug — every instance must be independently addressable.
+
+```ts
+import { describe, expect, it } from 'vitest';
+import { render, count } from '~/test/render';
+import ImageCarousel from '~/components/ui/ImageCarousel.astro';
+
+const stub = { src: '/x.png', width: 1, height: 1, format: 'png' as const };
+const images = [
+  { src: stub, alt: 'one', caption: 'First' },
+  { src: stub, alt: 'two', caption: 'Second' },
+  { src: stub, alt: 'three', caption: 'Third' },
+];
+
+describe('ImageCarousel', () => {
+  it('emits one slide and one dot per image', async () => {
+    const html = await render(ImageCarousel, { images });
+    expect(count(html, /data-slide/g)).toBe(3);
+    expect(count(html, /data-dot/g)).toBe(3);
+  });
+
+  it('shows only the first slide initially', async () => {
+    const html = await render(ImageCarousel, { images });
+    expect(count(html, /data-slide[^>]*class="[^"]*\bhidden\b/g)).toBe(2);
+  });
+
+  it('scopes itself to a root so instances do not collide', async () => {
+    const html = await render(ImageCarousel, { images });
+    expect(count(html, /data-carousel\b/g)).toBe(1);
+    expect(html).not.toContain('document.querySelector(\'.slide-nav');
+  });
+
+  it('carries the auto-advance interval as data, not a closure constant', async () => {
+    const html = await render(ImageCarousel, { images, autoAdvanceMs: 1234 });
+    expect(html).toContain('data-interval="1234"');
+  });
+
+  it('renders a caption only when asked', async () => {
+    expect(await render(ImageCarousel, { images })).not.toContain('data-caption=');
+    const withCaption = await render(ImageCarousel, { images, showCaption: true });
+    expect(withCaption).toContain('First');
+  });
+
+  it('labels its controls for screen readers', async () => {
+    const html = await render(ImageCarousel, { images });
+    expect(html).toContain('aria-label="Previous slide"');
+    expect(html).toContain('aria-label="Next slide"');
+    expect(count(html, /aria-label="Go to slide \d"/g)).toBe(3);
+  });
+});
+```
+
+Create `src/components/ui/PhoneFrame.test.ts`:
+
+```ts
+import { describe, expect, it } from 'vitest';
+import { render } from '~/test/render';
+import PhoneFrame from '~/components/ui/PhoneFrame.astro';
+
+describe('PhoneFrame', () => {
+  it('renders its slot content', async () => {
+    const html = await render(PhoneFrame, {}, { default: '<img alt="screen" />' });
+    expect(html).toContain('alt="screen"');
+  });
+
+  it('maps each radius token to a distinct bezel', async () => {
+    const [lg, md, sm] = await Promise.all(
+      (['lg', 'md', 'sm'] as const).map((radius) => render(PhoneFrame, { radius }))
+    );
+    expect(new Set([lg, md, sm]).size).toBe(3);
+  });
+
+  it('animates only when float is set', async () => {
+    expect(await render(PhoneFrame, {})).not.toContain('animate-float');
+    expect(await render(PhoneFrame, { float: true })).toContain('animate-float');
+  });
+});
+```
+
+- [ ] **Step 4: Run the tests**
+
+Run: `npm test -- src/components/ui`
+Expected: PASS, 9 tests.
+
+- [ ] **Step 5: Verify it compiles**
 
 Run: `npm run fix && npm run build && npm run check`
-Expected: PASS. Nothing renders the components yet, so this only proves they typecheck and format.
+Expected: PASS.
 
-- [ ] **Step 4: Commit**
+- [ ] **Step 6: Commit**
 
 ```bash
-git add src/components/ui/PhoneFrame.astro src/components/ui/ImageCarousel.astro
+git add src/components/ui src/test
 git commit -m "feat(ui): add PhoneFrame and root-scoped ImageCarousel primitives"
 ```
 
@@ -1019,6 +1164,26 @@ const footerNavData = getFooterData(currentLocale);
 
 Footer still receives `{...footerNavData}` until Task 12 rewrites it; adapt the spread to the new shape there.
 
+- [ ] **Step 4b: Write the render tests**
+
+Create `src/components/common/LanguageSwitcher.test.ts` using the `render` helper from
+`~/test/render` (Task 1). Import `LanguageSwitcher.astro` and assert:
+
+- Rendering with `currentLocale: 'de'` emits exactly three `<a>` elements whose text is `DE`, `FR`, `EN`.
+- Exactly one carries `aria-current="true"`, and it is the one matching `currentLocale` — test all three locales.
+- Each link's `href` is correct from the root: `/`, `/fr`, `/en`.
+
+Create `src/navigation.test.ts` and assert against `getHeaderData` / `getFooterData`:
+
+- `getHeaderData('de')` returns five `links`, with hrefs ending `#premium`, `#angebot`, `#schools`, `#tandem`, `#faq` in that order.
+- `getHeaderData('fr').links[0].href` starts with `/fr` and `getHeaderData('en').links[0].href` starts with `/en`; the `de` variant has no locale prefix.
+- `login.links` has two entries pointing at `m.flightbook.ch` and `instructor.flightbook.ch`.
+- `getFooterData('en').columns[1].links[0].href` is `/en/privacy-policy` — the locale prefix reaches the legal links.
+- Link text differs between `getHeaderData('de')` and `getHeaderData('en')`, proving the table is actually consulted rather than hard-coded.
+
+Run: `npm test -- src/components/common/LanguageSwitcher.test.ts src/navigation.test.ts`
+Expected: PASS.
+
 - [ ] **Step 5: Verify**
 
 Run: `npm run fix && npm run build && npm run check`
@@ -1064,14 +1229,41 @@ Stat strip, after the grid, inside `relative border-t border-white/10`: `mx-auto
 
 Delete the old `md:-mt-[76px]` offset — the new header is sticky and translucent, so the hero starts below it naturally.
 
+**Photo:** `src/assets/images/Paraglider_Main.jpg` (5184×3456, 12.5 MB source). It is far
+larger than any rendered size, so give the `<Image>` explicit `widths={[768, 1280, 1920, 2560]}`,
+`sizes="100vw"`, and `format="webp"` so Sharp emits sensible derivatives instead of
+anything close to the original. Verify in Step 3 that no emitted asset exceeds ~400 KB.
+
+- [ ] **Step 1b: Write the render tests**
+
+Create `src/components/widgets/FlightbookHero.test.ts` using the `render` helper from `~/test/render`, with a stub `ImageMetadata` for both image props. Assert:
+
+- The section carries `id="top"`.
+- Both headline lines render, and the eyebrow and subtitle text appear.
+- Four stat cells render, each with its `value` and `label`; passing three renders three.
+- Three CTA links render with the exact App Store, Play Store, and `m.flightbook.ch/settings` hrefs, and the two store links carry `target="_blank"` with `rel` containing `noopener`.
+- The hero photo is eager: the rendered `<img>` has `loading="eager"` and `fetchpriority="high"`. This is a real performance contract — a lazy LCP image is a measurable regression.
+- The old `md:-mt-[76px]` offset is absent.
+
+Run: `npm test -- src/components/widgets/FlightbookHero.test.ts`
+Expected: PASS.
+
 - [ ] **Step 2: Wire it up temporarily to verify**
 
-The pages are rewritten in Task 13. To check this task in isolation, temporarily pass the props in `src/pages/index.astro`, using `hero-image.png` for `photo` and `home.png` for `screenshot`.
+The pages are rewritten in Task 13. To check this task in isolation, temporarily pass the props in `src/pages/index.astro`, using `Paraglider_Main.jpg` for `photo` and `home.png` for `screenshot`.
 
 - [ ] **Step 3: Verify**
 
 Run: `npm run fix && npm run build && npm run check`
 Then `npm run preview` and confirm at 1440px, 768px and 375px: the headline never overflows, the phone does not overlap the text column, and the stat strip reflows 4 → 2 columns.
+
+Check the hero photo was actually downscaled:
+
+```bash
+ls -lS dist/_astro/*.webp | head -5
+```
+
+Expected: largest derivative well under 400 KB. If a multi-megabyte file appears, the `widths`/`format` props did not take effect.
 
 - [ ] **Step 4: Commit**
 
@@ -1125,6 +1317,20 @@ Note the carousel sits *outside* the phone's screen slot for its controls but th
 
 Delete the old `icons` array and the four inline SVG paths — the redesign has no per-feature icons.
 
+- [ ] **Step 1b: Write the render tests**
+
+Create `src/components/widgets/FlightbookPremiumFeatures.test.ts` using the `render` helper from `~/test/render`. Feed it eight stub items and four stub screenshots, then assert:
+
+- Exactly eight `<h3>` elements render, and each item's `description` text appears.
+- The section carries `id="premium"`.
+- Exactly one CTA anchor points at `https://m.flightbook.ch/register`, and it opens in a new tab (`target="_blank"` with `rel` containing `noopener`).
+- Exactly one `data-carousel` root is present — the section owns one carousel, not one per card.
+- No `<svg>` elements remain, proving the old per-feature icon array was deleted rather than orphaned.
+- Passing six items instead of eight renders six cards, proving the grid is data-driven rather than hard-coded to the design's count.
+
+Run: `npm test -- src/components/widgets/FlightbookPremiumFeatures.test.ts`
+Expected: PASS.
+
 - [ ] **Step 2: Verify**
 
 Run: `npm run fix && npm run build && npm run check`
@@ -1163,6 +1369,20 @@ Featured card: `relative min-h-[500px] overflow-hidden rounded-3xl p-8 shadow-[0
 Drop the old badge-colour conditional that string-matched `plan.badge === 'Flugschule' || plan.badge === 'Instructeur'` — it breaks with a third locale and the redesign styles badges uniformly.
 
 Notes: `mx-auto flex max-w-[760px] flex-col gap-3 text-center text-sm leading-relaxed text-muted-light`.
+
+- [ ] **Step 1b: Write the render tests**
+
+Create `src/components/widgets/FlightbookPricing.test.ts` using the `render` helper from `~/test/render`. Assert:
+
+- Three plan cards render, each showing its `title`, `price`, and every entry in its `features` array.
+- Exactly one card is the featured variant — assert on a stable marker such as a `data-featured` attribute you add to the featured card, **not** on a gradient class string.
+- Each plan's CTA `href` matches the `ctaLink` it was given, and all three differ.
+- The `period` suffix renders for the premium plan and is absent for the two without one.
+- Every note in `notes` appears.
+- Badge text renders identically regardless of its value — pass `badge: 'École de vol'` and confirm nothing branches on it, proving the old `plan.badge === 'Flugschule' || 'Instructeur'` string-match is gone. This is the regression that would silently break the third locale.
+
+Run: `npm test -- src/components/widgets/FlightbookPricing.test.ts`
+Expected: PASS.
 
 - [ ] **Step 2: Verify**
 
@@ -1204,6 +1424,19 @@ Text blocks: `<h3 class="font-heading text-[26px]">` and `<p class="max-w-[620px
 Delete the entire `<style>` block and both `<script>` blocks — `ImageCarousel` replaces roughly 200 lines of duplicated slider code.
 
 **Slide sets:** the design reuses the same three school screenshots for both carousels, which is a mock shortcut. Keep the repo's existing distinct sets: school carousel gets `subscription`, `appointment`, `appointment-create`; student carousel gets `home-mobile`, `appointment-mobile`, `appointment-detail`, `place-mobile`.
+
+- [ ] **Step 1b: Write the render tests**
+
+Create `src/components/widgets/FlightbookSchoolsFeatures.test.ts` using the `render` helper from `~/test/render`. Assert:
+
+- Three `<h3>` headings render with the three item titles and descriptions.
+- The section carries `id="schools"`.
+- **Exactly two `data-carousel` roots render**, and the two carousels receive different slide counts (3 and 4) — this is the structural half of the independence guarantee; the behavioural half is the manual check in Step 2.
+- No `class="schools-slide"` or `class="student-slide"` remains, and the file contains no `<style>` or `<script>` block — proving the ~200 lines of duplicated slider code were removed rather than left dormant.
+- The CTA anchor points at `https://instructor.flightbook.ch/school/register`.
+
+Run: `npm test -- src/components/widgets/FlightbookSchoolsFeatures.test.ts`
+Expected: PASS.
 
 - [ ] **Step 2: Verify**
 
@@ -1258,7 +1491,25 @@ Then the CTA as `btn-gradient` linking to `https://m.flightbook.ch/register` wit
 
 Under `lg`, the phone moves above the text and centres.
 
-**Interim asset:** the passenger-confirmation screenshot does not exist in the repo. Pass `src/assets/images/flightbook/home.png` as `screenshot` for now, and `src/assets/images/hero-image.png` as `photo`. Task 13 Step 5 records both swaps as follow-ups.
+**Assets:** pass `src/assets/images/Tandem.jpg` (3585×2248) as `photo`.
+
+The passenger-confirmation screenshot does not exist in the repo — pass
+`src/assets/images/flightbook/home.png` as `screenshot` for now. Task 13 Step 5
+records that swap as the one remaining follow-up.
+
+- [ ] **Step 1b: Write the render tests**
+
+Create `src/components/widgets/FlightbookTandem.test.ts` using the `render` helper from `~/test/render`. Assert:
+
+- The section carries `id="tandem"`.
+- Four sub-feature headings render with their descriptions.
+- Passing three items renders three, proving the 2×2 grid is data-driven.
+- Both the eyebrow and the `<h2>` title text render.
+- The CTA anchor points at `https://m.flightbook.ch/register` with `target="_blank"` and `rel` containing `noopener`.
+- Exactly one `PhoneFrame` bezel renders and no `data-carousel` root does — Tandem shows a single static screenshot, not a slider.
+
+Run: `npm test -- src/components/widgets/FlightbookTandem.test.ts`
+Expected: PASS.
 
 - [ ] **Step 2: Verify**
 
@@ -1331,6 +1582,20 @@ Keep the `FAQPage` JSON-LD block, but simplify `stripHtml`: answers are now plai
 
 Note: `<details name>` (exclusive accordion) is supported in all current evergreen browsers; where unsupported it degrades to multiple-open, which is acceptable.
 
+- [ ] **Step 1b: Write the render tests**
+
+Create `src/components/widgets/FlightbookFAQ.test.ts` using the `render` helper from `~/test/render`. The conditional `steps` branch is the part most likely to break, so cover both sides:
+
+- Six `<details>` elements render, every one carrying `name="faq"` so the exclusive-accordion behaviour is not accidentally dropped.
+- Each question and answer string appears.
+- An entry **without** `steps` renders no `<ol>`; an entry **with** `steps` renders one `<ol>` containing exactly its three items plus the school-registration link.
+- The `<script type="application/ld+json">` block parses as JSON, is `@type: 'FAQPage'`, and its `mainEntity` length equals the number of questions passed.
+- The JSON-LD answer text for the stepped question includes the step strings — they must not be lost now that they live outside the answer field.
+- The JSON-LD contains no HTML tags, confirming the old `stripHtml` regex is genuinely unnecessary rather than merely deleted.
+
+Run: `npm test -- src/components/widgets/FlightbookFAQ.test.ts`
+Expected: PASS.
+
 - [ ] **Step 2: Verify**
 
 Run: `npm run fix && npm run build && npm run check`
@@ -1377,6 +1642,18 @@ Then the link row: `flex flex-wrap items-start justify-between gap-10 border-t b
 
 Drop the `intersect-once`/`motion-safe:md:opacity-0` animation wrapper and the `socialLinks`/`secondaryLinks`/`footNote` props — all three are empty in this project and the redesign has no slot for them.
 
+- [ ] **Step 1b: Write the render tests**
+
+Create `src/components/widgets/Footer.test.ts` using the `render` helper from `~/test/render`. Assert:
+
+- The CTA band renders its `title` and `button` text, with the button's `href` matching `cta.href`.
+- Both link columns render with their titles, and every link's text and `href` appears.
+- Passing a locale-prefixed privacy href (`/en/privacy-policy`) emits it unchanged — the footer must not re-prefix.
+- The removed props are genuinely gone: rendering with no `socialLinks`, `secondaryLinks`, or `footNote` succeeds, and the output contains no `intersect-once` or `motion-safe:` class.
+
+Run: `npm test -- src/components/widgets/Footer.test.ts`
+Expected: PASS.
+
 - [ ] **Step 2: Verify**
 
 Run: `npm run fix && npm run build && npm run check`
@@ -1418,7 +1695,8 @@ import FlightbookSchoolsFeatures from '~/components/widgets/FlightbookSchoolsFea
 import FlightbookTandem from '~/components/widgets/FlightbookTandem.astro';
 import FlightbookFAQ from '~/components/widgets/FlightbookFAQ.astro';
 
-import heroPhoto from '~/assets/images/hero-image.png';
+import heroPhoto from '~/assets/images/Paraglider_Main.jpg';
+import tandemPhoto from '~/assets/images/Tandem.jpg';
 import homeImg from '~/assets/images/flightbook/home.png';
 import statisticImg from '~/assets/images/flightbook/statistic.png';
 import addFlightImg from '~/assets/images/flightbook/add-flight.png';
@@ -1519,17 +1797,16 @@ Then `npm run preview` and walk all three locales at 375px, 768px, and 1440px. C
 - The language pill round-trips: `/` → `/fr` → `/en` → `/`, and from `/en/privacy-policy` back to `/privacy-policy`.
 - No horizontal scrollbar at 375px on any locale.
 
-- [ ] **Step 5: Record the outstanding asset swaps**
+- [ ] **Step 5: Record the one outstanding asset swap**
 
-Append to the spec's *Assets* section a short "Pending" list naming the exact import to change once Joel supplies each file:
+Both photos are supplied (`Paraglider_Main.jpg`, `Tandem.jpg`). One placeholder remains.
+Append to the spec's *Assets* section:
 
 | Asset | Interim | Import to change |
 | --- | --- | --- |
-| Hero photo | `hero-image.png` | `FlightbookHome.astro` → `heroPhoto` |
-| Tandem photo | `hero-image.png` | `FlightbookHome.astro` → tandem `photo` |
-| Passenger confirmation | `home.png` | `FlightbookHome.astro` → tandem `screenshot` |
+| Passenger confirmation screenshot | `flightbook/home.png` | `FlightbookHome.astro` → tandem `screenshot` |
 
-Also note there that the five app screenshots in the design project are newer than the repo's copies and none byte-match, so all five are worth replacing, not just the missing one.
+Also note there that the five app screenshots in the design project are newer than the repo's copies and none byte-match, so all five are worth replacing, not just the missing one. `src/assets/images/flightbook-new-printscreens/` exists but is empty — it is the natural home for the refreshed set.
 
 - [ ] **Step 6: Commit**
 
@@ -1540,10 +1817,65 @@ git commit -m "feat(pages): compose redesigned homepage across de/fr/en"
 
 ---
 
+### Task 14: Rewrite the project agent documentation
+
+`AGENTS.md` currently documents the generic AstroWind template: it describes class-based
+dark mode, a blog that is disabled, and none of Flightbook's actual structure. After
+this redesign it would be actively misleading. `CLAUDE.md` stays a one-line pointer.
+
+**Files:**
+- Modify: `AGENTS.md`
+- Verify unchanged: `CLAUDE.md`
+
+**Interfaces:**
+- Consumes: the finished state of every prior task.
+- Produces: documentation only.
+
+- [ ] **Step 1: Confirm the pointer's referents before editing**
+
+Run: `grep -rn "AGENTS.md" --include="*.md" --include="*.json" --include="*.js" --include="*.ts" --include="*.yml" . --exclude-dir=node_modules --exclude-dir=dist`
+This confirms what depends on the filename (`CLAUDE.md`, `.agents/`, possibly CI). Do not rename or delete the file — only rewrite its contents.
+
+- [ ] **Step 2: Rewrite AGENTS.md**
+
+Keep the sections that are still true (commands table, path aliases, the `astrowind:config` virtual module, content collections, image handling) and correct or replace the rest:
+
+- **Project overview** — this is flightbook.ch, the marketing site for the Flightbook paragliding logbook, not an AstroWind demo. Astro v6, Tailwind v4, TypeScript, static output.
+- **Commands** — add `npm test` and `npm run test:watch`.
+- **Theming** — state plainly that there is **no dark mode**. The `.dark` variant is still declared in `tailwind.css` for upstream compatibility but is never applied; `ApplyColorMode` was removed from `Layout.astro` and `ui.theme` is `light:only`. Document the palette tokens from Task 2 as the source of truth for section colours.
+- **Internationalisation** — three locales (`de` at root, `fr`, `en`), tables in `src/content/i18n/*.json`, all three structurally identical and indexed positionally. `getLocaleFromUrl` matches whole path segments. `Layout.astro` takes a `locale` prop; do not read `I18N.language` for per-page output.
+- **Homepage structure** — the six sections in order with their frozen anchor ids, and the note that `#premium`/`#angebot` deliberately do not match their labels.
+- **Components** — `widgets/` holds page sections, `ui/PhoneFrame.astro` and `ui/ImageCarousel.astro` are shared primitives. State the rule that made `ImageCarousel` necessary: **client scripts must scope queries to their own root element**, never `document.querySelector`, because sections repeat on a page. Mention that `<ClientRouter />` is enabled, so any init must also listen for `astro:page-load` and be idempotent.
+- **Testing** — Vitest, files next to the code, `getViteConfig` wiring, the `src/test/render.ts` harness, and the standard: assert on contract and element counts, never on Tailwind class strings.
+- **Verification checklist** — `npm test`, `npm run fix`, `npm run build`, `npm run check`, then a visual pass across three locales at 375/768/1440.
+
+Delete the blog-centric guidance that does not apply while `apps.blog.isEnabled` is `false`, or mark it explicitly as dormant.
+
+- [ ] **Step 3: Verify the docs match reality**
+
+Every command in the commands table must actually run. Check each:
+
+```bash
+npm test && npm run build && npm run check
+```
+
+Then re-read AGENTS.md against the final tree and confirm no described file or export is absent. A doc that names a removed symbol is worse than no doc.
+
+- [ ] **Step 4: Commit**
+
+```bash
+git add AGENTS.md
+git commit -m "docs: rewrite AGENTS.md for the redesigned three-locale site"
+```
+
+---
+
 ## Self-Review
 
-**Spec coverage.** Foundations → Task 2. Component table → Tasks 3, 5-12. Page structure and anchor freeze → Task 13 plus Global Constraints. i18n including the `lang` bug → Tasks 1, 4, 5, 13. Copy corrections → Task 4 Steps 1-3. Assets and responsive authorship → Tasks 6-10 and 13 Step 5. Verification → Task 13 Step 4. Out-of-scope items are untouched by every task above.
+**Spec coverage.** Foundations → Task 2. Component table → Tasks 3, 5-12. Page structure and anchor freeze → Task 13 plus Global Constraints. i18n including the `lang` bug → Tasks 1, 4, 5, 13. Copy corrections → Task 4 Steps 1-3. Assets and responsive authorship → Tasks 6-10 and 13 Step 5. Verification → Task 13 Step 4. Documentation → Task 14. Out-of-scope items are untouched by every task above.
 
-**Known gaps handed forward.** Three assets ship as interim placeholders (Task 13 Step 5). The Tandem screenshot is the only one with no true equivalent in the repo. English `meta` strings are authored rather than sourced, since the design has no `meta` entries — flagged in Task 4 Step 3.
+**Test coverage.** Task 1 covers locale resolution and the language detector with executable tests. Task 3 ships full test code for both primitives. Tasks 5-12 each specify their render tests as an explicit assertion list rather than literal code — the harness and its usage are fully worked in Task 3, so each is directly implementable, and the assertions were chosen to pin contracts (element counts, hrefs, conditional branches, `aria-*`, eager-loading) rather than Tailwind class strings. Task 4 verifies the three i18n tables are structurally identical with a runnable script.
+
+**Known gaps handed forward.** One asset ships as an interim placeholder: the passenger-confirmation screenshot (Task 13 Step 5). Both photos are now supplied. English `meta` strings are authored rather than sourced, since the design has no `meta` entries — flagged in Task 4 Step 3.
 
 **Type consistency.** `Locale` is defined once in Task 1 and imported everywhere after. `getHeaderData`/`getFooterData` are named identically in Task 5 Step 1, consumed in Task 5 Step 4 and Task 12. `ImageCarousel`'s prop names (`images`, `theme`, `showCaption`, `autoAdvanceMs`) match between Task 3 and its three call sites in Tasks 7 and 9. `PhoneFrame`'s `radius` values (`lg`/`md`/`sm`) match its uses in Tasks 6, 7, and 10. The `features.captions` array is written in Task 4 and indexed in Task 13 Step 1.
