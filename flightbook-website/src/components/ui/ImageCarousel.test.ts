@@ -14,6 +14,30 @@ const images = [
   { src: stub, alt: 'three', caption: 'Third' },
 ];
 
+/**
+ * Returns the outerHTML of the first balanced <div ...>...</div> whose opening tag
+ * contains `marker`, by walking div-open/div-close tokens and counting depth. Used to
+ * check real containment (is X actually nested inside Y) rather than mere presence.
+ */
+function extractDiv(html: string, marker: string): string {
+  const markerIndex = html.indexOf(marker);
+  if (markerIndex === -1) throw new Error(`marker "${marker}" not found in html`);
+  const openStart = html.lastIndexOf('<div', markerIndex);
+  const tagRe = /<div\b[^>]*>|<\/div>/g;
+  tagRe.lastIndex = openStart;
+  let depth = 0;
+  let match: RegExpExecArray | null;
+  while ((match = tagRe.exec(html))) {
+    if (match[0].startsWith('</div')) {
+      depth--;
+      if (depth === 0) return html.slice(openStart, match.index + match[0].length);
+    } else {
+      depth++;
+    }
+  }
+  throw new Error(`unbalanced <div> starting at ${openStart}`);
+}
+
 describe('ImageCarousel', () => {
   it('emits one slide and one dot per image', async () => {
     const html = await render(ImageCarousel, { images });
@@ -120,6 +144,30 @@ describe('ImageCarousel', () => {
   it("no longer derives the active dot class by reading a dot's own className (source check)", () => {
     expect(source).not.toMatch(/\.className\.match\(/);
     expect(source).toContain('root.dataset.activeDot');
+  });
+
+  // FIX ROUND 3: FlightbookPremiumFeatures needed the phone-bezel frame around only the
+  // slides, with controls/caption as siblings below it. `frame` is opt-in specifically so
+  // Tasks 9 and 10's existing (unframed) carousels keep their current shape unchanged.
+  it('renders no PhoneFrame bezel when frame is omitted (guards other consumers against regression)', async () => {
+    const html = await render(ImageCarousel, { images });
+    expect(html).not.toContain('data-phone-frame');
+  });
+
+  it('wraps only the slides in the PhoneFrame bezel when frame is set; controls and caption stay outside it', async () => {
+    const html = await render(ImageCarousel, { images, frame: 'md', showCaption: true });
+
+    // Exactly one bezel, and it actually contains every slide.
+    expect(count(html, /data-phone-frame/g)).toBe(1);
+    const frameHtml = extractDiv(html, 'data-phone-frame');
+    expect(count(frameHtml, /data-slide/g)).toBe(images.length);
+
+    // The containment check the brief calls for: controls and caption must NOT be
+    // nested inside the bezel element, only positioned after it as siblings.
+    expect(frameHtml).not.toContain('data-prev');
+    expect(frameHtml).not.toContain('data-next');
+    expect(frameHtml).not.toContain('data-dot');
+    expect(frameHtml).not.toContain('data-caption-text');
   });
 
   // FIX ROUND 2, FINDING 1: nothing cleared a running `setInterval` before ClientRouter (enabled

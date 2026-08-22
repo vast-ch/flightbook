@@ -52,6 +52,21 @@ describe('FlightbookPremiumFeatures', () => {
     expect(count(html, /data-carousel\b/g)).toBe(1);
   });
 
+  // FIX ROUND 1 gave the whole carousel (images + controls) a phone bezel, which put the
+  // dark-theme controls on a white background inside it. FIX ROUND 2: ImageCarousel's new
+  // `frame` prop puts the bezel around only the images, so this section no longer wraps
+  // ImageCarousel in a separate <PhoneFrame> itself — it delegates via the prop instead.
+  it('frames only the carousel images in a single phone bezel', async () => {
+    const html = await render(FlightbookPremiumFeatures, baseProps);
+    expect(count(html, /data-phone-frame/g)).toBe(1);
+  });
+
+  it('uses the dark carousel theme, since the controls sit on the section’s dark background (not inside the bezel)', async () => {
+    const html = await render(FlightbookPremiumFeatures, baseProps);
+    expect(html).toContain('data-active-dot="bg-sky"');
+    expect(html).not.toContain('data-active-dot="bg-brand"');
+  });
+
   it('renders no per-feature icon svgs', async () => {
     const html = await render(FlightbookPremiumFeatures, baseProps);
     expect(html).not.toContain('<svg');
