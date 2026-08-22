@@ -6,6 +6,8 @@ import FlightbookPremiumFeatures from '~/components/widgets/FlightbookPremiumFea
 import FlightbookSchoolsFeatures from '~/components/widgets/FlightbookSchoolsFeatures.astro';
 import FlightbookFAQ from '~/components/widgets/FlightbookFAQ.astro';
 import { getTranslations } from '~/utils/i18n';
+import heroPhoto from '~/assets/images/Paraglider_Main.jpg';
+import heroScreenshot from '~/assets/images/flightbook/home.png';
 
 const t = getTranslations('de');
 
@@ -67,11 +69,16 @@ const pricingPlans = [
 
 <Layout metadata={metadata}>
   <FlightbookHero
-    title={t.hero.titleLine1}
+    eyebrow={t.hero.eyebrow}
+    titleLine1={t.hero.titleLine1}
+    titleLine2={t.hero.titleLine2}
     subtitle={t.hero.subtitle}
-    iosText={t.hero.ios}
-    androidText={t.hero.android}
-    premiumText={t.hero.subscribePremium}
+    ios={t.hero.ios}
+    android={t.hero.android}
+    premium={t.hero.subscribePremium}
+    stats={t.hero.stats}
+    photo={heroPhoto}
+    screenshot={heroScreenshot}
   />
 
   <FlightbookPricing title={t.pricing.title} plans={pricingPlans} notes={t.pricing.notes} />
