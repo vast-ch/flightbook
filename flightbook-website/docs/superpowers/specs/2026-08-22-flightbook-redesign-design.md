@@ -188,6 +188,24 @@ assets are not substitutes.
 The Passenger-confirmation screenshot shows an email address and a full phone
 number. They read as dummy data; confirm before it ships on a public page.
 
+### Pending (Task 13)
+
+| Asset                             | Interim               | Import to change                             |
+| --------------------------------- | --------------------- | -------------------------------------------- |
+| Passenger confirmation screenshot | `flightbook/home.png` | `FlightbookHome.astro` → tandem `screenshot` |
+
+`tandem.screenshotAlt` in all three locale tables (`de`, `fr`, `en`) currently describes the
+Home screen, not a passenger confirmation — it must be rewritten once the real asset lands.
+
+More broadly, the five app screenshots in the design project are newer than the repo's
+copies and none byte-match, so all five are worth replacing, not just the missing one.
+`src/assets/images/flightbook-new-printscreens/` exists but is empty — it is the natural
+home for the refreshed set.
+
+Separately, `home-mobile.png` and `place-mobile.png` are byte-identical duplicates of
+`home.png` and `place.png` respectively in the working tree — a pre-existing asset defect,
+not introduced by this task and not fixed here.
+
 ## Verification
 
 1. `npm run build` succeeds.

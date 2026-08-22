@@ -1,47 +1,9 @@
 ---
 import Layout from '~/layouts/PageLayout.astro';
-import FlightbookHero from '~/components/widgets/FlightbookHero.astro';
-import FlightbookPricing from '~/components/widgets/FlightbookPricing.astro';
-import FlightbookPremiumFeatures from '~/components/widgets/FlightbookPremiumFeatures.astro';
-import FlightbookSchoolsFeatures from '~/components/widgets/FlightbookSchoolsFeatures.astro';
-import FlightbookTandem from '~/components/widgets/FlightbookTandem.astro';
-import FlightbookFAQ from '~/components/widgets/FlightbookFAQ.astro';
+import FlightbookHome from '~/components/FlightbookHome.astro';
 import { getTranslations } from '~/utils/i18n';
-import heroPhoto from '~/assets/images/Paraglider_Main.jpg';
-import heroScreenshot from '~/assets/images/flightbook/home.png';
-import tandemPhoto from '~/assets/images/Tandem.jpg';
-import tandemScreenshot from '~/assets/images/flightbook/home.png';
-import featureHomeImg from '~/assets/images/flightbook/home.png';
-import featureStatisticImg from '~/assets/images/flightbook/statistic.png';
-import featureAddFlightImg from '~/assets/images/flightbook/add-flight.png';
-import featurePlaceImg from '~/assets/images/flightbook/place.png';
-import schoolsStudentImg from '~/assets/images/flightbook/student.png';
-import schoolsSubscriptionImg from '~/assets/images/flightbook/subscription.png';
-import schoolsAppointmentImg from '~/assets/images/flightbook/appointment.png';
-import schoolsAppointmentCreateImg from '~/assets/images/flightbook/appointment-create.png';
-import schoolsHomeMobileImg from '~/assets/images/flightbook/home-mobile.png';
-import schoolsAppointmentMobileImg from '~/assets/images/flightbook/appointment-mobile.png';
-import schoolsAppointmentDetailImg from '~/assets/images/flightbook/appointment-detail.png';
-import schoolsPlaceMobileImg from '~/assets/images/flightbook/place-mobile.png';
 
 const t = getTranslations('fr');
-
-const featureScreenshots = [featureHomeImg, featureStatisticImg, featureAddFlightImg, featurePlaceImg].map(
-  (src, i) => ({ src, alt: t.features.captions[i], caption: t.features.captions[i] })
-);
-
-const schoolSlides = [schoolsSubscriptionImg, schoolsAppointmentImg, schoolsAppointmentCreateImg].map((src, i) => ({
-  src,
-  alt: t.schools.schoolCaptions[i],
-  caption: t.schools.schoolCaptions[i],
-}));
-
-const studentSlides = [
-  schoolsHomeMobileImg,
-  schoolsAppointmentMobileImg,
-  schoolsAppointmentDetailImg,
-  schoolsPlaceMobileImg,
-].map((src, i) => ({ src, alt: t.schools.studentCaptions[i], caption: t.schools.studentCaptions[i] }));
 
 const metadata = {
   title: t.meta.title,
@@ -66,84 +28,13 @@ const metadata = {
     follow: true,
   },
 };
-
-const pricingPlans = [
-  {
-    badge: t.pricing.free.badge,
-    title: t.pricing.free.title,
-    price: t.pricing.free.price,
-    features: t.pricing.free.features,
-    cta: t.pricing.free.cta,
-    ctaLink: 'https://m.flightbook.ch/register',
-    featured: false,
-  },
-  {
-    badge: t.pricing.premium.badge,
-    title: t.pricing.premium.title,
-    price: t.pricing.premium.price,
-    period: t.pricing.premium.period,
-    features: t.pricing.premium.features,
-    cta: t.pricing.premium.cta,
-    ctaLink: 'https://m.flightbook.ch/settings',
-    featured: true,
-  },
-  {
-    badge: t.pricing.schools.badge,
-    title: t.pricing.schools.title,
-    price: t.pricing.schools.price,
-    features: t.pricing.schools.features,
-    cta: t.pricing.schools.cta,
-    ctaLink: 'https://instructor.flightbook.ch/school/register',
-    featured: false,
-  },
-];
 ---
 
 <Layout metadata={metadata}>
-  <FlightbookHero
-    eyebrow={t.hero.eyebrow}
-    titleLine1={t.hero.titleLine1}
-    titleLine2={t.hero.titleLine2}
-    subtitle={t.hero.subtitle}
-    ios={t.hero.ios}
-    android={t.hero.android}
-    premium={t.hero.subscribePremium}
-    stats={t.hero.stats}
-    photo={heroPhoto}
-    screenshot={heroScreenshot}
-    screenshotAlt={t.hero.screenshotAlt}
-  />
-
-  <FlightbookPricing title={t.pricing.title} intro={t.pricing.intro} plans={pricingPlans} notes={t.pricing.notes} />
-
-  <FlightbookPremiumFeatures
-    title={t.features.title}
-    intro={t.features.intro}
-    cta={t.features.cta}
-    items={t.features.items}
-    screenshots={featureScreenshots}
-  />
-
-  <FlightbookSchoolsFeatures
-    eyebrow={t.schools.eyebrow}
-    title={t.schools.title}
-    cta={t.schools.cta}
-    items={t.schools.items}
-    studentImg={schoolsStudentImg}
-    schoolSlides={schoolSlides}
-    studentSlides={studentSlides}
-  />
-
-  <FlightbookTandem
-    eyebrow={t.tandem.eyebrow}
-    title={t.tandem.title}
-    intro={t.tandem.intro}
-    cta={t.tandem.cta}
-    items={t.tandem.items}
-    photo={tandemPhoto}
-    screenshot={tandemScreenshot}
-    screenshotAlt={t.tandem.screenshotAlt}
-  />
-
-  <FlightbookFAQ title={t.faq.title} faqs={t.faq.questions} schoolCtaLabel={t.schools.cta} />
+  <FlightbookHome locale="fr" />
 </Layout>
+
+<script>
+  import { initLanguageDetection } from '~/utils/language-detector';
+  initLanguageDetection();
+</script>
