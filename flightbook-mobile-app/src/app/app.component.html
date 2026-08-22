@@ -4,4 +4,9 @@
 -->
 <ion-app>
   <ion-router-outlet (activate)="subscribeToEmmiter($event)" id="main-content"></ion-router-outlet>
+
+  <!-- Covers the router's boot decision; see AppComponent.bootVisible -->
+  @if (bootVisible()) {
+    <fb-loading-screen></fb-loading-screen>
+  }
 </ion-app>

@@ -1,0 +1,32 @@
+<!--
+    The boot screen. Two decorative ridgelines at the foot, the mark and an
+    indeterminate bar centred above them, version and domain pinned to the
+    bottom. Nothing here is interactive: the screen goes when the app is ready.
+-->
+<div class="splash" role="status" aria-live="polite">
+
+    <svg class="splash__ridges" viewBox="0 0 390 844" preserveAspectRatio="none" aria-hidden="true">
+        <path class="splash__ridge splash__ridge--far"
+              d="M0 640 C70 600 120 660 190 618 C260 576 320 610 390 572 L390 844 L0 844 Z"></path>
+        <path class="splash__ridge splash__ridge--near"
+              d="M0 712 C80 686 140 730 210 700 C280 670 330 706 390 682 L390 844 L0 844 Z"></path>
+    </svg>
+
+    <div class="splash__body">
+        <img class="splash__mark" src="assets/icons/icon-192x192.png" alt="" aria-hidden="true" />
+        <div class="splash__wordmark">Flightbook</div>
+
+        <!-- Indeterminate: the boot has no measurable progress to report -->
+        <div class="splash__track">
+            <div class="splash__bar"></div>
+        </div>
+
+        <div class="splash__line">{{ lineKey() | translate }}</div>
+    </div>
+
+    <div class="splash__footer">
+        <div class="splash__version">Flightbook {{ appVersion }}</div>
+        <div class="splash__domain">flightbook.ch</div>
+    </div>
+
+</div>

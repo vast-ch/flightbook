@@ -7,18 +7,12 @@ import { chevronForward, checkmark } from 'ionicons/icons';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { SplashScreen } from '@capacitor/splash-screen';
 import { NewsStore } from '../news/shared/news.store';
 import { LanguageService } from '../shared/services/language.service';
 import { HomeStore } from './shared/home.store';
 import { ActivityChartComponent } from './components/activity-chart/activity-chart.component';
 import { AvatarButtonComponent } from 'src/app/shared/components/avatar-button/avatar-button.component';
 import { splitDistance, splitDuration, toHoursMinutes } from 'src/app/shared/util/format';
-
-// The splash screen stays up until the first screen is ready to paint.
-setTimeout(() => {
-    SplashScreen.hide();
-}, 700);
 
 @Component({
     selector: 'app-home',

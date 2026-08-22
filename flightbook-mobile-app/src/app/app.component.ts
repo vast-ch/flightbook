@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, signal } from '@angular/core';
 
 import { AlertController, IonicSafeString } from '@ionic/angular/standalone';
 import { TranslateService } from '@ngx-translate/core';
@@ -16,6 +16,7 @@ import {
     Token,
 } from '@capacitor/push-notifications';
 import { Capacitor } from '@capacitor/core';
+import { SplashScreen } from '@capacitor/splash-screen';
 import { StatusBar } from '@capacitor/status-bar';
 import { Router } from '@angular/router';
 import { RegisterPage } from './account/register/register.page';
@@ -34,6 +35,19 @@ import { cloudUpload, copy } from 'ionicons/icons';
 })
 export class AppComponent implements OnDestroy, OnInit {
     unsubscribe$ = new Subject<void>();
+
+    /**
+     * The boot screen covers the window the router needs to decide where to go:
+     * ForceUpdateGuard's version check, then AuthGuardService.isAuth(), which on
+     * an expired token spends a refresh round-trip. Neither has an HTTP timeout,
+     * so on a bad connection that window is long - and used to be a blank shell,
+     * because the two module-scope `SplashScreen.hide()` timers this replaces
+     * fired when their chunk was parsed rather than when anything was ready.
+     */
+    bootVisible = signal(true);
+
+    private bootStartedAt = Date.now();
+    private bootFinishing = false;
 
     constructor(
         private router: Router,
@@ -64,6 +78,8 @@ export class AppComponent implements OnDestroy, OnInit {
     }
 
     async ngOnInit(): Promise<void> {
+        this.hideNativeSplash();
+
         // Fix EdgeToEdge header issue: ensure StatusBar overlaysWebView is false and set style
         try {
             if (Capacitor.isNativePlatform() && Capacitor.getPlatform() == "android") {
@@ -97,6 +113,10 @@ export class AppComponent implements OnDestroy, OnInit {
     }
 
     subscribeToEmmiter(componentRef: any) {
+        // Before the guard below: login and register are legitimate first
+        // screens, so the boot screen has to lift for them too.
+        this.finishBoot();
+
         if (componentRef instanceof LoginPage || componentRef instanceof RegisterPage || this.sessionService.sessionBootstrapped) {
             return;
         }
@@ -129,6 +149,40 @@ export class AppComponent implements OnDestroy, OnInit {
         })
 
         this.sessionService.markBootstrapped();
+    }
+
+    /**
+     * Lifts the boot screen once the first page has activated, but not before
+     * MIN_BOOT_MS has passed: a warm start resolves in about a tenth of a
+     * second, and a screen that flashes one status line and vanishes reads as a
+     * glitch rather than a splash.
+     */
+    private finishBoot() {
+        if (this.bootFinishing) {
+            return;
+        }
+        this.bootFinishing = true;
+
+        const shown = Date.now() - this.bootStartedAt;
+        setTimeout(() => this.bootVisible.set(false), Math.max(0, AppComponent.MIN_BOOT_MS - shown));
+    }
+
+    /** How long the boot screen stays up even when there is nothing left to wait for. */
+    private static readonly MIN_BOOT_MS = 900;
+
+    /**
+     * Hands the native splash over to the boot screen. Deferred a frame so the
+     * webview has painted it first - hiding on the same tick shows a white gap
+     * between the two. capacitor.config.json sets launchAutoHide: false, so
+     * until this runs the native splash is what is on screen.
+     */
+    private hideNativeSplash() {
+        if (!Capacitor.isNativePlatform()) {
+            return;
+        }
+        requestAnimationFrame(() => {
+            SplashScreen.hide().catch(() => { /* already hidden, or unavailable */ });
+        });
     }
 
     private initPushNotification() {

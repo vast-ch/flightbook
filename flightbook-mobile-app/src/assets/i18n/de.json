@@ -846,5 +846,18 @@
     "placelist": {
         "summaryOne": "1 Ort",
         "summary": "{{count}} Orte"
+    },
+    "splash": {
+        "lines": {
+            "1": "Warten auf Wind…",
+            "2": "Schirm auslegen…",
+            "3": "Leinen sortieren…",
+            "4": "Tragegurte prüfen…",
+            "5": "Windsack lesen…",
+            "6": "Einhängen…",
+            "7": "Auf eine Ablösung warten…",
+            "8": "Den Hang hochlaufen…"
+        },
+        "stillConnecting": "Verbindung wird aufgebaut…"
     }
 }

@@ -846,5 +846,18 @@
     "placelist": {
         "summaryOne": "1 place",
         "summary": "{{count}} places"
+    },
+    "splash": {
+        "lines": {
+            "1": "Waiting for wind…",
+            "2": "Laying out the wing…",
+            "3": "Untangling lines…",
+            "4": "Checking the risers…",
+            "5": "Reading the windsock…",
+            "6": "Clipping in…",
+            "7": "Waiting for a cycle…",
+            "8": "Running up the slope…"
+        },
+        "stillConnecting": "Still connecting…"
     }
 }
