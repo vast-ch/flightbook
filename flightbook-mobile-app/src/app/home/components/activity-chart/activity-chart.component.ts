@@ -1,5 +1,5 @@
 import { Component, Input, computed, inject, signal } from '@angular/core';
-import { Chart, ChartConfiguration, ChartData, Plugin } from 'chart.js';
+import { Chart, ChartConfiguration, ChartData, ChartType, Plugin } from 'chart.js';
 import { NgChartsModule } from 'ng2-charts';
 import { FlightStatistic } from '../../../flight/shared/flightStatistic.model';
 import { LanguageService } from '../../../shared/services/language.service';
@@ -15,13 +15,29 @@ const MONTHS_SHOWN = 12;
  * nothing, matching fb-flights-bars: a row of zeroes is noise, and the month
  * labels underneath already dim them.
  */
+declare module 'chart.js' {
+    interface PluginOptionsByType<TType extends ChartType> {
+        barValues?: { enabled: boolean };
+    }
+}
+
 /** Font size of the printed value, and the gap between it and the bar top. */
 const VALUE_SIZE = 8.5;
 const VALUE_GAP = 7;
 
 const BAR_VALUES: Plugin<'bar'> = {
     id: 'barValues',
-    afterDatasetsDraw(chart: Chart<'bar'>) {
+    /*
+     * Opt-in per chart, and it has to be. ng2-charts registers whatever is
+     * passed to [plugins] with Chart.register - globally, not on the one canvas
+     * - so without this gate the flight counts were drawn on every Chart.js
+     * chart in the app, printing raw unrounded hours over the cumulative
+     * airtime line.
+     */
+    afterDatasetsDraw(chart: Chart<'bar'>, _args: unknown, options: { enabled?: boolean }) {
+        if (!options?.enabled) {
+            return;
+        }
         const meta = chart.getDatasetMeta(0);
         const values = chart.data.datasets[0]?.data ?? [];
         const ctx = chart.ctx;
@@ -157,6 +173,9 @@ export class ActivityChartComponent {
             airtime: { display: false, beginAtZero: true, grace: '30%', position: 'right' }
         },
         plugins: {
+            // This chart is the one that wants the printed counts; the gate is
+            // in the plugin, because registration is global.
+            barValues: { enabled: true },
             // chartjs-plugin-datalabels is no longer loaded, so there is
             // nothing to switch off here.
             legend: { display: false },
