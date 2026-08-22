@@ -8,8 +8,16 @@ import FlightbookFAQ from '~/components/widgets/FlightbookFAQ.astro';
 import { getTranslations } from '~/utils/i18n';
 import heroPhoto from '~/assets/images/Paraglider_Main.jpg';
 import heroScreenshot from '~/assets/images/flightbook/home.png';
+import featureHomeImg from '~/assets/images/flightbook/home.png';
+import featureStatisticImg from '~/assets/images/flightbook/statistic.png';
+import featureAddFlightImg from '~/assets/images/flightbook/add-flight.png';
+import featurePlaceImg from '~/assets/images/flightbook/place.png';
 
 const t = getTranslations('de');
+
+const featureScreenshots = [featureHomeImg, featureStatisticImg, featureAddFlightImg, featurePlaceImg].map(
+  (src, i) => ({ src, alt: t.features.captions[i], caption: t.features.captions[i] })
+);
 
 const metadata = {
   title: t.meta.title,
@@ -84,7 +92,13 @@ const pricingPlans = [
 
   <FlightbookPricing title={t.pricing.title} plans={pricingPlans} notes={t.pricing.notes} />
 
-  <FlightbookPremiumFeatures title={t.features.title} features={t.features.items.slice(0, 4)} cta={t.features.cta} />
+  <FlightbookPremiumFeatures
+    title={t.features.title}
+    intro={t.features.intro}
+    cta={t.features.cta}
+    items={t.features.items}
+    screenshots={featureScreenshots}
+  />
 
   <FlightbookSchoolsFeatures title={t.schools.title} features={t.schools.items} cta={t.schools.cta} />
 
