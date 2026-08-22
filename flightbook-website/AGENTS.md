@@ -71,12 +71,12 @@ Site config lives in `src/config.yaml` and is loaded as a Vite virtual module
 `astrowind:config` by the custom integration in `vendor/integration/`. Exports: `SITE`,
 `I18N`, `METADATA`, `APP_BLOG`, `UI`, `ANALYTICS`.
 
-Note: `astro.config.ts` also has Astro's _built-in_ `i18n` block (`locales: ['de', 'fr']`,
-`defaultLocale: 'de'`). Nothing in `src/` imports `astro:i18n` or reads
+Note: `astro.config.ts` also has Astro's _built-in_ `i18n` block (`locales: ['de', 'fr',
+'en']`, `defaultLocale: 'de'`). Nothing in `src/` imports `astro:i18n` or reads
 `Astro.currentLocale` — routing and translation are handled entirely by
 `src/utils/i18n.ts` and the locale-specific files under `src/pages/`. That built-in block
-is vestigial (left over from the template) and is also missing `en`; don't take it as the
-source of truth for supported locales.
+is vestigial (left over from the template) and unused; don't take it as the source of
+truth for supported locales, even though its `locales` array happens to list all three.
 
 ## Internationalisation
 
@@ -87,9 +87,9 @@ built-in i18n routing is not used for this — each locale has its own thin page
 
 - `src/content/i18n/{de,fr,en}.json` are the three translation tables. **They are
   structurally identical and indexed positionally** by components (e.g. `features.captions[i]`
-  paired with the i-th screenshot import in `index.astro`). This positional pairing is
-  load-bearing — reordering or shortening one locale's array without doing the same to the
-  other two silently breaks that locale's captions/alt text.
+  paired with the i-th screenshot import in `FlightbookHome.astro`). This positional pairing
+  is load-bearing — reordering or shortening one locale's array without doing the same to
+  the other two silently breaks that locale's captions/alt text.
 - `src/utils/i18n.ts` exports `type Locale = 'de' | 'fr' | 'en'`, `getTranslations(locale)`,
   and `getLocaleFromUrl(url)`. `getLocaleFromUrl` matches a whole first path segment (so
   `/french-alps` is not misread as `/fr`).
@@ -208,6 +208,13 @@ instead of a render assertion that would pass vacuously. See
 `src/utils/i18n.test.ts` and `src/utils/language-detector.test.ts` cover locale resolution
 and the redirect decision logic without touching the DOM.
 
+`src/components/FlightbookHome.test.ts` renders the composed homepage per locale and
+asserts the six section ids from the "Homepage Structure" table above appear in that exact
+order, that `locale` is actually threaded through `getTranslations` (rendering `en`/`fr`
+must not silently fall back to German content), and that nothing leaks a raw `undefined`
+or `[object Object]` into the output. This is the test to extend if the frozen section
+order or ids ever need to change.
+
 ## Blog — present but dormant
 
 `apps.blog.isEnabled` is `false` in `src/config.yaml`. The blog components
@@ -237,25 +244,30 @@ Hero images use `loading="eager"` and `fetchpriority="high"`.
 ## Known Gaps
 
 - **Placeholder screenshot:** `FlightbookTandem`'s passenger-confirmation screenshot
-  (`src/pages/index.astro` passes `screenshot={homeImg}` into it) currently reuses the
-  Home-screen screenshot (`flightbook/home.png`) rather than an actual passenger
-  confirmation screen, and `tandem.screenshotAlt` in all three i18n tables describes the
-  Home screen accordingly (e.g. German: "Flightbook App Startseite"). This is a known,
-  intentional interim state, not a bug to silently "fix" by writing new alt text.
+  (`src/components/FlightbookHome.astro` imports `homeImg` from
+  `~/assets/images/flightbook/home.png` and passes `screenshot={homeImg}` into it, at both
+  its own call site and `FlightbookHero`'s) currently reuses the Home-screen screenshot
+  rather than an actual passenger confirmation screen, and `tandem.screenshotAlt` in all
+  three i18n tables describes the Home screen accordingly (e.g. German: "Flightbook App
+  Startseite"). This is a known, intentional interim state, not a bug to silently "fix" by
+  writing new alt text. Because `FlightbookHome.astro` is the single component shared by
+  all three locale pages (see "Homepage Structure" above), swapping in the real screenshot
+  is one edit in one file, not three.
 - **Duplicate image files:** `flightbook/home-mobile.png` is byte-identical to
   `flightbook/home.png`, and `flightbook/place-mobile.png` is byte-identical to
-  `flightbook/place.png`. Both pairs are imported and used separately in
-  `src/pages/index.astro` (once per breakpoint/context) — this is current, deliberate
-  duplication in the working tree, not a broken symlink or accidental copy to clean up
-  without checking with a human first.
+  `flightbook/place.png`. Both pairs are imported separately in
+  `src/components/FlightbookHome.astro` (once per breakpoint/context) — this is current,
+  deliberate duplication in the working tree, not a broken symlink or accidental copy to
+  clean up without checking with a human first.
 - **No browser in this environment:** responsive layout and interactive behaviour (the
   carousel, mobile menu, language switcher) have been verified structurally (render
   assertions, source-level checks) rather than visually. A visual pass across the three
   locales at common breakpoints is still worth doing by a human or a tool with a real
   browser before treating the redesign as fully verified.
-- **Astro's built-in `i18n` config** in `astro.config.ts` lists `locales: ['de', 'fr']` and
-  is unused dead config (see "Configuration System" above) — it doesn't include `en` and
-  isn't the source of truth for locales.
+- **Astro's built-in `i18n` config** in `astro.config.ts` lists `locales: ['de', 'fr',
+'en']` but is unused dead config (see "Configuration System" above) — nothing in `src/`
+  reads it, so it isn't the source of truth for locales even though its list is currently
+  complete.
 
 ## Verification Checklist
 
