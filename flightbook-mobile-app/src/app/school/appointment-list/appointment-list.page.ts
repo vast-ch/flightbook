@@ -7,6 +7,7 @@ import { firstValueFrom, Subject, takeUntil } from 'rxjs';
 import { AccountService } from 'src/app/account/shared/account.service';
 import { User } from 'src/app/account/shared/user.model';
 import { Appointment } from '../shared/appointment.model';
+import { AppointmentFilter } from '../shared/appointment-filter.model';
 import { AppointmentScope, SchoolService } from '../shared/school.service';
 import { Subscription } from '../shared/subscription.model';
 import { AppointmentDetailsComponent } from '../shared/components/appointment-details/appointment-details.component';
@@ -66,6 +67,23 @@ export class AppointmentListPage implements OnInit, OnDestroy {
     public readonly State = State;
 
     public scope = signal<AppointmentScope>('upcoming');
+
+    /**
+     * Bumped by every reload. A run that has been superseded - a second chip
+     * cleared, or an infinite-scroll page still in flight from the old filter -
+     * drops its result rather than writing it over the current one: its rows
+     * were fetched at offsets that no longer mean anything, so appending them
+     * double-counted fetchedCount and duplicated `track appointment.id`.
+     */
+    private loadGeneration = 0;
+
+    /**
+     * The filter the rows on screen were fetched with. Identity is enough -
+     * updateFilter and resetFilter both mint a new AppointmentFilter - so a
+     * reload that failed leaves this stale and re-entry retries, rather than
+     * the empty-list check alone leaving a narrowed list on screen for good.
+     */
+    private loadedFilter: AppointmentFilter | null = null;
 
     /** True once a page came back short, which is the only way we know the total. */
     private listComplete = signal<boolean>(false);
@@ -143,7 +161,10 @@ export class AppointmentListPage implements OnInit, OnDestroy {
     ngOnInit() {}
 
     ionViewDidEnter() {
-        if (this.appointments().length === 0) {
+        // Not just an empty list: the filter is shared, so it can move while this
+        // page is off-screen, and a reload that failed left the previous filter's
+        // rows on screen with no way back short of leaving the school.
+        if (this.appointments().length === 0 || this.loadedFilter !== this.schoolService.filter()) {
             this.initialDataLoad();
         }
     }
@@ -186,6 +207,8 @@ export class AppointmentListPage implements OnInit, OnDestroy {
     // ---- Data -----------------------------------------------------------
 
     private async initialDataLoad() {
+    const generation = ++this.loadGeneration;
+    const requestedFilter = this.schoolService.filter();
     const loading = await this.loadingCtrl.create({
         message: this.translate.instant('loading.loading')
     });
@@ -205,9 +228,16 @@ export class AppointmentListPage implements OnInit, OnDestroy {
                 )
         ]);
 
+        // A newer reload started while this one was in flight; its answer is the
+        // current filter's, and every row below belongs to a filter since dropped.
+        if (generation !== this.loadGeneration) {
+            return;
+        }
+
         this.currentSchool.set(schools.find((s: School) => s.id === this.schoolId));
         this.currentUser.set(user);
 
+        this.loadedFilter = requestedFilter;
         this.fetchedCount = rawAppointments.length;
         this.listComplete.set(this.scope() === 'upcoming' || rawAppointments.length < this.schoolService.defaultLimit);
 
@@ -236,7 +266,13 @@ export class AppointmentListPage implements OnInit, OnDestroy {
         }
     } catch (error) {
         console.error('Error loading appointments', error);
-        // Optionally, you could show an error alert here
+        // The rows on screen are still the previous filter's, fetched at its
+        // offsets, so another page from here would land at the wrong offset and
+        // repeat an appointment already listed - a duplicate `track` key. Shut
+        // the scroller; loadedFilter is left stale, so re-entry retries.
+        if (this.infiniteScroll) {
+            this.infiniteScroll.disabled = true;
+        }
     } finally {
         await loading.dismiss();
     }
@@ -392,6 +428,7 @@ export class AppointmentListPage implements OnInit, OnDestroy {
             event.target.disabled = true;
             return;
         }
+        const generation = this.loadGeneration;
         this.schoolService.getAppointments({
             limit: this.schoolService.defaultLimit,
             // fetchedCount, not the rendered length: inScope() drops today's
@@ -403,6 +440,12 @@ export class AppointmentListPage implements OnInit, OnDestroy {
             .pipe(takeUntil(this.unsubscribe$))
             .subscribe((res: Appointment[]) => {
                 event.target.complete();
+                // A reload replaced the list while this page was in flight - it
+                // was fetched at the old filter's offsets, so appending it would
+                // double-count fetchedCount and repeat rows already on screen.
+                if (generation !== this.loadGeneration) {
+                    return;
+                }
                 this.fetchedCount += res.length;
                 if (res.length < this.schoolService.defaultLimit) {
                     event.target.disabled = true;

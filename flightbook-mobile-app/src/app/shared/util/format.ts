@@ -50,6 +50,35 @@ export function localDate(value: string | Date): Date {
     return new Date(Number(year), Number(month ?? 1) - 1, Number(day ?? 1));
 }
 
+/** dd.MM.yyyy - all numeric, so it needs neither a locale nor a DatePipe. */
+export function shortDate(date: Date | null | undefined): string {
+    if (!date || Number.isNaN(date.getTime())) {
+        return '';
+    }
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    return `${day}.${month}.${date.getFullYear()}`;
+}
+
+/**
+ * A filter's period as one chip label: a whole calendar year reads as the year,
+ * any other closed range as its two ends, and a single bound as the bound it is.
+ *
+ * Shared because it had already drifted - the Flights chip collapsed the year
+ * and the appointment chip, copied from it, did not, so one filter read two
+ * ways. `translate` takes a key rather than the service, to keep this a plain
+ * function both callers can hand `instant` to.
+ */
+export function dateRangeLabel(from: Date | null, to: Date | null, translate: (key: string) => string): string {
+    if (from && to) {
+        const wholeYear = from.getFullYear() === to.getFullYear()
+            && from.getMonth() === 0 && from.getDate() === 1
+            && to.getMonth() === 11 && to.getDate() === 31;
+        return wholeYear ? String(from.getFullYear()) : `${shortDate(from)} – ${shortDate(to)}`;
+    }
+    return `${translate(from ? 'filter.from' : 'filter.to')} ${shortDate(from ?? to)}`;
+}
+
 /** Distance split the same way: no decimal once it stops fitting. */
 export function splitDistance(km: number): { value: string; unit: string } {
     const distance = Number(km ?? 0);

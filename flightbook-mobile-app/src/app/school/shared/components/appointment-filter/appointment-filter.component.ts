@@ -1,10 +1,11 @@
-import { Component, computed } from '@angular/core';
+import { Component } from '@angular/core';
 import { ModalController, IonContent, IonButton, IonModal, IonDatetime } from '@ionic/angular/standalone';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { AppointmentFilter } from '../../appointment-filter.model';
 import { SchoolService } from '../../school.service';
 import { State } from '../../state';
 import { DatePipe } from '@angular/common';
+import { localDate } from 'src/app/shared/util/format';
 
 /** '' is "any state", and leads the row the way the flight filter's "All" does. */
 const STATES: string[] = ['', ...Object.values(State)];
@@ -33,10 +34,8 @@ export class AppointmentFilterComponent {
      */
     public filter = this.schoolService.filter;
 
-    public isFiltered = computed(() => {
-        const { from, to, state } = this.filter();
-        return !!from || !!to || !!state;
-    });
+    /** The service's, so the sheet's Clear button and the list's header agree. */
+    public isFiltered = this.schoolService.filtered;
 
     constructor(
         private schoolService: SchoolService,
@@ -47,7 +46,10 @@ export class AppointmentFilterComponent {
     }
 
     changeDate(type: 'from' | 'to', event: CustomEvent) {
-        const value = event.detail.value ? new Date(event.detail.value) : new Date();
+        // localDate, not new Date(): ion-datetime emits a date-only 'YYYY-MM-DD',
+        // which the Date constructor reads as UTC midnight - so west of UTC the
+        // chip, the sheet and the request all named the day before the one picked.
+        const value = event.detail.value ? localDate(event.detail.value) : new Date();
         this.apply(type === 'from' ? { from: value } : { to: value });
     }
 

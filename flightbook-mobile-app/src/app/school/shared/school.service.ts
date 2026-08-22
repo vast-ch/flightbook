@@ -1,5 +1,5 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Injectable, signal } from '@angular/core';
+import { Injectable, computed, signal } from '@angular/core';
 import moment from 'moment';
 import { firstValueFrom, Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
@@ -24,8 +24,17 @@ export class SchoolService {
    */
   filter = signal<AppointmentFilter>(new AppointmentFilter());
 
-  /** Whether the last filtered request actually narrowed anything. */
-  filtered = signal(false);
+  /**
+   * Derived, not set when a request is built: the flag drove the list's header
+   * badge and its active filter button, so a filter changed without a fetch -
+   * a chip cleared, Clear then the same state picked again in the sheet - left
+   * both asserting the opposite of what the chips row showed. FlightStore
+   * derives its own for the same reason.
+   */
+  filtered = computed(() => {
+    const { from, to, state } = this.filter();
+    return !!from || !!to || !!state;
+  });
 
   defaultLimit = 20;
   schoolsSignal = signal<School[] | null>(null);
@@ -73,7 +82,6 @@ export class SchoolService {
    */
   resetFilter() {
     this.filter.set(new AppointmentFilter());
-    this.filtered.set(false);
   }
 
   /**
@@ -92,8 +100,8 @@ export class SchoolService {
   /**
    * The Upcoming / Past tabs, expressed with the from/to params the endpoint
    * already takes. A bound the user set in the filter wins - their filter is the
-   * more specific request - and the scope deliberately does not touch `filtered`,
-   * or every plain list would claim to be filtered.
+   * more specific request - and the scope is not part of `filtered`, or every
+   * plain list would claim to be filtered.
    *
    * Note both bounds are date-only, so today satisfies either scope; the page
    * settles today's appointments against the clock.
@@ -102,14 +110,15 @@ export class SchoolService {
     if (!scope) {
       return params;
     }
-    const filter = this.filter();
-    const today = moment().format('YYYY-MM-DD');
     // A bound the user set wins - unless the caller opted out of the filter, in
-    // which case there is no user bound to defer to.
-    if (scope === 'upcoming' && (!applyFilter || !filter.from)) {
+    // which case there is no user bound to defer to. Read only on that path, so
+    // an applyFilter: false caller takes no dependency on the shared filter.
+    const filter = applyFilter ? this.filter() : null;
+    const today = moment().format('YYYY-MM-DD');
+    if (scope === 'upcoming' && !filter?.from) {
       return params.append('from', today);
     }
-    if (scope === 'past' && (!applyFilter || !filter.to)) {
+    if (scope === 'past' && !filter?.to) {
       return params.append('to', today);
     }
     return params;
@@ -154,11 +163,7 @@ export class SchoolService {
     }
   }
 
-  private setFilterState(nextState: boolean) {
-    this.filtered.set(nextState);
-  }
-
-  /** Paging only - no filter read, and no change to `filtered`. */
+  /** Paging only - no filter read. */
   private createPagingParams(limit: Number, offset: Number): HttpParams {
     let params = new HttpParams();
     if (limit) {
@@ -172,19 +177,15 @@ export class SchoolService {
 
   private createFilterParams(limit: Number, offset: Number): HttpParams {
     let params = new HttpParams();
-    let filterState = false;
     const filter = this.filter();
-    if (filter.from && filter.from !== null) {
+    if (filter.from) {
       params = params.append('from', moment(filter.from).format('YYYY-MM-DD'));
-      filterState = true;
     }
-    if (filter.to && filter.to !== null) {
+    if (filter.to) {
       params = params.append('to', moment(filter.to).format('YYYY-MM-DD'));
-      filterState = true;
     }
     if (filter.state) {
       params = params.append('state', filter.state);
-      filterState = true
     }
 
     if (limit) {
@@ -194,7 +195,6 @@ export class SchoolService {
       params = params.append('offset', offset.toString());
     }
 
-    this.setFilterState(filterState);
     return params;
   }
 }

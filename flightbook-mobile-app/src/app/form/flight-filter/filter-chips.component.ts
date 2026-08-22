@@ -1,14 +1,13 @@
 import { Component, EventEmitter, Output, computed, inject } from '@angular/core';
-import { DatePipe } from '@angular/common';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { IonIcon } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { close } from 'ionicons/icons';
-import moment from 'moment';
 import { FlightStore } from 'src/app/flight/shared/flight.store';
 import { LanguageService } from 'src/app/shared/services/language.service';
 import { GliderStore } from 'src/app/glider/shared/glider.store';
 import { Glider } from 'src/app/glider/shared/glider.model';
+import { dateRangeLabel } from 'src/app/shared/util/format';
 
 type Chip = { label: string; clear: () => void };
 
@@ -45,7 +44,6 @@ export class FilterChipsComponent {
     private gliderStore = inject(GliderStore);
     private translate = inject(TranslateService);
     private languageService = inject(LanguageService);
-    private datePipe = new DatePipe('en-US');
 
     /** Fires after a criterion is dropped, so the host can refetch. */
     @Output() changed = new EventEmitter<void>();
@@ -64,7 +62,7 @@ export class FilterChipsComponent {
 
         if (filter.from || filter.to) {
             chips.push({
-                label: this.periodLabel(filter.from, filter.to),
+                label: dateRangeLabel(filter.from, filter.to, key => this.translate.instant(key)),
                 clear: () => this.flightStore.updateFilter({ from: null, to: null })
             });
         }
@@ -103,26 +101,6 @@ export class FilterChipsComponent {
     clearAll() {
         this.flightStore.resetFilter();
         this.changed.emit();
-    }
-
-    /** A whole calendar year reads as the year; anything else as its range. */
-    private periodLabel(from: Date | null, to: Date | null): string {
-        if (from && to) {
-            const start = moment(from);
-            const end = moment(to);
-            if (start.isSame(start.clone().startOf('year'), 'day')
-                && end.isSame(end.clone().endOf('year'), 'day')
-                && start.year() === end.year()) {
-                return String(start.year());
-            }
-            return `${this.short(from)} – ${this.short(to)}`;
-        }
-        const label = from ? 'filter.from' : 'filter.to';
-        return `${this.translate.instant(label)} ${this.short(from ?? to)}`;
-    }
-
-    private short(date: Date | null): string {
-        return date ? this.datePipe.transform(date, 'dd.MM.yyyy') ?? '' : '';
     }
 
     /**

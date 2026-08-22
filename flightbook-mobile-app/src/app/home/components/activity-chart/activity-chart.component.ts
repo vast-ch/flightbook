@@ -25,6 +25,26 @@ declare module 'chart.js' {
 const VALUE_SIZE = 8.5;
 const VALUE_GAP = 7;
 
+/**
+ * Resolved once, the way themeColor caches its tokens: the draw hook runs on
+ * every animation frame, and a getComputedStyle there is a forced style flush.
+ *
+ * An unlaid-out canvas answers '', which would make the shorthand invalid and
+ * the assignment a silent no-op - so that answer is neither used nor cached.
+ */
+let valueFont: string | undefined;
+
+function barValueFont(canvas: HTMLCanvasElement): string {
+    if (valueFont !== undefined) {
+        return valueFont;
+    }
+    const family = getComputedStyle(canvas).fontFamily;
+    if (!family) {
+        return `600 ${VALUE_SIZE}px sans-serif`;
+    }
+    return valueFont = `600 ${VALUE_SIZE}px ${family}`;
+}
+
 const BAR_VALUES: Plugin<'bar'> = {
     id: 'barValues',
     /*
@@ -38,16 +58,21 @@ const BAR_VALUES: Plugin<'bar'> = {
         if (!options?.enabled) {
             return;
         }
-        const meta = chart.getDatasetMeta(0);
-        const values = chart.data.datasets[0]?.data ?? [];
+        // By type, not index 0: this chart carries a line dataset alongside the
+        // bars, and `order` already means array position proves nothing.
+        const index = chart.data.datasets.findIndex(dataset => (dataset.type ?? 'bar') === 'bar');
+        if (index < 0) {
+            return;
+        }
+        const values = chart.data.datasets[index].data;
         const ctx = chart.ctx;
         ctx.save();
-        ctx.font = `600 ${VALUE_SIZE}px ${getComputedStyle(chart.canvas).fontFamily}`;
+        ctx.font = barValueFont(chart.canvas);
         ctx.fillStyle = themeColor('--fb-text-secondary', '#5b7284');
         ctx.textAlign = 'center';
         ctx.textBaseline = 'bottom';
-        meta.data.forEach((bar, index) => {
-            const value = Number(values[index] ?? 0);
+        chart.getDatasetMeta(index).data.forEach((bar, slot) => {
+            const value = Number(values[slot]);
             if (value > 0) {
                 ctx.fillText(String(value), bar.x, bar.y - VALUE_GAP);
             }
@@ -56,6 +81,8 @@ const BAR_VALUES: Plugin<'bar'> = {
     }
 };
 
+/** Module-level, so the [plugins] binding sees one stable array. */
+const CHART_PLUGINS = [BAR_VALUES];
 
 export interface MonthColumn {
     /** Single-letter month initial shown under the chart. */
@@ -157,27 +184,30 @@ export class ActivityChartComponent {
         };
     });
 
-    public readonly chartPlugins = [BAR_VALUES];
+    public readonly chartPlugins = CHART_PLUGINS;
 
     public chartOptions: ChartConfiguration<'bar'>['options'] = {
         responsive: true,
         maintainAspectRatio: false,
+        /*
+         * Headroom for the printed counts, in the pixels they actually occupy.
+         * Axis `grace` cannot do this: Chart.js takes the percentage off *half*
+         * the data range and then rounds up to the next nice tick, so '30%'
+         * bought 15% before rounding and the room left moved with the busiest
+         * month - 26px at a peak of 10, 13px at a peak of 5, where the number
+         * was clipped by the top of the 78px canvas.
+         */
+        layout: { padding: { top: VALUE_SIZE + VALUE_GAP } },
         // Axes are hidden: the design labels months in markup underneath.
         scales: {
             x: { display: false },
-            // grace: the printed values sit above the bars, and without headroom
-            // the tallest column's number is clipped by the top of the canvas. It
-            // has to cover VALUE_GAP plus the glyph height - about 16px of a 78px
-            // canvas, so a fifth is not enough once the gap grew to 7.
-            y: { display: false, beginAtZero: true, grace: '30%' },
-            airtime: { display: false, beginAtZero: true, grace: '30%', position: 'right' }
+            y: { display: false, beginAtZero: true },
+            airtime: { display: false, beginAtZero: true, position: 'right' }
         },
         plugins: {
             // This chart is the one that wants the printed counts; the gate is
             // in the plugin, because registration is global.
             barValues: { enabled: true },
-            // chartjs-plugin-datalabels is no longer loaded, so there is
-            // nothing to switch off here.
             legend: { display: false },
             tooltip: {
                 backgroundColor: themeColor('--fb-text', '#10293c'),
