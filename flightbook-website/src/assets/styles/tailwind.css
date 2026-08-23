@@ -140,6 +140,22 @@
   display: block;
 }
 
+/*
+ * The login menu is offset 10px below its trigger. That gap belongs to neither the button nor
+ * the menu, so a pointer travelling from one to the other leaves .dropdown, :hover goes false,
+ * and the menu closes before it can be clicked. Bridge the gap with an invisible extension of
+ * the menu itself — a descendant of .dropdown, so hovering it keeps .dropdown:hover true.
+ * Keep the height in sync with the menu's top offset in Header.astro (a test enforces this).
+ */
+.dropdown-menu::before {
+  content: '';
+  position: absolute;
+  top: -10px;
+  left: 0;
+  right: 0;
+  height: 10px;
+}
+
 [astro-icon].icon-light > * {
   stroke-width: 1.2;
 }

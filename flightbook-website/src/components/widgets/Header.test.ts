@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { render } from '~/test/render';
 import Header from './Header.astro';
@@ -210,5 +211,25 @@ describe('Header', () => {
     expect(de).toContain('href="/" class="flex items-center gap-[11px] text-white"');
     expect(fr).toContain('href="/fr" class="flex items-center gap-[11px] text-white"');
     expect(en).toContain('href="/en" class="flex items-center gap-[11px] text-white"');
+  });
+
+  // Source-level, like the ToggleMenu colour test: this failure is purely a
+  // pointer-interaction one, invisible to render assertions. The menu is offset
+  // below its trigger, and that gap belongs to neither element — so a pointer
+  // crossing it drops .dropdown:hover and the menu closes before it can be
+  // clicked. The ::before bridge must stay as tall as the offset.
+  it('bridges the gap between the login trigger and its menu so hover survives the crossing', async () => {
+    const css = readFileSync(new URL('../../assets/styles/tailwind.css', import.meta.url), 'utf8');
+    const header = readFileSync(new URL('./Header.astro', import.meta.url), 'utf8');
+
+    const offset = header.match(/top-\[calc\(100%\+(\d+)px\)\]/);
+    expect(offset, 'login menu should still be offset below its trigger').not.toBeNull();
+
+    const bridge = css.match(/\.dropdown-menu::before\s*\{([^}]*)\}/);
+    expect(bridge, '.dropdown-menu::before bridge is missing — hover will break').not.toBeNull();
+
+    const gap = Number(offset![1]);
+    expect(bridge![1]).toContain(`top: -${gap}px`);
+    expect(bridge![1]).toContain(`height: ${gap}px`);
   });
 });
