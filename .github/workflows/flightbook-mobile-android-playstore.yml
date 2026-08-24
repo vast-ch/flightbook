@@ -1,0 +1,80 @@
+name: Flightbook Mobile App - Android playstore
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to build'
+        required: true
+        default: 'main'
+
+jobs:
+  playstore:
+    runs-on: ubuntu-24.04
+    env:
+      BUNDLE_GEMFILE: ${{ github.workspace }}/flightbook-mobile-app/android/Gemfile
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.branch }}
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: gradle
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: 'npm'
+          cache-dependency-path: flightbook-mobile-app/package-lock.json
+
+      - name: Install web app dependencies
+        working-directory: flightbook-mobile-app
+        run: npm ci
+
+      - name: Build Angular app for production
+        working-directory: flightbook-mobile-app
+        run: npx ng build --configuration production
+
+      - name: Sync Capacitor Android project
+        working-directory: flightbook-mobile-app
+        run: npx cap sync android
+
+      - name: Write google-services.json
+        working-directory: flightbook-mobile-app
+        run: echo "$ANDROID_GOOGLE_SERVICES_JSON_BASE64" | base64 --decode > android/app/google-services.json
+        env:
+          ANDROID_GOOGLE_SERVICES_JSON_BASE64: ${{ secrets.ANDROID_GOOGLE_SERVICES_JSON_BASE64 }}
+
+      - name: Write release keystore
+        run: echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > ${{ runner.temp }}/upload-keystore.jks
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+
+      - name: Write Google Play service account key
+        run: echo "$GOOGLE_PLAY_JSON_KEY_BASE64" | base64 --decode > ${{ runner.temp }}/play-service-account.json
+        env:
+          GOOGLE_PLAY_JSON_KEY_BASE64: ${{ secrets.GOOGLE_PLAY_JSON_KEY_BASE64 }}
+
+      - name: Set up Ruby / Bundler
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
+          working-directory: flightbook-mobile-app/android
+
+      - name: Build and upload to Play Store
+        working-directory: flightbook-mobile-app/android
+        run: bundle exec fastlane playstore
+        env:
+          BUILD_NUMBER: ${{ github.run_number }}
+          ANDROID_KEYSTORE_PATH: ${{ runner.temp }}/upload-keystore.jks
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          GOOGLE_PLAY_JSON_KEY_FILEPATH: ${{ runner.temp }}/play-service-account.json
