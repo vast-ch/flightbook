@@ -64,8 +64,11 @@ export class FlightStatisticPage implements OnDestroy {
     public bests = this.store.bests;
     public firstFlightDate = this.store.firstFlightDate;
 
-    /** Total airtime for the selected period, as HH:mm. */
-    public totalAirtime = computed(() => this.toHoursMinutes(this.headline().airtime));
+    /**
+     * Total airtime for the selected period, as whole hours - the cumulative
+     * card carries no sub-hour precision, so its head and its tooltip agree.
+     */
+    public totalAirtime = computed(() => `${Math.round(this.headline().airtime / 3600)} h`);
 
     /**
      * Airtime and average as value + unit, so the unit can be styled smaller.
