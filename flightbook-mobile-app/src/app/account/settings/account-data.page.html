@@ -246,7 +246,7 @@
             }
           </div>
         </div>
-        @if (!isNative && paymentStatus?.state === 'ACTIVE') {
+        @if (paymentStatus.active && paymentStatus?.state === 'ACTIVE') {
           <div class="account-actions">
             <ion-button expand="block" fill="outline" color="danger" (click)="cancelSubscription()">
               {{ 'buttons.cancelSubscription' | translate }}
