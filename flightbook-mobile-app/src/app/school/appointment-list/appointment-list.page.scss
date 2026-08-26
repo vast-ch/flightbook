@@ -208,18 +208,7 @@
     --track-background-checked: var(--ion-color-primary);
 }
 
-.appt-row__registered {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--fb-success-text);
-
-    ion-icon {
-        font-size: 13px;
-    }
-}
+// .fb-registered-badge lives in theme/tokens.scss - shared with Home.
 
 // ---- Tail ---------------------------------------------------------------
 .appt-hint {

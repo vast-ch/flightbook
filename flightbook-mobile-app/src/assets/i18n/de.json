@@ -395,6 +395,7 @@
         "spotsFree": "{{free}} von {{total}} Plätzen frei",
         "full": "Ausgebucht · {{count}}/{{total}} · Warteliste",
         "registered": "Angemeldet",
+        "notRegistered": "Nicht angemeldet",
         "canceledBySchool": "Von der Flugschule abgesagt",
         "closesAt": "Anmeldung für {{date}} schliesst um {{time}}",
         "closesIn": "Anmeldeschluss",

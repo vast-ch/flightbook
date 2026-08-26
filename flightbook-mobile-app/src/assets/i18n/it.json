@@ -395,6 +395,7 @@
         "spotsFree": "{{free}} posti liberi su {{total}}",
         "full": "Completo · {{count}}/{{total}} · lista d'attesa",
         "registered": "Iscritto",
+        "notRegistered": "Non iscritto",
         "canceledBySchool": "Annullato dalla scuola",
         "closesAt": "Le iscrizioni per il {{date}} chiudono alle {{time}}",
         "closesIn": "Chiusura iscrizioni",
