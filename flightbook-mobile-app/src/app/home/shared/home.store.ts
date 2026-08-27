@@ -6,10 +6,12 @@ import { FlightStore } from '../../flight/shared/flight.store';
 import { SchoolService } from '../../school/shared/school.service';
 import { FlightStatistic } from '../../flight/shared/flightStatistic.model';
 import { Appointment } from '../../school/shared/appointment.model';
+import { Subscription } from '../../school/shared/subscription.model';
 import { State } from '../../school/shared/state';
 import { School } from '../../school/shared/school.model';
 import { ControlSheet } from '../../shared/domain/control-sheet';
 import { SessionTeardownRegistry } from 'src/app/shared/services/session-teardown.registry';
+import { AccountService } from 'src/app/account/shared/account.service';
 
 /**
  * Flights required for the SHV/SHGPA licence. Not exposed by the API, so it
@@ -50,6 +52,7 @@ export interface HomeState {
 export class HomeStore {
     private flightStore = inject(FlightStore);
     private schoolService = inject(SchoolService);
+    private accountService = inject(AccountService);
 
     private state = signal<HomeState>({
         globalStats: null,
@@ -175,8 +178,19 @@ export class HomeStore {
             catchError(() => of([] as School[])),
             shareReplay({ bufferSize: 1, refCount: false })
         );
-        const nextAppointment$: Observable<UpcomingAppointment | null> =
-            this.loadNextAppointment(schools$).pipe(catchError(() => of(null)));
+        // The signal first: AppComponent populates it once at session
+        // bootstrap and every screen reads it for free, so re-GETting /users
+        // here bought nothing. The request stays as the fallback for a load
+        // that races the bootstrap call.
+        const currentUserEmail$: Observable<string | undefined> = (
+            this.accountService.currentUser$()
+                ? of(this.accountService.currentUser$())
+                : this.accountService.currentUser().pipe(catchError(() => of(null)))
+        ).pipe(map(user => user?.email));
+        const nextAppointment$: Observable<UpcomingAppointment | null> = currentUserEmail$.pipe(
+            switchMap(email => this.loadNextAppointment(schools$, email)),
+            catchError(() => of(null))
+        );
 
         return forkJoin([global$, monthly$, controlSheet$, nextAppointment$, schools$]).pipe(
             map(([global, monthly, controlSheet, nextAppointment, schools]): HomeState => ({
@@ -209,7 +223,7 @@ export class HomeStore {
      * appointment list's filter lives on the shared service and Home has no
      * control to explain - or undo - a card that silently disappeared.
      */
-    private loadNextAppointment(schools$: Observable<School[]>): Observable<UpcomingAppointment | null> {
+    private loadNextAppointment(schools$: Observable<School[]>, email: string | undefined): Observable<UpcomingAppointment | null> {
         return schools$.pipe(
             switchMap((schools: School[]) => {
                 if (!schools || schools.length === 0) {
@@ -223,12 +237,12 @@ export class HomeStore {
                             catchError(() => of([] as { appointment: Appointment; school: School }[]))
                         )
                     )
-                ).pipe(map(perSchool => this.pickNext(perSchool.flat())));
+                ).pipe(map(perSchool => this.pickNext(perSchool.flat(), email)));
             })
         );
     }
 
-    private pickNext(entries: { appointment: Appointment; school: School }[]): UpcomingAppointment | null {
+    private pickNext(entries: { appointment: Appointment; school: School }[], email: string | undefined): UpcomingAppointment | null {
         const now = moment();
         const upcoming = entries
             // CANCELED excluded: the `upcoming` scope only appends `from=today`,
@@ -258,7 +272,10 @@ export class HomeStore {
              */
             appointment: {
                 ...next.appointment,
-                scheduling: new Date(scheduled.format('YYYY-MM-DD HH:mm:ss'))
+                scheduling: new Date(scheduled.format('YYYY-MM-DD HH:mm:ss')),
+                subscribed: next.appointment.subscriptions?.some((subscription: Subscription) =>
+                    subscription.user.email === email
+                ) ?? false
             } as Appointment,
             school: next.school,
             // clone(): startOf mutates in place, and `scheduled` is what the

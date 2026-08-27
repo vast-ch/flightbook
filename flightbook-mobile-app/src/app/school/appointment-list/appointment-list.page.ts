@@ -334,6 +334,10 @@ export class AppointmentListPage implements OnInit, OnDestroy {
         const resp = await modal.onWillDismiss();
         if (resp.data?.hasChange || outcome.changed) {
             this.initialDataLoad();
+            // Home caches the next appointment, including whether the pilot
+            // is registered for it - it has no way to know that changed short
+            // of being told.
+            this.homeStore.invalidate();
         }
     }
 
@@ -360,6 +364,10 @@ export class AppointmentListPage implements OnInit, OnDestroy {
                         handler: async () => {
                             const currentAppointment = await firstValueFrom(this.schoolService.subscribeToAppointment(this.schoolId, appointment.id));
                             await this.initialDataLoad();
+                            // Home caches the next appointment, including whether
+                            // the pilot is registered for it - it has no way to
+                            // know that changed short of being told.
+                            this.homeStore.invalidate();
 
                             const subscription = currentAppointment.subscriptions.find((subscription: Subscription) => subscription.user.email === this.currentUser()?.email);
                             if (subscription.waitingList) {
@@ -395,6 +403,7 @@ export class AppointmentListPage implements OnInit, OnDestroy {
                         handler: async () => {
                             await firstValueFrom(this.schoolService.deleteAppointmentSubscription(this.schoolId, appointment.id));
                             await this.initialDataLoad();
+                            this.homeStore.invalidate();
                         }
                     },
                     {

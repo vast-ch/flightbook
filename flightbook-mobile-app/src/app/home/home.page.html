@@ -68,6 +68,13 @@
           <span class="next-flight__time">
             {{ next.appointment.scheduling | date:'HH:mm' }}
           </span>
+          <span class="fb-registered-badge next-flight__badge"
+                [class.fb-registered-badge--not-registered]="!next.appointment.subscribed">
+            @if (next.appointment.subscribed) {
+              <ion-icon name="checkmark" aria-hidden="true"></ion-icon>
+            }
+            {{ (next.appointment.subscribed ? 'appointment.registered' : 'appointment.notRegistered') | translate }}
+          </span>
         </div>
         @if (next.appointment.meetingPoint) {
           <div class="next-flight__place fb-divider">

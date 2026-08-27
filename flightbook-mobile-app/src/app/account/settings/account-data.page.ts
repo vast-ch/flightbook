@@ -22,6 +22,7 @@ import { environment } from 'src/environments/environment';
 import { PhoneNumberComponent } from 'src/app/shared/components/phone-number/phone-number.component';
 import { Location } from '@angular/common';
 import { navigateBackOrTo } from 'src/app/shared/util/back-navigation';
+import { App } from '@capacitor/app';
 
 /** The four languages the app ships strings for, in the design's order. */
 const LANGUAGES = ['fr', 'de', 'en', 'it'];
@@ -51,7 +52,7 @@ export class AccountDataPage implements OnInit, OnDestroy {
     emergencyContact = new EmergencyContact();
     paymentStatus: PaymentStatus;
     isNative: boolean;
-    appVersion = environment.appVersion;
+    version = '';
 
     public readonly languages = LANGUAGES;
 
@@ -75,6 +76,7 @@ export class AccountDataPage implements OnInit, OnDestroy {
         private paymentService: PaymentService,
         private route: ActivatedRoute
     ) {
+        this.defineVersion();
         this.isNative = Capacitor.isNativePlatform();
         addIcons({ 'chevron-back': chevronBack, 'eye-outline': eyeOutline, 'eye-off-outline': eyeOffOutline, checkmark });
 
@@ -286,6 +288,14 @@ export class AccountDataPage implements OnInit, OnDestroy {
 
     setLanguage(lang: string) {
         this.languageService.setLanguage(lang);
+    }
+
+    async defineVersion() {
+        if (Capacitor.isNativePlatform()) {
+            this.version = (await App.getInfo()).version;
+        } else {
+            this.version = environment.appVersion;
+        }
     }
 
     async paymentSuccess() {

@@ -395,6 +395,7 @@
         "spotsFree": "{{free}} of {{total}} spots free",
         "full": "Full · {{count}}/{{total}} · waiting list",
         "registered": "Registered",
+        "notRegistered": "Not registered",
         "canceledBySchool": "Canceled by the school",
         "closesAt": "Registration for {{date}} closes at {{time}}",
         "closesIn": "Registration closes",

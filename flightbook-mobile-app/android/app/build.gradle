@@ -1,5 +1,12 @@
 apply plugin: 'com.android.application'
 
+def androidKeystorePath = System.getenv("ANDROID_KEYSTORE_PATH")
+def androidKeystorePassword = System.getenv("ANDROID_KEYSTORE_PASSWORD")
+def androidKeyAlias = System.getenv("ANDROID_KEY_ALIAS")
+def androidKeyPassword = System.getenv("ANDROID_KEY_PASSWORD")
+def hasReleaseSigning = androidKeystorePath && androidKeystorePassword && androidKeyAlias && androidKeyPassword
+def androidVersionCode = (System.getenv("ANDROID_VERSION_CODE") ?: "10060").toInteger()
+
 android {
     namespace = "ch.flightbook"
     compileSdk = rootProject.ext.compileSdkVersion
@@ -7,14 +14,29 @@ android {
         applicationId = "ch.flightbook.MobileFlight"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 10060
-        versionName "2.23.0"
+        versionCode androidVersionCode
+        versionName "3.0.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+    signingConfigs {
+        if (hasReleaseSigning) {
+            release {
+                storeFile file(androidKeystorePath)
+                storePassword androidKeystorePassword
+                keyAlias androidKeyAlias
+                keyPassword androidKeyPassword
+            }
+        }
     }
     buildTypes {
         release {
             minifyEnabled = false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            if (hasReleaseSigning) {
+                signingConfig signingConfigs.release
+            } else {
+                logger.warn("Release signing env vars not set, release build will be unsigned")
+            }
         }
     }
 }

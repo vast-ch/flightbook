@@ -246,7 +246,7 @@
             }
           </div>
         </div>
-        @if (!isNative && paymentStatus?.state === 'ACTIVE') {
+        @if (paymentStatus.active && paymentStatus?.state === 'ACTIVE') {
           <div class="account-actions">
             <ion-button expand="block" fill="outline" color="danger" (click)="cancelSubscription()">
               {{ 'buttons.cancelSubscription' | translate }}
@@ -265,8 +265,7 @@
         </ion-button>
       </div>
 
-      <!-- Brand name is a product name, not a translated string -->
-      <div class="account-footer">Flightbook {{ appVersion }}</div>
+      <div class="account-footer">Flightbook {{ version }}</div>
     }
   </div>
 </ion-content>

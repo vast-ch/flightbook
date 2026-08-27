@@ -124,6 +124,11 @@
   color: var(--fb-text);
 }
 
+.next-flight__badge {
+  margin-left: auto;
+  align-self: center;
+}
+
 .next-flight__place {
   display: flex;
   align-items: center;
