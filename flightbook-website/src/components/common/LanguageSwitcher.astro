@@ -6,71 +6,46 @@ interface Props {
 }
 
 const { currentLocale } = Astro.props;
+const LOCALES: Locale[] = ['de', 'fr', 'en'];
 
-const otherLocalePath = currentLocale === 'de' ? '/fr' : '/';
-const currentPath = Astro.url.pathname;
-const hash = Astro.url.hash;
-
-// Preserve hash when switching languages
-let targetPath = otherLocalePath;
-if (currentLocale === 'de' && currentPath !== '/') {
-  // Going from German to French
-  targetPath = `/fr${currentPath}${hash}`;
-} else if (currentLocale === 'fr') {
-  // Going from French to German
-  const pathWithoutFr = currentPath.replace(/^\/fr/, '') || '/';
-  targetPath = `${pathWithoutFr}${hash}`;
-}
+// Strip any locale prefix, then re-prefix for each target.
+const bare = Astro.url.pathname.replace(/^\/(fr|en)(?=\/|$)/, '') || '/';
+const hrefFor = (l: Locale) => (l === 'de' ? bare : `/${l}${bare === '/' ? '' : bare}`);
 ---
 
-<div class="language-switcher flex gap-1">
-  <a
-    href={currentLocale === 'de' ? '/' : otherLocalePath}
-    class:list={[
-      'lang-btn px-3 py-1 rounded text-sm font-medium transition-colors',
-      currentLocale === 'de'
-        ? 'bg-primary text-white'
-        : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600',
-    ]}
-    aria-label="Switch to German"
-    data-lang="de"
-  >
-    DE
-  </a>
-  <a
-    href={currentLocale === 'fr' ? '/fr' : targetPath}
-    class:list={[
-      'lang-btn px-3 py-1 rounded text-sm font-medium transition-colors',
-      currentLocale === 'fr'
-        ? 'bg-primary text-white'
-        : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600',
-    ]}
-    aria-label="Switch to French"
-    data-lang="fr"
-  >
-    FR
-  </a>
+<div class="flex items-center gap-0.5 rounded-full border border-white/15 bg-white/5 p-[3px]">
+  {
+    LOCALES.map((l) => (
+      <a
+        href={hrefFor(l)}
+        data-lang={l}
+        aria-label={`Switch to ${l.toUpperCase()}`}
+        aria-current={l === currentLocale ? 'true' : undefined}
+        class:list={[
+          'lang-btn rounded-full px-3 py-1.5 text-[12.5px] font-semibold tracking-[0.06em] transition',
+          l === currentLocale ? 'bg-white text-ink' : 'text-white/65 hover:text-white',
+        ]}
+      >
+        {l.toUpperCase()}
+      </a>
+    ))
+  }
 </div>
 
 <script>
-  // Store language preference when clicking
-  document.querySelectorAll('.lang-btn').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const lang = btn.getAttribute('data-lang');
-      if (lang) {
+  function bindLangButtons() {
+    document.querySelectorAll<HTMLElement>('.lang-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const lang = btn.dataset.lang;
+        if (!lang) return;
         try {
           localStorage.setItem('flightbook-lang', lang);
         } catch (e) {
           console.warn('Could not store language preference:', e);
         }
-      }
+      });
     });
-  });
-</script>
-
-<style>
-  .lang-btn {
-    min-width: 2.5rem;
-    text-align: center;
   }
-</style>
+  bindLangButtons();
+  document.addEventListener('astro:page-load', bindLangButtons);
+</script>

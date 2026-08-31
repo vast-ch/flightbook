@@ -1,97 +1,48 @@
-// Navigation data for Flightbook
+// Navigation data for Flightbook, built from the i18n tables per locale.
 
-export const headerData = {
-  links: [
-    {
-      text: 'Angebot',
-      href: '/#angebot',
-    },
-    {
-      text: 'Flightbook Premium',
-      href: '/#premium',
-    },
-    {
-      text: 'Flightbook Schools',
-      href: '/#schools',
-    },
-    {
-      text: 'Login',
-      href: 'https://m.flightbook.ch',
-      target: '_blank',
-    },
-    {
-      text: 'Login Fluglehrer',
-      href: 'https://instructor.flightbook.ch',
-      target: '_blank',
-    },
-  ],
-  actions: [
-    {
-      text: 'Registrieren',
-      href: 'https://m.flightbook.ch/register',
-      target: '_blank',
-      variant: 'primary' as const,
-    },
-  ],
-};
+import { getTranslations, type Locale } from '~/utils/i18n';
 
-export const headerDataFr = {
-  links: [
-    {
-      text: 'Offre',
-      href: '/fr#angebot',
-    },
-    {
-      text: 'Flightbook Premium',
-      href: '/fr#premium',
-    },
-    {
-      text: 'Flightbook Écoles',
-      href: '/fr#schools',
-    },
-    {
-      text: 'Connexion',
-      href: 'https://m.flightbook.ch',
-      target: '_blank',
-    },
-    {
-      text: 'Connexion Instructeur',
-      href: 'https://instructor.flightbook.ch',
-      target: '_blank',
-    },
-  ],
-  actions: [
-    {
-      text: "S'inscrire",
-      href: 'https://m.flightbook.ch/register',
-      target: '_blank',
-      variant: 'primary' as const,
-    },
-  ],
-};
+// Exported so Header.astro and Footer.astro can compute a locale-aware home link the same
+// way (N3/N4 are the same affordance - keep them consistent rather than reimplementing).
+export const prefix = (locale: Locale) => (locale === 'de' ? '' : `/${locale}`);
 
-export const footerData = {
-  links: [
-    {
-      title: 'Legal',
+export function getHeaderData(locale: Locale) {
+  const t = getTranslations(locale);
+  const p = prefix(locale);
+
+  return {
+    links: [
+      { text: t.nav.features, href: `${p}/#premium` },
+      { text: t.nav.pricing, href: `${p}/#angebot` },
+      { text: t.nav.schools, href: `${p}/#schools` },
+      { text: t.nav.tandem, href: `${p}/#tandem` },
+      { text: t.nav.faq, href: `${p}/#faq` },
+    ],
+    login: {
+      text: t.nav.login,
       links: [
-        { text: 'Datenschutz', href: '/privacy-policy' },
+        { text: t.nav.loginPilot, sub: t.nav.loginPilotSub, href: 'https://m.flightbook.ch', icon: 'wing' as const },
+        {
+          text: t.nav.loginSchool,
+          sub: t.nav.loginSchoolSub,
+          href: 'https://instructor.flightbook.ch',
+          icon: 'cap' as const,
+        },
       ],
     },
-  ],
-  secondaryLinks: [],
-  socialLinks: [],
-};
+    action: { text: t.nav.register, href: 'https://m.flightbook.ch/register' },
+  };
+}
 
-export const footerDataFr = {
-  links: [
-    {
-      title: 'Légal',
-      links: [
-        { text: 'Confidentialité', href: '/fr/privacy-policy' },
-      ],
-    },
-  ],
-  secondaryLinks: [],
-  socialLinks: [],
-};
+export function getFooterData(locale: Locale) {
+  const t = getTranslations(locale);
+  const p = prefix(locale);
+
+  return {
+    cta: { title: t.footer.ctaTitle, button: t.footer.ctaButton, href: 'https://m.flightbook.ch/register' },
+    columns: [
+      { title: t.footer.openSource, links: [{ text: t.footer.github, href: 'https://github.com/vast-ch/flightbook' }] },
+      { title: t.footer.legal, links: [{ text: t.footer.privacy, href: `${p}/privacy-policy` }] },
+    ],
+  };
+}

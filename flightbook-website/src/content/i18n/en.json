@@ -1,0 +1,218 @@
+{
+  "nav": {
+    "features": "Features",
+    "pricing": "Pricing",
+    "schools": "Schools",
+    "tandem": "Tandem",
+    "faq": "FAQ",
+    "login": "Log in",
+    "loginPilot": "Flightbook",
+    "loginPilotSub": "For pilots",
+    "loginSchool": "Flightbook Schools",
+    "loginSchoolSub": "For flight schools",
+    "register": "Sign up",
+    "skipToContent": "Skip to content"
+  },
+  "hero": {
+    "eyebrow": "For student pilots · experienced experts · flight schools",
+    "titleLine1": "Your logbook",
+    "titleLine2": "flies with you.",
+    "subtitle": "The digital logbook for paragliding and hang gliding - SHV approved",
+    "ios": "iOS",
+    "android": "Android",
+    "subscribePremium": "Subscribe to Flightbook Premium →",
+    "screenshotAlt": "Flightbook app home screen",
+    "stats": [
+      { "value": "SHV approved", "label": "accepted at the exam" },
+      { "value": "Log flights", "label": "manage your logbook" },
+      { "value": "Track progress", "label": "for student pilots" },
+      { "value": "Organise high flights", "label": "for flight schools" }
+    ]
+  },
+  "features": {
+    "title": "Features",
+    "intro": "Everything you need after landing — in one app.",
+    "cta": "Sign up",
+    "items": [
+      {
+        "title": "Log flights",
+        "description": "Log every flight: take-off and landing sites with the details that matter to you. And manage all your wings, so you always know their age and how many flights they have."
+      },
+      {
+        "title": "Visualise tracks",
+        "description": "Upload IGC files straight from your vario or tracker, collect them and analyse your flights without submitting them publicly anywhere."
+      },
+      {
+        "title": "Analyse statistics",
+        "description": "Flights per year, airtime or income from tandem work: in the app you can filter and adjust your numbers exactly as you need."
+      },
+      {
+        "title": "Export data",
+        "description": "So you never lose your data, you can export it as Excel at any time. And at the SHV exam, the PDF export serves as your approved logbook."
+      },
+      {
+        "title": "Import data",
+        "description": "Coming from another logbook? Flights, gliders and places import from other formats — with a report of what was added, updated or already there."
+      },
+      {
+        "title": "Read tracks on the map",
+        "description": "The IGC track sits on a shaded-relief map, climb and sink are colour coded, and the flight can be replayed."
+      },
+      {
+        "title": "Take-off and landing sites",
+        "description": "Pick a site by name search; altitude and country fill in automatically. Every place appears with its map in your list."
+      },
+      {
+        "title": "Wings at a glance",
+        "description": "Solo and tandem wings with age, flight count and checks. Retired equipment moves to the archive without disappearing from the logbook."
+      }
+    ],
+    "captions": [
+      "Home - Overview of flight management",
+      "Statistics - Flight data analysis",
+      "Add flight - Log new flights",
+      "Manage sites - Take-off and landing sites"
+    ]
+  },
+  "pricing": {
+    "title": "Pricing",
+    "intro": "The first 25 flights are free and can be added at no cost.",
+    "free": {
+      "badge": "Pilot",
+      "title": "Flightbook FREE",
+      "price": "FREE",
+      "features": [
+        "Manage flights (max 25 flights)",
+        "Passenger confirmations (max 10)",
+        "Manage gliders",
+        "IGC upload",
+        "Statistics"
+      ],
+      "cta": "Sign up"
+    },
+    "premium": {
+      "badge": "Pilot · Recommended",
+      "title": "Flightbook Premium",
+      "price": "CHF 12.-",
+      "period": "/ year",
+      "features": ["Manage flights", "Passenger confirmations", "Manage gliders", "IGC upload", "Statistics"],
+      "cta": "Subscribe now"
+    },
+    "schools": {
+      "badge": "Flight school",
+      "title": "Flightbook Schools",
+      "price": "FREE",
+      "features": [
+        "Transparent learning progress",
+        "Simple attendance management",
+        "Individual control sheet",
+        "Push notifications"
+      ],
+      "cta": "Create a flight school"
+    },
+    "notes": [
+      "The first 25 flights are free and can be added at no cost.",
+      "Price change from 1 February 2023 for new users. Rising server costs force me to charge for the application.",
+      "The whole application stays open source. Anyone who wants to contribute to development gets a free account — for life, of course."
+    ]
+  },
+  "schools": {
+    "title": "Flightbook Schools",
+    "eyebrow": "For flight schools",
+    "cta": "Create a flight school",
+    "items": [
+      {
+        "title": "Transparent learning progress",
+        "description": "As an instructor you can see your students' data. So you always know who has how many flights and who still needs work in which area. Your group's progress stays transparent at all times."
+      },
+      {
+        "title": "Simple attendance management",
+        "description": "You manage high flights, ground-handling sessions or theory lessons right in the tool. Students accept or decline, and you always know who is joining which course. No more scrolling endless chats — the participant list is one tap away."
+      },
+      {
+        "title": "Progress tracking for students",
+        "description": "Your students benefit too once you switch to Flightbook Pro: they use the app to track their flights and manoeuvres, take-off and landing sites. Even the SHV logbook for the exam can be generated directly from the app. They're also always informed about when the next course takes place and who's coming. They can use Flightbook Basic for just 12 francs a year (even after training) to track their progress as pilots."
+      }
+    ],
+    "schoolCaptions": [
+      "Attendance management – Subscriptions overview",
+      "Attendance management – Manage courses",
+      "Attendance management – Create a course"
+    ],
+    "studentCaptions": [
+      "Student app – Home",
+      "Student app – Courses",
+      "Student app – Course details",
+      "Student app – Flying sites"
+    ]
+  },
+  "tandem": {
+    "eyebrow": "For tandem pilots",
+    "title": "Flightbook for tandem pilots",
+    "intro": "Flying commercially means more than logging flights. Flightbook covers the admin around tandem operations right in the app.",
+    "cta": "Sign up",
+    "screenshotAlt": "Flightbook app home screen",
+    "items": [
+      {
+        "title": "Capture passenger confirmations",
+        "description": "Capture the SHV-required confirmation of the passenger briefing straight on your phone: personal details, briefing points and the passenger's signature on screen."
+      },
+      {
+        "title": "Track income",
+        "description": "Record the amount for each tandem flight and keep track of your income — per season, per month or filtered by period."
+      },
+      {
+        "title": "Export confirmations",
+        "description": "All confirmations stay stored in your account and can be exported as PDF or Excel at any time — for your records or on request."
+      },
+      {
+        "title": "Brief in several languages",
+        "description": "Your passengers read and sign the confirmation in their own language. You pick the language before handing over the phone."
+      }
+    ]
+  },
+  "faq": {
+    "title": "Frequently asked questions",
+    "questions": [
+      {
+        "question": "Is Flightbook approved for SHV exams?",
+        "answer": "Yes, Flightbook is officially approved for SHV exams. Export your logbook as a PDF straight from the app and present it at the exam."
+      },
+      {
+        "question": "Does Flightbook work for paragliders and hang gliders?",
+        "answer": "Yes, Flightbook suits both paraglider and hang glider pilots. You can manage all your flights, equipment and statistics."
+      },
+      {
+        "question": "Can I upload my IGC files?",
+        "answer": "Yes, you can upload IGC files directly from your vario or GPS tracker and visualise and analyse your flights."
+      },
+      {
+        "question": "Is Flightbook available for iOS and Android?",
+        "answer": "Yes, Flightbook is available as a native app for iOS (iPhone/iPad) and Android. Download it for free from the App Store or Google Play."
+      },
+      {
+        "question": "What is Flightbook Schools?",
+        "answer": "Flightbook Schools is a free solution for flight schools. Instructors can follow their students' progress, manage courses and create individual control sheets. Appointments can be created directly, students get push notifications and can sign up. Instructors always have a clear overview of who is attending."
+      },
+      {
+        "question": "How do I get started as a flight school?",
+        "answer": "Getting started is simple:",
+        "steps": ["Create your flight school", "Add your students", "Off you go!"]
+      }
+    ]
+  },
+  "footer": {
+    "ctaTitle": "The first 25 flights are free.",
+    "ctaButton": "Start for free",
+    "openSource": "Open source",
+    "github": "GitHub",
+    "legal": "Legal",
+    "privacy": "Privacy"
+  },
+  "meta": {
+    "title": "Paragliding Logbook - SHV approved | Flightbook",
+    "description": "Digital paragliding logbook for iOS and Android - SHV approved. Manage your flights, gliders and statistics. For pilots, tandem and flight schools. Start for free!",
+    "ogTitle": "Paragliding Logbook - SHV approved | Flightbook",
+    "ogDescription": "Digital paragliding logbook for iOS and Android - SHV approved. Manage your flights, gliders and statistics. For pilots, tandem and flight schools."
+  }
+}

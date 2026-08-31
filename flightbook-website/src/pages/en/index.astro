@@ -1,0 +1,40 @@
+---
+import Layout from '~/layouts/PageLayout.astro';
+import FlightbookHome from '~/components/FlightbookHome.astro';
+import { getTranslations } from '~/utils/i18n';
+
+const t = getTranslations('en');
+
+const metadata = {
+  title: t.meta.title,
+  description: t.meta.description,
+  canonical: 'https://flightbook.ch/en',
+  openGraph: {
+    title: t.meta.ogTitle,
+    description: t.meta.ogDescription,
+    type: 'website',
+    url: 'https://flightbook.ch/en',
+    images: [
+      {
+        url: 'https://raw.githubusercontent.com/laggery/Flightbook-MobileApp/7d738a8497449768f4a38d647cfdf7da138f77b6/src/assets/icons/icon-128x128.png',
+        width: 128,
+        height: 128,
+        alt: 'Flightbook App Icon',
+      },
+    ],
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+};
+---
+
+<Layout metadata={metadata}>
+  <FlightbookHome locale="en" />
+</Layout>
+
+<script>
+  import { initLanguageDetection } from '~/utils/language-detector';
+  initLanguageDetection();
+</script>

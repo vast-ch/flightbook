@@ -8,6 +8,7 @@ import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { IonicRouteStrategy, provideIonicAngular, IonApp, IonRouterOutlet, isPlatform } from '@ionic/angular/standalone';
 
 import { AppComponent } from './app.component';
+import { LoadingScreenComponent } from './shared/components/loading-screen/loading-screen.component';
 import { AppRoutingModule } from './app-routing.module';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
@@ -58,7 +59,8 @@ function getIonicConfig() {
         AppRoutingModule,
         ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
         IonApp,
-        IonRouterOutlet
+        IonRouterOutlet,
+        LoadingScreenComponent
     ], providers: [
         { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
         { provide: HTTP_INTERCEPTORS, useClass: HttpAuthInterceptor, multi: true },

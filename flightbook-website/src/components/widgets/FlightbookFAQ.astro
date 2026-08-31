@@ -1,26 +1,17 @@
 ---
-import WidgetWrapper from '~/components/ui/WidgetWrapper.astro';
-import Headline from '~/components/ui/Headline.astro';
-
 interface FAQ {
   question: string;
   answer: string;
+  steps?: string[];
 }
 
 interface Props {
   title?: string;
   faqs: FAQ[];
+  schoolCtaLabel: string;
 }
 
-const { title = 'Häufig gestellte Fragen', faqs = [] } = Astro.props;
-
-// Strip HTML tags from answers for structured data
-const stripHtml = (html: string) => {
-  return html
-    .replace(/<[^>]*>/g, ' ') // Remove HTML tags
-    .replace(/\s+/g, ' ') // Normalize whitespace
-    .trim();
-};
+const { title = 'Häufig gestellte Fragen', faqs = [], schoolCtaLabel } = Astro.props;
 
 const faqSchema = {
   '@context': 'https://schema.org',
@@ -30,38 +21,55 @@ const faqSchema = {
     name: faq.question,
     acceptedAnswer: {
       '@type': 'Answer',
-      text: stripHtml(faq.answer),
+      text: faq.steps ? [faq.answer, ...faq.steps].join('. ') : faq.answer,
     },
   })),
 };
 ---
 
-<WidgetWrapper id="faq">
-  <Headline title={title} tagline="" />
-  <div class="max-w-4xl mx-auto">
-    <div class="space-y-4">
+<section id="faq" class="scroll-mt-16 bg-surface-light px-7 py-28">
+  <div class="mx-auto flex max-w-[860px] flex-col gap-10">
+    <h2 class="text-center font-heading text-4xl text-heading lg:text-[52px]">{title}</h2>
+    <div class="flex flex-col gap-3">
       {
-        faqs.map((faq, index) => (
-          <details class="group border border-gray-200 dark:border-gray-700 rounded-lg p-6 hover:border-primary transition-colors">
-            <summary class="flex justify-between items-center cursor-pointer list-none">
-              <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{faq.question}</h3>
-              <span class="ml-4 flex-shrink-0 text-primary group-open:rotate-180 transition-transform">
-                <svg
-                  class="w-6 h-6"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                </svg>
+        faqs.map((faq) => (
+          <details name="faq" class="group overflow-hidden rounded-[18px] border border-hairline bg-white">
+            <summary class="flex cursor-pointer list-none items-center justify-between gap-4 px-6 py-5.5 hover:bg-[#fafcff]">
+              <h3 class="text-[17.5px] font-semibold text-heading">{faq.question}</h3>
+              <span class="text-[22px] leading-none text-brand" aria-hidden="true">
+                <span class="group-open:hidden">+</span>
+                <span class="hidden group-open:inline">−</span>
               </span>
             </summary>
-            <div class="mt-4 text-gray-600 dark:text-gray-400 leading-relaxed prose prose-sm dark:prose-invert max-w-none" set:html={faq.answer} />
+            <div class="flex flex-col gap-3 px-6 pb-6">
+              <p class="text-[15.5px] leading-[1.75] text-body text-pretty">{faq.answer}</p>
+              {faq.steps && (
+                <>
+                  <ol class="flex flex-col gap-2 text-[15.5px] text-body" role="list">
+                    {faq.steps.map((step, i) => (
+                      <li class="flex gap-2.5">
+                        <span class="font-bold text-brand" aria-hidden="true">
+                          {i + 1}
+                        </span>
+                        {step}
+                      </li>
+                    ))}
+                  </ol>
+                  <a
+                    href="https://instructor.flightbook.ch/school/register"
+                    target="_blank"
+                    rel="noopener"
+                    class="text-[15px] font-semibold text-brand"
+                  >
+                    {schoolCtaLabel}
+                  </a>
+                </>
+              )}
+            </div>
           </details>
         ))
       }
     </div>
   </div>
   <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
-</WidgetWrapper>
+</section>

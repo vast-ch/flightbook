@@ -1,0 +1,127 @@
+---
+import { getTranslations, type Locale } from '~/utils/i18n';
+import FlightbookHero from '~/components/widgets/FlightbookHero.astro';
+import FlightbookPremiumFeatures from '~/components/widgets/FlightbookPremiumFeatures.astro';
+import FlightbookPricing from '~/components/widgets/FlightbookPricing.astro';
+import FlightbookSchoolsFeatures from '~/components/widgets/FlightbookSchoolsFeatures.astro';
+import FlightbookTandem from '~/components/widgets/FlightbookTandem.astro';
+import FlightbookFAQ from '~/components/widgets/FlightbookFAQ.astro';
+
+import heroPhoto from '~/assets/images/Paraglider_Main.jpg';
+import tandemPhoto from '~/assets/images/Tandem.jpg';
+import homeImg from '~/assets/images/flightbook/home.png';
+import statisticImg from '~/assets/images/flightbook/statistic.png';
+import addFlightImg from '~/assets/images/flightbook/add-flight.png';
+import placeImg from '~/assets/images/flightbook/place.png';
+import studentImg from '~/assets/images/flightbook/student.png';
+import subscriptionImg from '~/assets/images/flightbook/subscription.png';
+import appointmentImg from '~/assets/images/flightbook/appointment.png';
+import appointmentCreateImg from '~/assets/images/flightbook/appointment-create.png';
+import homeMobileImg from '~/assets/images/flightbook/home-mobile.png';
+import appointmentMobileImg from '~/assets/images/flightbook/appointment-mobile.png';
+import appointmentDetailImg from '~/assets/images/flightbook/appointment-detail.png';
+import placeMobileImg from '~/assets/images/flightbook/place-mobile.png';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = getTranslations(locale);
+
+const featureScreenshots = [homeImg, statisticImg, addFlightImg, placeImg].map((src, i) => ({
+  src,
+  alt: t.features.captions[i],
+  caption: t.features.captions[i],
+}));
+
+const schoolSlides = [subscriptionImg, appointmentImg, appointmentCreateImg].map((src, i) => ({
+  src,
+  alt: t.schools.schoolCaptions[i],
+  caption: t.schools.schoolCaptions[i],
+}));
+
+const studentSlides = [homeMobileImg, appointmentMobileImg, appointmentDetailImg, placeMobileImg].map((src, i) => ({
+  src,
+  alt: t.schools.studentCaptions[i],
+  caption: t.schools.studentCaptions[i],
+}));
+
+const pricingPlans = [
+  {
+    badge: t.pricing.free.badge,
+    title: t.pricing.free.title,
+    price: t.pricing.free.price,
+    features: t.pricing.free.features,
+    cta: t.pricing.free.cta,
+    ctaLink: 'https://m.flightbook.ch/register',
+    featured: false,
+  },
+  {
+    badge: t.pricing.premium.badge,
+    title: t.pricing.premium.title,
+    price: t.pricing.premium.price,
+    period: t.pricing.premium.period,
+    features: t.pricing.premium.features,
+    cta: t.pricing.premium.cta,
+    ctaLink: 'https://m.flightbook.ch/settings',
+    featured: true,
+  },
+  {
+    badge: t.pricing.schools.badge,
+    title: t.pricing.schools.title,
+    price: t.pricing.schools.price,
+    features: t.pricing.schools.features,
+    cta: t.pricing.schools.cta,
+    ctaLink: 'https://instructor.flightbook.ch/school/register',
+    featured: false,
+  },
+];
+---
+
+<FlightbookHero
+  eyebrow={t.hero.eyebrow}
+  titleLine1={t.hero.titleLine1}
+  titleLine2={t.hero.titleLine2}
+  subtitle={t.hero.subtitle}
+  ios={t.hero.ios}
+  android={t.hero.android}
+  premium={t.hero.subscribePremium}
+  stats={t.hero.stats}
+  photo={heroPhoto}
+  screenshot={homeImg}
+  screenshotAlt={t.hero.screenshotAlt}
+/>
+
+<FlightbookPremiumFeatures
+  title={t.features.title}
+  intro={t.features.intro}
+  cta={t.features.cta}
+  items={t.features.items}
+  screenshots={featureScreenshots}
+/>
+
+<FlightbookPricing title={t.pricing.title} intro={t.pricing.intro} plans={pricingPlans} notes={t.pricing.notes} />
+
+<FlightbookSchoolsFeatures
+  eyebrow={t.schools.eyebrow}
+  title={t.schools.title}
+  cta={t.schools.cta}
+  items={t.schools.items}
+  studentImg={studentImg}
+  schoolSlides={schoolSlides}
+  studentSlides={studentSlides}
+/>
+
+<FlightbookTandem
+  eyebrow={t.tandem.eyebrow}
+  title={t.tandem.title}
+  intro={t.tandem.intro}
+  cta={t.tandem.cta}
+  items={t.tandem.items}
+  photo={tandemPhoto}
+  screenshot={homeImg}
+  screenshotAlt={t.tandem.screenshotAlt}
+/>
+
+<FlightbookFAQ title={t.faq.title} faqs={t.faq.questions} schoolCtaLabel={t.schools.cta} />

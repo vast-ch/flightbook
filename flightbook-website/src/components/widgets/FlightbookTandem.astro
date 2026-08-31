@@ -1,0 +1,77 @@
+---
+import type { ImageMetadata } from 'astro';
+import { Image } from 'astro:assets';
+import PhoneFrame from '~/components/ui/PhoneFrame.astro';
+
+interface Item {
+  title: string;
+  description: string;
+}
+
+interface Props {
+  eyebrow: string;
+  title: string;
+  intro: string;
+  cta: string;
+  items: Item[];
+  photo: ImageMetadata;
+  screenshot: ImageMetadata;
+  screenshotAlt: string;
+}
+
+const { eyebrow, title, intro, cta, items, photo, screenshot, screenshotAlt } = Astro.props;
+---
+
+<section id="tandem" class="scroll-mt-16 relative overflow-hidden bg-ink px-7 py-28">
+  <Image
+    src={photo}
+    alt=""
+    class="absolute inset-0 h-full w-full object-cover opacity-50"
+    loading="lazy"
+    width={2560}
+    height={1605}
+    widths={[768, 1280, 1920, 2560]}
+    sizes="100vw"
+    format="webp"
+  />
+  <div
+    class="absolute inset-0 pointer-events-none"
+    aria-hidden="true"
+    style="background:linear-gradient(90deg,rgba(5,16,29,.96) 0%,rgba(5,16,29,.8) 55%,rgba(5,16,29,.6) 100%)"
+  >
+  </div>
+
+  <div class="relative mx-auto grid max-w-[1240px] items-start gap-[72px] lg:grid-cols-[268px_1fr]">
+    <div class="mx-auto w-full max-w-[268px] lg:mx-0 lg:max-w-none">
+      <PhoneFrame radius="sm" class="w-full">
+        <Image src={screenshot} alt={screenshotAlt} class="w-full" />
+      </PhoneFrame>
+    </div>
+
+    <div class="flex flex-col items-start gap-8">
+      <span class="text-xs font-bold uppercase tracking-[0.14em] text-sky-soft">{eyebrow}</span>
+      <h2 class="font-heading text-4xl lg:text-[52px] text-white">{title}</h2>
+      <p class="max-w-[660px] text-[19px] leading-relaxed text-white/70 text-pretty">{intro}</p>
+
+      <div class="grid gap-x-11 gap-y-7 lg:grid-cols-2">
+        {
+          items.map((item) => (
+            <div class="flex flex-col gap-2.5">
+              <h3 class="font-heading text-xl text-white">{item.title}</h3>
+              <p class="text-[15px] leading-[1.7] text-white/60 text-pretty">{item.description}</p>
+            </div>
+          ))
+        }
+      </div>
+
+      <a
+        href="https://m.flightbook.ch/register"
+        target="_blank"
+        rel="noopener"
+        class="btn-gradient hover:btn-gradient-hover"
+      >
+        {cta}
+      </a>
+    </div>
+  </div>
+</section>

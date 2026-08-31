@@ -848,5 +848,18 @@
     "placelist": {
         "summaryOne": "1 lieu",
         "summary": "{{count}} lieux"
+    },
+    "splash": {
+        "lines": {
+            "1": "En attente de vent…",
+            "2": "Étalage de la voile…",
+            "3": "Démêlage des suspentes…",
+            "4": "Contrôle des élévateurs…",
+            "5": "Lecture de la manche à air…",
+            "6": "Accrochage à la sellette…",
+            "7": "En attente d'un cycle…",
+            "8": "Course sur la pente…"
+        },
+        "stillConnecting": "Connexion en cours…"
     }
 }

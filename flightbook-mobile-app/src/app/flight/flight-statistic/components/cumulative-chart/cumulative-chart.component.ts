@@ -90,14 +90,11 @@ export class CumulativeChartComponent {
                 padding: 8,
                 callbacks: {
                     label: (context) => {
+                        // Whole hours, matching the card's head: a running total
+                        // over months is read for its shape, and the minutes
+                        // were false precision on a figure in the thousands.
                         const hours = context.parsed.y ?? 0;
-                        // Round once, to whole minutes: flooring the hours and
-                        // rounding the remainder separately printed "100:60 h"
-                        // whenever the fraction landed above 59.5/60.
-                        const totalMinutes = Math.round(hours * 60);
-                        const h = Math.floor(totalMinutes / 60);
-                        const m = totalMinutes % 60;
-                        return `${h}:${m.toString().padStart(2, '0')} h`;
+                        return `${Math.round(hours)} h`;
                     }
                 }
             }

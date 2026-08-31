@@ -131,6 +131,8 @@
   --fb-inverse-surface: #10293c;
   --fb-inverse-text: #ffffff;
   --fb-inverse-text-muted: rgba(255, 255, 255, 0.55);
+  /* A step brighter than -muted: the loading screen's status line and version */
+  --fb-inverse-text-soft: rgba(255, 255, 255, 0.62);
   --fb-inverse-hairline: rgba(255, 255, 255, 0.14);
 
   --fb-radius: 12px;

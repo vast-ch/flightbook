@@ -1,10 +1,6 @@
 ---
 import Layout from '~/layouts/PageLayout.astro';
-import FlightbookHero from '~/components/widgets/FlightbookHero.astro';
-import FlightbookPricing from '~/components/widgets/FlightbookPricing.astro';
-import FlightbookPremiumFeatures from '~/components/widgets/FlightbookPremiumFeatures.astro';
-import FlightbookSchoolsFeatures from '~/components/widgets/FlightbookSchoolsFeatures.astro';
-import FlightbookFAQ from '~/components/widgets/FlightbookFAQ.astro';
+import FlightbookHome from '~/components/FlightbookHome.astro';
 import { getTranslations } from '~/utils/i18n';
 
 const t = getTranslations('fr');
@@ -37,53 +33,13 @@ const metadata = {
     { hrefLang: 'x-default', href: 'https://flightbook.ch' },
   ],
 };
-
-const pricingPlans = [
-  {
-    badge: t.pricing.free.badge,
-    title: t.pricing.free.title,
-    price: t.pricing.free.price,
-    features: t.pricing.free.features,
-    cta: t.pricing.free.cta,
-    ctaLink: 'https://m.flightbook.ch/register',
-    featured: false,
-  },
-  {
-    badge: t.pricing.premium.badge,
-    title: t.pricing.premium.title,
-    price: t.pricing.premium.price,
-    period: t.pricing.premium.period,
-    features: t.pricing.premium.features,
-    cta: t.pricing.premium.cta,
-    ctaLink: 'https://m.flightbook.ch/settings',
-    featured: true,
-  },
-  {
-    badge: t.pricing.schools.badge,
-    title: t.pricing.schools.title,
-    price: t.pricing.schools.price,
-    features: t.pricing.schools.features,
-    cta: t.pricing.schools.cta,
-    ctaLink: 'https://instructor.flightbook.ch/school/register',
-    featured: false,
-  },
-];
 ---
 
 <Layout metadata={metadata}>
-  <FlightbookHero
-    title={t.hero.title}
-    subtitle={t.hero.subtitle}
-    iosText={t.hero.ios}
-    androidText={t.hero.android}
-    premiumText={t.hero.subscribePremium}
-  />
-
-  <FlightbookPricing title={t.pricing.title} plans={pricingPlans} notes={t.pricing.notes} />
-
-  <FlightbookPremiumFeatures title={t.premium.title} features={t.premium.features} cta={t.premium.cta} />
-
-  <FlightbookSchoolsFeatures title={t.schools.title} features={t.schools.features} cta={t.schools.cta} />
-
-  <FlightbookFAQ title={t.faq.title} faqs={t.faq.questions} />
+  <FlightbookHome locale="fr" />
 </Layout>
+
+<script>
+  import { initLanguageDetection } from '~/utils/language-detector';
+  initLanguageDetection();
+</script>

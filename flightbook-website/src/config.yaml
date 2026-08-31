@@ -37,6 +37,9 @@ i18n:
     fr:
       name: Français
       locale: fr-CH
+    en:
+      name: English
+      locale: en-GB
 
 apps:
   blog:
@@ -76,4 +79,4 @@ analytics:
       id: null # Add your Google Analytics ID here, e.g., "G-XXXXXXXXXX"
 
 ui:
-  theme: 'system' # Values: "system" | "light" | "dark" | "light:only" | "dark:only"
+  theme: 'light:only' # Values: "system" | "light" | "dark" | "light:only" | "dark:only"

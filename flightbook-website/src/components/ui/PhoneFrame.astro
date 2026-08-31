@@ -1,0 +1,31 @@
+---
+interface Props {
+  radius?: 'lg' | 'md' | 'sm';
+  float?: boolean;
+  class?: string;
+}
+
+const { radius = 'md', float = false, class: className = '' } = Astro.props;
+
+// Outer bezel radius / inner screen radius, from the design.
+const radii = {
+  lg: ['rounded-[44px]', 'rounded-[34px]'],
+  md: ['rounded-[42px]', 'rounded-[32px]'],
+  sm: ['rounded-[36px]', 'rounded-[27px]'],
+}[radius];
+---
+
+<div
+  data-phone-frame
+  class:list={[
+    'border border-white/15 bg-gradient-to-br from-[#1c2b3f] to-[#08131f] p-[11px]',
+    'shadow-[0_50px_90px_-30px_rgba(0,0,0,0.85)]',
+    radii[0],
+    float && 'motion-safe:animate-float',
+    className,
+  ]}
+>
+  <div class:list={['overflow-hidden bg-white', radii[1]]}>
+    <slot />
+  </div>
+</div>

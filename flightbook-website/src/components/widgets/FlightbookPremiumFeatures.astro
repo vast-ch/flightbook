@@ -1,178 +1,63 @@
 ---
-import { Image } from 'astro:assets';
-import homeImg from '~/assets/images/flightbook/home.png';
-import statisticImg from '~/assets/images/flightbook/statistic.png';
-import addFlightImg from '~/assets/images/flightbook/add-flight.png';
-import placeImg from '~/assets/images/flightbook/place.png';
+import type { ImageMetadata } from 'astro';
+import ImageCarousel from '~/components/ui/ImageCarousel.astro';
 
-interface Feature {
+interface Item {
   title: string;
   description: string;
 }
 
-interface Props {
-  title: string;
-  features: Feature[];
-  cta: string;
+interface Screenshot {
+  src: ImageMetadata;
+  alt: string;
+  caption: string;
 }
 
-const { title, features, cta } = Astro.props;
+interface Props {
+  title: string;
+  intro: string;
+  cta: string;
+  items: Item[];
+  screenshots: Screenshot[];
+}
 
-const images = [
-  { src: homeImg, alt: 'Flightbook App Startseite - Übersicht der Flugverwaltung' },
-  { src: statisticImg, alt: 'Flightbook Statistiken - Auswertung von Flugdaten' },
-  { src: addFlightImg, alt: 'Flug hinzufügen - Neue Flüge in Flightbook erfassen' },
-  { src: placeImg, alt: 'Flugplätze verwalten - Start- und Landeplätze' },
-];
-
-const icons = [
-  `<path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4M12,6A6,6 0 0,0 6,12A6,6 0 0,0 12,18A6,6 0 0,0 18,12A6,6 0 0,0 12,6Z"/>`,
-  `<path d="M3,3H21V21H3V3M5,5V19H19V5H5M7.5,18A1.5,1.5 0 0,0 9,16.5A1.5,1.5 0 0,0 7.5,15A1.5,1.5 0 0,0 6,16.5A1.5,1.5 0 0,0 7.5,18M7.5,6A1.5,1.5 0 0,0 9,7.5A1.5,1.5 0 0,0 7.5,9A1.5,1.5 0 0,0 6,7.5A1.5,1.5 0 0,0 7.5,6M16.5,18A1.5,1.5 0 0,0 18,16.5A1.5,1.5 0 0,0 16.5,15A1.5,1.5 0 0,0 15,16.5A1.5,1.5 0 0,0 16.5,18M16.5,6A1.5,1.5 0 0,0 18,7.5A1.5,1.5 0 0,0 16.5,9A1.5,1.5 0 0,0 15,7.5A1.5,1.5 0 0,0 16.5,6M12,8L14,12L12,16L10,12L12,8Z"/>`,
-  `<path d="M22,21H2V3H4V19H6V10H10V19H12V6H16V19H18V14H22V21Z"/>`,
-  `<path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>`,
-];
+const { title, intro, cta, items, screenshots } = Astro.props;
 ---
 
-<section id="premium" class="scroll-mt-16 py-16 md:py-20 bg-gray-50 dark:bg-slate-800">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6">
-    <div class="mb-10 md:mb-16 text-center">
-      <h2 class="text-4xl md:text-5xl font-bold leading-tighter tracking-tighter mb-4 font-heading">
-        {title}
-      </h2>
+<section id="premium" class="scroll-mt-16 bg-surface-dark px-7 py-28">
+  <div class="mx-auto flex max-w-[1240px] flex-col gap-14">
+    <div class="flex flex-wrap items-end justify-between gap-10">
+      <h2 class="font-heading text-4xl text-white max-w-[620px] lg:text-[52px]">{title}</h2>
+      <p class="max-w-[400px] text-[17px] leading-relaxed text-white/60 text-pretty">{intro}</p>
     </div>
 
-    <div class="grid lg:grid-cols-2 gap-12 items-start">
-      <!-- Features Column -->
-      <div class="space-y-8">
+    <div class="grid gap-[72px] items-start lg:grid-cols-[1fr_340px]">
+      <div
+        class="grid grid-cols-1 gap-[2px] overflow-hidden rounded-[22px] border border-white/10 bg-white/10 sm:grid-cols-2"
+      >
         {
-          features.map((feature, index) => (
-            <div class="flex gap-4">
-              <div class="flex-shrink-0">
-                <div class="w-12 h-12 rounded-lg bg-primary/10 dark:bg-primary/20 flex items-center justify-center">
-                  <svg class="w-6 h-6 text-primary" viewBox="0 0 24 24" fill="currentColor">
-                    <Fragment set:html={icons[index]} />
-                  </svg>
-                </div>
-              </div>
-              <div>
-                <h3 class="text-xl font-bold mb-2">{feature.title}</h3>
-                <p class="text-gray-600 dark:text-gray-400">{feature.description}</p>
-              </div>
+          items.map((item) => (
+            <div class="flex flex-col gap-3 bg-card-dark p-8">
+              <h3 class="font-heading text-[21px] text-white">{item.title}</h3>
+              <p class="text-[15px] leading-[1.7] text-white/60 text-pretty">{item.description}</p>
             </div>
           ))
         }
-      </div>
-
-      <!-- Slideshow Column -->
-      <div class="relative max-w-md mx-auto lg:mx-0">
-        <div class="slideshow-container relative rounded-lg overflow-hidden shadow-xl bg-gray-100 dark:bg-gray-800">
-          {
-            images.map((img, index) => (
-              <div class:list={['slide', index === 0 && 'active']}>
-                <Image src={img.src} alt={img.alt} class="w-full h-auto max-h-[600px] object-contain" loading="lazy" />
-              </div>
-            ))
-          }
-
-          <!-- Navigation arrows -->
-          <button
-            class="slide-nav prev absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors"
-            aria-label="Previous slide"
+        <div class="bg-card-dark px-8 py-7 sm:col-span-2">
+          <a
+            href="https://m.flightbook.ch/register"
+            target="_blank"
+            rel="noopener"
+            class="btn-gradient hover:btn-gradient-hover"
           >
-            &#10094;
-          </button>
-          <button
-            class="slide-nav next absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors"
-            aria-label="Next slide"
-          >
-            &#10095;
-          </button>
-
-          <!-- Slide indicators -->
-          <div class="slide-indicators absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-            {
-              images.map((_, index) => (
-                <button
-                  class:list={[
-                    'indicator w-3 h-3 rounded-full bg-white/50 hover:bg-white/80 transition-colors',
-                    index === 0 && 'active bg-white',
-                  ]}
-                  aria-label={`Go to slide ${index + 1}`}
-                  data-slide={index}
-                />
-              ))
-            }
-          </div>
+            {cta}
+          </a>
         </div>
       </div>
-    </div>
 
-    <div class="mt-12 text-center">
-      <a href="https://m.flightbook.ch/register" class="btn btn-primary">
-        {cta}
-      </a>
+      <div class="sticky top-24 flex flex-col items-center gap-5">
+        <ImageCarousel images={screenshots} theme="dark" showCaption frame="md" class="w-full" />
+      </div>
     </div>
   </div>
 </section>
-
-<style>
-  .slide {
-    display: none;
-  }
-  .slide.active {
-    display: block;
-  }
-  .indicator.active {
-    background-color: white;
-  }
-</style>
-
-<script>
-  let currentSlideIndex = 0;
-  const slides = document.querySelectorAll('.slide');
-  const indicators = document.querySelectorAll('.indicator');
-
-  function showSlide(index: number) {
-    slides.forEach((slide) => slide.classList.remove('active'));
-    indicators.forEach((indicator) => indicator.classList.remove('active'));
-
-    if (slides[index]) {
-      slides[index].classList.add('active');
-      indicators[index]?.classList.add('active');
-    }
-  }
-
-  function changeSlide(direction: number) {
-    currentSlideIndex += direction;
-
-    if (currentSlideIndex >= slides.length) {
-      currentSlideIndex = 0;
-    } else if (currentSlideIndex < 0) {
-      currentSlideIndex = slides.length - 1;
-    }
-
-    showSlide(currentSlideIndex);
-  }
-
-  // Navigation buttons
-  document.querySelector('.slide-nav.prev')?.addEventListener('click', () => changeSlide(-1));
-  document.querySelector('.slide-nav.next')?.addEventListener('click', () => changeSlide(1));
-
-  // Indicators
-  indicators.forEach((indicator, index) => {
-    indicator.addEventListener('click', () => {
-      currentSlideIndex = index;
-      showSlide(currentSlideIndex);
-    });
-  });
-
-  // Auto-advance slideshow
-  let autoSlideInterval = setInterval(() => changeSlide(1), 4000);
-
-  // Pause on hover
-  const container = document.querySelector('.slideshow-container');
-  container?.addEventListener('mouseenter', () => clearInterval(autoSlideInterval));
-  container?.addEventListener('mouseleave', () => {
-    autoSlideInterval = setInterval(() => changeSlide(1), 4000);
-  });
-</script>

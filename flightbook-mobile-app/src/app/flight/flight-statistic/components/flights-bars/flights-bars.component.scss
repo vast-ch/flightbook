@@ -1,5 +1,28 @@
 :host {
     display: block;
+
+    /*
+     * The floor a column may never go below. 22px keeps a season no thinner
+     * than the twelve months the design draws in this same card (~24px across
+     * a phone), and leaves the 8.5px printed value its four characters. Past
+     * thirteen seasons the row outgrows the card and scrolls instead of
+     * shrinking to hairlines.
+     */
+    --bar-min: 22px;
+}
+
+/* Scrolls only once the columns hit their floor; below that they fill the card. */
+.chart {
+    overflow-x: auto;
+    overflow-y: hidden;
+    // A horizontal swipe here must not turn into a page or tab gesture.
+    overscroll-behavior-x: contain;
+    // Hidden to match .period__scroll, the page's other horizontal scroller.
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
 }
 
 .bars {
@@ -9,6 +32,13 @@
     height: 96px;
     margin-top: 16px;
     border-bottom: 1px solid var(--fb-track);
+    /*
+     * max-content so the baseline runs under every bar rather than stopping at
+     * the scrollport, and min-width so a short logbook still fills the card -
+     * with both, the row is max(its columns, the card).
+     */
+    width: max-content;
+    min-width: 100%;
 
     &--tight {
         gap: 2px;
@@ -37,8 +67,9 @@
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
-    flex: 1;
-    min-width: 0;
+    // Grows to share spare width, never shrinks past the floor.
+    flex: 1 0 var(--bar-min);
+    min-width: var(--bar-min);
     height: 100%;
 }
 
@@ -59,6 +90,9 @@
     display: flex;
     gap: 4px;
     margin-top: 7px;
+    // Sized exactly as .bars, or the two rows would scroll out of step.
+    width: max-content;
+    min-width: 100%;
 
     &--tight {
         gap: 2px;
@@ -66,8 +100,8 @@
 }
 
 .labels__cell {
-    flex: 1;
-    min-width: 0;
+    flex: 1 0 var(--bar-min);
+    min-width: var(--bar-min);
     overflow: hidden;
     text-align: center;
     font-size: 9px;

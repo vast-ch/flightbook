@@ -1,0 +1,213 @@
+---
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import PhoneFrame from '~/components/ui/PhoneFrame.astro';
+
+interface Slide {
+  src: ImageMetadata;
+  alt: string;
+  caption?: string;
+}
+
+interface Props {
+  images: Slide[];
+  theme?: 'dark' | 'light';
+  showCaption?: boolean;
+  autoAdvanceMs?: number;
+  frame?: 'lg' | 'md' | 'sm' | 'figure';
+  class?: string;
+}
+
+const { images, theme = 'dark', showCaption = false, autoAdvanceMs = 5000, frame, class: className = '' } = Astro.props;
+
+// Shared with any bare (non-carousel) figure that needs to match this shell exactly —
+// e.g. FlightbookSchoolsFeatures' static row-1 image — so the two can't drift apart.
+export const FIGURE_SHELL_CLASSES =
+  'w-full overflow-hidden rounded-[18px] border border-hairline bg-white shadow-[0_26px_50px_-30px_rgba(11,22,38,0.55)]';
+
+const isPhoneFrame = frame === 'lg' || frame === 'md' || frame === 'sm';
+const isFigureFrame = frame === 'figure';
+
+const arrow =
+  theme === 'dark'
+    ? 'h-[42px] w-[42px] rounded-full border border-white/20 bg-white/5 text-white transition hover:bg-white/15'
+    : 'h-10 w-10 rounded-full border border-hairline-strong bg-white text-body transition hover:border-brand hover:text-brand';
+const dotOn = theme === 'dark' ? 'bg-sky' : 'bg-brand';
+const captionClass = theme === 'dark' ? 'text-white/50' : 'text-muted-light';
+---
+
+<div
+  class:list={['flex flex-col items-center gap-5', className]}
+  data-carousel
+  data-interval={autoAdvanceMs}
+  data-active-dot={dotOn}
+>
+  {
+    isPhoneFrame ? (
+      <PhoneFrame radius={frame as 'lg' | 'md' | 'sm'}>
+        <div class="w-full">
+          {images.map((img, i) => (
+            <div data-slide class:list={[i === 0 ? 'block' : 'hidden']}>
+              <Image
+                src={img.src}
+                alt={img.alt}
+                class="block w-full"
+                loading="lazy"
+                widths={[300, 600]}
+                sizes="(max-width: 768px) 300px, 600px"
+              />
+            </div>
+          ))}
+        </div>
+      </PhoneFrame>
+    ) : isFigureFrame ? (
+      <div class={FIGURE_SHELL_CLASSES} data-figure-frame>
+        <div class="w-full">
+          {images.map((img, i) => (
+            <div data-slide class:list={[i === 0 ? 'block' : 'hidden']}>
+              <Image
+                src={img.src}
+                alt={img.alt}
+                class="block w-full"
+                loading="lazy"
+                widths={[300, 600]}
+                sizes="(max-width: 768px) 300px, 600px"
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+    ) : (
+      <div class="w-full">
+        {images.map((img, i) => (
+          <div data-slide class:list={[i === 0 ? 'block' : 'hidden']}>
+            <Image
+              src={img.src}
+              alt={img.alt}
+              class="block w-full"
+              loading="lazy"
+              widths={[300, 600]}
+              sizes="(max-width: 768px) 300px, 600px"
+            />
+          </div>
+        ))}
+      </div>
+    )
+  }
+
+  <div class="flex items-center gap-3.5">
+    <button type="button" data-prev class={arrow} aria-label="Previous slide">&#10094;</button>
+    <div class="flex gap-[7px]">
+      {
+        images.map((img, i) => (
+          <button
+            type="button"
+            data-dot
+            data-index={i}
+            data-caption={showCaption ? (img.caption ?? '') : undefined}
+            aria-label={`Go to slide ${i + 1}`}
+            class:list={['block h-[7px] w-[7px] rounded-full transition', i === 0 ? dotOn : 'bg-slate-400/45']}
+          />
+        ))
+      }
+    </div>
+    <button type="button" data-next class={arrow} aria-label="Next slide">&#10095;</button>
+  </div>
+
+  {
+    showCaption && (
+      <p class:list={['text-center text-[13px]', captionClass]} data-caption-text>
+        {images[0].caption}
+      </p>
+    )
+  }
+</div>
+
+<script>
+  function initCarousels() {
+    document.querySelectorAll<HTMLElement>('[data-carousel]').forEach((root) => {
+      if (root.dataset.carouselReady === 'true') return;
+      root.dataset.carouselReady = 'true';
+
+      const slides = Array.from(root.querySelectorAll<HTMLElement>('[data-slide]'));
+      const dots = Array.from(root.querySelectorAll<HTMLElement>('[data-dot]'));
+      const caption = root.querySelector<HTMLElement>('[data-caption-text]');
+      const captions = slides.map((_, i) => dots[i]?.getAttribute('data-caption') ?? '');
+      if (slides.length < 2) return;
+
+      // Passed as data from the server (the same value used in the dot's own class:list),
+      // rather than re-derived by pattern-matching the dot's className back out of the DOM —
+      // that regex silently produced the wrong theme's class if the literal ever changed.
+      const activeDot = root.dataset.activeDot ?? 'bg-sky';
+      let current = 0;
+      let timer: number | undefined;
+
+      function show(next: number) {
+        current = (next + slides.length) % slides.length;
+        slides.forEach((s, i) => s.classList.toggle('hidden', i !== current));
+        dots.forEach((d, i) => {
+          d.classList.toggle(activeDot, i === current);
+          d.classList.toggle('bg-slate-400/45', i !== current);
+        });
+        if (caption && captions[current]) caption.textContent = captions[current];
+      }
+
+      function clearTimer() {
+        if (timer !== undefined) {
+          window.clearInterval(timer);
+          activeTimers.delete(timer);
+          timer = undefined;
+        }
+      }
+      function start() {
+        // WCAG 2.2.2: auto-advance must be possible to disable. The existing pause was
+        // mouseenter-only (unreachable by keyboard/touch); a full pause control is a separate
+        // piece of work, but honoring reduced-motion is not optional, so guard it here too.
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        const ms = Number(root.dataset.interval ?? 5000);
+        if (ms > 0) {
+          timer = window.setInterval(() => show(current + 1), ms);
+          activeTimers.add(timer);
+        }
+      }
+      function restart() {
+        clearTimer();
+        start();
+      }
+
+      root.querySelector('[data-prev]')?.addEventListener('click', () => {
+        show(current - 1);
+        restart();
+      });
+      root.querySelector('[data-next]')?.addEventListener('click', () => {
+        show(current + 1);
+        restart();
+      });
+      dots.forEach((dot, i) =>
+        dot.addEventListener('click', () => {
+          show(i);
+          restart();
+        })
+      );
+
+      root.addEventListener('mouseenter', clearTimer);
+      root.addEventListener('mouseleave', start);
+      start();
+    });
+  }
+
+  // Module-scope so a teardown triggered by an incoming view transition can sweep every
+  // running interval, regardless of which carousel's closure created it — without this, an
+  // auto-advancing carousel keeps ticking against DOM nodes that ClientRouter is about to
+  // discard, compounding with every navigation.
+  const activeTimers = new Set<number>();
+
+  function teardownCarousels() {
+    activeTimers.forEach((id) => window.clearInterval(id));
+    activeTimers.clear();
+  }
+
+  initCarousels();
+  document.addEventListener('astro:page-load', initCarousels);
+  document.addEventListener('astro:before-swap', teardownCarousels);
+</script>

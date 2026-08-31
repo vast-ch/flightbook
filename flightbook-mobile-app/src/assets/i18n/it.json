@@ -848,5 +848,18 @@
     "placelist": {
         "summaryOne": "1 luogo",
         "summary": "{{count}} luoghi"
+    },
+    "splash": {
+        "lines": {
+            "1": "In attesa di vento…",
+            "2": "Stesura della vela…",
+            "3": "Sistemazione dei cordini…",
+            "4": "Controllo delle bretelle…",
+            "5": "Lettura della manica a vento…",
+            "6": "Aggancio all'imbrago…",
+            "7": "In attesa di un ciclo…",
+            "8": "Corsa sul pendio…"
+        },
+        "stillConnecting": "Connessione in corso…"
     }
 }
