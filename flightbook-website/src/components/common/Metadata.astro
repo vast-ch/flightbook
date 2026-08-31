@@ -22,6 +22,7 @@ const {
   description,
   openGraph = {},
   twitter = {},
+  languageAlternates,
 } = Astro.props;
 
 const mergedOg: MetaDataOpenGraph = merge(
@@ -106,6 +107,7 @@ const seoProps: SEOProps = {
   description: description || METADATA?.description,
   openGraph: buildOpenGraph(adaptedOg),
   twitter: mergedTwitter,
+  languageAlternates,
   surpressWarnings: true,
 };
 ---

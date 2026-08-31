@@ -22,24 +22,22 @@ async function bootstrap() {
     defaultVersion: VERSION_NEUTRAL
   })
 
-  if (process.env.ENV != "prod") {
-    const config = new DocumentBuilder()
-      .setTitle('Flightbook')
-      .setDescription('The flightbbok api')
-      .setVersion('1.0')
-      .addBearerAuth(
-        { 
-          type: 'http',
-          scheme: 'bearer',
-          bearerFormat: 'JWT',
-          in: 'header'
-        },
-        'jwt',
-      )
-      .build();
-    const document = SwaggerModule.createDocument(app, config);
-    SwaggerModule.setup('swagger', app, document);
-  }
+  const config = new DocumentBuilder()
+    .setTitle('Flightbook')
+    .setDescription('The flightbbok api')
+    .setVersion('1.0')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        in: 'header'
+      },
+      'jwt',
+    )
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('swagger', app, document);
 
   await app.listen(8282);
 }
