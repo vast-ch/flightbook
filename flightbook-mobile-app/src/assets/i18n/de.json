@@ -43,7 +43,6 @@
         "cancelSubscription": "Abonnement kündigen",
         "controlSheet": "Kontrollblatt",
         "subscribe": "Flightbook Premium abonnieren",
-        "shvWeather": "SHV Wetter (Login)",
         "dabsToday": "DABS Schweiz heute",
         "dabsTomorrow": "DABS Schweiz morgen",
         "emergencyContacts": "Notfallkontakt",
@@ -350,6 +349,8 @@
         "clearFilters": "Filter zurücksetzen"
     },
     "export": {
+        "shvCertification": "SHV-Nachweis",
+        "fullLogbook": "Komplettes Flugbuch",
         "pilote": "Pilot",
         "nbStartplaces": "Anzahl Startplätze",
         "nbLandingplaces": "Anzahl Landeplätze",
@@ -805,7 +806,7 @@
         "linksHint": "Sammle hier die Seiten, die du vor dem Fliegen prüfst — Webcams, Windstationen, Luftraum oder die Seite deines Clubs.",
         "importIgc": "Mehrere IGC-Dateien importieren",
         "importData": "Flugbuchdaten importieren",
-        "export": "Export als XLSX, CSV oder PDF",
+        "export": "Diverse Exportmöglichkeiten",
         "accountSettings": "Konto & Einstellungen",
         "accountSettingsHint": "Deine Daten, Notfallkontakt, Passwort, Sprache"
     },
@@ -820,7 +821,7 @@
         "activity": "Aktivität",
         "allStatistics": "Alle Statistiken",
         "flightsPerMonth": "Flüge pro Monat",
-        "fromShv": "News",
+        "news": "News",
         "emptyLogbook": "Das ist bisher dein ganzes Flugbuch. Importiere IGC-Dateien, um frühere Flüge zu ergänzen — ",
         "importFromDevice": "Vom Gerät importieren",
         "ofTotal": "von {{total}}",

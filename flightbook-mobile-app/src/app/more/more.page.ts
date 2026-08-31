@@ -15,7 +15,7 @@ import { Link } from '../account/shared/userConfig.model';
 import { User } from '../account/shared/user.model';
 import { SchoolService } from '../school/shared/school.service';
 import { ControlSheet } from '../shared/domain/control-sheet';
-import { FlightExportService } from '../shared/services/flight-export.service';
+import { LogbookExportService } from '../shared/services/logbook-export.service';
 import { SessionService } from '../shared/services/session.service';
 import { AvatarButtonComponent } from 'src/app/shared/components/avatar-button/avatar-button.component';
 
@@ -53,7 +53,7 @@ export class MorePage implements OnDestroy {
     private accountService = inject(AccountService);
     private schoolService = inject(SchoolService);
     private sessionService = inject(SessionService);
-    private flightExportService = inject(FlightExportService);
+    private logbookExportService = inject(LogbookExportService);
     private router = inject(Router);
     private alertController = inject(AlertController);
     private translate = inject(TranslateService);
@@ -302,7 +302,7 @@ export class MorePage implements OnDestroy {
     }
 
     openExport() {
-        this.flightExportService.openExport();
+        this.logbookExportService.openFullExport();
     }
 
     logout() {

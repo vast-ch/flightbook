@@ -43,7 +43,6 @@
         "cancelSubscription": "Annullare l'abbonamento",
         "controlSheet": "Scheda di controllo",
         "subscribe": "Abbonarsi a Flightbook Premium",
-        "shvWeather": "FSVL Tempo (Login)",
         "dabsToday": "DABS Svizzera oggi",
         "dabsTomorrow": "DABS Svizzera domani",
         "emergencyContacts": "Contatto di emergenza",
@@ -350,6 +349,8 @@
         "clearFilters": "Cancella i filtri"
     },
     "export": {
+        "shvCertification": "Documento giustificativo FSVL",
+        "fullLogbook": "Diario di volo completo",
         "pilote": "Pilota",
         "nbStartplaces": "Numero luoghi di decollo",
         "nbLandingplaces": "Numero luoghi di atterraggio",
@@ -805,7 +806,7 @@
         "linksHint": "Tieni qui le pagine che controlli prima di volare — webcam, stazioni del vento, spazio aereo o il sito del tuo club.",
         "importIgc": "Importa più file IGC",
         "importData": "Importa dati del libretto",
-        "export": "Esporta in XLSX, CSV o PDF",
+        "export": "Diverse esportazioni",
         "accountSettings": "Account & impostazioni",
         "accountSettingsHint": "I tuoi dati, contatto di emergenza, password, lingua"
     },
@@ -820,7 +821,7 @@
         "activity": "Attività",
         "allStatistics": "Tutte le statistiche",
         "flightsPerMonth": "Voli al mese",
-        "fromShv": "News",
+        "news": "News",
         "emptyLogbook": "Questo è tutto il tuo libro di volo finora. Importa file IGC per aggiungere voli precedenti — ",
         "importFromDevice": "Importa dal dispositivo",
         "ofTotal": "di {{total}}",

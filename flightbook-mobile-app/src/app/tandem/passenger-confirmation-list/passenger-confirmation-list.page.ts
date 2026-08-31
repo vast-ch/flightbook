@@ -1,7 +1,7 @@
 import { DatePipe } from '@angular/common';
 import { Component, OnDestroy, OnInit, computed, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ModalController, LoadingController, NavController, IonIcon, IonContent, IonInfiniteScroll, IonInfiniteScrollContent, AlertController } from '@ionic/angular/standalone';
+import { ModalController, LoadingController, NavController, IonIcon, IonContent, IonInfiniteScroll, IonInfiniteScrollContent, AlertController, ActionSheetController } from '@ionic/angular/standalone';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { firstValueFrom, Subject, takeUntil } from 'rxjs';
 import { addIcons } from "ionicons";
@@ -10,10 +10,8 @@ import { PassengerConfirmationFormComponent } from '../shared/components/passeng
 import { TandemService } from '../shared/tandem.service';
 import { PassengerConfirmation } from '../shared/domain/passenger-confirmation.model';
 import { PaymentService } from 'src/app/shared/services/payment.service';
-import { Capacitor } from '@capacitor/core';
 import { XlsxExportService } from 'src/app/shared/services/xlsx-export.service';
-import { Directory, Filesystem } from '@capacitor/filesystem';
-import { FileOpener } from '@capacitor-community/file-opener';
+import { SpreadsheetDownloadService } from 'src/app/shared/services/spreadsheet-download.service';
 import { TandemSchoolService } from 'src/app/school/shared/tandem-school.service';
 import { LanguageService, resolveLanguage } from 'src/app/shared/services/language.service';
 import { Location } from '@angular/common';
@@ -75,6 +73,8 @@ export class PassengerConfirmationListPage implements OnInit, OnDestroy {
     private translate: TranslateService,
     private paymentService: PaymentService,
     private xlsxExportService: XlsxExportService,
+    private spreadsheetDownloadService: SpreadsheetDownloadService,
+    private actionSheetCtrl: ActionSheetController,
     private tandemSchoolService: TandemSchoolService,
     private languageService: LanguageService,
     private router: Router
@@ -269,60 +269,39 @@ export class PassengerConfirmationListPage implements OnInit, OnDestroy {
     });
   }
 
+  /** Two formats, so the header button opens a picker rather than doubling up. */
+  async openExport() {
+    const sheet = await this.actionSheetCtrl.create({
+      header: this.translate.instant('buttons.export'),
+      buttons: [
+        { text: 'XLSX', handler: () => { this.xlsxExport(); } },
+        { text: 'CSV', handler: () => { this.csvExport(); } },
+        { text: this.translate.instant('buttons.cancel'), role: 'cancel' }
+      ]
+    });
+    await sheet.present();
+  }
+
   async xlsxExport() {
-    const loading = await this.loadingCtrl.create({
-        message: this.translate.instant('loading.loading')
+    await this.spreadsheetDownloadService.download({
+      format: 'xlsx',
+      filenameBase: 'passenger_confirmations',
+      generate: async (writeOptions) => {
+        const confirmations = await firstValueFrom(this.tandemService.getPassengerConfirmations());
+        return this.xlsxExportService.generatePassengerConfirmationsXlsxFile(confirmations, writeOptions);
+      }
     });
-    loading.present();
-    this.tandemService.getPassengerConfirmations().pipe(takeUntil(this.unsubscribe$)).subscribe(async (res: PassengerConfirmation[]) => {
-        if (Capacitor.isNativePlatform()) {
-            try {
-                const data: any = await this.xlsxExportService.generatePassengerConfirmationsXlsxFile(res, { bookType: 'xlsx', type: 'base64' });
-                const path = `xlsx/passenger_confirmation_export.xlsx`;
+  }
 
-                const result = await Filesystem.writeFile({
-                    path,
-                    data,
-                    directory: Directory.External,
-                    recursive: true
-                });
-
-                await loading.dismiss();
-
-                // Opening is a separate step from writing, as in
-                // FlightExportService: a device with no viewer for the file must
-                // not be reported as a failed export, which is what re-throwing
-                // into the generation catch below did off Android.
-                try {
-                    await FileOpener.open({
-                        filePath: result.uri,
-                        contentType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-                    });
-                } catch {
-                    const alert = await this.alertController.create({
-                        header: this.translate.instant('message.infotitle'),
-                        message: this.translate.instant('message.downloadExcel'),
-                        buttons: [this.translate.instant('buttons.done')]
-                    });
-                    await alert.present();
-                }
-            } catch (e) {
-                await loading.dismiss();
-                const alert = await this.alertController.create({
-                    header: this.translate.instant('message.infotitle'),
-                    message: this.translate.instant('message.generationError'),
-                    buttons: [this.translate.instant('buttons.done')]
-                });
-                await alert.present();
-            }
-        } else {
-            const data: any = await this.xlsxExportService.generatePassengerConfirmationsXlsxFile(res, { bookType: 'xlsx', type: 'array' });
-            await loading.dismiss();
-            this.xlsxExportService.saveExcelFile(data, `passenger_confirmations_export_${Date.now()}.xlsx`);
-        }
-    }, async (error: any) => {
-        await loading.dismiss();
+  async csvExport() {
+    await this.spreadsheetDownloadService.download({
+      format: 'csv',
+      filenameBase: 'passenger_confirmations',
+      generate: async (writeOptions) => {
+        const confirmations = await firstValueFrom(this.tandemService.getPassengerConfirmations());
+        return this.xlsxExportService.generatePassengerConfirmationsXlsxFile(confirmations, writeOptions);
+      }
     });
-}
+  }
 
 }

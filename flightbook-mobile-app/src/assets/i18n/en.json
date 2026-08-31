@@ -43,7 +43,6 @@
         "cancelSubscription": "Cancel subscription",
         "controlSheet": "Control sheet",
         "subscribe": "Subscribe to Flightbook Premium",
-        "shvWeather": "SHV Weather (Login)",
         "dabsToday": "DABS Swiss today",
         "dabsTomorrow": "DABS Swiss tomorrow",
         "emergencyContacts": "Emergency Contacts",
@@ -350,6 +349,8 @@
         "clearFilters": "Clear filters"
     },
     "export": {
+        "shvCertification": "SHGPA-Certification",
+        "fullLogbook": "Full Logbook",
         "pilote": "Pilot",
         "nbStartplaces": "Number of starting places",
         "nbLandingplaces": "Number of landing places",
@@ -796,7 +797,7 @@
         "dabs": "DABS Switzerland",
         "today": "Today",
         "tomorrow": "Tomorrow",
-        "shvApp": "SHV Meteo App",
+        "shvApp": "SHGPA Meteo App",
         "beforeYouFly": "Before you fly",
         "addLink": "Add a link",
         "saveLink": "Save link",
@@ -805,7 +806,7 @@
         "linksHint": "Keep the pages you check before flying here — webcams, wind stations, airspace or your club's site.",
         "importIgc": "Import multiple IGC files",
         "importData": "Import logbook data",
-        "export": "Export XLSX, CSV or PDF",
+        "export": "Export logbook data",
         "accountSettings": "Account & settings",
         "accountSettingsHint": "Your data, emergency contact, password, language"
     },
@@ -820,7 +821,7 @@
         "activity": "Activity",
         "allStatistics": "All statistics",
         "flightsPerMonth": "Flights per month",
-        "fromShv": "News",
+        "news": "News",
         "emptyLogbook": "That's your whole logbook so far. Import IGC files to backfill earlier flights — ",
         "importFromDevice": "Import from device",
         "ofTotal": "of {{total}}",

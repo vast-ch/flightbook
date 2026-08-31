@@ -5,7 +5,7 @@ import { takeUntil } from 'rxjs/operators';
 import { FlightFilterComponent } from 'src/app/form/flight-filter/flight-filter.component';
 import { FilterChipsComponent } from 'src/app/form/flight-filter/filter-chips.component';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
-import { FlightExportService } from 'src/app/shared/services/flight-export.service';
+import { LogbookExportService } from 'src/app/shared/services/logbook-export.service';
 import { Flight } from '../shared/flight.model';
 import { FlightStatistic } from '../shared/flightStatistic.model';
 import { DatePipe } from '@angular/common';
@@ -110,7 +110,7 @@ export class FlightListPage implements OnInit, OnDestroy {
         private alertController: AlertController,
         private translate: TranslateService,
         private loadingCtrl: LoadingController,
-        private flightExportService: FlightExportService,
+        private logbookExportService: LogbookExportService,
         private router: Router,
         private languageService: LanguageService
     ) {
@@ -310,7 +310,7 @@ export class FlightListPage implements OnInit, OnDestroy {
 
     /** Export lives in the header now, so it needs its own picker. */
     openExport() {
-        this.flightExportService.openExport();
+        this.logbookExportService.openExport();
     }
 
 }

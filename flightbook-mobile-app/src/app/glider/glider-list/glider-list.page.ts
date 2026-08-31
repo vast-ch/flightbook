@@ -1,14 +1,12 @@
 import { Component, OnDestroy, ViewChild, Signal } from '@angular/core';
-import { NavController, ModalController, LoadingController, AlertController, IonIcon, IonContent, IonItem, IonList, IonInfiniteScroll, IonInfiniteScrollContent } from '@ionic/angular/standalone';
-import { Subject } from 'rxjs';
+import { NavController, ModalController, LoadingController, ActionSheetController, IonIcon, IonContent, IonItem, IonList, IonInfiniteScroll, IonInfiniteScrollContent } from '@ionic/angular/standalone';
+import { Subject, firstValueFrom } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { GliderFilterComponent } from '../glider-filter/glider-filter.component';
 import { GliderFilterChipsComponent } from '../glider-filter/glider-filter-chips.component';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
-import { Capacitor } from '@capacitor/core';
-import { Filesystem, Directory } from '@capacitor/filesystem';
-import { FileOpener } from '@capacitor-community/file-opener';
 import { XlsxExportService } from 'src/app/shared/services/xlsx-export.service';
+import { SpreadsheetDownloadService } from 'src/app/shared/services/spreadsheet-download.service';
 import { Glider } from '../shared/glider.model';
 import { GliderStore } from '../shared/glider.store';
 import { DatePipe, Location } from '@angular/common';
@@ -53,10 +51,11 @@ export class GliderListPage implements OnDestroy {
         private location: Location,
         private gliderStore: GliderStore,
         public modalCtrl: ModalController,
-        private alertController: AlertController,
+        private actionSheetCtrl: ActionSheetController,
         private translate: TranslateService,
         private loadingCtrl: LoadingController,
-        private xlsxExportService: XlsxExportService
+        private xlsxExportService: XlsxExportService,
+        private spreadsheetDownloadService: SpreadsheetDownloadService
     ) {
         addIcons({
             'add': add,
@@ -146,59 +145,38 @@ export class GliderListPage implements OnDestroy {
         return await modal.present();
     }
 
-    async xlsxExport() {
-        const loading = await this.loadingCtrl.create({
-            message: this.translate.instant('loading.loading')
+    /** Two formats, so the header button opens a picker rather than doubling up. */
+    async openExport() {
+        const sheet = await this.actionSheetCtrl.create({
+            header: this.translate.instant('buttons.export'),
+            buttons: [
+                { text: 'XLSX', handler: () => { this.xlsxExport(); } },
+                { text: 'CSV', handler: () => { this.csvExport(); } },
+                { text: this.translate.instant('buttons.cancel'), role: 'cancel' }
+            ]
         });
-        loading.present();
-        this.gliderStore.getGliders({ store: false }).pipe(takeUntil(this.unsubscribe$)).subscribe(async (res: Glider[]) => {
-            if (Capacitor.isNativePlatform()) {
-                try {
-                    const data: any = await this.xlsxExportService.generateGlidersXlsxFile(res, { bookType: 'xlsx', type: 'base64' });
-                    const path = `xlsx/gliders_export.xlsx`;
+        await sheet.present();
+    }
 
-                    const result = await Filesystem.writeFile({
-                        path,
-                        data,
-                        directory: Directory.External,
-                        recursive: true
-                    });
-
-                    await loading.dismiss();
-
-                    try {
-                        await FileOpener.open({
-                            filePath: result.uri,
-                            contentType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-                        });
-                    } catch (error) {
-                        if (Capacitor.getPlatform() == "android") {
-                            const alert = await this.alertController.create({
-                                header: this.translate.instant('message.infotitle'),
-                                message: this.translate.instant('message.downloadExcel'),
-                                buttons: [this.translate.instant('buttons.done')]
-                            });
-                            await alert.present();
-                        } else {
-                            throw error;
-                        }
-                    }
-                } catch (e) {
-                    await loading.dismiss();
-                    const alert = await this.alertController.create({
-                        header: this.translate.instant('message.infotitle'),
-                        message: this.translate.instant('message.generationError'),
-                        buttons: [this.translate.instant('buttons.done')]
-                    });
-                    await alert.present();
-                }
-            } else {
-                const data: any = await this.xlsxExportService.generateGlidersXlsxFile(res, { bookType: 'xlsx', type: 'array' });
-                await loading.dismiss();
-                this.xlsxExportService.saveExcelFile(data, `gliders_export_${Date.now()}.xlsx`);
+    async xlsxExport() {
+        await this.spreadsheetDownloadService.download({
+            format: 'xlsx',
+            filenameBase: 'gliders',
+            generate: async (writeOptions) => {
+                const gliders = await firstValueFrom(this.gliderStore.getGliders({ store: false }));
+                return this.xlsxExportService.generateGlidersXlsxFile(gliders, writeOptions);
             }
-        }, async () => {
-            await loading.dismiss();
+        });
+    }
+
+    async csvExport() {
+        await this.spreadsheetDownloadService.download({
+            format: 'csv',
+            filenameBase: 'gliders',
+            generate: async (writeOptions) => {
+                const gliders = await firstValueFrom(this.gliderStore.getGliders({ store: false }));
+                return this.xlsxExportService.generateGlidersXlsxFile(gliders, writeOptions);
+            }
         });
     }
 }
