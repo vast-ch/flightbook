@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { NavController, AlertController, LoadingController, IonContent, IonInput, IonButton, IonIcon } from '@ionic/angular/standalone';
 import { UpperCasePipe } from '@angular/common';
@@ -8,12 +8,11 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { Capacitor } from '@capacitor/core';
 import HttpStatusCode from '../../shared/util/HttpStatusCode';
-import { environment } from 'src/environments/environment';
 import { AccountService } from '../shared/account.service';
 import { NewsStore } from 'src/app/news/shared/news.store';
-import { App } from '@capacitor/app';
 import { NavigationService } from 'src/app/shared/services/navigation.service';
 import { LanguageService } from 'src/app/shared/services/language.service';
+import { VersionService } from 'src/app/shared/services/version.service';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
@@ -37,7 +36,7 @@ export class LoginPage implements OnInit, OnDestroy {
         email: '',
         password: ''
     };
-    version = '';
+    version = inject(VersionService).version;
 
     readonly languages = ['fr', 'de', 'en', 'it'];
     showPassword = false;
@@ -62,7 +61,6 @@ export class LoginPage implements OnInit, OnDestroy {
         private router: Router,
         private languageService: LanguageService
     ) {
-        this.defineVersion();
         addIcons({ eyeOutline, eyeOffOutline });
     }
 
@@ -102,14 +100,6 @@ export class LoginPage implements OnInit, OnDestroy {
     ngOnDestroy() {
         this.unsubscribe$.next();
         this.unsubscribe$.complete();
-    }
-
-    async defineVersion() {
-        if (Capacitor.isNativePlatform()) {
-            this.version = (await App.getInfo()).version;
-        } else {
-            this.version = environment.appVersion;
-        }
     }
 
     async login(loginForm: any) {

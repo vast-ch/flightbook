@@ -1,6 +1,6 @@
-import { Component, OnDestroy, OnInit, computed, signal } from '@angular/core';
+import { Component, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
 import { TranslateModule } from '@ngx-translate/core';
-import { environment } from 'src/environments/environment';
+import { VersionService } from 'src/app/shared/services/version.service';
 
 /** How many rotating status lines splash.lines carries, per locale. */
 const LINE_COUNT = 8;
@@ -38,7 +38,7 @@ export class LoadingScreenComponent implements OnInit, OnDestroy {
     private stalledTimer?: ReturnType<typeof setTimeout>;
 
     /** Rendered under the version, as the design draws it. */
-    public readonly appVersion = environment.appVersion;
+    public version = inject(VersionService).version;
 
     /**
      * The key rather than the string: reading it through the pipe keeps the line

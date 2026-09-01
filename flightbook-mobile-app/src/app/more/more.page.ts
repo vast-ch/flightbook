@@ -9,7 +9,6 @@ import { Browser } from '@capacitor/browser';
 import { Capacitor } from '@capacitor/core';
 import { Subject, firstValueFrom } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { environment } from 'src/environments/environment';
 import { AccountService } from '../account/shared/account.service';
 import { Link } from '../account/shared/userConfig.model';
 import { User } from '../account/shared/user.model';
@@ -17,6 +16,7 @@ import { SchoolService } from '../school/shared/school.service';
 import { ControlSheet } from '../shared/domain/control-sheet';
 import { LogbookExportService } from '../shared/services/logbook-export.service';
 import { SessionService } from '../shared/services/session.service';
+import { VersionService } from '../shared/services/version.service';
 import { AvatarButtonComponent } from 'src/app/shared/components/avatar-button/avatar-button.component';
 
 const DABS_URLS = {
@@ -58,7 +58,7 @@ export class MorePage implements OnDestroy {
     private alertController = inject(AlertController);
     private translate = inject(TranslateService);
 
-    public appVersion = environment.appVersion;
+    public version = inject(VersionService).version;
 
     public schools = this.schoolService.schoolsSignal;
 
