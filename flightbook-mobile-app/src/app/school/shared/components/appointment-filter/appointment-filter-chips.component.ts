@@ -22,22 +22,7 @@ type Chip = { label: string; clear: () => void };
     selector: 'fb-appointment-filter-chips',
     standalone: true,
     imports: [TranslateModule, IonIcon],
-    template: `
-        @if (chips().length > 0) {
-            <div class="fb-chip-row filter-summary">
-                @for (chip of chips(); track chip.label) {
-                    <button type="button" class="fb-chip fb-chip--removable"
-                            (click)="chip.clear(); changed.emit()">
-                        {{ chip.label }}
-                        <ion-icon name="close" aria-hidden="true"></ion-icon>
-                    </button>
-                }
-                <button type="button" class="filter-summary__clear" (click)="clearAll()">
-                    {{ 'filter.clearAll' | translate }}
-                </button>
-            </div>
-        }
-    `
+    templateUrl: './appointment-filter-chips.component.html'
 })
 export class AppointmentFilterChipsComponent {
     private schoolService = inject(SchoolService);

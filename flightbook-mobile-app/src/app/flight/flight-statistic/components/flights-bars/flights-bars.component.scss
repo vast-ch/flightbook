@@ -15,6 +15,14 @@
 .chart {
     overflow-x: auto;
     overflow-y: hidden;
+    /*
+     * Opens at the newest season rather than the oldest. `rtl` anchors a scroll
+     * box to its right edge, and re-anchors it when the data or the viewport
+     * changes - a scrollLeft written from TypeScript would have to be redone on
+     * every one of those. The rows below flip back to `ltr` so the columns keep
+     * running oldest-to-newest.
+     */
+    direction: rtl;
     // A horizontal swipe here must not turn into a page or tab gesture.
     overscroll-behavior-x: contain;
     // Hidden to match .period__scroll, the page's other horizontal scroller.
@@ -27,6 +35,8 @@
 
 .bars {
     display: flex;
+    // Undoes the scroll box's `rtl`; only that box is meant to be flipped.
+    direction: ltr;
     align-items: flex-end;
     gap: 4px;
     height: 96px;
@@ -88,6 +98,7 @@
 
 .labels {
     display: flex;
+    direction: ltr;
     gap: 4px;
     margin-top: 7px;
     // Sized exactly as .bars, or the two rows would scroll out of step.

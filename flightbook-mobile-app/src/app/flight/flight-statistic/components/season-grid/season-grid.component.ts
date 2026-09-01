@@ -10,30 +10,7 @@ import { SeasonRow } from '../../shared/statistic.store';
 @Component({
     selector: 'fb-season-grid',
     standalone: true,
-    template: `
-        <div class="grid">
-            <div class="grid__years">
-                @for (row of rows(); track row.year) {
-                    <div class="grid__year">{{ row.year }}</div>
-                }
-            </div>
-
-            <div class="grid__body">
-                @for (row of rows(); track row.year) {
-                    <div class="grid__row">
-                        @for (level of row.cells; track $index) {
-                            <div class="grid__cell" [attr.data-level]="level"></div>
-                        }
-                    </div>
-                }
-                <div class="grid__months">
-                    @for (initial of months; track $index) {
-                        <div class="grid__month">{{ initial }}</div>
-                    }
-                </div>
-            </div>
-        </div>
-    `,
+    templateUrl: './season-grid.component.html',
     styleUrls: ['./season-grid.component.scss']
 })
 export class SeasonGridComponent {

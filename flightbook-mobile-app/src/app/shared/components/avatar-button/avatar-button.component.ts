@@ -14,12 +14,7 @@ import { AccountService } from 'src/app/account/shared/account.service';
     selector: 'fb-avatar-button',
     standalone: true,
     imports: [TranslateModule],
-    template: `
-        <button class="fb-avatar-button" type="button" (click)="openAccount()"
-                [attr.aria-label]="'buttons.accountData' | translate">
-            {{ initials() }}
-        </button>
-    `,
+    templateUrl: './avatar-button.component.html',
     styles: [':host { display: contents; }']
 })
 export class AvatarButtonComponent {
