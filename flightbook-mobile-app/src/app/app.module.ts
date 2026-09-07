@@ -10,8 +10,6 @@ import { IonicRouteStrategy, provideIonicAngular, IonApp, IonRouterOutlet, isPla
 import { AppComponent } from './app.component';
 import { LoadingScreenComponent } from './shared/components/loading-screen/loading-screen.component';
 import { AppRoutingModule } from './app-routing.module';
-import { ServiceWorkerModule } from '@angular/service-worker';
-import { environment } from '../environments/environment';
 import { SharedModule } from './shared/shared.module';
 
 import { HttpAuthInterceptor } from './shared/interceptor/auth.interceptor';
@@ -57,7 +55,6 @@ function getIonicConfig() {
         }),
         SharedModule,
         AppRoutingModule,
-        ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
         IonApp,
         IonRouterOutlet,
         LoadingScreenComponent

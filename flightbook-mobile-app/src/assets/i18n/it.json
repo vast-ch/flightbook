@@ -302,7 +302,6 @@
         "watingList": "È già pieno. Siete in lista d'attesa.",
         "deadlinePassed": "Il termine d'iscrizione è passato.",
         "notificationRegistrationFailed": "L'app non è riuscita a registrarsi per le notifiche push. Provate a chiudere l'app e a riaprirla.",
-        "newVersion": "La nuova versione dell'app verrà caricata",
         "cancelPymentSubscription": "È sicuro di voler annullare l'abbonamento?",
         "uploadError": "Si è verificato un errore durante l'importazione. Il team di Flightbook è stato informato e vi contatterà via e-mail il prima possibile.",
         "accountVerificationSuccess": "Il tuo account è stato convalidato con successo.",

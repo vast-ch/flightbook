@@ -302,7 +302,6 @@
         "watingList": "Es ist bereits ausgebucht. Du stehst auf der Warteliste.",
         "deadlinePassed": "An / Abmeldefrist ist abgelaufen.",
         "notificationRegistrationFailed": "Die Applikation konnte sich nicht für die Push Notifikationen registrieren. Versuchen sie die Applikation zu schliessen und nochmals zu öffnen.",
-        "newVersion": "Die neue Version der App wird geladen",
         "cancelPymentSubscription": "Sind Sie sicher, dass Sie Ihr Abonnement kündigen möchten?",
         "uploadError": "Beim Import ist ein Fehler aufgetreten. Das Flightbook Team wurde informiert und wird sich so schnell wie möglich bei ihnen per E-Mail melden.",
         "accountVerificationSuccess": "Ihr Konto wurde erfolgreich validiert.",

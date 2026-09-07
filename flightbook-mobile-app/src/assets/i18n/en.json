@@ -302,7 +302,6 @@
         "watingList": "It's already full. You are on the waiting list.",
         "deadlinePassed": "The registration / cancellation deadline has passed.",
         "notificationRegistrationFailed": "The app could not register for push notifications. Try closing the app and opening it again.",
-        "newVersion": "The new version of the app will be loaded",
         "cancelPymentSubscription": "Are you sure you want to cancel your subscription?",
         "uploadError": "An error has occurred during import. The Flightbook team has been informed and will get back to you by email as soon as possible.",
         "accountVerificationSuccess": "Your account has been successfully validated.",

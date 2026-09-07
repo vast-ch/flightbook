@@ -2,8 +2,7 @@ import { Component, OnDestroy, OnInit, signal } from '@angular/core';
 
 import { AlertController, IonicSafeString } from '@ionic/angular/standalone';
 import { TranslateService } from '@ngx-translate/core';
-import { filter, takeUntil } from 'rxjs/operators';
-import { SwUpdate, VersionReadyEvent } from '@angular/service-worker';
+import { takeUntil } from 'rxjs/operators';
 import { AccountService } from './account/shared/account.service';
 import { SchoolService } from './school/shared/school.service';
 import { SessionService } from './shared/services/session.service';
@@ -53,7 +52,6 @@ export class AppComponent implements OnDestroy, OnInit {
         private router: Router,
         private translate: TranslateService,
         private accountService: AccountService,
-        private swUpdate: SwUpdate,
         private schoolService: SchoolService,
         private alertController: AlertController,
         private paymentService: PaymentService,
@@ -88,27 +86,6 @@ export class AppComponent implements OnDestroy, OnInit {
         } catch (e) {
             // StatusBar not available or not supported
             console.warn('StatusBar plugin not available:', e);
-        }
-
-        if (this.swUpdate.isEnabled) {
-            this.swUpdate.versionUpdates
-                .pipe(filter((evt): evt is VersionReadyEvent => evt.type === 'VERSION_READY'))
-                .subscribe(async evt => {
-                    const alert = await this.alertController.create({
-                        header: this.translate.instant('message.infotitle'),
-                        message: this.translate.instant('message.newVersion'),
-                        backdropDismiss: false,
-                        buttons: [
-                            {
-                                text: this.translate.instant('buttons.done'),
-                                handler: () => {
-                                    document.location.reload();
-                                }
-                            }
-                        ]
-                    });
-                    await alert.present();
-                });
         }
     }
 
