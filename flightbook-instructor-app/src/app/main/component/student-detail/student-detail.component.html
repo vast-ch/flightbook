@@ -1,70 +1,137 @@
 @if (student) {
-  <div class='data'>
-    @if (isMobile()) {
-      <button class="menu-button" mat-mini-fab color="primary" (click)=backButton()>
-        <mat-icon>arrow_back</mat-icon>
-      </button>
-    }
-    <h2>{{ student.user?.firstname }} {{ student.user?.lastname }}
-      <div class="icon-list ">
+  <div class="fb-detail-pane">
+    <header class="fb-detail-header">
+      @if (isMobile()) {
+        <button type="button" mat-icon-button class="fb-detail-header__back" [attr.aria-label]="'student.backToList' | translate" (click)="backButton()">
+          <mat-icon>arrow_back</mat-icon>
+        </button>
+      }
+      <div class="fb-detail-header__title">
+        <div class="fb-detail-header__eyebrow">
+          <span class="fb-detail-header__role">{{ 'student.roleLabel' | translate }}</span>
+          @if (isExamReady()) {
+            <span class="fb-badge-success">{{ 'student.examReady' | translate }}</span>
+          }
+        </div>
+        <h1>{{ student.user?.firstname }} {{ student.user?.lastname }}</h1>
+      </div>
+      <div class="fb-detail-header__toggles">
         @if (student.isArchived) {
           <mat-slide-toggle class="isAppointmentActive" color="primary" (change)="changeStudentIsAppointmentActive($event)" [checked]="student.isAppointmentActive" labelPosition="before">{{ 'student.isAppointmentActive'| translate }}</mat-slide-toggle>
         }
         <mat-slide-toggle class="tandem" color="primary" (change)="changeStudentIsTandem($event)" [disabled]="student.isArchived" [checked]="student.isTandem" labelPosition="before">{{ 'student.tandem'| translate }}</mat-slide-toggle>
-        <mat-icon class="print-flights" (click)="printFlightbook()">print</mat-icon>
-        @if (!student.isArchived) {
-          <mat-icon color="warn" class="archive-student" (click)="archiveStudent()">archive</mat-icon>
+      </div>
+      <button type="button" mat-icon-button class="fb-detail-header__action" [attr.aria-label]="'student.printFlightbook' | translate" (click)="printFlightbook()">
+        <mat-icon>print</mat-icon>
+      </button>
+      @if (!student.isArchived) {
+        <button type="button" mat-icon-button color="warn" class="fb-detail-header__action fb-detail-header__action--danger" [attr.aria-label]="'student.archiveStudent' | translate" (click)="archiveStudent()">
+          <mat-icon>archive</mat-icon>
+        </button>
+      }
+    </header>
+
+    <div class="fb-period-bar">
+      <span class="fb-period-bar__label">{{ 'student.period.label' | translate }}</span>
+      <div class="fb-period-segments">
+        <!-- Single static period until the API exposes real period filtering (see CONTRACT
+             "Period segmented control: OMIT"). Inert markup on purpose - not a <button>/tab,
+             so it doesn't announce an interactive contract it doesn't honour. Shaped so a
+             future @for over real periods drops in without restructuring. -->
+        <span class="fb-period-segment fb-period-segment--active">{{ 'student.period.total' | translate }}</span>
+      </div>
+    </div>
+
+    @if (student.statistic) {
+      <div class="fb-stats-strip">
+        <div class="fb-stat-tile">
+          <div class="fb-stat-tile__value">{{ student.statistic.nbFlights || 0 }}</div>
+          <div class="fb-stat-tile__label">{{ 'student.amountofflights'| translate }}</div>
+        </div>
+        <div class="fb-stat-tile">
+          <div class="fb-stat-tile__value">{{ student.statistic.time || 0 | hoursFormat }}</div>
+          <div class="fb-stat-tile__label">{{ 'student.flighthour'| translate }}</div>
+        </div>
+        <div class="fb-stat-tile">
+          <div class="fb-stat-tile__value">{{ student.statistic.average || 0 | hoursFormat }}</div>
+          <div class="fb-stat-tile__label">{{ 'student.average'| translate }}</div>
+        </div>
+        <div class="fb-stat-tile">
+          <div class="fb-stat-tile__value">{{ student.statistic.nbStartplaces || 0 }}</div>
+          <div class="fb-stat-tile__label">{{ 'student.nbStartplaces' | translate }}</div>
+        </div>
+        <div class="fb-stat-tile">
+          <div class="fb-stat-tile__value">{{ student.statistic.nbLandingplaces || 0 }}</div>
+          <div class="fb-stat-tile__label">{{ 'student.nbLandingplaces' | translate }}</div>
+        </div>
+        <div class="fb-stat-tile">
+          <div class="fb-stat-tile__value">{{ student.statistic.nbFlightsAlone || 0 }}</div>
+          <div class="fb-stat-tile__label">{{ 'student.nbFlightsAlone' | translate }}</div>
+        </div>
+      </div>
+    }
+
+    <mat-card appearance="outlined" class="fb-card fb-card--level">
+      <div class="fb-card__header">
+        <h2 class="fb-card__title">{{ 'controlSheet.level.title'| translate }}</h2>
+        <span class="fb-card__header-summary">{{ 'controlSheet.level.summary' | translate: { count: levelRatedCount(), total: 3 } }}</span>
+      </div>
+      <fb-level [level]="student.controlSheet?.level" (saveLevelEvent)="saveControlSheet(student.controlSheet)"></fb-level>
+    </mat-card>
+
+    <div class="fb-cards-grid">
+      @if ((student.isArchived && student.controlSheet) || !student.isArchived) {
+        <mat-card appearance="outlined" class="fb-card fb-card--controlsheet">
+          <div class="fb-card__header">
+            <h2 class="fb-card__title">{{ 'controlSheet.title'| translate }}</h2>
+          </div>
+          <fb-control-sheet section="ratings" [controlSheet]="student.controlSheet" (saveControlSheetEvent)="saveControlSheet($event)"></fb-control-sheet>
+          @if (student.controlSheet) {
+            <div class="fb-card__footer">
+              <span class="fb-card__footer-title">{{ 'controlSheet.exam.title' | translate }}</span>
+              <fb-control-sheet section="exams" [controlSheet]="student.controlSheet" (saveControlSheetEvent)="saveControlSheet($event)"></fb-control-sheet>
+            </div>
+          }
+        </mat-card>
+      }
+
+      <mat-card appearance="outlined" class="fb-card fb-card--notes">
+        <div class="fb-card__header">
+          <h2 class="fb-card__title">{{ 'studentNote.title'| translate }}</h2>
+          @if (!student.isArchived) {
+            <button type="button" class="fb-card__header-action" (click)="notesComponent.addNote()">{{ 'studentNote.addNote'| translate }}</button>
+          }
+        </div>
+        <fb-student-note #notesComponent [student]="student"></fb-student-note>
+      </mat-card>
+    </div>
+
+    <mat-card appearance="outlined" class="fb-card fb-card--flights">
+      <div class="fb-card__header">
+        <h2 class="fb-card__title">{{ 'student.flights'| translate }}</h2>
+        @if (school?.configuration?.schoolModule?.validateFlights) {
+          <button type="button" class="fb-validate-all-button" [matTooltip]="'student.flight.validateAll'| translate" (click)="validateAllFlights()">
+            <mat-icon>done_all</mat-icon>{{ 'student.flight.validateAllAction' | translate }}
+          </button>
         }
       </div>
-    </h2>
-    <mat-expansion-panel class='card' hideToggle expanded>
-      <mat-expansion-panel-header>
-        <mat-panel-title><h3>{{ 'student.information'| translate }}</h3></mat-panel-title>
-      </mat-expansion-panel-header>
-      @if (student.statistic) {
-        <div class="basic-stat">
-          <div><label>{{ 'student.lastflight'| translate }}:</label><span>{{ student.lastFlight?.date | date:'dd.MM.yyyy' }}</span></div>
-          <div><label>{{ 'student.flight.glider'| translate }}:</label><span>{{ student.lastFlight?.glider?.brand }} {{ student.lastFlight?.glider?.name }}</span></div>
-          <div><label>{{ 'student.amountofflights'| translate }}:</label><span id="nbFlights">{{ student.statistic.nbFlights || "0" }}</span></div>
-          <div><label>{{ 'student.nbStartplaces' | translate }}:</label><span id="nbStartplaces">{{ student.statistic.nbStartplaces || "0" }}</span></div>
-          <div><label>{{ 'student.nbLandingplaces' | translate }}:</label><span id="nbLandingplaces">{{ student.statistic.nbLandingplaces || "0" }}</span></div>
-          <div><label>{{ 'student.nbFlightsAlone' | translate }}:</label><span id="nbFlightsAlone">{{ student.statistic.nbFlightsAlone || "0" }}</span></div>
-          <div><label>{{ 'student.flighthour'| translate }}:</label><span>{{ student.statistic.time || "0" | hoursFormat }}</span></div>
-          <div><label>{{ 'student.average'| translate }}:</label><span>{{ student.statistic.average || "0" | hoursFormat }}</span></div>
-        </div>
-      }
-    </mat-expansion-panel>
-    <mat-expansion-panel class='card level' expanded>
-      <mat-expansion-panel-header>
-        <mat-panel-title><h3>{{ 'controlSheet.level.title'| translate }}</h3></mat-panel-title>
-      </mat-expansion-panel-header>
-      <fb-level [level]="student.controlSheet?.level" (saveLevelEvent)="saveControlSheet(student.controlSheet)"></fb-level>
-    </mat-expansion-panel>
-    <mat-expansion-panel class='card'>
-      <mat-expansion-panel-header>
-        <mat-panel-title><h3>{{ 'studentNote.title'| translate }}</h3></mat-panel-title>
-      </mat-expansion-panel-header>
-      <fb-student-note [student]="student"></fb-student-note>
-    </mat-expansion-panel>
-    @if ((student.isArchived && student.controlSheet) || !student.isArchived) {
-      <mat-expansion-panel class='card'>
-        <mat-expansion-panel-header>
-          <mat-panel-title><h3>{{ 'controlSheet.title'| translate }}</h3></mat-panel-title>
-        </mat-expansion-panel-header>
-        <fb-control-sheet [controlSheet]="student.controlSheet" (saveControlSheetEvent)="saveControlSheet($event)"></fb-control-sheet>
-      </mat-expansion-panel>
-    }
-    <mat-expansion-panel class='card'>
-      <mat-expansion-panel-header>
-        <mat-panel-title><h3>{{ 'student.flights'| translate }}</h3></mat-panel-title>
-        @if (school?.configuration?.schoolModule?.validateFlights) {
-          <mat-panel-description>
-            <button [matTooltip]="'student.flight.validateAll'| translate" class="validate-all-button" mat-icon-button (click)="validateAllFlights(); $event.stopPropagation()"><mat-icon>check</mat-icon></button>
-          </mat-panel-description>
-        }
-      </mat-expansion-panel-header>
-      <div class="table-container">
-        <table #table mat-table [dataSource]="flights">
+      <div class="fb-table-scroll">
+        <table #table mat-table [dataSource]="flights" [multiTemplateDataRows]="true">
+          <!-- Validation actions column (leftmost, per mockup) -->
+          @if (school?.configuration?.schoolModule?.validateFlights) {
+            <ng-container matColumnDef="validationButton">
+              <th class="validation-actions" mat-header-cell *matHeaderCellDef></th>
+              <td class="validation-actions" mat-cell *matCellDef="let element">
+                @if (!(showRejectCommentBox && flightToReject === element)) {
+                  <div class="fb-flight-actions">
+                    <button type="button" mat-icon-button class="fb-flight-action fb-flight-action--validate" [attr.aria-label]="'student.flight.validate' | translate" (click)="validateFlight(element)"><mat-icon>check</mat-icon></button>
+                    <button type="button" mat-icon-button class="fb-flight-action fb-flight-action--reject" [attr.aria-label]="'student.flight.reject' | translate" (click)="rejectFlight(element)"><mat-icon>close</mat-icon></button>
+                  </div>
+                }
+              </td>
+            </ng-container>
+          }
+
           <!-- Number Column -->
           <ng-container matColumnDef="nb">
             <th mat-header-cell *matHeaderCellDef>{{ 'student.flight.number'| translate }}</th>
@@ -97,14 +164,14 @@
 
           <!-- Time Column -->
           <ng-container matColumnDef="time">
-            <th mat-header-cell *matHeaderCellDef>{{ 'student.flight.time'| translate }}</th>
-            <td mat-cell *matCellDef="let element"> {{element.time?.split(':').slice(0, 2).join(':')}} </td>
+            <th class="numeric" mat-header-cell *matHeaderCellDef>{{ 'student.flight.time'| translate }}</th>
+            <td class="numeric" mat-cell *matCellDef="let element"> {{element.time?.split(':').slice(0, 2).join(':')}} </td>
           </ng-container>
 
           <!-- Km Column -->
           <ng-container matColumnDef="km">
-            <th mat-header-cell *matHeaderCellDef>{{ 'student.flight.km'| translate }}</th>
-            <td mat-cell *matCellDef="let element"> {{element.km}} </td>
+            <th class="numeric" mat-header-cell *matHeaderCellDef>{{ 'student.flight.km'| translate }}</th>
+            <td class="numeric" mat-cell *matCellDef="let element"> {{element.km}} </td>
           </ng-container>
 
           <!-- Description Column -->
@@ -130,7 +197,7 @@
             <th class="alone" mat-header-cell *matHeaderCellDef>{{ 'student.flight.alone'| translate }}</th>
             <td class="alone" mat-cell *matCellDef="let element"><mat-slide-toggle [(ngModel)]="element.shvAlone" color="primary" (change)="changeAloneValue(element)"></mat-slide-toggle></td>
           </ng-container>
-          
+
           <!-- Validation Column -->
           @if (school?.configuration?.schoolModule?.validateFlights) {
             <ng-container matColumnDef="validationState">
@@ -147,64 +214,66 @@
               </td>
             </ng-container>
           }
-          @if (school?.configuration?.schoolModule?.validateFlights) {
-            <ng-container matColumnDef="validationButton">
-              <th class="validation-actions" mat-header-cell *matHeaderCellDef>{{ 'student.flight.validationActions'| translate }}</th>
-              <td class="validation-actions" mat-cell *matCellDef="let element">
-                @if (!(showRejectCommentBox && flightToReject === element)) {
-                  <button mat-icon-button (click)="validateFlight(element)"><mat-icon>check</mat-icon></button>
-                  <button mat-icon-button (click)="rejectFlight(element)"><mat-icon>close</mat-icon></button>
-                }
-                <!-- Reject Comment Modal: only show if flightToReject is this element -->
-                @if (showRejectCommentBox && flightToReject === element) {
-                  <div class="modal-overlay">
-                    <div class="modal-box">
-                      <textarea [(ngModel)]="rejectComment" rows="4" placeholder="{{ 'student.flight.validationState.comment' | translate }}"></textarea>
-                      <div class="modal-actions">
-                        <button mat-raised-button color="primary" (click)="submitRejectComment()">{{ 'buttons.done' | translate }}</button>
-                        <button mat-button (click)="closeRejectCommentBox()">{{ 'buttons.cancel' | translate }}</button>
-                      </div>
-                    </div>
-                  </div>
-                }
-              </td>
-            </ng-container>
-          }
+
+          <!-- Reject reason row (own full-width row, not squeezed into a data cell) -->
+          <ng-container matColumnDef="rejectRow">
+            <td mat-cell *matCellDef="let element" class="fb-reject-row" [attr.colspan]="displayedColumns.length">
+              <div class="fb-reject-box">
+                <span class="fb-reject-box__title" id="fb-reject-box-title">{{ 'student.flight.rejectReason' | translate }}</span>
+                <textarea class="fb-reject-box__textarea" aria-labelledby="fb-reject-box-title" [(ngModel)]="rejectComment" rows="2" placeholder="{{ 'student.flight.rejectPlaceholder' | translate }}"></textarea>
+                <div class="fb-reject-box__actions">
+                  <span class="fb-reject-box__hint">{{ 'student.flight.rejectHint' | translate }}</span>
+                  <button type="button" class="fb-reject-btn fb-reject-btn--cancel" (click)="closeRejectCommentBox()">{{ 'buttons.cancel' | translate }}</button>
+                  <button type="button" class="fb-reject-btn fb-reject-btn--confirm" (click)="submitRejectComment()">{{ 'student.flight.rejectConfirm' | translate }}</button>
+                </div>
+              </div>
+            </td>
+          </ng-container>
+
           <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
           <tr mat-row *matRowDef="let row; columns: displayedColumns;"
           [ngClass]="{'not-validated-row': school?.configuration?.schoolModule?.validateFlights && !isFlightValidated(row)}"></tr>
+          <tr mat-row *matRowDef="let row; columns: ['rejectRow']; when: isRejectRow"></tr>
         </table>
+        @if (flights.length === 0) {
+          <div class="fb-empty-state">
+            <mat-icon>list_alt</mat-icon>
+            <span>{{ 'student.flight.noData' | translate }}</span>
+          </div>
+        }
       </div>
       <mat-paginator #paginator [length]="flightPagerEntity.totalItems" [pageSize]="flightPagerEntity.itemsPerPage"
         [pageSizeOptions]="[20, 50]" (page)="handleFlightPage($event)">
       </mat-paginator>
-    </mat-expansion-panel>
-    <mat-expansion-panel class='card'>
-      <mat-expansion-panel-header>
-        <mat-panel-title><h3>{{ 'emergencyContact.title'| translate }}</h3></mat-panel-title>
-      </mat-expansion-panel-header>
+    </mat-card>
+
+    <mat-card appearance="outlined" class="fb-card fb-card--emergency">
+      <div class="fb-card__header">
+        <h2 class="fb-card__title">{{ 'emergencyContact.title'| translate }}</h2>
+        <span class="fb-card__header-note"><mat-icon>lock</mat-icon>{{ 'emergencyContact.providedByStudent' | translate }}</span>
+      </div>
       @if (emergencyContact) {
-        <div class="emergency-contact-details">
-          <div>
-            <label>{{ 'emergencyContact.firstname' | translate }}:</label>
-            <span>{{ emergencyContact.firstname || '-' }}</span>
+        <div class="fb-emergency-grid">
+          <div class="fb-emergency-item">
+            <span class="fb-emergency-item__label">{{ 'emergencyContact.firstname' | translate }}</span>
+            <span class="fb-emergency-item__value">{{ emergencyContact.firstname || '-' }}</span>
           </div>
-          <div>
-            <label>{{ 'emergencyContact.lastname' | translate }}:</label>
-            <span>{{ emergencyContact.lastname || '-' }}</span>
+          <div class="fb-emergency-item">
+            <span class="fb-emergency-item__label">{{ 'emergencyContact.lastname' | translate }}</span>
+            <span class="fb-emergency-item__value">{{ emergencyContact.lastname || '-' }}</span>
           </div>
-          <div>
-            <label>{{ 'emergencyContact.phone' | translate }}:</label>
-            <span>{{ emergencyContact.phone || '-' }}</span>
+          <div class="fb-emergency-item">
+            <span class="fb-emergency-item__label">{{ 'emergencyContact.phone' | translate }}</span>
+            <span class="fb-emergency-item__value">{{ emergencyContact.phone || '-' }}</span>
           </div>
-          <div>
-            <label>{{ 'emergencyContact.additionalInformation' | translate }}:</label>
-            <span>{{ emergencyContact.additionalInformation || '-' }}</span>
+          <div class="fb-emergency-item">
+            <span class="fb-emergency-item__label">{{ 'emergencyContact.additionalInformation' | translate }}</span>
+            <span class="fb-emergency-item__value">{{ emergencyContact.additionalInformation || '-' }}</span>
           </div>
         </div>
       }
-    </mat-expansion-panel>
+    </mat-card>
   </div>
 } @else {
-  <p class="no-student-selcted">{{ 'student.noStudentSelected'| translate }}</p>
+  <p class="fb-no-student">{{ 'student.noStudentSelected'| translate }}</p>
 }

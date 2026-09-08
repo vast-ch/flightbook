@@ -1,9 +1,198 @@
+// App shell header - see CONTRACT.md "SCOPE EXPANSION (round 2)".
+// The `.mat-toolbar.mat-primary` rule in `_m2-compat.scss` no longer applies here because
+// `color="primary"` was removed from the `<mat-toolbar>` in main.component.html - the M3
+// theme's default toolbar surface (`--mat-sys-surface`, white) plus this file supply the
+// mockup's white header instead.
+mat-toolbar.fb-toolbar {
+  padding: 0 20px;
+  height: 64px;
+  gap: 14px;
+  border-bottom: 1px solid var(--fb-border-subtle);
+}
+
+.fb-toolbar__menu-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 36px;
+  height: 36px;
+  margin-left: -6px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--fb-radius-md);
+  background: transparent;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--fb-bg);
+  }
+}
+
+.fb-toolbar__menu-icon {
+  font-size: 22px;
+  width: 22px;
+  height: 22px;
+  line-height: 22px;
+  color: var(--fb-text-2);
+}
+
+.fb-toolbar__brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  flex: none;
+}
+
+.fb-toolbar__logo {
+  display: block;
+  flex: none;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--fb-radius-md);
+}
+
+.fb-toolbar__wordmark {
+  flex: none;
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  color: var(--fb-ink);
+}
+
+.fb-toolbar__nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: none;
+  margin-left: 14px;
+}
+
+.fb-toolbar__nav-link {
+  display: inline-flex;
+  align-items: center;
+  height: 34px;
+  padding: 0 13px;
+  flex: none;
+  white-space: nowrap;
+  border-radius: var(--fb-radius-pill);
+  background: transparent;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--fb-text-2);
+  cursor: pointer;
+
+  &:hover {
+    background: var(--fb-bg);
+  }
+
+  &.fb-toolbar__nav-link--active {
+    background: var(--fb-nav-active-bg);
+    font-weight: 600;
+    color: var(--fb-primary);
+  }
+}
+
+.fb-toolbar__school {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: none;
+  height: 36px;
+  padding: 0 12px;
+  border: 1px solid var(--fb-border-subtle);
+  border-radius: var(--fb-radius-md);
+  background: var(--fb-surface);
+  font-family: inherit;
+  font-size: var(--fb-text-base);
+  font-weight: 500;
+  color: var(--fb-text-2);
+  cursor: pointer;
+
+  &:hover {
+    background: var(--fb-fill-subtle);
+  }
+}
+
+.fb-toolbar__school-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 220px;
+}
+
+.fb-toolbar__school-icon {
+  font-size: 17px;
+  width: 17px;
+  height: 17px;
+  line-height: 17px;
+  color: var(--fb-text-4);
+}
+
+.fb-toolbar__school-caret {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+  line-height: 16px;
+  color: var(--fb-text-4);
+}
+
+.fb-toolbar__icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid var(--fb-border-subtle);
+  border-radius: var(--fb-radius-md);
+  background: var(--fb-surface);
+  cursor: pointer;
+
+  &:hover {
+    background: var(--fb-fill-subtle);
+  }
+}
+
+.fb-toolbar__icon-btn-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  line-height: 18px;
+  color: var(--fb-text-2);
+}
+
+.fb-toolbar__account {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid var(--fb-border-subtle);
+  border-radius: 50%;
+  background: transparent;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--fb-text-3);
+  cursor: pointer;
+
+  &:hover {
+    background: var(--fb-bg);
+  }
+}
+
 .menu-spacer {
     flex: 1 1 auto;
 }
 
 .toolbar-link {
-    margin-left: 20px;
+    margin-left: 0;
     display: block;
 }
 

@@ -1,46 +1,58 @@
-<mat-toolbar color="primary">
+<mat-toolbar class="fb-toolbar">
   <div class="responsive-menu">
-    <button mat-icon-button (click)="menuSidenav.toggle()">
-      <mat-icon>menu</mat-icon>
+    <button type="button" class="fb-toolbar__menu-btn" [attr.aria-label]="'menu.openMenu' | translate" (click)="menuSidenav.toggle()">
+      <mat-icon class="fb-toolbar__menu-icon">menu</mat-icon>
     </button>
   </div>
-  <span>{{ 'title'| translate }}</span>
-  <div class="toolbar-link" fxShow="true" fxHide.lt-md="true">
-    <a mat-button [routerLink]="'/students'">{{ 'menu.students'| translate }}</a>
-    <a mat-button [routerLink]="'/appointments'">{{ 'menu.appointments'| translate }}</a>
+
+  <div class="fb-toolbar__brand">
+    <img src="assets/icon/logo.png" alt="Flightbook" class="fb-toolbar__logo" />
+    <span class="fb-toolbar__wordmark">Flightbook</span>
+  </div>
+
+  <nav class="toolbar-link fb-toolbar__nav">
+    <a class="fb-toolbar__nav-link" routerLinkActive="fb-toolbar__nav-link--active" [routerLink]="'/students'">{{ 'menu.students'| translate }}</a>
+    <a class="fb-toolbar__nav-link" routerLinkActive="fb-toolbar__nav-link--active" [routerLink]="'/appointments'">{{ 'menu.appointments'| translate }}</a>
     @if(selectedSchool?.configuration?.tandemModule?.active) {
-      <a mat-button [routerLink]="'/tandem-pilots'">{{ 'menu.tandemPilots'| translate }}</a>
+      <a class="fb-toolbar__nav-link" routerLinkActive="fb-toolbar__nav-link--active" [routerLink]="'/tandem-pilots'">{{ 'menu.tandemPilots'| translate }}</a>
     }
-    <a mat-button [routerLink]="'/configuration'">{{ 'menu.configuration'| translate }}</a>
-  </div>
+    <a class="fb-toolbar__nav-link" routerLinkActive="fb-toolbar__nav-link--active" [routerLink]="'/configuration'">{{ 'menu.configuration'| translate }}</a>
+  </nav>
+
   <span class="menu-spacer"></span>
-  <span>
-    <button mat-icon-button [matMenuTriggerFor]="menu">
-      <mat-icon>account_circle</mat-icon>
-    </button>
-    <mat-menu #menu="matMenu" [overlapTrigger]="false">
-      <button (click)="openExportDialog()" mat-menu-item>
-        <mat-icon>file_download</mat-icon>
-        <span>{{ 'buttons.export'| translate }}</span>
-      </button>
-      <button (click)="openPasswordDialog()" mat-menu-item>
-        <mat-icon>lock</mat-icon>
-        <span>{{ 'buttons.change_password'| translate }}</span>
-      </button>
-      <button (click)=logout() mat-menu-item>
-        <mat-icon>exit_to_app</mat-icon>
-        <span>{{ 'buttons.logout'| translate }}</span>
-      </button>
-      @for (school of schools; track school) {
-        @if (school.id != selectedSchool?.id) {
-          <button (click)=switchSchool(school) mat-menu-item>
-            <!-- <mat-icon>exit_to_app</mat-icon> -->
-            <span>{{ school.name }}</span>
-          </button>
-        }
+
+  <button type="button" class="fb-toolbar__school" [matMenuTriggerFor]="schoolMenu">
+    <mat-icon class="fb-toolbar__school-icon">school</mat-icon>
+    <span class="fb-toolbar__school-name">{{ selectedSchool?.name }}</span>
+    <mat-icon class="fb-toolbar__school-caret">expand_more</mat-icon>
+  </button>
+  <mat-menu #schoolMenu="matMenu" [overlapTrigger]="false">
+    @for (school of schools; track school) {
+      @if (school.id != selectedSchool?.id) {
+        <button (click)="switchSchool(school)" mat-menu-item>
+          <span>{{ school.name }}</span>
+        </button>
       }
-    </mat-menu>
-  </span>
+    }
+  </mat-menu>
+
+  <button type="button" class="fb-toolbar__icon-btn" [title]="'buttons.export' | translate" [attr.aria-label]="'buttons.export' | translate" (click)="openExportDialog()">
+    <mat-icon class="fb-toolbar__icon-btn-icon">download</mat-icon>
+  </button>
+
+  <button type="button" class="fb-toolbar__account" [matMenuTriggerFor]="accountMenu" [title]="'account.title' | translate" [attr.aria-label]="'account.title' | translate">
+    {{ accountInitials }}
+  </button>
+  <mat-menu #accountMenu="matMenu" [overlapTrigger]="false">
+    <button (click)="openPasswordDialog()" mat-menu-item>
+      <mat-icon>lock</mat-icon>
+      <span>{{ 'buttons.change_password'| translate }}</span>
+    </button>
+    <button (click)=logout() mat-menu-item>
+      <mat-icon>exit_to_app</mat-icon>
+      <span>{{ 'buttons.logout'| translate }}</span>
+    </button>
+  </mat-menu>
 </mat-toolbar>
 
 <mat-sidenav-container class="menu-sidenav-container">

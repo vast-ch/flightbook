@@ -1,0 +1,97 @@
+// Design tokens for the redesigned student page.
+//
+// Token layer rule (see CONTRACT): if a value has an M3 system role, the --fb-* token is a
+// var() alias of the corresponding --mat-sys-* variable, never a literal. Literals are used
+// only for values M3 has no role for (extra greys, the success triple, custom radii, the
+// dense type scale, spacing, sizes).
+:root {
+  // ---- Colors with an M3 role: aliases only -------------------------------------------
+  --fb-primary: var(--mat-sys-primary);
+  --fb-on-primary: var(--mat-sys-on-primary);
+  --fb-primary-container: var(--mat-sys-primary-container);
+  --fb-on-primary-container: var(--mat-sys-on-primary-container);
+  --fb-tertiary: var(--mat-sys-tertiary);
+  --fb-bg: var(--mat-sys-background);
+  --fb-ink: var(--mat-sys-on-surface);
+  --fb-surface: var(--mat-sys-surface);
+  --fb-surface-lowest: var(--mat-sys-surface-container-lowest);
+  --fb-fill-subtle: var(--mat-sys-surface-container-low);
+  --fb-surface-container: var(--mat-sys-surface-container);
+  --fb-surface-variant: var(--mat-sys-surface-variant);
+  --fb-text-2: var(--mat-sys-on-surface-variant);
+  --fb-border: var(--mat-sys-outline);
+  --fb-border-subtle: var(--mat-sys-outline-variant);
+  --fb-danger: var(--mat-sys-error);
+  --fb-on-danger: var(--mat-sys-on-error);
+  --fb-danger-bg: var(--mat-sys-error-container);
+  --fb-on-danger-bg: var(--mat-sys-on-error-container);
+
+  // Derived states from the CONTRACT's table, re-using the roles above wherever the hex
+  // matches an existing override (see CONTRACT "Token layer rule").
+  --fb-primary-active: var(--mat-sys-on-primary-container); // #095c99 - pressed primary
+  --fb-surface-active: var(--mat-sys-primary-container); // #e7f0f7 - selected row / pressed surface
+  --fb-focus-ring: var(--mat-sys-tertiary); // #45b1fd
+
+  // ---- Design-only literals: no M3 role exists for these ------------------------------
+  --fb-text-3: #5b7284;
+  --fb-text-4: #6c8394;
+  --fb-icon-muted: #8fa4b3;
+  --fb-primary-hover: #0a5e9b;
+  --fb-primary-tint-hover: #eaf4fd;
+  --fb-track-bg: #e1ecf4;
+  --fb-divider-faint: #f0f6fa;
+  --fb-warn-bg: #fffaf3;
+  --fb-danger-border: #f3c7c1;
+  --fb-danger-hover-bg: #fbe0dc;
+  --fb-danger-active: #a13124;
+  --fb-success-fg: #186340;
+  --fb-success-bg: #f1f9f4;
+  --fb-success-border: #bfe0cc;
+  --fb-success-hover-bg: #e6f4ec;
+  --fb-star: #f5a623;
+  --fb-star-empty: var(--fb-border-subtle);
+  --fb-input-active-border: #9dc9e8; // note/reject textarea border while actively edited
+  --fb-dot-border: #c3ddee; // exam-row status dot border, not-done state
+
+  // Shell (app header/toolbar) - distinct from the selected-row `--fb-surface-active`
+  // (#e7f0f7): the mockup's nav-pill active fill is a lighter, dedicated tint (#e9f6ff)
+  // with no matching M3 role in the theme override.
+  --fb-nav-active-bg: #e9f6ff;
+
+  // Disabled state (color-mix against on-surface, per the CONTRACT's derived-states table)
+  --fb-disabled-fg: color-mix(in srgb, var(--fb-ink) 38%, transparent);
+  --fb-disabled-bg: color-mix(in srgb, var(--fb-ink) 8%, transparent);
+
+  // ---- Radii ---------------------------------------------------------------------------
+  --fb-radius-sm: 7px;
+  --fb-radius-md: 9px;
+  --fb-radius-lg: 12px;
+  --fb-radius-pill: 99px;
+
+  // ---- Spacing scale ---------------------------------------------------------------------
+  --fb-space-1: 4px;
+  --fb-space-2: 6px;
+  --fb-space-3: 8px;
+  --fb-space-4: 10px;
+  --fb-space-5: 12px;
+  --fb-space-6: 14px;
+  --fb-space-6-plus: 15px; // card header vertical padding (in-scope mockup card headers use 15/18, not the 14/18 of the tandem header)
+  --fb-space-7: 16px;
+  --fb-space-8: 18px;
+  --fb-space-9: 24px;
+
+  // ---- Dense type scale (design uses sizes M3's default scale doesn't provide) ---------
+  --fb-text-2xs: 9.5px;
+  --fb-text-xs: 10px;
+  --fb-text-xs-plus: 11px;
+  --fb-text-sm: 11.5px;
+  --fb-text-sm-plus: 12px;
+  --fb-text-base: 12.5px;
+  --fb-text-base-plus: 13px;
+  --fb-text-md: 13.5px;
+  --fb-text-lg: 14px;
+  --fb-text-xl: 17px;
+  --fb-text-2xl: 18px;
+  --fb-text-3xl: 22px;
+  --fb-text-4xl: 26px;
+}

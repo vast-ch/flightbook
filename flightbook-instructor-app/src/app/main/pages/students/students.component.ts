@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewChild, effect } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, QueryList, ViewChild, ViewChildren, effect } from '@angular/core';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { AccountService } from 'src/app/core/services/account.service';
@@ -12,7 +12,6 @@ import { TranslateService } from '@ngx-translate/core';
 import { DeviceSizeService } from 'src/app/core/services/device-size.service';
 import { MatSidenav } from '@angular/material/sidenav';
 import { Subject, takeUntil } from 'rxjs';
-import { MatTabChangeEvent, MatTabGroup } from '@angular/material/tabs';
 
 @Component({
     selector: 'fb-students',
@@ -25,12 +24,13 @@ export class StudentsComponent implements OnInit, OnDestroy {
   selectedStudent: Student | undefined;
   studentList: Student[];
   @ViewChild(MatSidenav) sidenav: MatSidenav | undefined;
-  @ViewChild(MatTabGroup) tabGroup: MatTabGroup | undefined;
+  @ViewChildren('tabButton') tabButtons: QueryList<ElementRef<HTMLButtonElement>> | undefined;
   unsubscribe$ = new Subject<void>();
 
   students: Student[];
   archivedStudents: Student[];
   sortBy: string = 'firstname';
+  selectedTabIndex = 0;
 
   constructor(
     private translate: TranslateService,
@@ -60,7 +60,7 @@ export class StudentsComponent implements OnInit, OnDestroy {
       this.school = school;
       this.selectedStudent = undefined;
       this.studentList = [];
-      if (this.tabGroup?.selectedIndex == 0) {
+      if (this.selectedTabIndex === 0) {
         this.syncStudentList(false);
       } else {
         this.syncStudentList(true);
@@ -71,6 +71,38 @@ export class StudentsComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
+  }
+
+  /** Single source of truth for which list the template iterates over - the Active/Archived
+   *  tablist above shares one tabpanel (.fb-student-list) rather than each tab owning its
+   *  own body. */
+  get displayedStudents(): Student[] {
+    return this.selectedTabIndex === 0 ? this.students : this.archivedStudents;
+  }
+
+  get activeCount(): number {
+    return this.students.length;
+  }
+
+  get archivedCount(): number {
+    return this.archivedStudents.length;
+  }
+
+  initials(student: Student): string {
+    const first = student.user?.firstname?.charAt(0) || '';
+    const last = student.user?.lastname?.charAt(0) || '';
+    return (first + last).toUpperCase();
+  }
+
+  isExamReady(student: Student): boolean {
+    const statistic = student.statistic;
+    return !!(
+      statistic?.nbFlights && statistic.nbFlights > 50 &&
+      statistic?.nbStartplaces && statistic.nbStartplaces >= 5 &&
+      statistic?.nbLandingplaces && statistic.nbLandingplaces >= 5 &&
+      statistic?.nbFlightsAlone && statistic.nbFlightsAlone >= 1 &&
+      student.controlSheet?.passTheoryExam
+    );
   }
 
   syncStudentList(archived: boolean, onlyChangeStatistics: boolean = false) {
@@ -102,7 +134,7 @@ export class StudentsComponent implements OnInit, OnDestroy {
       return;
     }
 
-    if (this.tabGroup?.selectedIndex == 0) {
+    if (this.selectedTabIndex === 0) {
       this.syncStudentList(false, true);
     } else {
       this.syncStudentList(true, true);
@@ -134,7 +166,8 @@ export class StudentsComponent implements OnInit, OnDestroy {
       data: {
         title: this.translate.instant('student.addStudent')
       },
-      width: "500px"
+      width: "500px",
+      panelClass: "fb-email-dialog-panel"
     });
 
     dialogRef.afterClosed().subscribe(response => {
@@ -167,13 +200,46 @@ export class StudentsComponent implements OnInit, OnDestroy {
     });
   }
 
-  tabChange(event: MatTabChangeEvent) {
-    if (event.index == 0) {
+  tabChange(index: number) {
+    this.selectedTabIndex = index;
+    if (index === 0) {
       this.syncStudentList(false);
     } else {
       this.syncStudentList(true);
-    } 
- }
+    }
+  }
+
+  /** WAI-ARIA APG tabs pattern: Left/Right (with wrap-around) and Home/End move focus and
+   *  select the tab, keeping the tablist a single Tab stop (roving tabindex in the template). */
+  onTabKeydown(event: KeyboardEvent): void {
+    const buttons = this.tabButtons?.toArray();
+    if (!buttons || buttons.length === 0) {
+      return;
+    }
+
+    const count = buttons.length;
+    let newIndex: number;
+    switch (event.key) {
+      case 'ArrowLeft':
+        newIndex = (this.selectedTabIndex - 1 + count) % count;
+        break;
+      case 'ArrowRight':
+        newIndex = (this.selectedTabIndex + 1) % count;
+        break;
+      case 'Home':
+        newIndex = 0;
+        break;
+      case 'End':
+        newIndex = count - 1;
+        break;
+      default:
+        return;
+    }
+
+    event.preventDefault();
+    this.tabChange(newIndex);
+    buttons[newIndex].nativeElement.focus();
+  }
 
   selectSort(sortBy: string) {
     this.sortBy = sortBy;

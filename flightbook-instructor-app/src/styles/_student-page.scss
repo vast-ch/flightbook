@@ -1,0 +1,1366 @@
+@use '@angular/material' as mat;
+
+// Structural styles for the redesigned student page. Every selector is nested under
+// .fb-student-page (applied to the page's <mat-sidenav-container> root) per the CONTRACT's
+// styling policy tier 2 - this replaces ::ng-deep and keeps everything leak-proof while being
+// charged against the generous "initial" budget instead of the per-component one.
+//
+// Token-first (tier 1) overrides for the Material components used on this page also live
+// here, each scoped to a `.fb-student-page …` selector so they cannot leak onto the ~30
+// other, out-of-scope screens that reuse the same Material components.
+.fb-student-page {
+  height: 100%;
+  background: var(--fb-bg);
+  font-family: Sora, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  color: var(--fb-ink);
+
+  // ---------------------------------------------------------------------------------
+  // List pane
+  // ---------------------------------------------------------------------------------
+  .fb-list-pane {
+    display: flex;
+    flex-direction: column;
+    width: 320px;
+    min-width: 320px;
+    background: var(--fb-surface);
+    border-right: 1px solid var(--fb-border-subtle);
+
+    @media (max-width: 768px) {
+      width: 100%;
+    }
+  }
+
+  .fb-list-pane__add {
+    flex: none;
+    padding: var(--fb-space-7) var(--fb-space-8) var(--fb-space-5);
+  }
+
+  .fb-add-student-button {
+    width: 100%;
+    height: 44px;
+
+    // The mockup's add-student button is 10px, one px more than the 9px global default
+    // set for all filled buttons in _m2-compat.scss - override locally rather than there.
+    @include mat.button-overrides(
+      (
+        protected-container-shape: 10px,
+      )
+    );
+  }
+
+  // Hand-rolled ARIA tablist (not mat-tab-group): the visible content that changes with the
+  // selection is a single shared .fb-student-list below, not a per-tab body, so a real
+  // MatTabGroup would point aria-controls at an empty tabpanel. See CONTRACT/round-2 C2.
+  .fb-tab-selector {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    flex: none;
+    padding: 0 var(--fb-space-8);
+    border-bottom: 1px solid var(--fb-border-subtle);
+  }
+
+  .fb-tab {
+    padding: var(--fb-space-5) 0 11px;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    background: transparent;
+    font: inherit;
+    font-size: var(--fb-text-base-plus);
+    font-weight: 500;
+    color: var(--fb-text-3);
+    cursor: pointer;
+
+    &--active {
+      border-bottom-color: var(--fb-primary);
+      font-weight: 600;
+      color: var(--fb-ink);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--fb-focus-ring);
+      outline-offset: 2px;
+    }
+  }
+
+  .fb-tab-count {
+    margin-left: 7px;
+    font-size: var(--fb-text-xs-plus);
+    font-weight: 500;
+    color: var(--fb-text-3);
+  }
+
+  // Wrapper carries the padding/border that used to sit on the .fb-sort-field host below.
+  // mat-form-field's own box-sizing is content-box on the host (Material only sets
+  // border-box on descendants like .mat-mdc-form-field-flex/.mdc-text-field, and this app
+  // has no global border-box reset), so padding directly on the host added to its 100%
+  // width and overflowed the fixed 320px .fb-list-pane. Moving the box model here, matching
+  // how the mockup wraps its control in a flex:none padded/bordered box, leaves the
+  // form-field itself at a plain width: 100% that can never exceed the pane.
+  .fb-list-pane__sort {
+    flex: none;
+    padding: var(--fb-space-5) var(--fb-space-8);
+    border-bottom: 1px solid var(--fb-surface-variant);
+  }
+
+  .fb-sort-field {
+    display: block;
+    width: 100%;
+
+    // appearance="outline", restyled to the mockup's always-white, 9px-radius select rather
+    // than Material's default shaded "fill" box. Stock outlined height is 56px
+    // (container-height/container-vertical-padding, see node_modules/@angular/material/
+    // form-field/_m3-form-field.scss) which dwarfs this pane's other chrome - the 44px add-
+    // student button above it and the 40px .fb-note-field elsewhere on this page - so it is
+    // dropped to 44px here, matching the add button, with vertical padding recomputed to
+    // keep the same ~24px text/content band the stock metrics reserve (44 - 2*10 = 24, same
+    // as 56 - 2*16). The floated label's vertical offset is derived from container-height by
+    // Material's own generated CSS (see the transform on .mdc-floating-label), so it stays
+    // correct automatically - verified whole/unclipped against .mdc-text-field's
+    // overflow: hidden at this height.
+    //
+    // Deliberate, accepted deviation from the mockup: the mockup pins its label inside the
+    // field permanently. Per product decision, this field keeps Material's idiom instead -
+    // the label floats up onto the outline border - so do not re-flag this as a fidelity gap.
+    @include mat.form-field-overrides(
+      (
+        outlined-container-shape: var(--fb-radius-md),
+        outlined-outline-color: var(--fb-border-subtle),
+        outlined-hover-outline-color: var(--fb-border-subtle),
+        container-height: 44px,
+        container-vertical-padding: 10px,
+      )
+    );
+
+    &.mat-mdc-form-field {
+      font-size: var(--fb-text-base-plus);
+    }
+
+    .mat-mdc-text-field-wrapper {
+      background: var(--fb-surface);
+    }
+  }
+
+  .fb-student-list {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    scrollbar-gutter: stable;
+  }
+
+  .fb-student-row {
+    display: block;
+    width: 100%;
+    padding: var(--fb-space-6) var(--fb-space-8);
+    border: 0;
+    border-bottom: 1px solid var(--fb-surface-variant);
+    background: transparent;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+
+    &:hover {
+      background: var(--fb-fill-subtle);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--fb-focus-ring);
+      // Negative, not the contract's default +2px: this row sits flush against the
+      // scrolling list pane's edge, so a positive offset would clip the outline there.
+      outline-offset: -2px;
+    }
+
+    &--selected {
+      background: var(--fb-surface-active);
+      box-shadow: inset 3px 0 0 var(--fb-primary);
+
+      .fb-student-row__name {
+        font-weight: 700;
+      }
+    }
+  }
+
+  .fb-student-row__main {
+    display: flex;
+    align-items: center;
+    gap: var(--fb-space-4);
+  }
+
+  .fb-avatar {
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--fb-bg);
+    font-size: var(--fb-text-xs);
+    font-weight: 600;
+    color: var(--fb-text-3);
+  }
+
+  .fb-student-row__name {
+    flex: 1;
+    min-width: 0;
+    font-size: var(--fb-text-lg);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--fb-ink);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .fb-pill-danger {
+    flex: none;
+    padding: 2px 7px;
+    border-radius: var(--fb-radius-pill);
+    background: var(--fb-danger-bg);
+    font-size: var(--fb-text-2xs);
+    font-weight: 600;
+    color: var(--fb-on-danger-bg);
+  }
+
+  .fb-student-row__type {
+    flex: none;
+    font-size: 17px;
+    width: 17px;
+    height: 17px;
+    color: var(--fb-text-4);
+  }
+
+  .fb-student-row__exam {
+    flex: none;
+    font-size: 17px;
+    width: 17px;
+    height: 17px;
+    color: var(--fb-success-fg);
+  }
+
+  .fb-student-row__meta {
+    display: flex;
+    gap: var(--fb-space-6);
+    margin-top: var(--fb-space-4);
+    padding-left: 38px;
+    font-size: var(--fb-text-sm);
+    color: var(--fb-text-3);
+  }
+
+  .fb-student-row__glider {
+    margin-top: var(--fb-space-1);
+    padding-left: 38px;
+    font-size: var(--fb-text-sm);
+    color: var(--fb-text-3);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .fb-empty-list {
+    padding: var(--fb-space-9);
+    text-align: center;
+    font-size: var(--fb-text-sm);
+    color: var(--fb-text-3);
+  }
+
+  // ---------------------------------------------------------------------------------
+  // Detail pane
+  // ---------------------------------------------------------------------------------
+  mat-sidenav-content {
+    background: var(--fb-bg);
+  }
+
+  .fb-detail-pane {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .fb-no-student {
+    padding: var(--fb-space-9);
+    text-align: center;
+    font-weight: 600;
+    color: var(--fb-text-3);
+  }
+
+  .fb-detail-header {
+    display: flex;
+    align-items: center;
+    gap: var(--fb-space-6);
+    padding: var(--fb-space-8) var(--fb-space-9);
+    background: var(--fb-surface);
+    border-bottom: 1px solid var(--fb-border-subtle);
+    flex-wrap: wrap;
+
+    // Material's default icon-button touch target is 40px/24px; the mockup's header
+    // actions (back/print/archive) are a dense 36px/17-19px. Scope the override here
+    // rather than globally so it does not affect icon buttons on other, out-of-scope pages.
+    // icon-size must move with state-layer-size: overrides() only sets the CSS custom
+    // property, it never touches the hardcoded 24px baked into Material's own padding
+    // calc (padding: (state-layer-size - icon-size) / 2), so without it the padding box
+    // stays keyed to 24px while our glyphs are shrunk to 17-19px below, leaving uneven
+    // slack. Centering with flex removes the last dependency on that padding math.
+    @include mat.icon-button-overrides(
+      (
+        state-layer-size: 36px,
+        icon-size: 17px,
+      )
+    );
+  }
+
+  .fb-detail-header__back,
+  .fb-detail-header__action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    border: 1px solid var(--fb-border-subtle);
+    border-radius: var(--fb-radius-md);
+    background: var(--fb-surface);
+
+    &:hover {
+      background: var(--fb-fill-subtle);
+    }
+
+    .mat-icon {
+      color: var(--fb-text-2);
+    }
+  }
+
+  .fb-detail-header__back {
+    margin-left: -4px;
+
+    @include mat.icon-button-overrides(
+      (
+        icon-size: 19px,
+      )
+    );
+
+    .mat-icon {
+      font-size: 19px;
+      width: 19px;
+      height: 19px;
+    }
+  }
+
+  .fb-detail-header__action {
+    .mat-icon {
+      font-size: 17px;
+      width: 17px;
+      height: 17px;
+    }
+  }
+
+  .fb-detail-header__title {
+    flex: 1;
+    min-width: 0;
+
+    h1 {
+      margin: var(--fb-space-3) 0 0;
+      font-size: var(--fb-text-4xl);
+      font-weight: 600;
+      line-height: 1.05;
+      letter-spacing: -0.025em;
+      color: var(--fb-ink);
+    }
+  }
+
+  .fb-detail-header__eyebrow {
+    display: flex;
+    align-items: center;
+    gap: var(--fb-space-3);
+  }
+
+  .fb-detail-header__role {
+    font-size: var(--fb-text-xs);
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--fb-text-3);
+  }
+
+  .fb-badge-success {
+    padding: 2px 7px;
+    border-radius: 5px;
+    background: var(--fb-success-bg);
+    font-size: var(--fb-text-2xs);
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--fb-success-fg);
+  }
+
+  .fb-detail-header__toggles {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: var(--fb-space-6);
+  }
+
+  .fb-detail-header__action--danger {
+    border-color: var(--fb-danger-border);
+    background: var(--fb-danger-bg);
+
+    &:hover {
+      background: var(--fb-danger-hover-bg);
+    }
+
+    .mat-icon {
+      color: var(--fb-danger);
+    }
+  }
+
+  // ---------------------------------------------------------------------------------
+  // Period bar
+  // ---------------------------------------------------------------------------------
+  // FlightStatistic is a single aggregate - no endpoint accepts a period parameter and
+  // API changes are out of scope (see CONTRACT "Period segmented control: OMIT"). This
+  // renders exactly one segment ("Total"), always active, as inert non-interactive
+  // markup (not a <button>/role="tab") so it doesn't announce a control it doesn't
+  // honour, but keeps the same shape a future @for over real periods would need.
+  .fb-period-bar {
+    display: flex;
+    align-items: center;
+    gap: var(--fb-space-5);
+    padding: var(--fb-space-5) var(--fb-space-9);
+    background: var(--fb-surface);
+    border-bottom: 1px solid var(--fb-surface-variant);
+  }
+
+  .fb-period-bar__label {
+    flex: 1;
+    font-size: var(--fb-text-xs);
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--fb-text-3);
+  }
+
+  .fb-period-segments {
+    display: flex;
+    flex: none;
+    border: 1px solid var(--fb-border-subtle);
+    border-radius: var(--fb-radius-md);
+    overflow: hidden;
+    background: var(--fb-surface);
+  }
+
+  .fb-period-segment {
+    flex: none;
+    min-width: 78px;
+    padding: 9px var(--fb-space-6);
+    font-size: var(--fb-text-sm-plus);
+    font-weight: 500;
+    color: var(--fb-text-2);
+    text-align: center;
+
+    &--active {
+      background: var(--fb-primary);
+      font-weight: 600;
+      color: var(--fb-on-primary);
+    }
+  }
+
+  // ---------------------------------------------------------------------------------
+  // Stats strip
+  // ---------------------------------------------------------------------------------
+  .fb-stats-strip {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    background: var(--fb-surface);
+    border-bottom: 1px solid var(--fb-border-subtle);
+  }
+
+  .fb-stat-tile {
+    padding: var(--fb-space-7) var(--fb-space-8);
+    border-right: 1px solid var(--fb-surface-variant);
+    border-bottom: 1px solid var(--fb-surface-variant);
+  }
+
+  .fb-stat-tile__value {
+    font-size: var(--fb-text-3xl);
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: var(--fb-ink);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .fb-stat-tile__label {
+    margin-top: var(--fb-space-4);
+    font-size: var(--fb-text-2xs);
+    font-weight: 500;
+    line-height: 1.2;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--fb-text-3);
+  }
+
+  // ---------------------------------------------------------------------------------
+  // Cards
+  // ---------------------------------------------------------------------------------
+  .fb-card {
+    margin: var(--fb-space-7) var(--fb-space-9) 0;
+
+    @include mat.card-overrides(
+      (
+        outlined-container-color: var(--fb-surface),
+        outlined-outline-color: var(--fb-border),
+        outlined-container-shape: var(--fb-radius-lg),
+      )
+    );
+
+    &.mat-mdc-card {
+      padding: 0;
+      overflow: hidden;
+    }
+
+    &:last-child {
+      margin-bottom: var(--fb-space-9);
+    }
+  }
+
+  .fb-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: var(--fb-space-7);
+    margin: var(--fb-space-7) var(--fb-space-9) 0;
+
+    .fb-card {
+      margin: 0;
+    }
+  }
+
+  .fb-card__header {
+    display: flex;
+    align-items: center;
+    gap: var(--fb-space-4);
+    padding: var(--fb-space-6-plus) var(--fb-space-8);
+    border-bottom: 1px solid var(--fb-surface-variant);
+  }
+
+  .fb-card__title {
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+    font-size: var(--fb-text-md);
+    font-weight: 600;
+    color: var(--fb-ink);
+  }
+
+  // Right-aligned "n/total" summary in a card header (e.g. Level's "2/3 bewertet"),
+  // sitting next to a flex:1 .fb-card__title so it's pushed to the right edge.
+  .fb-card__header-summary {
+    flex: none;
+    font-size: var(--fb-text-xs-plus);
+    color: var(--fb-text-3);
+  }
+
+  .fb-card__header-note {
+    display: flex;
+    align-items: center;
+    gap: var(--fb-space-2);
+    font-size: var(--fb-text-xs-plus);
+    color: var(--fb-text-3);
+
+    .mat-icon {
+      font-size: 14px;
+      width: 14px;
+      height: 14px;
+      color: var(--fb-icon-muted);
+    }
+  }
+
+  .fb-card__footer {
+    display: flex;
+    flex-direction: column;
+    gap: var(--fb-space-5);
+    padding: var(--fb-space-6) var(--fb-space-8);
+    background: var(--fb-fill-subtle);
+    border-top: 1px solid var(--fb-surface-variant);
+  }
+
+  .fb-card__footer-title {
+    font-size: var(--fb-text-xs);
+    font-weight: 600;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--fb-text-3);
+  }
+
+  // Borderless text-button placed in a card header (e.g. notes "Add note").
+  .fb-card__header-action {
+    flex: none;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    font: inherit;
+    font-size: var(--fb-text-sm);
+    font-weight: 600;
+    color: var(--fb-primary);
+    cursor: pointer;
+
+    &:hover {
+      color: var(--fb-primary-hover);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--fb-focus-ring);
+      outline-offset: 2px;
+    }
+  }
+
+  // Level card
+  // No padding on the host: the mockup's Level card body (students-screen.html:180) has
+  // NONE — only each cell (.fb-level-row) is padded. Padding here would stack with the
+  // row padding below.
+  fb-level {
+    display: block;
+  }
+
+  .fb-level-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+
+  .fb-level-row {
+    display: flex;
+    flex-direction: column;
+    gap: var(--fb-space-4);
+    padding: var(--fb-space-7) var(--fb-space-8);
+    border-right: 1px solid var(--fb-surface-variant);
+
+    // The Level card's stars are a distinct, wider-spaced row than the Kontrollblatt's
+    // (see the CORRECTION in CONTRACT.md) - override the shared start-rating gap here.
+    .star-rating-container {
+      gap: 2px;
+    }
+  }
+
+  .fb-level-row__label {
+    font-size: var(--fb-text-xs);
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--fb-text-3);
+  }
+
+  // Kontrollblatt accordion
+  .fb-controlsheet-accordion {
+    @include mat.expansion-overrides(
+      (
+        container-shape: 0,
+        container-background-color: transparent,
+        header-text-color: var(--fb-ink),
+        header-text-size: var(--fb-text-sm-plus),
+        header-text-weight: 600,
+        header-collapsed-state-height: 48px,
+        header-expanded-state-height: 48px,
+        header-hover-state-layer-color: var(--fb-fill-subtle),
+      )
+    );
+
+    .mat-expansion-panel {
+      box-shadow: none !important;
+      border-top: 1px solid var(--fb-surface-variant);
+    }
+
+    .mat-expansion-panel:first-of-type,
+    .mat-expansion-panel:last-of-type {
+      border-radius: 0;
+    }
+
+    .mat-expansion-panel-body {
+      padding: 0 var(--fb-space-8) var(--fb-space-5);
+    }
+
+    .mat-expansion-panel-header {
+      padding: 0 var(--fb-space-8);
+    }
+  }
+
+  .fb-controlsheet-accordion__meta {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: var(--fb-space-5);
+  }
+
+  // Leading caret, replacing Material's own trailing toggle indicator (hideToggle on the
+  // panel - see D5): 18px, before the section name, rotating on expand.
+  .fb-controlsheet-accordion__caret {
+    flex: none;
+    width: 18px;
+    height: 18px;
+    font-size: 18px;
+    margin-right: var(--fb-space-4);
+    color: var(--fb-icon-muted);
+    transition: transform 0.2s ease;
+
+    &--open {
+      transform: rotate(180deg);
+    }
+  }
+
+  .fb-mini-bar {
+    display: inline-block;
+    width: 76px;
+    height: 4px;
+    border-radius: 1px;
+    overflow: hidden;
+    background: var(--fb-track-bg);
+  }
+
+  .fb-mini-bar__fill {
+    display: block;
+    height: 100%;
+    background: var(--fb-primary);
+  }
+
+  .fb-controlsheet-accordion__count {
+    width: 44px;
+    text-align: right;
+    font-size: var(--fb-text-xs-plus);
+    font-variant-numeric: tabular-nums;
+    color: var(--fb-text-3);
+  }
+
+  // A single stacked column, not a multi-column grid (see the CORRECTION in CONTRACT.md).
+  .fb-rating-grid {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .fb-rating-row {
+    display: flex;
+    align-items: center;
+    gap: var(--fb-space-5);
+    padding: var(--fb-space-2) 0;
+    border-bottom: 1px solid var(--fb-divider-faint);
+  }
+
+  .fb-rating-row__label {
+    flex: 1;
+    min-width: 0;
+    font-size: var(--fb-text-sm-plus);
+    color: var(--fb-text-2);
+    text-wrap: pretty;
+  }
+
+  // Prüfungen (exams) card footer
+  .fb-exam-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--fb-space-4);
+  }
+
+  .fb-exam-row {
+    display: flex;
+    align-items: center;
+    gap: var(--fb-space-4);
+  }
+
+  .fb-exam-row__dot {
+    flex: none;
+    box-sizing: border-box;
+    width: 16px;
+    height: 16px;
+    border: 1.5px solid var(--fb-dot-border);
+    border-radius: 50%;
+    background: transparent;
+
+    &--done {
+      border-color: var(--fb-success-fg);
+      background: var(--fb-success-fg);
+    }
+  }
+
+  .fb-exam-row__label {
+    flex: 1;
+    min-width: 0;
+    font-size: var(--fb-text-sm-plus);
+    color: var(--fb-text-2);
+  }
+
+  .fb-exam-row__value {
+    font-size: var(--fb-text-sm);
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    color: var(--fb-text-3);
+
+    &--done {
+      color: var(--fb-ink);
+    }
+  }
+
+  // Wraps the action button and its visually-hidden datepicker input so the CDK overlay
+  // (anchored to the hidden input) opens under the button rather than at the row's
+  // flex-start edge. An absolutely-positioned flex item resolves its static position
+  // against the flex container's justify-content, not its DOM position among siblings -
+  // giving the hidden input its own positioned ancestor here fixes that without touching
+  // the sr-only clip technique itself (see D4).
+  .fb-exam-row__trigger {
+    position: relative;
+    display: inline-flex;
+    flex: none;
+  }
+
+  .fb-exam-row__action {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: var(--fb-space-1);
+    padding: var(--fb-space-1) 9px;
+    border: 1px solid var(--fb-border-subtle);
+    border-radius: var(--fb-radius-sm);
+    background: var(--fb-surface);
+    font: inherit;
+    font-size: var(--fb-text-xs-plus);
+    font-weight: 500;
+    color: var(--fb-primary);
+    cursor: pointer;
+
+    .mat-icon {
+      font-size: 14px;
+      width: 14px;
+      height: 14px;
+    }
+
+    &:hover {
+      background: var(--fb-primary-tint-hover);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--fb-focus-ring);
+      outline-offset: 2px;
+    }
+  }
+
+  .fb-exam-row__hidden-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  // Instructor notes card
+  fb-student-note {
+    display: block;
+  }
+
+  .fb-note-list {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .fb-note-row {
+    padding: var(--fb-space-6) var(--fb-space-8);
+    border-bottom: 1px solid var(--fb-surface-variant);
+
+    &:hover {
+      background: var(--fb-fill-subtle);
+    }
+  }
+
+  .fb-note-row__main {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--fb-space-4);
+  }
+
+  .fb-note-row__text {
+    flex: 1;
+    min-width: 0;
+    font-size: var(--fb-text-base);
+    line-height: 1.55;
+    color: var(--fb-text-2);
+    white-space: pre-wrap;
+    text-wrap: pretty;
+  }
+
+  .fb-note-row__actions {
+    display: flex;
+    flex: none;
+    gap: var(--fb-space-2);
+  }
+
+  .fb-note-icon-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border-radius: var(--fb-radius-sm);
+    background: var(--fb-surface);
+    cursor: pointer;
+
+    .mat-icon {
+      font-size: 15px;
+      width: 15px;
+      height: 15px;
+    }
+
+    &--edit {
+      border: 1px solid var(--fb-border-subtle);
+      color: var(--fb-text-2);
+
+      &:hover {
+        background: var(--fb-fill-subtle);
+      }
+    }
+
+    &--delete {
+      border: 1px solid var(--fb-danger-border);
+      color: var(--fb-danger);
+
+      &:hover {
+        background: var(--fb-danger-hover-bg);
+      }
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--fb-focus-ring);
+      outline-offset: 2px;
+    }
+  }
+
+  .fb-note-row__meta {
+    margin-top: var(--fb-space-3);
+    font-size: var(--fb-text-xs-plus);
+    color: var(--fb-text-3);
+  }
+
+  // Inline editor (shared by the "new note" row and an existing row being edited)
+  .fb-note-row--editing {
+    &:hover {
+      background: transparent;
+    }
+  }
+
+  .fb-note-row__edit-fields {
+    display: flex;
+    gap: var(--fb-space-5);
+    margin-bottom: var(--fb-space-4);
+  }
+
+  .fb-note-field {
+    flex: 1;
+    min-width: 0;
+
+    &--date {
+      flex: 0 0 160px;
+    }
+
+    @include mat.form-field-overrides(
+      (
+        container-height: 40px,
+        container-vertical-padding: 8px,
+      )
+    );
+  }
+
+  .fb-note-row__textarea {
+    display: block;
+    width: 100%;
+    padding: var(--fb-space-4) var(--fb-space-5);
+    border: 1px solid var(--fb-input-active-border);
+    border-radius: var(--fb-radius-md);
+    background: var(--fb-surface);
+    font: inherit;
+    font-size: var(--fb-text-base);
+    line-height: 1.55;
+    color: var(--fb-text-2);
+    resize: vertical;
+    outline: none;
+    box-sizing: border-box;
+
+    &:focus-visible {
+      outline: 2px solid var(--fb-focus-ring);
+      outline-offset: 2px;
+    }
+  }
+
+  .fb-note-row__edit-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--fb-space-3);
+    margin-top: var(--fb-space-4);
+  }
+
+  .fb-note-btn {
+    height: 30px;
+    padding: 0 var(--fb-space-5);
+    border-radius: 8px;
+    font: inherit;
+    font-size: var(--fb-text-sm);
+    font-weight: 600;
+    cursor: pointer;
+
+    &--cancel {
+      border: 1px solid var(--fb-border-subtle);
+      background: var(--fb-surface);
+      color: var(--fb-text-2);
+
+      &:hover {
+        background: var(--fb-bg);
+      }
+    }
+
+    &--save {
+      border: 0;
+      background: var(--fb-primary);
+      color: var(--fb-on-primary);
+
+      &:hover {
+        background: var(--fb-primary-hover);
+      }
+
+      &:disabled {
+        color: var(--fb-disabled-fg);
+        background: var(--fb-disabled-bg);
+        cursor: not-allowed;
+      }
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--fb-focus-ring);
+      outline-offset: 2px;
+    }
+  }
+
+  // Emergency contact
+  .fb-emergency-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  }
+
+  .fb-emergency-item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--fb-space-3);
+    padding: var(--fb-space-7) var(--fb-space-8);
+    border-right: 1px solid var(--fb-surface-variant);
+    border-bottom: 1px solid var(--fb-surface-variant);
+  }
+
+  .fb-emergency-item__label {
+    font-size: var(--fb-text-xs);
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--fb-text-3);
+  }
+
+  .fb-emergency-item__value {
+    font-size: var(--fb-text-base-plus);
+    line-height: 1.45;
+    color: var(--fb-ink);
+    text-wrap: pretty;
+  }
+
+  // ---------------------------------------------------------------------------------
+  // Flights table
+  // ---------------------------------------------------------------------------------
+  .fb-validate-all-button {
+    display: flex;
+    align-items: center;
+    gap: var(--fb-space-2);
+    height: 32px;
+    padding: 0 var(--fb-space-5);
+    border: 1px solid var(--fb-success-border);
+    border-radius: var(--fb-radius-sm);
+    background: var(--fb-success-bg);
+    font: inherit;
+    font-size: var(--fb-text-sm-plus);
+    font-weight: 600;
+    color: var(--fb-success-fg);
+    cursor: pointer;
+
+    .mat-icon {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+    }
+
+    &:hover {
+      background: var(--fb-success-hover-bg);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--fb-focus-ring);
+      outline-offset: 2px;
+    }
+  }
+
+  .fb-table-scroll {
+    overflow-x: auto;
+    scrollbar-gutter: stable;
+
+    table {
+      min-width: 1080px;
+    }
+  }
+
+  .mat-mdc-header-cell {
+    font-size: var(--fb-text-xs);
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--fb-text-3);
+    background: var(--fb-fill-subtle);
+  }
+
+  .mat-mdc-cell {
+    font-size: var(--fb-text-base);
+    color: var(--fb-text-2);
+  }
+
+  // "Awaiting validation" is a pending state, not an error - use the warm/cream warn
+  // tokens (rgb(255, 250, 243)), not the danger-red ones the row used before.
+  .not-validated-row {
+    background: var(--fb-warn-bg);
+  }
+
+  // Validation action column - leftmost per the mockup, header intentionally blank. The
+  // mockup uses a plain table cell with an inner flex wrapper (.fb-flight-actions below)
+  // rather than flexing the <td> itself: `display: flex` on a <td> converts it from an
+  // internal-table box to a block-level flex container, which stops it stretching to the
+  // row height and drops the UA `vertical-align: middle` every sibling <td> still gets, so
+  // its content no longer shares the row's baseline. Keeping the cell a normal table cell
+  // and pushing the flex onto the wrapper div avoids that entirely.
+  .validation-actions {
+    width: 1%;
+    white-space: nowrap;
+    padding: 13px 14px;
+  }
+
+  .fb-flight-actions {
+    display: flex;
+    justify-content: flex-start;
+    gap: var(--fb-space-2);
+    min-width: 62px;
+  }
+
+  // Numeric columns (Time, Km) are right-aligned per the mockup.
+  .numeric {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .fb-flight-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border-radius: var(--fb-radius-sm);
+
+    // icon-size must move with state-layer-size, same as the header actions above -
+    // overrides() only sets the CSS custom property, it never touches the hardcoded 24px
+    // baked into Material's own padding calc, so without it the padding box stays keyed to
+    // 24px while the glyph is shrunk to 15px below, mis-centring it.
+    @include mat.icon-button-overrides(
+      (
+        state-layer-size: 28px,
+        icon-size: 15px,
+      )
+    );
+
+    .mat-icon {
+      font-size: 15px;
+      width: 15px;
+      height: 15px;
+    }
+
+    &--validate {
+      border: 1px solid var(--fb-success-border);
+      background: var(--fb-success-bg);
+      color: var(--fb-success-fg);
+    }
+
+    &--reject {
+      border: 1px solid var(--fb-danger-border);
+      background: var(--fb-danger-bg);
+      color: var(--fb-on-danger-bg);
+    }
+  }
+
+  .fb-reject-row {
+    padding: 0 var(--fb-space-6) var(--fb-space-6) !important;
+    background: var(--fb-warn-bg);
+    border-bottom: 1px solid var(--fb-surface-active);
+  }
+
+  .fb-reject-box {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    max-width: 560px;
+  }
+
+  .fb-reject-box__title {
+    font-size: var(--fb-text-xs-plus);
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--fb-on-danger-bg);
+  }
+
+  .fb-reject-box__textarea {
+    width: 100%;
+    padding: var(--fb-space-4) var(--fb-space-5);
+    border: 1px solid var(--fb-danger-border);
+    border-radius: var(--fb-radius-md);
+    background: var(--fb-surface);
+    font: inherit;
+    font-size: var(--fb-text-base);
+    line-height: 1.5;
+    color: var(--fb-text-2);
+    resize: vertical;
+    outline: none;
+    box-sizing: border-box;
+
+    &:focus-visible {
+      outline: 2px solid var(--fb-focus-ring);
+      outline-offset: 2px;
+    }
+  }
+
+  .fb-reject-box__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--fb-space-3);
+  }
+
+  .fb-reject-box__hint {
+    flex: 1;
+    font-size: var(--fb-text-xs-plus);
+    color: var(--fb-text-3);
+  }
+
+  .fb-reject-btn {
+    height: 30px;
+    padding: 0 var(--fb-space-5);
+    border-radius: 8px;
+    font: inherit;
+    font-size: var(--fb-text-sm);
+    font-weight: 600;
+    cursor: pointer;
+
+    &--cancel {
+      border: 1px solid var(--fb-border-subtle);
+      background: var(--fb-surface);
+      color: var(--fb-text-2);
+
+      &:hover {
+        background: var(--fb-bg);
+      }
+    }
+
+    &--confirm {
+      border: 0;
+      background: var(--fb-danger);
+      color: var(--fb-on-danger);
+
+      &:hover {
+        background: var(--fb-danger-active);
+      }
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--fb-focus-ring);
+      outline-offset: 2px;
+    }
+  }
+
+  .fb-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--fb-space-4);
+    padding: var(--fb-space-9);
+    text-align: center;
+
+    .mat-icon {
+      font-size: 32px;
+      width: 32px;
+      height: 32px;
+      color: var(--fb-text-4);
+    }
+
+    span {
+      font-size: var(--fb-text-sm);
+      color: var(--fb-text-3);
+    }
+  }
+
+  mat-paginator {
+    background: var(--fb-fill-subtle);
+    border-top: 1px solid var(--fb-surface-variant);
+  }
+}
+
+// ---------------------------------------------------------------------------------
+// start-rating (shared by the level and Kontrollblatt cards, both inside .fb-student-page)
+// ---------------------------------------------------------------------------------
+.fb-student-page {
+  .star-rating-container {
+    display: flex;
+    align-items: center;
+    gap: 1px;
+  }
+
+  // Bare glyph buttons (students-screen.html:186,221: padding:0; border:0; background:transparent),
+  // not boxed mat-icon-buttons - the template no longer applies the mat-icon-button directive,
+  // so there's no Material ripple/state-layer/touch-target chrome left to override here.
+  .star-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    line-height: 0;
+    color: var(--fb-star-empty);
+    cursor: pointer;
+
+    .mat-icon {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+    }
+
+    // Level's stars (26px) vs. the Kontrollblatt's (16px, the default above) - see the
+    // CORRECTION in CONTRACT.md.
+    &--big .mat-icon {
+      font-size: 26px;
+      width: 26px;
+      height: 26px;
+    }
+
+    &--filled {
+      color: var(--fb-star);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--fb-focus-ring);
+      outline-offset: 2px;
+    }
+  }
+}

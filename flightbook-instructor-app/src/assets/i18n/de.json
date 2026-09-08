@@ -6,7 +6,8 @@
         "appointments": "Termine",
         "tandemPilots": "Tandempiloten",
         "team": "Team",
-        "configuration": "Konfiguration"
+        "configuration": "Konfiguration",
+        "openMenu": "Menü öffnen"
     },
     "language": {
         "fr": "Französisch",
@@ -91,6 +92,7 @@
         "average": "Durchschnittszeit",
         "list": "Teilnehmerliste",
         "noStudentSelected": "Kein Schüler*in wurde ausgewählt.",
+        "noStudents": "Keine Schüler*innen vorhanden.",
         "flights": "Flüge",
         "flight": {
             "number": "Nr",
@@ -124,6 +126,13 @@
             },
             "validationActions": "Aktionen",
             "validateAll": "Alle Flüge im Status \"Angefragt\" validieren",
+            "validateAllAction": "Alle validieren",
+            "validate": "Flug validieren",
+            "reject": "Flug ablehnen",
+            "rejectReason": "Ablehnungsgrund",
+            "rejectPlaceholder": "Warum wird dieser Flug abgelehnt? Für den Schüler*in sichtbar.",
+            "rejectHint": "Wird als Tooltip beim abgelehnten Status angezeigt.",
+            "rejectConfirm": "Flug ablehnen",
             "noData": "Keine Daten"
         },
         "phone": "Tel",
@@ -132,6 +141,17 @@
         "archived": "Archiviert",
         "tandem": "Tandem",
         "isAppointmentActive": "Termine weiterhin ersichtlich?",
+        "roleLabel": "Schüler*in",
+        "examReady": "Prüfungsbereit",
+        "printFlightbook": "Flugbuch drucken",
+        "archiveStudent": "Schüler*in archivieren",
+        "backToList": "Zurück zur Liste",
+        "toCheck": "{{n}} zu prüfen",
+        "flightsCount": "{{n}} Flüge",
+        "period": {
+            "label": "Zeitraum",
+            "total": "Total"
+        },
         "sort": {
             "sortBy": "Sortieren nach",
             "firstname": "Vorname",
@@ -176,7 +196,9 @@
         "title": "Notizen",
         "addNote": "Notiz hinzufügen",
         "noteTitle": "Titel (optional)",
-        "comment": "Kommentar"
+        "comment": "Kommentar",
+        "edit": "Notiz bearbeiten",
+        "remove": "Notiz löschen"
     },
     "export": {
         "pilote": "Pilot",
@@ -213,7 +235,10 @@
         "exam": {
             "title": "Prüfungen",
             "theory": "Theorie bestanden am",
-            "practice": "Praxis bestanden am"
+            "practice": "Praxis bestanden am",
+            "notSet": "Nicht gesetzt",
+            "setDate": "Datum setzen",
+            "change": "Ändern"
         },
         "trainingHill": {
             "title": "Übungshang",
@@ -281,7 +306,12 @@
             "title": "Level",
             "start": "Start",
             "maneuver": "Manöver",
-            "landing": "Landung"
+            "landing": "Landung",
+            "summary": "{{count}}/{{total}} bewertet"
+        },
+        "rating": {
+            "starLabel": "Bewertung {{n}} von 3",
+            "starLabelWithContext": "{{label}}: Bewertung {{n}} von 3"
         }
     },
     "emergencyContact": {
@@ -290,7 +320,8 @@
         "lastname": "Nachname",
         "phone": "Telefon",
         "email": "E-Mail",
-        "additionalInformation": "Zusatzinformation"
+        "additionalInformation": "Zusatzinformation",
+        "providedByStudent": "Vom Schüler*in angegeben"
     },
     "formMessage": {
         "emailExist": "Diese E-Mail-Adresse wird bereits verwendet!",

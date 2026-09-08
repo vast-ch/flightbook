@@ -6,7 +6,8 @@
         "appointments": "Rendez-vous",
         "tandemPilots": "Pilote biplace",
         "team": "Équipe",
-        "configuration": "Configuration"
+        "configuration": "Configuration",
+        "openMenu": "Ouvrir le menu"
     },
     "language": {
         "fr": "Français",
@@ -91,6 +92,7 @@
         "average": "Temps moyen",
         "list": "Liste de participants",
         "noStudentSelected": "Aucun élève n'a été sélectionné.",
+        "noStudents": "Aucun élève.",
         "flights": "Vols",
         "flight": {
             "number": "N°",
@@ -124,6 +126,13 @@
             },
             "validationActions": "Actions",
             "validateAll": "Valide tous les vols avec le statut \"En attente\"",
+            "validateAllAction": "Tout valider",
+            "validate": "Valider le vol",
+            "reject": "Refuser le vol",
+            "rejectReason": "Motif du refus",
+            "rejectPlaceholder": "Pourquoi ce vol est-il refusé ? Visible par l'élève.",
+            "rejectHint": "Affiché comme infobulle sur le statut refusé.",
+            "rejectConfirm": "Refuser le vol",
             "noData": "Pas de données"
         },
         "phone": "Tél",
@@ -132,6 +141,17 @@
         "archived": "Archivé",
         "tandem": "Biplace",
         "isAppointmentActive": "Rendez-vous toujours visible?",
+        "roleLabel": "Élève",
+        "examReady": "Prêt pour l'examen",
+        "printFlightbook": "Imprimer le carnet de vol",
+        "archiveStudent": "Archiver l'élève",
+        "backToList": "Retour à la liste",
+        "toCheck": "{{n}} à vérifier",
+        "flightsCount": "{{n}} vols",
+        "period": {
+            "label": "Période",
+            "total": "Total"
+        },
         "sort": {
             "sortBy": "Trier par",
             "firstname": "Prénom",
@@ -176,7 +196,9 @@
         "title": "Notes",
         "addNote": "Ajouter une note",
         "noteTitle": "Titre (optionnel)",
-        "comment": "Commentaire"
+        "comment": "Commentaire",
+        "edit": "Modifier la note",
+        "remove": "Supprimer la note"
     },
     "export": {
         "pilote": "Pilote",
@@ -213,7 +235,10 @@
         "exam": {
             "title": "Examens",
             "theory": "Théorie réussie le",
-            "practice": "Pratique réussie le"
+            "practice": "Pratique réussie le",
+            "notSet": "Non défini",
+            "setDate": "Définir la date",
+            "change": "Modifier"
         },
         "trainingHill": {
             "title": "Pente école",
@@ -281,7 +306,12 @@
             "title": "Niveau",
             "start": "Décollage",
             "maneuver": "Manoeuvre",
-            "landing": "Atterrissage"
+            "landing": "Atterrissage",
+            "summary": "{{count}}/{{total}} évalué(s)"
+        },
+        "rating": {
+            "starLabel": "Note {{n}} sur 3",
+            "starLabelWithContext": "{{label}} : Note {{n}} sur 3"
         }
     },
     "emergencyContact": {
@@ -290,7 +320,8 @@
         "lastname": "Nom",
         "phone": "Téléphone",
         "email": "E-Mail",
-        "additionalInformation": "Information complémentaires"
+        "additionalInformation": "Information complémentaires",
+        "providedByStudent": "Indiqué par l'élève"
     },
     "formMessage": {
         "emailExist": "Cette adresse e-mail est déjà utilisée!",

@@ -11,6 +11,7 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { DatePipe } from '@angular/common';
+import { MAT_ICON_DEFAULT_OPTIONS } from '@angular/material/icon';
 
 export function createTranslateLoader(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json');
@@ -36,7 +37,8 @@ export function createTranslateLoader(http: HttpClient) {
         DatePipe,
         { provide: HTTP_INTERCEPTORS, useClass: HttpAuthInterceptor, multi: true },
         { provide: HTTP_INTERCEPTORS, useClass: HttpErrorInterceptor, multi: true },
-        provideHttpClient(withInterceptorsFromDi())
+        provideHttpClient(withInterceptorsFromDi()),
+        { provide: MAT_ICON_DEFAULT_OPTIONS, useValue: { fontSet: 'material-symbols-outlined' } }
     ]
 })
 export class AppModule { }

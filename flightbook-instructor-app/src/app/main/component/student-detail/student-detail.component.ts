@@ -1,5 +1,6 @@
-import { Component, ElementRef, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, Signal, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, Signal, SimpleChanges, ViewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
+import { MatTable } from '@angular/material/table';
 import { MatSlideToggleChange } from '@angular/material/slide-toggle';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
@@ -41,7 +42,7 @@ export class StudentDetailComponent implements OnInit, OnChanges, OnDestroy {
 
   displayedColumns: string[] = ['nb', 'date', 'start', 'landing', 'glider', 'time', 'km', 'description', 'instructor', 'alone'];
   emergencyContact: EmergencyContact = new EmergencyContact();
-  @ViewChild('table', { read: ElementRef }) table: ElementRef | undefined;
+  @ViewChild('table') table: MatTable<Flight> | undefined;
   unsubscribe$ = new Subject<void>();
 
   // For reject comment modal
@@ -66,6 +67,29 @@ export class StudentDetailComponent implements OnInit, OnChanges, OnDestroy {
 
   ngOnInit(): void { }
 
+  /** Number of the three Level cells (start/maneuver/landing) that have a rating > 0.
+   *  Drives the "n/3" summary in the Level card header. */
+  levelRatedCount(): number {
+    const level = this.student?.controlSheet?.level;
+    if (!level) {
+      return 0;
+    }
+    return [level.start, level.maneuver, level.landing].filter((value) => (value || 0) > 0).length;
+  }
+
+  /** Mirrors students.component's isExamReady() - kept in sync manually since each
+   *  operates on a different Student reference (list item vs. selected student). */
+  isExamReady(): boolean {
+    const statistic = this.student?.statistic;
+    return !!(
+      statistic?.nbFlights && statistic.nbFlights > 50 &&
+      statistic?.nbStartplaces && statistic.nbStartplaces >= 5 &&
+      statistic?.nbLandingplaces && statistic.nbLandingplaces >= 5 &&
+      statistic?.nbFlightsAlone && statistic.nbFlightsAlone >= 1 &&
+      this.student?.controlSheet?.passTheoryExam
+    );
+  }
+
   ngOnDestroy() {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
@@ -73,6 +97,7 @@ export class StudentDetailComponent implements OnInit, OnChanges, OnDestroy {
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['student'] && changes['student'].currentValue) {
+      this.closeRejectCommentBox();
       this.loadStudentFLights(changes['student'].currentValue.id);
       this.studentService.getEmergencyContactsByStudentId(changes['student'].currentValue.id).pipe(takeUntil(this.unsubscribe$)).subscribe((emergencyContacts: EmergencyContact[]) => {
         if (emergencyContacts?.length > 0) {
@@ -84,12 +109,13 @@ export class StudentDetailComponent implements OnInit, OnChanges, OnDestroy {
     // Update displayedColumns when school changes
     if (changes['school'] && changes['school'].currentValue) {
       // Reset to base columns first to avoid duplicates
-      this.displayedColumns = ['nb', 'date', 'start', 'landing', 'glider', 'time', 'km', 'description', 'instructor', 'alone'];
-      
-      // Add validation column if needed
+      const baseColumns = ['nb', 'date', 'start', 'landing', 'glider', 'time', 'km', 'description', 'instructor', 'alone'];
+
+      // Validation actions go FIRST (mockup), validation state stays LAST
       if (changes['school'].currentValue.configuration?.schoolModule?.validateFlights) {
-        this.displayedColumns.push('validationState');
-        this.displayedColumns.push('validationButton');
+        this.displayedColumns = ['validationButton', ...baseColumns, 'validationState'];
+      } else {
+        this.displayedColumns = baseColumns;
       }
     }
   }
@@ -108,6 +134,7 @@ export class StudentDetailComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   handleFlightPage(event: any) {
+    this.closeRejectCommentBox();
     let offset = event.pageIndex * event.pageSize;
     if (this.student?.id) {
       this.loadStudentFLights(this.student?.id, offset, event.pageSize);
@@ -202,6 +229,7 @@ export class StudentDetailComponent implements OnInit, OnChanges, OnDestroy {
     this.flightToReject = flight;
     this.rejectComment = '';
     this.showRejectCommentBox = true;
+    this.table?.renderRows();
   }
 
   submitRejectComment() {
@@ -219,7 +247,12 @@ export class StudentDetailComponent implements OnInit, OnChanges, OnDestroy {
     this.showRejectCommentBox = false;
     this.rejectComment = '';
     this.flightToReject = null;
+    this.table?.renderRows();
   }
+
+  isRejectRow = (_index: number, row: Flight): boolean => {
+    return this.showRejectCommentBox && this.flightToReject === row;
+  };
 
   private changeValidationValue(flight: Flight) {
     this.studentService.validateFlightSchoolIdAndStudentId(this.student?.id!, this.school?.id!, flight).pipe(takeUntil(this.unsubscribe$)).subscribe((updatedFlight: Flight) => {

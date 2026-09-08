@@ -114,6 +114,10 @@ export class StudentNoteComponent implements OnDestroy, OnChanges {
     this.displayAddNote = true;
   }
 
+  isEditingNote(note: Note): boolean {
+    return this.displayAddNote && this.mode === 'edit' && this.form.get('id')?.value === note.id;
+  }
+
   private updateFormGroup(note?: Note) {
     if (!note) {
       note = new Note();

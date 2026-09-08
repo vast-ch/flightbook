@@ -1,6 +1,6 @@
 <h1 mat-dialog-title>{{ title }}</h1>
 <mat-dialog-content [formGroup]="form">
-    <mat-form-field>
+    <mat-form-field appearance="outline">
         <mat-label>{{ 'login.email'| translate }}</mat-label>
         <input matInput placeholder="{{ 'login.email'| translate }}" formControlName="email" required>
         <mat-error>
