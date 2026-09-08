@@ -3,6 +3,14 @@
 mat-form-field {
     width: 100%;
 
+    // An outlined field's floated label sits ~6.75px ABOVE the field's top edge - that
+    // is how it straddles the border - and it gets cut off at that boundary here.
+    // Material also zeroes the dialog content's top padding when it follows a
+    // mat-dialog-title, so there is no clearance for the overhang. This pushes the
+    // field down far enough for the label to render whole. Verified visually; do not
+    // remove without re-checking the label in the running dialog.
+    padding-top: 5px;
+
     @include mat.form-field-overrides(
         (
             container-height: 40px,
