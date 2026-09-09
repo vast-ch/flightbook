@@ -15,7 +15,8 @@
         },
         "informWaitingStudent": {
             "subject": "{school}: Registrazione per: {date}",
-            "content": "<p>Qualcuno ha cancellato la sua partecipazione per {date}. Ora puoi registrarti per questa data.</p>"
+            "contentCanParticipate": "<p>Qualcuno ha cancellato la sua partecipazione per {date}. Ora puoi partecipare.</p>",
+            "contentMovedUp": "<p>Qualcuno ha cancellato la sua partecipazione per {date}. Sei passato alla posizione {position} nella lista d'attesa.</p>"
         }
     },
     "invoice": {

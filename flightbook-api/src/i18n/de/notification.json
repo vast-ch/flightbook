@@ -14,7 +14,8 @@
         },
         "informWaitingStudent": {
             "title": "{school}: Anmeldung",
-            "body": "Jemand hat sich für den Termin vom {date} abgemeldet. Sie können jetzt teilnehmen."
+            "bodyCanParticipate": "Jemand hat sich für den Termin vom {date} abgemeldet. Sie können jetzt teilnehmen.",
+            "bodyMovedUp": "Jemand hat sich für den Termin vom {date} abgemeldet. Sie sind auf Platz {position} der Warteliste vorgerückt."
         }
     },
     "flightValidation": {
