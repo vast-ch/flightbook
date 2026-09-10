@@ -300,6 +300,54 @@ describe('V2 Flights (e2e)', () => {
         expect(response.body[0]).toMatchSnapshot();
       });
   });
+
+  it('/v2/flights/statistic?type=monthly (GET)', async () => {
+    // given
+    const keycloakToken = JwtTestHelper.createKeycloakToken();
+
+    //when
+    return request(testInstance.app.getHttpServer())
+      .get('/v2/flights/statistic')
+      .query({ type: 'monthly' })
+      .set('Authorization', `Bearer ${keycloakToken}`)
+      .expect(200)
+      .then(response => {
+        expect(response.body).toBeInstanceOf(Array);
+        expect(response.body.length).toBeGreaterThanOrEqual(1);
+        expect(response.body[0]).toMatchSnapshot();
+      });
+  });
+
+  it('/v2/flights/statistic?type=daily (GET)', async () => {
+    // given
+    const keycloakToken = JwtTestHelper.createKeycloakToken();
+
+    //when
+    return request(testInstance.app.getHttpServer())
+      .get('/v2/flights/statistic')
+      .query({ type: 'daily', from: '2025-01-01', to: '2025-01-03' })
+      .set('Authorization', `Bearer ${keycloakToken}`)
+      .expect(200)
+      .then(response => {
+        expect(response.body).toBeInstanceOf(Array);
+        expect(response.body).toHaveLength(3);
+        expect(response.body[0]).toMatchObject({ type: 'daily', year: '2025', month: '01', day: '01', nbFlights: 2 });
+        expect(response.body[1]).toMatchObject({ type: 'daily', year: '2025', month: '01', day: '02', nbFlights: 1 });
+        expect(response.body[2]).toMatchObject({ type: 'daily', year: '2025', month: '01', day: '03', nbFlights: 1 });
+      });
+  });
+
+  it('/v2/flights/statistic?type=daily (GET) without a date range', async () => {
+    // given
+    const keycloakToken = JwtTestHelper.createKeycloakToken();
+
+    //when
+    return request(testInstance.app.getHttpServer())
+      .get('/v2/flights/statistic')
+      .query({ type: 'daily' })
+      .set('Authorization', `Bearer ${keycloakToken}`)
+      .expect(400);
+  });
 });
 
 describe('Instructor Flight (e2e)', () => {

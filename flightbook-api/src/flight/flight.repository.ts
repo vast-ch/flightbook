@@ -144,11 +144,15 @@ export class FlightRepository extends Repository<Flight> {
         let builder = this.repository.createQueryBuilder('flight')
             .select('count(flight.id)::int', "nbFlights")
             .addSelect('count(CASE WHEN flight.shv_alone = true THEN 1 END)::int', "nbFlightsAlone")
+            .addSelect('count(CASE WHEN flight.price > 0 THEN 1 END)::int', "paidFlights")
             .addSelect("EXTRACT(epoch FROM Sum(flight.time))", "time")
             .addSelect('Sum(flight.price)', "income")
             .addSelect('Sum(flight.km)', "totalDistance")
             .addSelect('Max(flight.km)', "bestDistance")
+            .addSelect("to_char((array_agg(flight.date ORDER BY flight.km DESC NULLS LAST))[1], 'YYYY-MM-DD')", "bestDistanceDate")
             .addSelect('EXTRACT(epoch FROM Avg(flight.time))', "average")
+            .addSelect('EXTRACT(epoch FROM Max(flight.time))', "longestAirtime")
+            .addSelect("to_char((array_agg(flight.date ORDER BY flight.time DESC NULLS LAST))[1], 'YYYY-MM-DD')", "longestAirtimeDate")
             .addSelect('count(DISTINCT(flight.start_id))::int', "nbStartplaces")
             .addSelect('count(DISTINCT(flight.landing_id))::int', "nbLandingplaces")
             .leftJoin('flight.user', 'user', 'user.id = flight.user_id')
@@ -181,6 +185,13 @@ export class FlightRepository extends Repository<Flight> {
             .addSelect("coalesce(average, 0)", "average")
             .addSelect("coalesce(total_distance, 0)", "totalDistance")
             .addSelect("coalesce(best_distance, 0)", "bestDistance")
+            .addSelect("best_distance_date", "bestDistanceDate")
+            .addSelect("coalesce(longest_airtime, 0)", "longestAirtime")
+            .addSelect("longest_airtime_date", "longestAirtimeDate")
+            .addSelect("coalesce(paid_flights, 0)", "paidFlights")
+            .addSelect("coalesce(nb_flights_alone, 0)", "nbFlightsAlone")
+            .addSelect("coalesce(nb_startplaces, 0)", "nbStartplaces")
+            .addSelect("coalesce(nb_landingplaces, 0)", "nbLandingplaces")
             .addFrom((qb) => {
                 return qb.select(`date_trunc('year',generate_series((${mindate.getSql()})::DATE, (${maxdate.getSql()})::DATE, '1 year'))`, "year")
                     .fromDummy();
@@ -193,6 +204,13 @@ export class FlightRepository extends Repository<Flight> {
                     .addSelect('EXTRACT(epoch FROM Avg(flight.time))', "average")
                     .addSelect('Sum(flight.km)', "total_distance")
                     .addSelect('Max(flight.km)', "best_distance")
+                    .addSelect("to_char((array_agg(flight.date ORDER BY flight.km DESC NULLS LAST))[1], 'YYYY-MM-DD')", "best_distance_date")
+                    .addSelect('EXTRACT(epoch FROM Max(flight.time))', "longest_airtime")
+                    .addSelect("to_char((array_agg(flight.date ORDER BY flight.time DESC NULLS LAST))[1], 'YYYY-MM-DD')", "longest_airtime_date")
+                    .addSelect('count(CASE WHEN flight.price > 0 THEN 1 END)::int', "paid_flights")
+                    .addSelect('count(CASE WHEN flight.shv_alone = true THEN 1 END)::int', "nb_flights_alone")
+                    .addSelect('count(DISTINCT(flight.start_id))::int', "nb_startplaces")
+                    .addSelect('count(DISTINCT(flight.landing_id))::int', "nb_landingplaces")
                     .addFrom(Flight, "flight")
                     .where(`flight.user_id = ${token.userId}`)
                     .leftJoin('flight.glider', 'glider')
@@ -233,6 +251,13 @@ export class FlightRepository extends Repository<Flight> {
             .addSelect("coalesce(average, 0)", "average")
             .addSelect("coalesce(total_distance, 0)", "totalDistance")
             .addSelect("coalesce(best_distance, 0)", "bestDistance")
+            .addSelect("best_distance_date", "bestDistanceDate")
+            .addSelect("coalesce(longest_airtime, 0)", "longestAirtime")
+            .addSelect("longest_airtime_date", "longestAirtimeDate")
+            .addSelect("coalesce(paid_flights, 0)", "paidFlights")
+            .addSelect("coalesce(nb_flights_alone, 0)", "nbFlightsAlone")
+            .addSelect("coalesce(nb_startplaces, 0)", "nbStartplaces")
+            .addSelect("coalesce(nb_landingplaces, 0)", "nbLandingplaces")
             .addFrom((qb) => {
                 return qb.select(`date_trunc('month',generate_series((${mindate.getSql()})::DATE, (${maxdate.getSql()})::DATE, '1 month'))`, "year_month")
                     .fromDummy();
@@ -245,6 +270,13 @@ export class FlightRepository extends Repository<Flight> {
                     .addSelect('EXTRACT(epoch FROM Avg(flight.time))', "average")
                     .addSelect('Sum(flight.km)', "total_distance")
                     .addSelect('Max(flight.km)', "best_distance")
+                    .addSelect("to_char((array_agg(flight.date ORDER BY flight.km DESC NULLS LAST))[1], 'YYYY-MM-DD')", "best_distance_date")
+                    .addSelect('EXTRACT(epoch FROM Max(flight.time))', "longest_airtime")
+                    .addSelect("to_char((array_agg(flight.date ORDER BY flight.time DESC NULLS LAST))[1], 'YYYY-MM-DD')", "longest_airtime_date")
+                    .addSelect('count(CASE WHEN flight.price > 0 THEN 1 END)::int', "paid_flights")
+                    .addSelect('count(CASE WHEN flight.shv_alone = true THEN 1 END)::int', "nb_flights_alone")
+                    .addSelect('count(DISTINCT(flight.start_id))::int', "nb_startplaces")
+                    .addSelect('count(DISTINCT(flight.landing_id))::int', "nb_landingplaces")
                     .addFrom(Flight, "flight")
                     .where(`flight.user_id = ${token.userId}`)
                     .leftJoin('flight.glider', 'glider')
@@ -256,6 +288,36 @@ export class FlightRepository extends Repository<Flight> {
 
             }, "counts", "m.year_month = counts.sub_year_month")
             .orderBy("year_month")
+            .take(900);
+
+        return builder.getRawMany<FlightStatisticDto>();
+    }
+
+    async getStatisticDay(token: any, query: any): Promise<FlightStatisticDto[]> {
+        let builder = this.repository.manager.createQueryBuilder()
+            .select("'daily'", "type")
+            .addSelect("to_char(day, 'YYYY')", "year")
+            .addSelect("to_char(day, 'MM')", "month")
+            .addSelect("to_char(day, 'DD')", "day")
+            .addSelect("coalesce(nb_flight, 0)", "nbFlights")
+            .addFrom((qb) => {
+                return qb.select(`date_trunc('day',generate_series('${query.from}'::DATE, '${query.to}'::DATE, '1 day'))`, "day")
+                    .fromDummy();
+            }, "m")
+            .leftJoin((qb) => {
+                let builder = qb.select("date_trunc('day',date)", "sub_day")
+                    .addSelect("COUNT(*)::int", "nb_flight")
+                    .addFrom(Flight, "flight")
+                    .where(`flight.user_id = ${token.userId}`)
+                    .leftJoin('flight.glider', 'glider')
+                    .groupBy('sub_day');
+
+                builder = FlightRepository.addQueryParams(builder, query);
+
+                return builder;
+
+            }, "counts", "m.day = counts.sub_day")
+            .orderBy("day")
             .take(900);
 
         return builder.getRawMany<FlightStatisticDto>();

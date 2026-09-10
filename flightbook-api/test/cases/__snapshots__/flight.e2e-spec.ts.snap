@@ -239,11 +239,15 @@ exports[`Flights (e2e) /flights/statistic (GET) 1`] = `
 {
   "average": "5400.000000",
   "bestDistance": 100.2,
+  "bestDistanceDate": "2025-01-01",
   "income": null,
+  "longestAirtime": "5400.000000",
+  "longestAirtimeDate": "2025-01-01",
   "nbFlights": 4,
   "nbFlightsAlone": 0,
   "nbLandingplaces": 3,
   "nbStartplaces": 3,
+  "paidFlights": 0,
   "time": "21600.000000",
   "totalDistance": 400.8,
 }
@@ -507,11 +511,39 @@ exports[`V2 Flights (e2e) /v2/flights/statistic (GET) 1`] = `
 {
   "average": "5400.000000",
   "bestDistance": 100.2,
+  "bestDistanceDate": "2025-01-01",
   "income": 0,
+  "longestAirtime": "5400.000000",
+  "longestAirtimeDate": "2025-01-01",
   "nbFlights": 4,
+  "nbFlightsAlone": 0,
+  "nbLandingplaces": 3,
+  "nbStartplaces": 3,
+  "paidFlights": 0,
   "time": "21600.000000",
   "totalDistance": 400.8,
   "type": "yearly",
+  "year": "2025",
+}
+`;
+
+exports[`V2 Flights (e2e) /v2/flights/statistic?type=monthly (GET) 1`] = `
+{
+  "average": "5400.000000",
+  "bestDistance": 100.2,
+  "bestDistanceDate": "2025-01-01",
+  "income": 0,
+  "longestAirtime": "5400.000000",
+  "longestAirtimeDate": "2025-01-01",
+  "month": "01",
+  "nbFlights": 4,
+  "nbFlightsAlone": 0,
+  "nbLandingplaces": 3,
+  "nbStartplaces": 3,
+  "paidFlights": 0,
+  "time": "21600.000000",
+  "totalDistance": 400.8,
+  "type": "monthly",
   "year": "2025",
 }
 `;
