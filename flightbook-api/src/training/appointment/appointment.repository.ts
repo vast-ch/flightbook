@@ -36,6 +36,23 @@ export class AppointmentRepository extends Repository<Appointment> {
     }
 
     async getAppointmentsBySchoolId(schoolId: number, query: any): Promise<[Appointment[], number]> {
+        const ALLOWED_SORT_FIELDS = ['scheduling'];
+        let sort = 'scheduling';
+        if (query && query.sort !== undefined) {
+            if (!ALLOWED_SORT_FIELDS.includes(query.sort)) {
+                throw new BadRequestException(`sort must be one of: ${ALLOWED_SORT_FIELDS.join(', ')}`);
+            }
+            sort = query.sort;
+        }
+
+        let order: 'ASC' | 'DESC' = 'DESC';
+        if (query && query.order !== undefined) {
+            if (query.order !== 'ASC' && query.order !== 'DESC') {
+                throw new BadRequestException("order must be 'ASC' or 'DESC'");
+            }
+            order = query.order;
+        }
+
         const options: any = {
             relations: {
                 subscriptions:{
@@ -52,7 +69,7 @@ export class AppointmentRepository extends Repository<Appointment> {
                 }
             },
             order: {
-                scheduling: 'DESC'
+                [sort]: order
             }
         };
 
