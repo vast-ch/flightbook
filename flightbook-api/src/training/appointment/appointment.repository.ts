@@ -92,7 +92,7 @@ export class AppointmentRepository extends Repository<Appointment> {
         } else if (query && query.from) {
             options.where.scheduling = MoreThanOrEqual(query.from);
         } else if (query && query.to) {
-            options.where.scheduling = LessThanOrEqual(query.to);
+            options.where.scheduling = LessThanOrEqual(`${query.to} 23:59:00.000000`);
         }
 
         const state = State[query?.state];

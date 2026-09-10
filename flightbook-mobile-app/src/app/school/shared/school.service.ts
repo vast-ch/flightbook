@@ -110,6 +110,8 @@ export class SchoolService {
     if (!scope) {
       return params;
     }
+    params = params.append('sort', 'scheduling');
+    params = params.append('order', scope === 'upcoming' ? 'ASC' : 'DESC');
     // A bound the user set wins - unless the caller opted out of the filter, in
     // which case there is no user bound to defer to. Read only on that path, so
     // an applyFilter: false caller takes no dependency on the shared filter.
