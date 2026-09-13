@@ -62,7 +62,7 @@ export class FlightStatisticPage implements OnDestroy {
     public heatmap = this.store.heatmap;
     public cumulative = this.store.cumulative;
     public bests = this.store.bests;
-    public firstFlightDate = this.store.firstFlightDate;
+    public firstFlightYear = this.store.firstFlightYear;
 
     /**
      * Total airtime for the selected period, as whole hours - the cumulative
@@ -183,9 +183,9 @@ export class FlightStatisticPage implements OnDestroy {
         const revision = this.flightStore.revision();
         await modal.present();
         await modal.onWillDismiss();
-        // Only if the sheet actually moved the filter: reload() refetches three
-        // aggregates plus the whole unpaginated logbook, and opening the sheet
-        // to look at it used to pay that price.
+        // Only if the sheet actually moved the filter: reload() refetches the
+        // three aggregates (and the selected year's day counts, if any), and
+        // opening the sheet to look at it used to pay that price.
         if (this.flightStore.revision() !== revision) {
             this.reloadForFilter();
         }

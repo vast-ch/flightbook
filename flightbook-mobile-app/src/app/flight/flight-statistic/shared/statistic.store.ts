@@ -1,12 +1,10 @@
-import { Injectable, computed, inject, signal } from '@angular/core';
+import { Injectable, computed, effect, inject, signal } from '@angular/core';
 import { forkJoin, of, Observable } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
 import { LanguageService } from 'src/app/shared/services/language.service';
 import { FlightStore } from '../../shared/flight.store';
 import { FlightStatistic } from '../../shared/flightStatistic.model';
-import { Flight } from '../../shared/flight.model';
 import { SessionTeardownRegistry } from 'src/app/shared/services/session-teardown.registry';
-import { localDate } from 'src/app/shared/util/format';
 
 /** 'all' or a four-digit year. */
 export type StatisticPeriod = string;
@@ -96,20 +94,16 @@ export interface StatisticState {
     global: FlightStatistic | null;
     yearly: FlightStatistic[];
     monthly: FlightStatistic[];
-    /** Every flight, fetched once per session and reused for every period. */
-    flights: Flight[];
+    /** Day counts for a selected year, fetched lazily the first time it's shown. */
+    daily: Map<string, HeatmapDay[]>;
     loaded: boolean;
     /** FlightStore.revision this snapshot was taken at. */
     revision: number;
 }
 
-/** 'HH:mm:ss' from the API to seconds. */
-function timeToSeconds(time?: string): number {
-    if (!time) {
-        return 0;
-    }
-    const [h = 0, m = 0, s = 0] = time.split(':').map(Number);
-    return h * 3600 + m * 60 + s;
+/** 'YYYY-MM-DD', comparable against the API's date strings. */
+function dateKey(date: Date): string {
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 }
 
 /**
@@ -139,13 +133,26 @@ export class StatisticStore {
         global: null,
         yearly: [],
         monthly: [],
-        flights: [],
+        daily: new Map(),
         loaded: false,
         revision: -1
     });
 
+    /** Years currently being fetched, so a rapid re-select can't fire it twice. */
+    private pendingDaily = new Set<string>();
+
     constructor() {
         inject(SessionTeardownRegistry).register(() => this.clear());
+
+        // The day heatmap is only ever shown for one selected year (never
+        // all-time - the season grid covers that), so this is at most one
+        // small request per year the user actually opens, not a bulk fetch.
+        effect(() => {
+            const period = this.period();
+            if (this.loaded() && period !== ALL_TIME) {
+                this.ensureDaily(period);
+            }
+        });
     }
 
     /** Selected period: ALL_TIME or a year. */
@@ -167,10 +174,10 @@ export class StatisticStore {
             .sort((a, b) => Number(b) - Number(a))
     );
 
-    /** Date of the first flight, for the header eyebrow. */
-    public firstFlightDate = computed<string | null>(() => {
-        const dates = this.state().flights.map(f => f.date).filter(Boolean).sort();
-        return dates.length ? dates[0] : null;
+    /** Earliest year with a flight, for the header eyebrow. */
+    public firstFlightYear = computed<string | null>(() => {
+        const years = this.years();
+        return years.length ? years[years.length - 1] : null;
     });
 
     /**
@@ -342,22 +349,21 @@ export class StatisticStore {
         this.monthNames().map(name => name.charAt(0).toUpperCase())
     );
 
-    /** Flights inside the selected period. */
-    private periodFlights = computed<Flight[]>(() => {
+    /**
+     * The aggregate row behind the selected period: the global row for
+     * all-time, the matching yearly row for a single year. Both arrive with
+     * numeric fields as strings. Shared by headline, bests and incomeSummary
+     * so the all-time/yearly lookup isn't repeated three times.
+     */
+    private selectedStatRow = computed<FlightStatistic | null>(() => {
         const period = this.period();
-        const flights = this.state().flights;
-        return period === ALL_TIME ? flights : flights.filter(f => f.date?.startsWith(period));
+        return period === ALL_TIME
+            ? this.state().global
+            : this.state().yearly.find(y => y.year === period) ?? null;
     });
 
     public headline = computed<HeadlineStats>(() => {
-        const period = this.period();
-
-        // All-time comes from the authoritative global aggregate; a single year
-        // comes from its yearly row. Both arrive with numeric fields as strings.
-        const row = period === ALL_TIME
-            ? this.state().global
-            : this.state().yearly.find(y => y.year === period) ?? null;
-
+        const row = this.selectedStatRow();
         const flights = Number(row?.nbFlights ?? 0);
         const airtime = Number(row?.time ?? 0);
         return {
@@ -379,56 +385,39 @@ export class StatisticStore {
 
     /**
      * The total comes from the aggregate row, so it follows the shared filter;
-     * the paid-flight count has to come from the flights themselves, because
-     * the API only sums the prices, it does not count them.
+     * paidFlights is a count the API now returns alongside it.
      */
     public incomeSummary = computed<IncomeSummary>(() => {
         const total = this.headline().income;
-        let paidFlights = 0;
-        for (const flight of this.periodFlights()) {
-            if (Number(flight.price ?? 0) > 0) {
-                paidFlights++;
-            }
-        }
+        const paidFlights = Number(this.selectedStatRow()?.paidFlights ?? 0);
         return { total, paidFlights, perFlight: paidFlights > 0 ? total / paidFlights : 0 };
     });
 
     /**
-     * One entry per day: from the first flight for all-time, the calendar year
-     * for a selected year. All-time is what the design's "every day since you
-     * started" describes; the grid compresses to fit rather than scrolling, so
-     * a long logbook draws narrower columns instead of running off the card.
+     * One entry per day of the selected year, Monday-aligned so the 7-row grid
+     * lines up. Only ever read for a specific year - the template shows the
+     * season grid instead of this for all-time - so `ensureDaily` only ever
+     * requests a single calendar year, safely under the API's day-count cap.
      */
     public heatmap = computed<HeatmapDay[]>(() => {
-        const flights = this.periodFlights();
-        if (flights.length === 0) {
+        const period = this.period();
+        if (period === ALL_TIME) {
+            return [];
+        }
+
+        const rows = this.state().daily.get(period);
+        if (!rows || rows.length === 0) {
             return [];
         }
 
         const counts = new Map<string, number>();
-        for (const flight of flights) {
-            if (flight.date) {
-                counts.set(flight.date, (counts.get(flight.date) ?? 0) + 1);
-            }
+        for (const row of rows) {
+            counts.set(dateKey(row.date), row.flights);
         }
 
-        const period = this.period();
-        const sorted = [...counts.keys()].sort();
         const today = new Date();
-
-        // Flights can carry no date, so `flights` being non-empty does not mean
-        // `counts` is - and the all-time window is anchored on its first key.
-        if (period === ALL_TIME && sorted.length === 0) {
-            return [];
-        }
-
-        const start: Date = period === ALL_TIME
-            ? localDate(sorted[0])
-            : new Date(Number(period), 0, 1);
-
-        const end = period === ALL_TIME || Number(period) === today.getFullYear()
-            ? today
-            : new Date(Number(period), 11, 31);
+        const start = new Date(Number(period), 0, 1);
+        const end = Number(period) === today.getFullYear() ? today : new Date(Number(period), 11, 31);
 
         // Start on the Monday of the first week so the 7-row grid aligns.
         const cursor = new Date(start);
@@ -437,8 +426,7 @@ export class StatisticStore {
 
         const days: HeatmapDay[] = [];
         while (cursor <= end) {
-            const key = `${cursor.getFullYear()}-${String(cursor.getMonth() + 1).padStart(2, '0')}-${String(cursor.getDate()).padStart(2, '0')}`;
-            days.push({ date: new Date(cursor), flights: counts.get(key) ?? 0 });
+            days.push({ date: new Date(cursor), flights: counts.get(dateKey(cursor)) ?? 0 });
             cursor.setDate(cursor.getDate() + 1);
         }
         return days;
@@ -469,34 +457,40 @@ export class StatisticStore {
     });
 
     public bests = computed<PersonalBests>(() => {
-        const flights = this.periodFlights();
+        const row = this.selectedStatRow();
 
-        let longestDistance: { km: number; date: string } | null = null;
-        let longestAirtime: { seconds: number; date: string } | null = null;
-        const startPlaces = new Set<number>();
-        const landingPlaces = new Set<number>();
+        const km = Number(row?.bestDistance ?? 0);
+        const airtimeSeconds = Number(row?.longestAirtime ?? 0);
 
-        for (const flight of flights) {
-            const km = Number(flight.km ?? 0);
-            if (km > 0 && (!longestDistance || km > longestDistance.km)) {
-                longestDistance = { km, date: flight.date };
-            }
-
-            const seconds = timeToSeconds(flight.time);
-            if (seconds > 0 && (!longestAirtime || seconds > longestAirtime.seconds)) {
-                longestAirtime = { seconds, date: flight.date };
-            }
-
-            if (flight.start?.id) {
-                startPlaces.add(flight.start.id);
-            }
-            if (flight.landing?.id) {
-                landingPlaces.add(flight.landing.id);
-            }
-        }
-
-        return { longestDistance, longestAirtime, startPlaces: startPlaces.size, landingPlaces: landingPlaces.size };
+        return {
+            longestDistance: km > 0 && row?.bestDistanceDate ? { km, date: row.bestDistanceDate } : null,
+            longestAirtime: airtimeSeconds > 0 && row?.longestAirtimeDate ? { seconds: airtimeSeconds, date: row.longestAirtimeDate } : null,
+            startPlaces: Number(row?.nbStartplaces ?? 0),
+            landingPlaces: Number(row?.nbLandingplaces ?? 0)
+        };
     });
+
+    /** Fetches one year's day counts once, and only once, per session. */
+    private ensureDaily(year: string): void {
+        if (this.state().daily.has(year) || this.pendingDaily.has(year)) {
+            return;
+        }
+        this.pendingDaily.add(year);
+        this.flightStore.getStatistics('daily', true, { from: `${year}-01-01`, to: `${year}-12-31` }).pipe(
+            catchError(() => of([] as FlightStatistic[]))
+        ).subscribe(rows => {
+            this.pendingDaily.delete(year);
+            const days: HeatmapDay[] = rows.map(row => ({
+                date: new Date(Number(row.year), Number(row.month) - 1, Number(row.day)),
+                flights: Number(row.nbFlights ?? 0)
+            }));
+            this.state.update(state => {
+                const daily = new Map(state.daily);
+                daily.set(year, days);
+                return { ...state, daily };
+            });
+        });
+    }
 
     /**
      * One load per session. Everything else is derived, so switching period
@@ -509,7 +503,7 @@ export class StatisticStore {
         const previous = this.state();
         /*
          * Read now, not in the map() below. Stamped on arrival, a filter applied
-         * while these four requests were in flight was recorded as already
+         * while these three requests were in flight was recorded as already
          * included: `loaded` stayed true and the page kept the unfiltered
          * figures under the new filter's chips for the rest of the session.
          */
@@ -517,14 +511,15 @@ export class StatisticStore {
         const global$: Observable<FlightStatistic[] | null> = this.flightStore.getStatistics('global').pipe(catchError(() => of(null)));
         const yearly$ = this.flightStore.getStatistics('yearly').pipe(catchError(() => of([] as FlightStatistic[])));
         const monthly$ = this.flightStore.getStatistics('monthly').pipe(catchError(() => of([] as FlightStatistic[])));
-        const flights$ = this.flightStore.getFlights({ store: false }).pipe(catchError(() => of([] as Flight[])));
 
-        return forkJoin([global$, yearly$, monthly$, flights$]).pipe(
-            map(([global, yearly, monthly, flights]): StatisticState => ({
+        return forkJoin([global$, yearly$, monthly$]).pipe(
+            map(([global, yearly, monthly]): StatisticState => ({
                 global: global?.[0] ?? null,
                 yearly: yearly ?? [],
                 monthly: monthly ?? [],
-                flights: flights ?? [],
+                // Cleared, not carried over: a filter change can change every
+                // day's count, and ensureDaily() re-fetches on demand.
+                daily: new Map(),
                 // A load where even the global aggregate failed is not loaded:
                 // caching it would pin the empty state for the whole session,
                 // because the page only refetches while `loaded` is false.
@@ -582,6 +577,7 @@ export class StatisticStore {
 
     clear(): void {
         this.period.set(ALL_TIME);
-        this.state.set({ global: null, yearly: [], monthly: [], flights: [], loaded: false, revision: -1 });
+        this.state.set({ global: null, yearly: [], monthly: [], daily: new Map(), loaded: false, revision: -1 });
+        this.pendingDaily.clear();
     }
 }

@@ -7,7 +7,7 @@
     @if (period() === ALL_TIME) {
       {{ 'statistics.kickerAll' | translate:{
            count: headline().flights,
-           date: (firstFlightDate() | date:'dd.MM.yyyy') } }}
+           year: firstFlightYear() } }}
     } @else {
       {{ 'statistics.kickerSeason' | translate:{ year: period(), count: headline().flights } }}
     }

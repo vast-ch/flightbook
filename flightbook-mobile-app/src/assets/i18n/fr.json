@@ -192,7 +192,7 @@
         "allTime": "Total",
         "period": "Période",
         "flightActivity": "Activité de vol",
-        "kickerAll": "Tout · {{count}} vols depuis le {{date}}",
+        "kickerAll": "Tout · {{count}} vols depuis {{year}}",
         "kickerSeason": "Saison {{year}} · {{count}} vols",
         "flightsPerYear": "Vols par an",
         "flightsPerMonth": "Vols par mois",
