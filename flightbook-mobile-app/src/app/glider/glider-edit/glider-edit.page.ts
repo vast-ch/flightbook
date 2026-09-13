@@ -48,7 +48,7 @@ export class GliderEditPage implements OnDestroy {
         if (!this.glider) {
             this.router.navigate(['/gliders'], { replaceUrl: true });
         }
-        this.flightStore.nbFlightsByGliderId(this.gliderId).subscribe((resp: any) => {
+        this.flightStore.nbFlightsByGliderId(this.gliderId).pipe(takeUntil(this.unsubscribe$)).subscribe((resp: any) => {
             if (resp.nbFlights == 0) {
                 this.deleteDisabled = false;
             }
@@ -100,7 +100,7 @@ export class GliderEditPage implements OnDestroy {
         });
         await loading.present();
 
-        this.gliderStore.deleteGlider(this.glider).subscribe(async (res: any) => {
+        this.gliderStore.deleteGlider(this.glider).pipe(takeUntil(this.unsubscribe$)).subscribe(async (res: any) => {
             await loading.dismiss();
             await this.router.navigate(['/gliders'], { replaceUrl: true });
         },

@@ -47,7 +47,7 @@ export class PlaceEditPage implements OnDestroy {
         if (!this.place) {
             this.router.navigate(['/places'], { replaceUrl: true });
         }
-        this.flightStore.nbFlightsByPlaceId(this.placeId).subscribe((resp: any) => {
+        this.flightStore.nbFlightsByPlaceId(this.placeId).pipe(takeUntil(this.unsubscribe$)).subscribe((resp: any) => {
             if (resp.nbFlights == 0) {
                 this.deleteDisabled = false;
             }
@@ -95,7 +95,7 @@ export class PlaceEditPage implements OnDestroy {
         });
         await loading.present();
 
-        this.placeStore.deletePlace(this.place).subscribe(async (res: any) => {
+        this.placeStore.deletePlace(this.place).pipe(takeUntil(this.unsubscribe$)).subscribe(async (res: any) => {
             await loading.dismiss();
             await this.router.navigate(['/places'], { replaceUrl: true });
         },
