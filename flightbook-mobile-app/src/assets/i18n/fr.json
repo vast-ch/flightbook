@@ -145,8 +145,6 @@
         },
         "importIgc": "Importer un fichier IGC",
         "importIgcHint": "Remplit la date, le trajet, le temps et la distance",
-        "placeFlightCount": "{{count}} vols",
-        "placeFlightCountOne": "1 vol",
         "shvAlone": "FSVL vol autonome",
         "tandemSchool": "Entreprise biplace",
         "customSchoolFields": "Informations supplémentaires {{schoolName}}",

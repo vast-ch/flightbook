@@ -162,8 +162,6 @@
         },
         "importIgc": "IGC-Datei importieren",
         "importIgcHint": "Füllt Datum, Strecke, Zeit und Distanz",
-        "placeFlightCount": "{{count}} Flüge",
-        "placeFlightCountOne": "1 Flug",
         "orByHand": "oder von Hand erfassen",
         "vario": {
             "legendLabel": "Spurfarbe: blau sinken, grün konstant, rot steigen",

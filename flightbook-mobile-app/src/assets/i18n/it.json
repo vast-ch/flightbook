@@ -162,8 +162,6 @@
         },
         "importIgc": "Importa file IGC",
         "importIgcHint": "Compila data, percorso, tempo e distanza",
-        "placeFlightCount": "{{count}} voli",
-        "placeFlightCountOne": "1 volo",
         "orByHand": "oppure inserisci a mano",
         "vario": {
             "legendLabel": "Colore della traccia: blu discesa, verde costante, rosso salita",

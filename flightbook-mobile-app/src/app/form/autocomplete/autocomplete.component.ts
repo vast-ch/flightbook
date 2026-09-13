@@ -1,9 +1,8 @@
 import { Component, OnInit, Input, Output, EventEmitter, ElementRef, OnChanges, OnDestroy } from '@angular/core';
-import { Subject, forkJoin, of } from 'rxjs';
-import { catchError, debounceTime, map, switchMap, takeUntil } from 'rxjs/operators';
+import { Subject, of } from 'rxjs';
+import { catchError, debounceTime, switchMap, takeUntil } from 'rxjs/operators';
 import { Place } from 'src/app/place/shared/place.model';
 import { PlaceStore } from 'src/app/place/shared/place.store';
-import { FlightStore } from 'src/app/flight/shared/flight.store';
 import { addIcons } from "ionicons";
 import { close } from "ionicons/icons";
 import { IonIcon } from "@ionic/angular/standalone";
@@ -33,15 +32,8 @@ export class AutocompleteComponent implements OnInit, OnChanges, OnDestroy {
     show: boolean;
     listElement: Place[];
 
-    /**
-     * Flights-per-place, keyed by place id. Cached for the lifetime of the
-     * component so retyping the same prefix doesn't refetch counts.
-     */
-    flightCounts: { [placeId: number]: number } = {};
-
     constructor(
         private placeStore: PlaceStore,
-        private flightStore: FlightStore,
         private eRef: ElementRef
     ) {
         this.search = null;
@@ -52,8 +44,7 @@ export class AutocompleteComponent implements OnInit, OnChanges, OnDestroy {
         // before ngOnInit, and a Subject drops anything emitted before there is
         // a subscriber.
         this.searchTerm$.pipe(
-            // One lookup per settled prefix rather than one per keystroke: each
-            // match also costs up to four flight-count requests below.
+            // One lookup per settled prefix rather than one per keystroke.
             debounceTime(250),
             switchMap(term => this.placeStore.getPlacesByName(term, { limit: 4 }).pipe(
                 catchError(() => of([] as Place[]))
@@ -63,9 +54,6 @@ export class AutocompleteComponent implements OnInit, OnChanges, OnDestroy {
             if (res && res.length > 0) {
                 this.show = true;
                 this.listElement = res;
-                // Fired after the list renders, so names appear immediately
-                // and counts fill in when they arrive.
-                this.loadFlightCounts(res);
             } else {
                 this.show = false;
             }
@@ -109,31 +97,6 @@ export class AutocompleteComponent implements OnInit, OnChanges, OnDestroy {
 
     closeList() {
         this.show = false;
-    }
-
-    private loadFlightCounts(places: Place[]) {
-        const missing = places.filter(place => place.id != null && this.flightCounts[place.id] === undefined);
-        if (missing.length === 0) {
-            return;
-        }
-
-        forkJoin(
-            missing.map(place =>
-                this.flightStore.nbFlightsByPlaceId(place.id).pipe(
-                    // The API returns nbFlights as a string.
-                    map(resp => ({ id: place.id, count: Number(resp?.nbFlights ?? 0) as number | null })),
-                    catchError(() => of({ id: place.id, count: null }))
-                )
-            )
-        ).pipe(takeUntil(this.unsubscribe$)).subscribe(results => {
-            for (const result of results) {
-                // Only a real answer is cached: caching the catchError fallback
-                // pinned "0 flights" on that place for the component's life.
-                if (result.count !== null) {
-                    this.flightCounts[result.id] = result.count;
-                }
-            }
-        });
     }
 
     ngOnDestroy() {

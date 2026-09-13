@@ -13,15 +13,6 @@
             {{ element.name }}
           }
         </span>
-        @if (flightCounts[element.id] !== undefined) {
-          <span class="suggestion__count">
-            @if (flightCounts[element.id] === 1) {
-              {{ 'flight.placeFlightCountOne' | translate }}
-            } @else {
-              {{ 'flight.placeFlightCount' | translate:{ count: flightCounts[element.id] } }}
-            }
-          </span>
-        }
       </button>
     }
     <button type="button" class="suggestion suggestion--close" (click)="closeList()">

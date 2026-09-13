@@ -162,8 +162,6 @@
         },
         "importIgc": "Import IGC file",
         "importIgcHint": "Fills date, route, time and distance",
-        "placeFlightCount": "{{count}} flights",
-        "placeFlightCountOne": "1 flight",
         "orByHand": "or enter it by hand",
         "vario": {
             "legendLabel": "Track colour: blue sinking, green level, red climbing",
