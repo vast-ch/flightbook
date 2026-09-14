@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { Location } from '@angular/common';
 import { LoadingController, NavController, IonContent, IonFooter, IonList, IonItem, IonSpinner, IonButton, IonIcon } from '@ionic/angular/standalone';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { Subject, from, firstValueFrom } from 'rxjs';
+import { takeUntil, mergeMap, toArray } from 'rxjs/operators';
 import { Place } from 'src/app/place/shared/place.model';
 import { FileUploadService } from 'src/app/flight/shared/fileupload.service';
 import { Glider } from 'src/app/glider/shared/glider.model';
@@ -18,6 +18,15 @@ import { LanguageService } from 'src/app/shared/services/language.service';
 import { navigateBackOrTo } from 'src/app/shared/util/back-navigation';
 import { addIcons } from "ionicons";
 import { trashOutline, cloudDoneOutline, alert, chevronBack } from "ionicons/icons";
+
+/**
+ * How many flights save() uploads+posts at once. Unbounded would fire every
+ * upload and POST in the batch simultaneously - fine for a handful of
+ * flights, not for a season's worth of dumped IGC files. Sequential (1) was
+ * the previous behaviour and is safe but slow; this trades a bit of
+ * concurrent server load for a partial speedup.
+ */
+const IMPORT_CONCURRENCY = 2;
 
 @Component({
     selector: 'app-multiple-igc',
@@ -123,21 +132,29 @@ export class MultipleIgcPage implements OnInit {
         });
         await loading.present();
 
-        for await (const flightSate of this.flightStateList) {
-            try {
-                if (flightSate.flight.igcFile) {
-                    await this.uploadIgc(flightSate.flight);
-                }
+        await firstValueFrom(
+            from(this.flightStateList).pipe(
+                mergeMap(flightState => this.saveOne(flightState), IMPORT_CONCURRENCY),
+                toArray()
+            )
+        );
 
-                await this.flightStore.postFlight(flightSate.flight).toPromise();
-
-                flightSate.state = State.SAVED;
-            } catch {
-                flightSate.state = State.ERROR;
-            }
-        }
         this.isSaved = true;
         await loading.dismiss();
+    }
+
+    private async saveOne(flightState: FlightStatus): Promise<void> {
+        try {
+            if (flightState.flight.igcFile) {
+                await this.uploadIgc(flightState.flight);
+            }
+
+            await this.flightStore.postFlight(flightState.flight).toPromise();
+
+            flightState.state = State.SAVED;
+        } catch {
+            flightState.state = State.ERROR;
+        }
     }
 
     private async uploadIgc(flight: Flight) {
