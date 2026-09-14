@@ -84,6 +84,7 @@ export class FlightAddPage implements OnInit, OnDestroy {
                 .subscribe((res: Flight[]) => {
                     if (res.length > 0) {
                         this.flight.glider = res[0].glider;
+                        this.ensureSelectedGliderIncluded();
                     }
                 });
         }
@@ -93,6 +94,7 @@ export class FlightAddPage implements OnInit, OnDestroy {
         // request failed.
         this.gliderStore.getGliders({ store: false, archived: "0" }).pipe(takeUntil(this.unsubscribe$)).subscribe((resp: Glider[]) => {
             this.gliders = resp;
+            this.ensureSelectedGliderIncluded();
             this.noGliderCheck();
         });
     }
@@ -163,12 +165,23 @@ export class FlightAddPage implements OnInit, OnDestroy {
         await loading.present();
 
         this.igcFile = await this.igcService.getIgcFileContentAndPrefillFlight(this.flight, this.flight.igcFile);
-        const glider = this.gliders.find(glider => glider.id === this.flight.glider.id);
-        if (!glider) {
-            this.gliders.push(this.flight.glider);
-        }
+        this.ensureSelectedGliderIncluded();
 
         await loading.dismiss();
+    }
+
+    /**
+     * The dropdown is built from the non-archived glider list, but the
+     * selected glider can be set independently (last flight's glider, an
+     * IGC-prefilled one) and may since have been archived - without this, it
+     * has no matching option and ion-select renders blank with no arrow.
+     * Guarded on an id: a brand-new pilot with no flight history reaches
+     * ngOnInit with the default, unset Glider() and nothing to add yet.
+     */
+    private ensureSelectedGliderIncluded() {
+        if (this.flight.glider?.id && !this.gliders.find(glider => glider.id === this.flight.glider.id)) {
+            this.gliders.push(this.flight.glider);
+        }
     }
 
     private async noGliderCheck() {

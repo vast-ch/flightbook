@@ -259,7 +259,7 @@
 }
 
 .fb-row__label {
-  flex: 0 0 76px;
+  flex: 0 0 88px;
   /*
    * The design's label column is a fixed 76px and carries no mandatory marker.
    * Ours does, and a label like "Nachname&nbsp;*" is wider than 76px.
@@ -421,6 +421,20 @@ button.fb-row {
     &::part(icon) {
       color: var(--fb-text-muted);
       opacity: 1;
+      /* Match .fb-row__chevron - Ionic's own default is ~18px. */
+      font-size: 13px;
+    }
+
+    /*
+     * Ionic's "inner" part (text + icon) only stretches full-width itself
+     * when using a stacked/floating label - the label placement this app
+     * doesn't use. Left at its default fit-content width, the icon sits
+     * right after the text instead of flush at the row's end like
+     * .fb-row__chevron.
+     */
+    &::part(inner) {
+      width: 100%;
+      justify-content: space-between;
     }
   }
 
