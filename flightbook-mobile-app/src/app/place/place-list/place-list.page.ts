@@ -7,7 +7,7 @@ import { Place } from 'src/app/place/shared/place.model';
 import { XlsxExportService } from 'src/app/shared/services/xlsx-export.service';
 import { SpreadsheetDownloadService } from 'src/app/shared/services/spreadsheet-download.service';
 import { PlaceStore } from '../shared/place.store';
-import { Countries, Country } from 'src/app/place/shared/place.countries';
+import { CountryByCode } from 'src/app/place/shared/place.countries';
 import { json2csv } from 'json-2-csv';
 import { MapUtil } from 'src/app/shared/util/MapUtil';
 import { RouterLink } from '@angular/router';
@@ -43,7 +43,6 @@ export class PlaceListPage implements OnDestroy {
     public error = this.placeStore.error;
     limit = 50;
     lang: string;
-    countries: Country[] = Countries;
 
     constructor(
         public navCtrl: NavController,
@@ -134,7 +133,7 @@ export class PlaceListPage implements OnDestroy {
         }
         // An unknown code used to throw here and take the whole list down with
         // it; fall back to showing the raw code instead.
-        const country = this.countries.find(x => x.code === code);
+        const country = CountryByCode.get(code);
         return country?.name[this.lang] ?? code.toUpperCase();
     }
 

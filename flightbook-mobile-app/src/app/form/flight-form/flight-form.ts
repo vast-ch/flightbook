@@ -67,6 +67,13 @@ export class FlightFormComponent implements OnInit, OnChanges {
     uploadSuccessful = false;
     language;
     customFieldValues: { [key: string]: any } = {};
+    /**
+     * Cached result of getActiveCustomFields(), refreshed only where its
+     * inputs actually change - the template used to call the method itself
+     * (twice per render, filtering + re-finding each disabled field's value
+     * every time), which reran on every change-detection pass.
+     */
+    public activeCustomFields: CustomFieldDefinition[] = [];
 
     constructor(
         private alertController: AlertController,
@@ -84,17 +91,19 @@ export class FlightFormComponent implements OnInit, OnChanges {
         if (!this.flight.landing) {
             this.flight.landing = new Place();
         }
-        
+
         if (this.flight.tandemSchoolData === null || this.flight.tandemSchoolData === undefined) {
             this.flight.tandemSchoolData = new TandemSchoolData();
         }
-        
+
         this.initializeCustomValues();
+        this.getActiveCustomFields();
     }
 
     ngOnChanges(changes: SimpleChanges) {
         if (changes['flight'] && this.flight) {
             this.initializeCustomValues();
+            this.getActiveCustomFields();
         }
     }
 
@@ -182,11 +191,13 @@ export class FlightFormComponent implements OnInit, OnChanges {
     clearSchoolButton() {
         this.flight.tandemSchoolData.tandemSchool = null;
         this.flight.tandemSchoolData.schoolCustomValues = [];
+        this.getActiveCustomFields();
     }
 
     onTandemSchoolChange() {
         this.flight.tandemSchoolData.schoolCustomValues = [];
         this.initializeCustomValues();
+        this.getActiveCustomFields();
     }
 
     compareSchools(school1: School, school2: School): boolean {
@@ -195,19 +206,21 @@ export class FlightFormComponent implements OnInit, OnChanges {
 
     getActiveCustomFields(): CustomFieldDefinition[] {
         if (!this.flight.tandemSchoolData?.tandemSchool?.configuration?.tandemModule?.flightConfig?.customFields) {
-            return [];
+            this.activeCustomFields = [];
+            return this.activeCustomFields;
         }
 
         const fields = this.flight.tandemSchoolData.tandemSchool.configuration.tandemModule.flightConfig.customFields;
-        
-        return fields.filter(field => {
+
+        this.activeCustomFields = fields.filter(field => {
             if (!field.disabled) {
                 return true;
             }
-            
+
             const existingValue = this.getCustomFieldValue(field.key);
             return existingValue !== null && existingValue !== undefined;
         });
+        return this.activeCustomFields;
     }
 
     getCustomFieldValue(key: string): any {
@@ -235,6 +248,10 @@ export class FlightFormComponent implements OnInit, OnChanges {
         } else {
             this.flight.tandemSchoolData.schoolCustomValues.push({ key, value });
         }
+
+        // A value change can flip a disabled field's visibility - see the
+        // filter in getActiveCustomFields().
+        this.getActiveCustomFields();
     }
 
     private ensureBooleanFieldsInitialized(): void {

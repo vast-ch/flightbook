@@ -147,13 +147,13 @@
     </div>
 
     <!-- ---- Card: tandem school custom fields ---- -->
-    @if (flight.tandemSchoolData?.tandemSchool && getActiveCustomFields().length > 0) {
+    @if (flight.tandemSchoolData?.tandemSchool && activeCustomFields.length > 0) {
       <div class="fb-section-label form-section-label">
         {{ 'flight.customSchoolFields' | translate: {schoolName: flight.tandemSchoolData?.tandemSchool?.name} }}
       </div>
 
       <div class="fb-card--flush form-card">
-        @for (field of getActiveCustomFields(); track field.key) {
+        @for (field of activeCustomFields; track field.key) {
           @if (field.type === 'date') {
             <!-- The row itself carries the modal trigger id -->
             <button type="button" [id]="'customField_' + field.key" class="fb-row">
