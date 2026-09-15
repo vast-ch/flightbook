@@ -109,10 +109,7 @@
         <span class="fb-row__value">{{ flight.time }}</span>
         <ion-icon class="fb-row__chevron" name="chevron-forward" aria-hidden="true"></ion-icon>
       </button>
-    </div>
 
-    <!-- ---- Card: measurements ---- -->
-    <div class="fb-card--flush form-card">
       @if (flight.glider?.tandem) {
         <div class="fb-row">
           <span class="fb-row__label" id="lbl-price">{{ 'flight.price' | translate }}</span>
@@ -127,16 +124,16 @@
           <ion-input [(ngModel)]="flight.km" type="number" name="km" aria-labelledby="lbl-km"></ion-input>
         </span>
       </div>
-    </div>
-
-    <!-- ---- Card: notes ---- -->
-    <div class="fb-card--flush form-card">
       @if (schools?.length > 0) {
         <div class="fb-row fb-row--toggle">
           <span class="fb-row__label" id="lbl-shvalone">{{ 'flight.shvAlone' | translate }}</span>
           <ion-toggle [(ngModel)]="flight.shvAlone" name="shvAlone" aria-labelledby="lbl-shvalone"></ion-toggle>
         </div>
       }
+    </div>
+
+    <!-- ---- Card: notes ---- -->
+    <div class="fb-card--flush form-card">
       <div class="fb-row fb-row--stack">
         <span class="fb-row__label" id="lbl-description">{{ 'flight.description' | translate }}</span>
         <span class="fb-row__value">

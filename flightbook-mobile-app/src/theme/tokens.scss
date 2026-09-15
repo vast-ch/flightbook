@@ -256,6 +256,15 @@
   & + .fb-row {
     border-top: 1px solid var(--fb-hairline);
   }
+
+  /*
+   * An <autocomplete> (flight-form's start/landing rows) sits between two
+   * .fb-rows in the DOM, so `& + .fb-row` above never matches across it.
+   * Same separator, bridged over that element.
+   */
+  & + autocomplete + .fb-row {
+    border-top: 1px solid var(--fb-hairline);
+  }
 }
 
 .fb-row__label {
