@@ -71,7 +71,7 @@ export class ControlSheetPage implements OnInit, OnDestroy {
      * instead of their rows - with 30 altitude skills, four always-open
      * accordions were what made this screen unreadable.
      */
-    public expandedGroup = signal<SkillGroup | null>('theory');
+    public expandedGroup = signal<SkillGroup | null>('altitudeFlight');
 
     /** Rendered in this order; declared here so the template stays typed. */
     public readonly groups: SkillGroup[] = ['theory', 'trainingHill', 'altitudeFlight'];
