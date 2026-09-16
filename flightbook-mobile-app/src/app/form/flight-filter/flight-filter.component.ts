@@ -11,7 +11,7 @@ import { FlightStatistic } from 'src/app/flight/shared/flightStatistic.model';
 import { FormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { addIcons } from 'ionicons';
-import { search } from 'ionicons/icons';
+import { search, chevronForward } from 'ionicons/icons';
 import moment from 'moment';
 
 /** How many past years the period shorthand offers. */
@@ -94,7 +94,10 @@ export class FlightFilterComponent implements OnInit, OnDestroy {
         private translate: TranslateService
     ) {
         this.language = translate.currentLang;
-        addIcons({ search });
+        // Without registering it here, chevron-forward on the glider select
+        // only resolves if some earlier page already registered it - see the
+        // same gotcha noted in glider-form.ts.
+        addIcons({ search, 'chevron-forward': chevronForward });
 
         // store/applyFilter false, as the brand dropdown does: this select has to
         // offer every glider the pilot owns. Read through the store it was

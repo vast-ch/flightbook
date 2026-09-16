@@ -53,10 +53,11 @@
             <div class="fb-section-label filter-label">{{ 'groupname.glider' | translate }}</div>
             <div class="filter-select">
                 <ion-select [ngModel]="selectedGliderId()" (ngModelChange)="setGliderById($event)"
-                            name="glider" interface="popover" toggleIcon="chevron-forward"
+                            name="glider" toggleIcon="chevron-forward"
                             [attr.aria-label]="'groupname.glider' | translate"
                             okText="{{ 'buttons.done' | translate }}"
-                            cancelText="{{ 'buttons.cancel' | translate }}">
+                            cancelText="{{ 'buttons.clear' | translate }}"
+                            (ionCancel)="setGliderById('')">
                     <ion-select-option value="">{{ 'glider.all' | translate }}</ion-select-option>
                     @for (glider of gliders; track glider.id) {
                         <ion-select-option [value]="glider.id.toString()">
