@@ -13,7 +13,7 @@ import { CumulativeChartComponent } from './components/cumulative-chart/cumulati
 import { FlightFilterComponent } from 'src/app/form/flight-filter/flight-filter.component';
 import { FilterChipsComponent } from 'src/app/form/flight-filter/filter-chips.component';
 import { FlightStore } from 'src/app/flight/shared/flight.store';
-import { ModalController } from '@ionic/angular/standalone';
+import { ModalController, NavController } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { chevronForward, filterOutline, trendingUp } from 'ionicons/icons';
 import { AvatarButtonComponent } from 'src/app/shared/components/avatar-button/avatar-button.component';
@@ -47,6 +47,7 @@ export class FlightStatisticPage implements OnDestroy {
     private translate = inject(TranslateService);
     private router = inject(Router);
     private modalCtrl = inject(ModalController);
+    private navCtrl = inject(NavController);
     private flightStore = inject(FlightStore);
     private languageService = inject(LanguageService);
 
@@ -212,6 +213,13 @@ export class FlightStatisticPage implements OnDestroy {
 
     openImport() {
         this.router.navigate(['imports/igc']);
+    }
+
+    goToFlight(id: number) {
+        if (!id) {
+            return;
+        }
+        this.navCtrl.navigateForward(`flights/${id}`);
     }
 
     /** Seconds to HH:mm. */

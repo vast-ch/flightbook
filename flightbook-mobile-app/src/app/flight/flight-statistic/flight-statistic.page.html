@@ -178,18 +178,20 @@
       <div class="fb-section-label stat-section-label">{{ 'statistics.personalBests' | translate }}</div>
       <div class="fb-card--flush bests">
         @if (bests().longestDistance; as best) {
-          <div class="bests__row">
+          <button type="button" class="bests__row bests__row--link" [disabled]="!best.id" (click)="goToFlight(best.id)">
             <span class="bests__name">{{ 'statistics.longestDistance' | translate }}</span>
             <span class="bests__value">{{ best.km | number:'1.2-2':currentLang }} km</span>
             <span class="bests__meta">{{ best.date | date:'dd.MM.yyyy' }}</span>
-          </div>
+            <ion-icon name="chevron-forward" class="bests__row__chevron" aria-hidden="true"></ion-icon>
+          </button>
         }
         @if (bests().longestAirtime; as best) {
-          <div class="bests__row">
+          <button type="button" class="bests__row bests__row--link" [disabled]="!best.id" (click)="goToFlight(best.id)">
             <span class="bests__name">{{ 'statistics.longestAirtime' | translate }}</span>
             <span class="bests__value">{{ toHoursMinutes(best.seconds) }}</span>
             <span class="bests__meta">{{ best.date | date:'dd.MM.yyyy' }}</span>
-          </div>
+            <ion-icon name="chevron-forward" class="bests__row__chevron" aria-hidden="true"></ion-icon>
+          </button>
         }
         <div class="bests__row">
           <span class="bests__name">{{ 'statistics.placesFlown' | translate }}</span>

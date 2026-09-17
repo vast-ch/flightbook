@@ -84,8 +84,8 @@ export interface IncomeSummary {
 }
 
 export interface PersonalBests {
-    longestDistance: { km: number; date: string } | null;
-    longestAirtime: { seconds: number; date: string } | null;
+    longestDistance: { km: number; date: string; id: number } | null;
+    longestAirtime: { seconds: number; date: string; id: number } | null;
     startPlaces: number;
     landingPlaces: number;
 }
@@ -463,8 +463,12 @@ export class StatisticStore {
         const airtimeSeconds = Number(row?.longestAirtime ?? 0);
 
         return {
-            longestDistance: km > 0 && row?.bestDistanceDate ? { km, date: row.bestDistanceDate } : null,
-            longestAirtime: airtimeSeconds > 0 && row?.longestAirtimeDate ? { seconds: airtimeSeconds, date: row.longestAirtimeDate } : null,
+            longestDistance: km > 0 && row?.bestDistanceDate
+                ? { km, date: row.bestDistanceDate, id: Number(row?.bestDistanceId ?? 0) }
+                : null,
+            longestAirtime: airtimeSeconds > 0 && row?.longestAirtimeDate
+                ? { seconds: airtimeSeconds, date: row.longestAirtimeDate, id: Number(row?.longestAirtimeId ?? 0) }
+                : null,
             startPlaces: Number(row?.nbStartplaces ?? 0),
             landingPlaces: Number(row?.nbLandingplaces ?? 0)
         };

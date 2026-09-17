@@ -16,9 +16,13 @@ export class FlightStatistic {
     public bestDistance: number;
     /** 'YYYY-MM-DD' of the flight behind bestDistance. */
     public bestDistanceDate: string;
+    /** Id of the flight behind bestDistance. */
+    public bestDistanceId: number;
     public paidFlights: number;
     /** Seconds. */
     public longestAirtime: number;
     /** 'YYYY-MM-DD' of the flight behind longestAirtime. */
     public longestAirtimeDate: string;
+    /** Id of the flight behind longestAirtime. */
+    public longestAirtimeId: number;
 }
