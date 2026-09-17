@@ -21,6 +21,12 @@
 
     <div class="secondary-actions">
       <ion-button expand="block" fill="outline" (click)="copy()">{{ 'buttons.copy' | translate }}</ion-button>
+      @if (flight?.igc && igcFile) {
+        <ion-button expand="block" fill="outline" (click)="downloadIgc()">
+          <ion-icon slot="start" name="download-outline" aria-hidden="true"></ion-icon>
+          {{ 'buttons.downloadIgc' | translate }}
+        </ion-button>
+      }
       @if (flight.validation?.state !== FlightValidationState.VALIDATED && flight.tandemSchoolData?.paymentState !== TandemSchoolPaymentState.PAID) {
         <ion-button expand="block" fill="clear" color="danger" (click)="delete()">{{ 'buttons.delete' | translate }}</ion-button>
       }

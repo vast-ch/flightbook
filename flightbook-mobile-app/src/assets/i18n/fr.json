@@ -20,6 +20,7 @@
         "save": "Sauvegarder",
         "delete": "Supprimer",
         "copy": "Copier",
+        "downloadIgc": "Télécharger l'IGC",
         "done": "Ok",
         "cancel": "Annuler",
         "clear": "Effacer",
@@ -293,6 +294,8 @@
         "emptyIgcFile": "Ce fichier IGC est vide",
         "igcUploadError": "Le fichier IGC n'a pas pu être téléchargé",
         "igcCopyError": "Le fichier IGC n'a pas pu être copié",
+        "igcDownloadError": "Le fichier IGC n'a pas pu être téléchargé",
+        "igcDownloadSaved": "Le fichier IGC a été enregistré sous {{location}}.",
         "wrongFileType": "Veuillez choisir un fichier {{fileType}}",
         "subscription": "Voulez-vous vraiment vous inscrire à ce rendez-vous?",
         "removeSubscription": "Souhaites-tu vraiment te désinscrire?",
@@ -855,7 +858,7 @@
             "5": "Lecture de la manche à air…",
             "6": "Accrochage à la sellette…",
             "7": "En attente d'un cycle…",
-            "8": "Course sur la pente…"
+            "8": "Monter la pente…"
         },
         "stillConnecting": "Connexion en cours…"
     }

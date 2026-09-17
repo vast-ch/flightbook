@@ -20,6 +20,7 @@
         "save": "Salva",
         "delete": "Elimina",
         "copy": "Copia",
+        "downloadIgc": "Scarica IGC",
         "done": "Ok",
         "cancel": "Annulla",
         "clear": "Elimina",
@@ -293,6 +294,8 @@
         "emptyIgcFile": "Questo file IGC è vuoto",
         "igcUploadError": "Il file IGC non può essere caricato",
         "igcCopyError": "Il file IGC non può essere copiato",
+        "igcDownloadError": "Il file IGC non può essere scaricato",
+        "igcDownloadSaved": "Il file IGC è stato salvato in {{location}}.",
         "wrongFileType": "Scegliere un file {{fileType}}",
         "subscription": "Volete davvero iscrivervi a questo appuntamento?",
         "removeSubscription": "Vuoi davvero annullare l'iscrizione?",
@@ -855,7 +858,7 @@
             "5": "Lettura della manica a vento…",
             "6": "Aggancio all'imbrago…",
             "7": "In attesa di un ciclo…",
-            "8": "Corsa sul pendio…"
+            "8": "Risalire il pendio…"
         },
         "stillConnecting": "Connessione in corso…"
     }
