@@ -1,14 +1,13 @@
-import { Component, OnDestroy, Input, signal } from '@angular/core';
-import { ModalController, LoadingController, IonInfiniteScroll, IonContent, IonFooter, IonInput, IonSelect, IonSelectOption, IonButton, IonIcon } from '@ionic/angular/standalone';
+import { Component, OnDestroy, signal } from '@angular/core';
+import { ModalController, IonContent, IonInput, IonSelect, IonSelectOption, IonButton } from '@ionic/angular/standalone';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { TranslateService, TranslateModule } from '@ngx-translate/core';
-import { GliderFilter } from 'src/app/glider/shared/glider-filter.model';
+import { TranslateModule } from '@ngx-translate/core';
 import { GliderStore } from '../shared/glider.store';
 import { Glider } from '../shared/glider.model';
 import { FormsModule } from '@angular/forms';
 import { addIcons } from 'ionicons';
-import { close, chevronForward } from 'ionicons/icons';
+import { chevronForward } from 'ionicons/icons';
 
 @Component({
     selector: 'app-glider-filter',
@@ -18,32 +17,27 @@ import { close, chevronForward } from 'ionicons/icons';
         FormsModule,
         TranslateModule,
         IonContent,
-        IonFooter,
         IonInput,
         IonSelect,
         IonSelectOption,
-        IonButton,
-        IonIcon
+        IonButton
     ]
 })
 export class GliderFilterComponent implements OnDestroy {
-    @Input() infiniteScroll: IonInfiniteScroll;
     private unsubscribe$ = new Subject<void>();
-    public filter: GliderFilter;
+
+    /** The store's own signal, edited live - same grammar as the flight and appointment filters. */
+    public filter = this.gliderStore.filter;
+    public isFiltered = this.gliderStore.filtered;
 
     /** Manufacturers to choose from, gathered from the pilot's own gliders. */
     public brands = signal<string[]>([]);
 
     constructor(
         private modalCtrl: ModalController,
-        private gliderStore: GliderStore,
-        private loadingCtrl: LoadingController,
-        private translate: TranslateService
+        private gliderStore: GliderStore
     ) {
-        // A copy, not the store's own object: editing the fields and then
-        // dismissing must not leave the store filtered by what was typed.
-        this.filter = Object.assign(new GliderFilter(), this.gliderStore.filter());
-        addIcons({ close, 'chevron-forward': chevronForward });
+        addIcons({ 'chevron-forward': chevronForward });
 
         // Seeded with the current choice so the control shows it immediately, and
         // still shows it if the request below no longer returns that brand.
@@ -62,8 +56,8 @@ export class GliderFilterComponent implements OnDestroy {
     /** Distinct, sorted, and never dropping the brand already filtered on. */
     private mergeBrands(gliders: Glider[]): string[] {
         const brands = new Set<string>();
-        if (this.filter.brand) {
-            brands.add(this.filter.brand);
+        if (this.filter().brand) {
+            brands.add(this.filter().brand);
         }
         for (const glider of gliders) {
             if (glider.brand) {
@@ -78,41 +72,27 @@ export class GliderFilterComponent implements OnDestroy {
         this.unsubscribe$.complete();
     }
 
-    /** Leaves without touching the store's filter. */
-    dismiss() {
-        this.modalCtrl.dismiss({ dismissed: true });
+    setBrand(brand: string) {
+        this.gliderStore.updateFilter({ brand });
     }
 
-    async filterElement() {
-        this.gliderStore.filter.set(this.filter);
-        this.applyAndClose();
+    setName(name: string) {
+        this.gliderStore.updateFilter({ name: name ?? '' });
+    }
+
+    setType(type: string) {
+        this.gliderStore.updateFilter({ type });
+    }
+
+    setArchived(archived: string) {
+        this.gliderStore.updateFilter({ archived });
     }
 
     clearFilter() {
-        this.filter = new GliderFilter();
         this.gliderStore.resetFilter();
-        this.applyAndClose();
     }
 
-    private async applyAndClose() {
-        const loading = await this.loadingCtrl.create({
-            message: this.translate.instant('loading.loading')
-        });
-        await loading.present();
-
-        if (this.infiniteScroll) {
-            this.infiniteScroll.disabled = false;
-        }
-
-        this.gliderStore.getGliders({ limit: this.gliderStore.defaultLimit, clearStore: true })
-            .pipe(takeUntil(this.unsubscribe$))
-            .subscribe(async (res: Glider[]) => {
-                await loading.dismiss();
-                this.modalCtrl.dismiss({
-                    dismissed: true
-                });
-            }, async (error: any) => {
-                await loading.dismiss();
-            });
+    close() {
+        return this.modalCtrl.dismiss();
     }
 }

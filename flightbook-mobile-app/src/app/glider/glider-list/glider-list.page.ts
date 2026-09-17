@@ -137,12 +137,21 @@ export class GliderListPage implements OnDestroy {
     async openFilter() {
         const modal = await this.modalCtrl.create({
             component: GliderFilterComponent,
-            componentProps: {
-                infiniteScroll: this.infiniteScroll
-            }
+            cssClass: 'fb-filter-sheet'
         });
 
-        return await modal.present();
+        /*
+         * Compared before and after rather than read off the dismiss role: the
+         * sheet edits the shared filter as it goes, and a backdrop tap or the
+         * Android back button dismisses it without any role of ours. The flight
+         * and appointment filters do the same.
+         */
+        const before = JSON.stringify(this.gliderStore.filter());
+        modal.present();
+        await modal.onWillDismiss();
+        if (JSON.stringify(this.gliderStore.filter()) !== before) {
+            this.reloadForFilter();
+        }
     }
 
     /** Two formats, so the header button opens a picker rather than doubling up. */

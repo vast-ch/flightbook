@@ -1,76 +1,70 @@
-<div class="form-header">
-  <button type="button" class="icon-button" (click)="dismiss()"
-          [attr.aria-label]="'buttons.close' | translate">
-    <ion-icon name="close" aria-hidden="true"></ion-icon>
-  </button>
-  <h1 class="form-header__title">{{ 'buttons.filter' | translate }}</h1>
+<!--
+  No Cancel: the sheet edits the shared filter live, so the footer button and the
+  backdrop both simply close it. Clear is the way back to an unfiltered list.
+  Same grammar as the flight and appointment filter.
+-->
+<div class="filter-head">
+    <div class="filter-head__grabber" aria-hidden="true"></div>
+    <div class="filter-head__row">
+        <h1 class="filter-head__title">{{ 'buttons.filter' | translate }}</h1>
+        <button type="button" class="filter-head__clear" [class.is-enabled]="isFiltered()"
+                [disabled]="!isFiltered()" (click)="clearFilter()">
+            {{ 'buttons.clear' | translate }}
+        </button>
+    </div>
 </div>
 
-<ion-content>
-  <div class="form-body">
-    <form id="gliderFilterForm" (ngSubmit)="filterElement()">
-      <div class="fb-card--flush">
-        <div class="fb-row fb-row--select">
-          <span class="fb-row__label" id="lbl-filter-brand">{{ 'glider.brand' | translate }}</span>
-          <span class="fb-row__value">
-            <ion-select [(ngModel)]="filter.brand" name="brand" interface="popover"
-                        toggleIcon="chevron-forward" aria-labelledby="lbl-filter-brand"
+<ion-content class="filter-body">
+    <div class="filter-scroll">
+
+        <!-- Brand: boxed dropdown, same pattern as flight-filter's glider select -->
+        <div class="fb-section-label">{{ 'glider.brand' | translate }}</div>
+        <div class="filter-select">
+            <ion-select [ngModel]="filter().brand" (ngModelChange)="setBrand($event)"
+                        name="brand" toggleIcon="chevron-forward"
+                        [attr.aria-label]="'glider.brand' | translate"
                         okText="{{ 'buttons.done' | translate }}"
-                        cancelText="{{ 'buttons.cancel' | translate }}">
-              <ion-select-option value="">{{ 'glider.all' | translate }}</ion-select-option>
-              @for (brand of brands(); track brand) {
-                <ion-select-option [value]="brand">{{ brand }}</ion-select-option>
-              }
+                        cancelText="{{ 'buttons.clear' | translate }}"
+                        (ionCancel)="setBrand('')">
+                <ion-select-option value="">{{ 'glider.all' | translate }}</ion-select-option>
+                @for (brand of brands(); track brand) {
+                    <ion-select-option [value]="brand">{{ brand }}</ion-select-option>
+                }
             </ion-select>
-          </span>
         </div>
 
-        <div class="fb-row">
-          <span class="fb-row__label" id="lbl-filter-name">{{ 'glider.name' | translate }}</span>
-          <span class="fb-row__value">
-            <ion-input clearInput type="text" [(ngModel)]="filter.name" name="name"
-                       aria-labelledby="lbl-filter-name"></ion-input>
-          </span>
+        <!-- Name: boxed text field -->
+        <div class="fb-section-label filter-label">{{ 'glider.name' | translate }}</div>
+        <div class="filter-name">
+            <ion-input [ngModel]="filter().name" (ngModelChange)="setName($event)"
+                       name="name" type="text"
+                       [attr.aria-label]="'glider.name' | translate"></ion-input>
         </div>
 
-        <div class="fb-row fb-row--select">
-          <span class="fb-row__label" id="lbl-filter-type">{{ 'glider.type' | translate }}</span>
-          <span class="fb-row__value">
-            <ion-select [(ngModel)]="filter.type" name="type" interface="popover"
-                        toggleIcon="chevron-forward" aria-labelledby="lbl-filter-type"
-                        okText="{{ 'buttons.done' | translate }}"
-                        cancelText="{{ 'buttons.cancel' | translate }}">
-              <ion-select-option value="">{{ 'glider.all' | translate }}</ion-select-option>
-              <ion-select-option value="0">{{ 'glider.solo' | translate }}</ion-select-option>
-              <ion-select-option value="1">{{ 'glider.tandem' | translate }}</ion-select-option>
-            </ion-select>
-          </span>
+        <!-- Type: chip row -->
+        <div class="fb-section-label filter-label">{{ 'glider.type' | translate }}</div>
+        <div class="fb-chip-row filter-chips">
+            <button type="button" class="fb-chip" [class.fb-chip--active]="!filter().type"
+                    (click)="setType('')">{{ 'glider.all' | translate }}</button>
+            <button type="button" class="fb-chip" [class.fb-chip--active]="filter().type === '0'"
+                    (click)="setType('0')">{{ 'glider.solo' | translate }}</button>
+            <button type="button" class="fb-chip" [class.fb-chip--active]="filter().type === '1'"
+                    (click)="setType('1')">{{ 'glider.tandem' | translate }}</button>
         </div>
 
-        <div class="fb-row fb-row--select">
-          <span class="fb-row__label" id="lbl-filter-archived">{{ 'glider.archived' | translate }}</span>
-          <span class="fb-row__value">
-            <ion-select [(ngModel)]="filter.archived" name="archived" interface="popover"
-                        toggleIcon="chevron-forward" aria-labelledby="lbl-filter-archived"
-                        okText="{{ 'buttons.done' | translate }}"
-                        cancelText="{{ 'buttons.cancel' | translate }}">
-              <ion-select-option value="">{{ 'glider.all' | translate }}</ion-select-option>
-              <ion-select-option value="1">{{ 'buttons.yes' | translate }}</ion-select-option>
-              <ion-select-option value="0">{{ 'buttons.no' | translate }}</ion-select-option>
-            </ion-select>
-          </span>
+        <!-- Archived: chip row -->
+        <div class="fb-section-label filter-label">{{ 'glider.archived' | translate }}</div>
+        <div class="fb-chip-row filter-chips">
+            <button type="button" class="fb-chip" [class.fb-chip--active]="!filter().archived"
+                    (click)="setArchived('')">{{ 'glider.all' | translate }}</button>
+            <button type="button" class="fb-chip" [class.fb-chip--active]="filter().archived === '1'"
+                    (click)="setArchived('1')">{{ 'buttons.yes' | translate }}</button>
+            <button type="button" class="fb-chip" [class.fb-chip--active]="filter().archived === '0'"
+                    (click)="setArchived('0')">{{ 'buttons.no' | translate }}</button>
         </div>
-      </div>
-
-      <div class="secondary-actions">
-        <ion-button expand="block" fill="clear" type="button" (click)="clearFilter()">
-          {{ 'buttons.clear' | translate }}
-        </ion-button>
-      </div>
-    </form>
-  </div>
+    </div>
 </ion-content>
 
-<ion-footer class="form-footer">
-  <ion-button expand="block" type="submit" form="gliderFilterForm">{{ 'buttons.filter' | translate }}</ion-button>
-</ion-footer>
+<div class="form-footer">
+    <ion-button expand="block" (click)="close()">{{ 'buttons.filter' | translate }}</ion-button>
+</div>
