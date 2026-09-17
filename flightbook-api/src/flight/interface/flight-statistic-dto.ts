@@ -14,6 +14,8 @@ export class FlightStatisticDto {
     public totalDistance: number;
     public bestDistance: number;
     public bestDistanceDate: string;
+    public bestDistanceId: number;
     public longestAirtime: number;
     public longestAirtimeDate: string;
+    public longestAirtimeId: number;
 }

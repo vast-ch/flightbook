@@ -213,6 +213,12 @@ describe('Flights (e2e)', () => {
   it('/flights/statistic (GET)', async () => {
     // given
     const keycloakToken = JwtTestHelper.createKeycloakToken();
+    const places = await testInstance.placeRepository.find();
+    const gliders = await testInstance.gliderRepository.find();
+    const bestFlight = Testdata.createFlight(places[0], places[1], gliders[0], '2025-01-04');
+    bestFlight.km = 500.5;
+    bestFlight.time = '05:00';
+    const savedBestFlight = await testInstance.flightRepository.save(bestFlight);
 
     //when
     return request(testInstance.app.getHttpServer())
@@ -220,7 +226,9 @@ describe('Flights (e2e)', () => {
       .set('Authorization', `Bearer ${keycloakToken}`)
       .expect(200)
       .then(response => {
-        expect(response.body).toMatchSnapshot();
+        expect(response.body.bestDistanceId).toEqual(savedBestFlight.id);
+        expect(response.body.longestAirtimeId).toEqual(savedBestFlight.id);
+        expect(removeIds(response.body)).toMatchSnapshot();
       });
   });
 
@@ -288,6 +296,12 @@ describe('V2 Flights (e2e)', () => {
   it('/v2/flights/statistic (GET)', async () => {
     // given
     const keycloakToken = JwtTestHelper.createKeycloakToken();
+    const places = await testInstance.placeRepository.find();
+    const gliders = await testInstance.gliderRepository.find();
+    const bestFlight = Testdata.createFlight(places[0], places[1], gliders[0], '2025-01-04');
+    bestFlight.km = 500.5;
+    bestFlight.time = '05:00';
+    const savedBestFlight = await testInstance.flightRepository.save(bestFlight);
 
     //when
     return request(testInstance.app.getHttpServer())
@@ -297,13 +311,21 @@ describe('V2 Flights (e2e)', () => {
       .then(response => {
         expect(response.body).toBeInstanceOf(Array);
         expect(response.body.length).toBeGreaterThanOrEqual(1);
-        expect(response.body[0]).toMatchSnapshot();
+        expect(response.body[0].bestDistanceId).toEqual(savedBestFlight.id);
+        expect(response.body[0].longestAirtimeId).toEqual(savedBestFlight.id);
+        expect(removeIds(response.body[0])).toMatchSnapshot();
       });
   });
 
   it('/v2/flights/statistic?type=monthly (GET)', async () => {
     // given
     const keycloakToken = JwtTestHelper.createKeycloakToken();
+    const places = await testInstance.placeRepository.find();
+    const gliders = await testInstance.gliderRepository.find();
+    const bestFlight = Testdata.createFlight(places[0], places[1], gliders[0], '2025-01-04');
+    bestFlight.km = 500.5;
+    bestFlight.time = '05:00';
+    const savedBestFlight = await testInstance.flightRepository.save(bestFlight);
 
     //when
     return request(testInstance.app.getHttpServer())
@@ -314,7 +336,9 @@ describe('V2 Flights (e2e)', () => {
       .then(response => {
         expect(response.body).toBeInstanceOf(Array);
         expect(response.body.length).toBeGreaterThanOrEqual(1);
-        expect(response.body[0]).toMatchSnapshot();
+        expect(response.body[0].bestDistanceId).toEqual(savedBestFlight.id);
+        expect(response.body[0].longestAirtimeId).toEqual(savedBestFlight.id);
+        expect(removeIds(response.body[0])).toMatchSnapshot();
       });
   });
 
