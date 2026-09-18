@@ -1,4 +1,4 @@
-import { Component, ViewChild, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ViewChild, OnDestroy } from '@angular/core';
 import { NavController, LoadingController, ActionSheetController, IonIcon, IonContent, IonItem, IonList, IonInfiniteScroll, IonInfiniteScrollContent } from '@ionic/angular/standalone';
 import { takeUntil } from 'rxjs/operators';
 import { Subject, firstValueFrom } from 'rxjs';
@@ -21,6 +21,7 @@ import { add, locationOutline, shareOutline, chevronBack, chevronForward } from 
     selector: 'app-place-list',
     templateUrl: './place-list.page.html',
     styleUrls: ['./place-list.page.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         RouterLink,
         FlagsModule,

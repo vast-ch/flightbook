@@ -1,4 +1,4 @@
-import { Component, OnDestroy, ViewChild, Signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, ViewChild, Signal } from '@angular/core';
 import { NavController, ModalController, LoadingController, ActionSheetController, IonIcon, IonContent, IonItem, IonList, IonInfiniteScroll, IonInfiniteScrollContent } from '@ionic/angular/standalone';
 import { Subject, firstValueFrom } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -20,6 +20,7 @@ import { navigateBackOrTo } from 'src/app/shared/util/back-navigation';
     selector: 'app-glider-list',
     templateUrl: './glider-list.page.html',
     styleUrls: ['./glider-list.page.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         RouterLink,
         TranslateModule,

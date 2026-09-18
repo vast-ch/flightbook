@@ -37,10 +37,7 @@ export class GliderStore {
   
   // Default limit for pagination
   public defaultLimit = 40;
-  
-  // Flag to disable list
-  public disableList = false;
-  
+
   // Selectors (computed values)
   public gliders = computed(() => this.state().gliders);
   public loading = computed(() => this.state().loading);

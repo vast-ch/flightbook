@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild, Signal, computed, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, OnDestroy, ViewChild, Signal, computed, signal } from '@angular/core';
 import { NavController, ModalController, LoadingController, AlertController, IonButton, IonContent, IonItem, IonList, IonInfiniteScroll, IonInfiniteScrollContent, IonIcon, IonItemSliding, IonItemOptions, IonItemOption } from '@ionic/angular/standalone';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -30,6 +30,7 @@ import { toHoursMinutes } from 'src/app/shared/util/format';
     selector: 'app-flight-list',
     templateUrl: './flight-list.page.html',
     styleUrls: ['./flight-list.page.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         AvatarButtonComponent,
         FlagsModule,
