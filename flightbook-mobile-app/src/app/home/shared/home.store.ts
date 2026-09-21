@@ -19,9 +19,6 @@ import { AccountService } from 'src/app/account/shared/account.service';
  */
 export const REQUIRED_LICENCE_FLIGHTS = 50;
 
-/** Schools without an explicit timezone predate the field. */
-const FALLBACK_TIMEZONE = 'Europe/Zurich';
-
 export interface TrainingProgress {
     ratedSkills: number;
     totalSkills: number;
@@ -259,7 +256,7 @@ export class HomeStore {
         }
 
         const next = upcoming[0];
-        const zone = next.school?.timezone || FALLBACK_TIMEZONE;
+        const zone = next.school?.timezone || 'UTC';
         const scheduled = moment.utc(next.appointment.scheduling).tz(zone);
 
         return {
