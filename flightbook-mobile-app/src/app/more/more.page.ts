@@ -27,11 +27,6 @@ const DABS_URLS = {
 /** Leading "flight school" in the languages the app ships, plus the English word. */
 const SCHOOL_WORD = /^(flugschule|flight\s+school|paragliding\s+school|school|[ée]cole(\s+de\s+parapente)?|scuola(\s+di\s+parapendio)?)\s+/i;
 
-const SHV_APP_URLS = {
-    ios: 'https://apps.apple.com/us/app/shv-fsvl/id6761252391',
-    other: 'https://play.google.com/store/apps/details?id=ch.shv_fsvl'
-};
-
 @Component({
     selector: 'app-more',
     templateUrl: './more.page.html',
@@ -161,14 +156,6 @@ export class MorePage implements OnDestroy {
         return this.hostOf(DABS_URLS.today);
     }
 
-    public get shvHost(): string {
-        return this.hostOf(this.shvUrl());
-    }
-
-    private shvUrl(): string {
-        return Capacitor.getPlatform() === 'ios' ? SHV_APP_URLS.ios : SHV_APP_URLS.other;
-    }
-
     /** The design puts the host under the name; the full URL rarely fits. */
     hostOf(url: string): string {
         try {
@@ -287,11 +274,6 @@ export class MorePage implements OnDestroy {
 
     openDabs(when: 'today' | 'tomorrow') {
         Browser.open({ url: DABS_URLS[when] });
-    }
-
-    /** Store link for the SHV/FSVL app: App Store on iOS, Play Store elsewhere. */
-    openShvApp() {
-        Browser.open({ url: this.shvUrl() });
     }
 
     openLink(url: string) {
