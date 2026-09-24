@@ -2,5 +2,3 @@ dist
 node_modules
 .github
 .changeset
-docs/superpowers/plans/2026-08-22-flightbook-redesign.md
-src/data/post/markdown-elements-demo-post.mdx
