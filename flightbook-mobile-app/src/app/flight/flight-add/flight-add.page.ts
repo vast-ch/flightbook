@@ -20,6 +20,7 @@ import { FlightFormComponent } from '../../form/flight-form/flight-form';
 import { SchoolService } from 'src/app/school/shared/school.service';
 import { School } from 'src/app/school/shared/school.model';
 import { TandemSchoolService } from 'src/app/school/shared/tandem-school.service';
+import { NavigationService } from 'src/app/shared/services/navigation.service';
 
 @Component({
     selector: 'app-flight-add',
@@ -45,6 +46,7 @@ export class FlightAddPage implements OnInit, OnDestroy {
 
     constructor(
         private router: Router,
+        private navigationService: NavigationService,
         private flightStore: FlightStore,
         private gliderStore: GliderStore,
         private alertController: AlertController,
@@ -64,7 +66,7 @@ export class FlightAddPage implements OnInit, OnDestroy {
     }
 
     close() {
-        this.router.navigate(['flights']);
+        this.navigationService.back('/flights');
     }
 
     ngOnInit() {
@@ -120,7 +122,7 @@ export class FlightAddPage implements OnInit, OnDestroy {
             next: async (res: Flight) => {
                 await loading.dismiss();
                 // Navigate back to the flights list and ensure it's refreshed
-                await this.router.navigate(['/flights'], { replaceUrl: true });
+                await this.navigationService.back('/flights');
             },
             error: async (resp: any) => {
                 await loading.dismiss();

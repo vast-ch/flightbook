@@ -11,8 +11,7 @@ import { CountryByCode } from 'src/app/place/shared/place.countries';
 import { json2csv } from 'json-2-csv';
 import { MapUtil } from 'src/app/shared/util/MapUtil';
 import { RouterLink } from '@angular/router';
-import { Location } from '@angular/common';
-import { navigateBackOrTo } from 'src/app/shared/util/back-navigation';
+import { NavigationService } from 'src/app/shared/services/navigation.service';
 import { FlagsModule } from 'nxt-flags';
 import { addIcons } from "ionicons";
 import { add, locationOutline, shareOutline, chevronBack, chevronForward } from "ionicons/icons";
@@ -47,7 +46,7 @@ export class PlaceListPage implements OnDestroy {
 
     constructor(
         public navCtrl: NavController,
-        private location: Location,
+        private navigationService: NavigationService,
         private actionSheetCtrl: ActionSheetController,
         private placeStore: PlaceStore,
         private translate: TranslateService,
@@ -97,7 +96,7 @@ export class PlaceListPage implements OnDestroy {
      * the pilot on a tab they never came from.
      */
     goBack() {
-        navigateBackOrTo(this.navCtrl, this.location, 'more');
+        this.navigationService.back('more');
     }
 
     itemTapped(place: Place) {

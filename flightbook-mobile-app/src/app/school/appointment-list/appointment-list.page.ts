@@ -22,8 +22,7 @@ import { FormsModule } from '@angular/forms';
 import { School } from '../shared/school.model';
 import { LanguageService } from 'src/app/shared/services/language.service';
 import { HomeStore } from 'src/app/home/shared/home.store';
-import { Location } from '@angular/common';
-import { navigateBackOrTo } from 'src/app/shared/util/back-navigation';
+import { NavigationService } from 'src/app/shared/services/navigation.service';
 
 /** How close a registration deadline has to be to earn the notice at the top. */
 const CLOSING_SOON_HOURS = 24;
@@ -132,7 +131,7 @@ export class AppointmentListPage implements OnInit, OnDestroy {
     constructor(
         private activeRoute: ActivatedRoute,
         public navCtrl: NavController,
-        private location: Location,
+        private navigationService: NavigationService,
         private schoolService: SchoolService,
         private translate: TranslateService,
         private loadingCtrl: LoadingController,
@@ -174,7 +173,7 @@ export class AppointmentListPage implements OnInit, OnDestroy {
     // ---- View state -----------------------------------------------------
 
     close() {
-        navigateBackOrTo(this.navCtrl, this.location, 'more');
+        this.navigationService.back('more');
     }
 
     /** LanguageService, not translate.currentLang: reactive, and always a locale Angular has data for. */

@@ -117,11 +117,13 @@ export class LoginPage implements OnInit, OnDestroy {
                     this.loginData.email = null;
                     this.loginData.password = null;
                     if (Capacitor.isNativePlatform()) {
-                        // For native, navigate to home page
-                        this.router.navigate([`home`], { replaceUrl: true });
+                        // navigateRoot, not a plain navigate: this resets Ionic's own
+                        // stack so /login isn't left sitting underneath home, which
+                        // would otherwise make hardware-back land back on the login
+                        // screen.
+                        this.navCtrl.navigateRoot('home');
                     } else {
-                        // For web, navigate to home page
-                        this.navigationService.back();
+                        this.navigationService.backToPendingRoute();
                     }
                     
                 },

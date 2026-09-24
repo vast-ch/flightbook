@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { firstValueFrom, Subject } from 'rxjs';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { takeUntil } from 'rxjs/operators';
 import { AlertController, LoadingController, IonContent, IonButton, IonFooter, IonIcon } from '@ionic/angular/standalone';
 import { DatePipe } from '@angular/common';
@@ -26,6 +26,7 @@ import { Place } from 'src/app/place/shared/place.model';
 import { TandemSchoolService } from 'src/app/school/shared/tandem-school.service';
 import { TandemSchoolPaymentState } from '../shared/tandem-school-payment-state';
 import { TandemSchoolData } from '../shared/tandem-school-data.model';
+import { NavigationService } from 'src/app/shared/services/navigation.service';
 
 @Component({
     selector: 'app-flight-edit',
@@ -57,7 +58,7 @@ export class FlightEditPage implements OnInit, OnDestroy {
 
     constructor(
         private activeRoute: ActivatedRoute,
-        private router: Router,
+        private navigationService: NavigationService,
         private flightStore: FlightStore,
         private gliderStore: GliderStore,
         private alertController: AlertController,
@@ -74,7 +75,7 @@ export class FlightEditPage implements OnInit, OnDestroy {
     }
 
     back() {
-        this.router.navigate(['flights']);
+        this.navigationService.back('/flights');
     }
 
     private async dataLoading() {
@@ -129,7 +130,7 @@ export class FlightEditPage implements OnInit, OnDestroy {
             this.loadIgcData();
 
         } catch (error) {
-            this.router.navigate(['/flights'], { replaceUrl: true });
+            await this.navigationService.back('/flights');
         } finally {
             await loading.dismiss();
         }
@@ -164,11 +165,11 @@ export class FlightEditPage implements OnInit, OnDestroy {
                     .pipe(takeUntil(this.unsubscribe$))
                     .subscribe(async (res: Flight[]) => {
                         await loading.dismiss();
-                        await this.router.navigate(['/flights'], { replaceUrl: true });
+                        await this.navigationService.back('/flights');
                     });
             } else {
                 await loading.dismiss();
-                await this.router.navigate(['/flights'], { replaceUrl: true });
+                await this.navigationService.back('/flights');
             }
         },
             (async (resp: any) => {
@@ -194,7 +195,7 @@ export class FlightEditPage implements OnInit, OnDestroy {
         this.flightStore.deleteFlight(this.flight).pipe(takeUntil(this.unsubscribe$)).subscribe({
             next: async () => {
                 await loading.dismiss();
-                await this.router.navigate(['/flights'], { replaceUrl: true });
+                await this.navigationService.back('/flights');
             },
             error: (async (resp: any) => {
                 await loading.dismiss();
@@ -245,7 +246,7 @@ export class FlightEditPage implements OnInit, OnDestroy {
     private postFlightRequest(loading: any) {
         this.flightStore.postFlight(this.flight).pipe(takeUntil(this.unsubscribe$)).subscribe(async (res: Flight) => {
             await loading.dismiss();
-            await this.router.navigate(['/flights'], { replaceUrl: true });
+            await this.navigationService.back('/flights');
         },
             (async (resp: any) => {
                 await loading.dismiss();

@@ -9,12 +9,12 @@ import { XlsxExportService } from 'src/app/shared/services/xlsx-export.service';
 import { SpreadsheetDownloadService } from 'src/app/shared/services/spreadsheet-download.service';
 import { Glider } from '../shared/glider.model';
 import { GliderStore } from '../shared/glider.store';
-import { DatePipe, Location } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { HoursFormatPipe } from '../../shared/pipes/hours-format.pipe';
 import { addIcons } from "ionicons";
 import { add, filterOutline, peopleOutline, personOutline, shareOutline, chevronBack, chevronForward } from "ionicons/icons";
-import { navigateBackOrTo } from 'src/app/shared/util/back-navigation';
+import { NavigationService } from 'src/app/shared/services/navigation.service';
 
 @Component({
     selector: 'app-glider-list',
@@ -49,7 +49,7 @@ export class GliderListPage implements OnDestroy {
 
     constructor(
         public navCtrl: NavController,
-        private location: Location,
+        private navigationService: NavigationService,
         private gliderStore: GliderStore,
         public modalCtrl: ModalController,
         private actionSheetCtrl: ActionSheetController,
@@ -114,7 +114,7 @@ export class GliderListPage implements OnDestroy {
      * navigateBack('more') dropped the pilot on a tab they never came from.
      */
     goBack() {
-        navigateBackOrTo(this.navCtrl, this.location, 'more');
+        this.navigationService.back('more');
     }
 
     itemTapped(glider: Glider) {

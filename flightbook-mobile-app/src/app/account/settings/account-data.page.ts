@@ -20,8 +20,7 @@ import { FormsModule } from '@angular/forms';
 import { addIcons } from 'ionicons';
 import { chevronBack, eyeOutline, eyeOffOutline, checkmark } from 'ionicons/icons';
 import { PhoneNumberComponent } from 'src/app/shared/components/phone-number/phone-number.component';
-import { Location } from '@angular/common';
-import { navigateBackOrTo } from 'src/app/shared/util/back-navigation';
+import { NavigationService } from 'src/app/shared/services/navigation.service';
 
 /** The four languages the app ships strings for, in the design's order. */
 const LANGUAGES = ['fr', 'de', 'en', 'it'];
@@ -70,7 +69,7 @@ export class AccountDataPage implements OnInit, OnDestroy {
         private alertController: AlertController,
         private loadingCtrl: LoadingController,
         public navCtrl: NavController,
-        private location: Location,
+        private navigationService: NavigationService,
         private router: Router,
         private paymentService: PaymentService,
         private route: ActivatedRoute
@@ -141,7 +140,7 @@ export class AccountDataPage implements OnInit, OnDestroy {
     // ---- Actions --------------------------------------------------------
 
     close() {
-        navigateBackOrTo(this.navCtrl, this.location, 'more');
+        this.navigationService.back('more');
     }
 
     /**

@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Location } from '@angular/common';
-import { LoadingController, NavController, IonContent, IonFooter, IonList, IonItem, IonSpinner, IonButton, IonIcon } from '@ionic/angular/standalone';
+import { LoadingController, IonContent, IonFooter, IonList, IonItem, IonSpinner, IonButton, IonIcon } from '@ionic/angular/standalone';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { Subject, from, firstValueFrom } from 'rxjs';
 import { takeUntil, mergeMap, toArray } from 'rxjs/operators';
@@ -15,7 +14,7 @@ import { FileInputComponent } from '../../shared/components/file-input/file-inpu
 import { DatePipe } from '@angular/common';
 import { GliderSelectComponent } from '../../shared/components/glider-select/glider-select.component';
 import { LanguageService } from 'src/app/shared/services/language.service';
-import { navigateBackOrTo } from 'src/app/shared/util/back-navigation';
+import { NavigationService } from 'src/app/shared/services/navigation.service';
 import { addIcons } from "ionicons";
 import { trashOutline, cloudDoneOutline, alert, chevronBack } from "ionicons/icons";
 
@@ -66,8 +65,7 @@ export class MultipleIgcPage implements OnInit {
         private translate: TranslateService,
         private fileUploadService: FileUploadService,
         private flightStore: FlightStore,
-        private navCtrl: NavController,
-        private location: Location,
+        private navigationService: NavigationService,
         private languageService: LanguageService
     ) {
         addIcons({ trashOutline, cloudDoneOutline, alert, 'chevron-back': chevronBack });
@@ -76,7 +74,7 @@ export class MultipleIgcPage implements OnInit {
     // Reached from More, Home, the flight list and Statistics, so back pops the
     // history rather than always landing on More.
     close() {
-        navigateBackOrTo(this.navCtrl, this.location, 'more');
+        this.navigationService.back('more');
     }
 
     ngOnInit() {

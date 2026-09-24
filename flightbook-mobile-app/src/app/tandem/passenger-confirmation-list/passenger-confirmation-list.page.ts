@@ -1,7 +1,7 @@
 import { DatePipe } from '@angular/common';
 import { Component, OnDestroy, OnInit, computed, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ModalController, LoadingController, NavController, IonIcon, IonContent, IonInfiniteScroll, IonInfiniteScrollContent, AlertController, ActionSheetController } from '@ionic/angular/standalone';
+import { ModalController, LoadingController, IonIcon, IonContent, IonInfiniteScroll, IonInfiniteScrollContent, AlertController, ActionSheetController } from '@ionic/angular/standalone';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { firstValueFrom, Subject, takeUntil } from 'rxjs';
 import { addIcons } from "ionicons";
@@ -14,8 +14,7 @@ import { XlsxExportService } from 'src/app/shared/services/xlsx-export.service';
 import { SpreadsheetDownloadService } from 'src/app/shared/services/spreadsheet-download.service';
 import { TandemSchoolService } from 'src/app/school/shared/tandem-school.service';
 import { LanguageService, resolveLanguage } from 'src/app/shared/services/language.service';
-import { Location } from '@angular/common';
-import { navigateBackOrTo } from 'src/app/shared/util/back-navigation';
+import { NavigationService } from 'src/app/shared/services/navigation.service';
 import { localDate } from 'src/app/shared/util/format';
 
 @Component({
@@ -65,8 +64,7 @@ export class PassengerConfirmationListPage implements OnInit, OnDestroy {
   constructor(
     private route: ActivatedRoute,
     private modalCtrl: ModalController,
-    private navCtrl: NavController,
-    private location: Location,
+    private navigationService: NavigationService,
     private tandemService: TandemService,
     private loadingCtrl: LoadingController,
     private alertController: AlertController,
@@ -118,7 +116,7 @@ export class PassengerConfirmationListPage implements OnInit, OnDestroy {
   }
 
   close() {
-    navigateBackOrTo(this.navCtrl, this.location, 'more');
+    this.navigationService.back('more');
   }
 
   initials(confirmation: PassengerConfirmation): string {

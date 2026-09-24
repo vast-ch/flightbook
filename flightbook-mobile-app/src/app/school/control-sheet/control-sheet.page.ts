@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit, computed, signal } from '@angular/core';
 import { ControlSheet } from 'src/app/shared/domain/control-sheet';
 import { SchoolService } from '../shared/school.service';
 import { Subject, takeUntil } from 'rxjs';
-import { AlertController, LoadingController, ModalController, NavController, IonContent, IonIcon, IonModal, IonDatetime } from '@ionic/angular/standalone';
+import { AlertController, LoadingController, ModalController, IonContent, IonIcon, IonModal, IonDatetime } from '@ionic/angular/standalone';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { ControlSheetDetailsComponent } from '../shared/components/control-sheet-details/control-sheet-details.component';
 import { NxgTransalteSortPipe } from 'src/app/shared/pipes/nxg-transalte-sort.pipe';
@@ -13,8 +13,7 @@ import { HomeStore } from 'src/app/home/shared/home.store';
 import { addIcons } from 'ionicons';
 import { chevronBack, chevronDown, chevronForward, chevronUp, checkmark } from 'ionicons/icons';
 import { LanguageService } from 'src/app/shared/services/language.service';
-import { Location } from '@angular/common';
-import { navigateBackOrTo } from 'src/app/shared/util/back-navigation';
+import { NavigationService } from 'src/app/shared/services/navigation.service';
 
 /** The three rated groups, in the order the design lists them. */
 type SkillGroup = 'theory' | 'trainingHill' | 'altitudeFlight';
@@ -89,8 +88,7 @@ export class ControlSheetPage implements OnInit, OnDestroy {
         private modalCtrl: ModalController,
         private alertController: AlertController,
         private translate: TranslateService,
-        private navCtrl: NavController,
-        private location: Location,
+        private navigationService: NavigationService,
         private homeStore: HomeStore,
         private nxgTransalteSortPipe: NxgTransalteSortPipe,
         private languageService: LanguageService
@@ -122,7 +120,7 @@ export class ControlSheetPage implements OnInit, OnDestroy {
     // ---- View state -----------------------------------------------------
 
     close() {
-        navigateBackOrTo(this.navCtrl, this.location, 'more');
+        this.navigationService.back('more');
     }
 
     openExamPicker(exam: 'theory' | 'practice') {

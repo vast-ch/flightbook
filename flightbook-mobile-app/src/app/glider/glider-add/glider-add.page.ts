@@ -1,5 +1,4 @@
 import { Component, OnDestroy } from '@angular/core';
-import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { LoadingController, AlertController, IonContent, IonFooter, IonButton, IonIcon } from '@ionic/angular/standalone';
@@ -7,6 +6,7 @@ import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import HttpStatusCode from '../../shared/util/HttpStatusCode';
 import { Glider } from '../shared/glider.model';
 import { GliderStore } from '../shared/glider.store';
+import { NavigationService } from 'src/app/shared/services/navigation.service';
 import moment from 'moment';
 import { addIcons } from 'ionicons';
 import { close } from 'ionicons/icons';
@@ -30,7 +30,7 @@ export class GliderAddPage implements OnDestroy {
     glider: Glider;
 
     constructor(
-        private router: Router,
+        private navigationService: NavigationService,
         private gliderStore: GliderStore,
         private loadingCtrl: LoadingController,
         private alertController: AlertController,
@@ -46,7 +46,7 @@ export class GliderAddPage implements OnDestroy {
     }
 
     close() {
-        this.router.navigate(['/gliders'], { replaceUrl: true });
+        this.navigationService.back('/gliders');
     }
 
     async saveGlider(glider: Glider) {
@@ -61,7 +61,7 @@ export class GliderAddPage implements OnDestroy {
 
         this.gliderStore.postGlider(glider).pipe(takeUntil(this.unsubscribe$)).subscribe(async (res: Glider) => {
             await loading.dismiss();
-            await this.router.navigate(['/gliders'], { replaceUrl: true });
+            await this.navigationService.back('/gliders');
         },
             (async (resp: any) => {
                 await loading.dismiss();

@@ -1,7 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Location } from '@angular/common';
 import { Capacitor } from '@capacitor/core';
-import { AlertController, LoadingController, NavController, IonContent, IonFooter, IonSelect, IonSelectOption, IonButton, IonIcon } from '@ionic/angular/standalone';
+import { AlertController, LoadingController, IonContent, IonFooter, IonSelect, IonSelectOption, IonButton, IonIcon } from '@ionic/angular/standalone';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { Subject, firstValueFrom, takeUntil } from 'rxjs';
 import { FilePicker, PickedFile, PickFilesResult } from '@capawesome/capacitor-file-picker';
@@ -10,7 +9,7 @@ import { GliderStore } from 'src/app/glider/shared/glider.store';
 import { PlaceStore } from 'src/app/place/shared/place.store';
 import { ImportService } from '../shared/import.service';
 import { ImportType } from '../shared/import-type.model';
-import { navigateBackOrTo } from 'src/app/shared/util/back-navigation';
+import { NavigationService } from 'src/app/shared/services/navigation.service';
 import { addIcons } from "ionicons";
 import { chevronBack, chevronForward, cloudUploadOutline } from "ionicons/icons";
 
@@ -47,8 +46,7 @@ export class DataPage implements OnInit, OnDestroy {
         private flightStore: FlightStore,
         private gliderStore: GliderStore,
         private placeStore: PlaceStore,
-        private navCtrl: NavController,
-        private location: Location
+        private navigationService: NavigationService
     ) {
         if (Capacitor.getPlatform() == "ios") {
             this.isIos = true;
@@ -58,7 +56,7 @@ export class DataPage implements OnInit, OnDestroy {
     }
 
     close() {
-        navigateBackOrTo(this.navCtrl, this.location, 'more');
+        this.navigationService.back('more');
     }
 
     ngOnInit() {

@@ -1,5 +1,5 @@
 import { Component, OnDestroy } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { LoadingController, AlertController, IonContent, IonFooter, IonButton, IonIcon } from '@ionic/angular/standalone';
@@ -8,6 +8,7 @@ import HttpStatusCode from '../../shared/util/HttpStatusCode';
 import { Glider } from '../shared/glider.model';
 import { GliderStore } from '../shared/glider.store';
 import { FlightStore } from 'src/app/flight/shared/flight.store';
+import { NavigationService } from 'src/app/shared/services/navigation.service';
 import moment from 'moment';
 import { addIcons } from 'ionicons';
 import { chevronBack } from 'ionicons/icons';
@@ -34,7 +35,7 @@ export class GliderEditPage implements OnDestroy {
 
     constructor(
         private activeRoute: ActivatedRoute,
-        private router: Router,
+        private navigationService: NavigationService,
         private gliderStore: GliderStore,
         private flightStore: FlightStore,
         private loadingCtrl: LoadingController,
@@ -46,7 +47,7 @@ export class GliderEditPage implements OnDestroy {
         this.glider = this.gliderStore.gliders().find(glider => glider.id === this.gliderId);
         this.glider = structuredClone(this.glider);
         if (!this.glider) {
-            this.router.navigate(['/gliders'], { replaceUrl: true });
+            this.navigationService.back('/gliders');
         }
         this.flightStore.nbFlightsByGliderId(this.gliderId).pipe(takeUntil(this.unsubscribe$)).subscribe((resp: any) => {
             if (resp.nbFlights == 0) {
@@ -62,7 +63,7 @@ export class GliderEditPage implements OnDestroy {
     }
 
     close() {
-        this.router.navigate(['/gliders'], { replaceUrl: true });
+        this.navigationService.back('/gliders');
     }
 
     async saveGlider(glider: Glider) {
@@ -78,7 +79,7 @@ export class GliderEditPage implements OnDestroy {
         this.gliderStore.putGlider(glider).pipe(takeUntil(this.unsubscribe$)).subscribe(async (res: Glider) => {
             this.flightStore.clearFlights();
             await loading.dismiss();
-            this.router.navigate(['/gliders'], { replaceUrl: true });
+            await this.navigationService.back('/gliders');
         },
             (async (resp: any) => {
                 await loading.dismiss();
@@ -102,7 +103,7 @@ export class GliderEditPage implements OnDestroy {
 
         this.gliderStore.deleteGlider(this.glider).pipe(takeUntil(this.unsubscribe$)).subscribe(async (res: any) => {
             await loading.dismiss();
-            await this.router.navigate(['/gliders'], { replaceUrl: true });
+            await this.navigationService.back('/gliders');
         },
             (async (error: any) => {
                 await loading.dismiss();

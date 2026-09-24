@@ -1,5 +1,4 @@
 import { Component, OnDestroy } from '@angular/core';
-import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { LoadingController, AlertController, IonContent, IonFooter, IonButton, IonIcon } from '@ionic/angular/standalone';
@@ -7,6 +6,7 @@ import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import HttpStatusCode from '../../shared/util/HttpStatusCode';
 import { Place } from 'src/app/place/shared/place.model';
 import { PlaceStore } from '../shared/place.store';
+import { NavigationService } from 'src/app/shared/services/navigation.service';
 import { addIcons } from 'ionicons';
 import { close } from 'ionicons/icons';
 import { PlaceFormComponent } from '../../form/place-form/place-form';
@@ -29,7 +29,7 @@ export class PlaceAddPage implements OnDestroy {
     place: Place;
 
     constructor(
-        private router: Router,
+        private navigationService: NavigationService,
         private translate: TranslateService,
         private placeStore: PlaceStore,
         private loadingCtrl: LoadingController,
@@ -45,7 +45,7 @@ export class PlaceAddPage implements OnDestroy {
     }
 
     close() {
-        this.router.navigate(['/places'], { replaceUrl: true });
+        this.navigationService.back('/places');
     }
 
     async savePlace(place: Place) {
@@ -56,7 +56,7 @@ export class PlaceAddPage implements OnDestroy {
 
         this.placeStore.postPlace(place).pipe(takeUntil(this.unsubscribe$)).subscribe(async (res: Place) => {
             await loading.dismiss();
-            await this.router.navigate(['/places'], { replaceUrl: true });
+            await this.navigationService.back('/places');
         },
             (async (error: any) => {
                 await loading.dismiss();
