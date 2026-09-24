@@ -1,7 +1,7 @@
 import { Component, OnDestroy, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AlertController, IonContent, IonIcon, IonInput, IonReorder, IonReorderGroup, ReorderEndCustomEvent } from '@ionic/angular/standalone';
+import { AlertController, IonContent, IonIcon, IonInput, IonReorder, IonReorderGroup, IonToggle, ReorderEndCustomEvent, ToggleCustomEvent } from '@ionic/angular/standalone';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { add, chevronForward, openOutline, remove } from 'ionicons/icons';
@@ -10,7 +10,7 @@ import { Capacitor } from '@capacitor/core';
 import { Subject, firstValueFrom } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { AccountService } from '../account/shared/account.service';
-import { Link } from '../account/shared/userConfig.model';
+import { Link, Preparation } from '../account/shared/userConfig.model';
 import { User } from '../account/shared/user.model';
 import { SchoolService } from '../school/shared/school.service';
 import { ControlSheet } from '../shared/domain/control-sheet';
@@ -39,7 +39,8 @@ const SCHOOL_WORD = /^(flugschule|flight\s+school|paragliding\s+school|school|[Ã
         IonIcon,
         IonInput,
         IonReorder,
-        IonReorderGroup
+        IonReorderGroup,
+        IonToggle
     ]
 })
 export class MorePage implements OnDestroy {
@@ -93,6 +94,9 @@ export class MorePage implements OnDestroy {
     private preparation = computed(() => this.accountService.currentUser$()?.config?.preparation);
 
     public customLinks = computed<Link[]>(() => this.preparation()?.links ?? []);
+
+    /** Drives both the edit-mode toggle's state and whether view mode shows the row at all. */
+    public dabsDisabled = computed(() => !!this.preparation()?.dabsLinkDisabled);
 
     constructor() {
         addIcons({
@@ -245,16 +249,16 @@ export class MorePage implements OnDestroy {
     /**
      * There is no Save button on this screen, so every change writes through.
      * The user signal is only replaced by a successful response, which is what
-     * lets a failed save leave the list exactly as it was.
+     * lets a failed save leave the state exactly as it was.
      */
-    private async persistLinks(links: Link[]): Promise<boolean> {
+    private async persistPreparation(mutate: (preparation: Preparation) => void): Promise<boolean> {
         const user = structuredClone(this.accountService.currentUser$()) as User;
         if (!user) {
             return false;
         }
         user.config = user.config ?? {};
         user.config.preparation = user.config.preparation ?? {};
-        user.config.preparation.links = links;
+        mutate(user.config.preparation);
 
         try {
             await firstValueFrom(this.accountService.updateUser(user));
@@ -272,8 +276,26 @@ export class MorePage implements OnDestroy {
         }
     }
 
+    private persistLinks(links: Link[]): Promise<boolean> {
+        return this.persistPreparation(preparation => { preparation.links = links; });
+    }
+
     openDabs(when: 'today' | 'tomorrow') {
         Browser.open({ url: DABS_URLS[when] });
+    }
+
+    /**
+     * Toggle-on save-on-change, matching persistLinks. The web component
+     * already flips its own internal state before firing ionChange, so on a
+     * failed save - where the bound signal is left untouched - the control
+     * has to be put back by hand.
+     */
+    async toggleDabsDisabled(event: ToggleCustomEvent) {
+        const disabled = !event.detail.checked;
+        const ok = await this.persistPreparation(preparation => { preparation.dabsLinkDisabled = disabled; });
+        if (!ok) {
+            event.target.checked = !disabled;
+        }
     }
 
     openLink(url: string) {

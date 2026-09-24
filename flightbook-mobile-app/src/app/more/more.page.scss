@@ -324,3 +324,10 @@ ion-reorder-group .link-row:first-child {
   font-size: 12px;
   color: var(--fb-text-secondary);
 }
+
+// Same slot as .link-row__meta - the toggle takes over that space in edit mode.
+.link-row__toggle {
+  flex: none;
+  padding: 0;
+  --track-background-checked: var(--ion-color-primary);
+}

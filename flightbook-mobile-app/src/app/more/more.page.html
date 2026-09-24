@@ -81,11 +81,9 @@
     <div class="more-section">
       <div class="more-section__head">
         <span class="fb-section-label">{{ 'more.beforeYouFly' | translate }}</span>
-        @if (customLinks().length > 0) {
-          <button type="button" class="fb-section-action" (click)="toggleLinkEdit()">
-            {{ (editingLinks() ? 'buttons.editDone' : 'buttons.edit') | translate }}
-          </button>
-        }
+        <button type="button" class="fb-section-action" (click)="toggleLinkEdit()">
+          {{ (editingLinks() ? 'buttons.editDone' : 'buttons.edit') | translate }}
+        </button>
       </div>
 
       <div class="fb-card--flush">
@@ -94,21 +92,31 @@
           is what the design's `builtIn` entry is: name over host, plus a meta
           on the right. DABS keeps both days tappable - one row, two URLs.
         -->
-        <div class="fb-row link-row">
-          <span class="link-row__text">
-            <span class="link-row__name">{{ 'more.dabs' | translate }}</span>
-            <span class="link-row__host">{{ dabsHost }}</span>
-          </span>
-          <span class="link-row__meta">
-            <button type="button" class="link-row__meta-link" (click)="openDabs('today')">
-              {{ 'more.today' | translate }}
-            </button>
-            <span class="link-row__meta-sep" aria-hidden="true">·</span>
-            <button type="button" class="link-row__meta-link" (click)="openDabs('tomorrow')">
-              {{ 'more.tomorrow' | translate }}
-            </button>
-          </span>
-        </div>
+        @if (editingLinks() || !dabsDisabled()) {
+          <div class="fb-row link-row">
+            <span class="link-row__text">
+              <span class="link-row__name">{{ 'more.dabs' | translate }}</span>
+              <span class="link-row__host">{{ dabsHost }}</span>
+            </span>
+            @if (editingLinks()) {
+              <ion-toggle class="link-row__toggle"
+                          [checked]="!dabsDisabled()"
+                          [attr.aria-label]="'more.dabs' | translate"
+                          (ionChange)="toggleDabsDisabled($event)">
+              </ion-toggle>
+            } @else {
+              <span class="link-row__meta">
+                <button type="button" class="link-row__meta-link" (click)="openDabs('today')">
+                  {{ 'more.today' | translate }}
+                </button>
+                <span class="link-row__meta-sep" aria-hidden="true">·</span>
+                <button type="button" class="link-row__meta-link" (click)="openDabs('tomorrow')">
+                  {{ 'more.tomorrow' | translate }}
+                </button>
+              </span>
+            }
+          </div>
+        }
 
         <!--
           The pilot's own links. Built-in rows above are not editable; these are,
