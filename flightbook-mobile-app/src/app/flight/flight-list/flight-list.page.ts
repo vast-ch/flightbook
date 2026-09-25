@@ -306,7 +306,7 @@ export class FlightListPage implements OnInit, OnDestroy {
     }
 
     openImport() {
-        this.router.navigate(['imports/igc']);
+        this.router.navigate(['flights/imports/igc']);
     }
 
     /** Export lives in the header now, so it needs its own picker. */

@@ -212,7 +212,7 @@ export class FlightStatisticPage implements OnDestroy {
     }
 
     openImport() {
-        this.router.navigate(['imports/igc']);
+        this.router.navigate(['flights/imports/igc']);
     }
 
     goToFlight(id: number) {

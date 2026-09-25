@@ -113,18 +113,18 @@ export class HomePage implements OnDestroy {
     }
 
     openControlSheet() {
-        this.router.navigate(['control-sheet']);
+        this.router.navigate(['more', 'control-sheet']);
     }
 
     openAppointment() {
         const next = this.nextAppointment();
         if (next) {
-            this.router.navigate(['/school/', next.school.id], { queryParams: { appointmentId: next.appointment.id } });
+            this.router.navigate(['/more/school/', next.school.id], { queryParams: { appointmentId: next.appointment.id } });
         }
     }
 
     openImport() {
-        this.router.navigate(['imports/igc']);
+        this.router.navigate(['flights/imports/igc']);
     }
 
 }

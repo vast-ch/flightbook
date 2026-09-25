@@ -45,7 +45,7 @@ export class PlaceAddPage implements OnDestroy {
     }
 
     close() {
-        this.navigationService.back('/places');
+        this.navigationService.back('/more/places');
     }
 
     async savePlace(place: Place) {
@@ -56,7 +56,7 @@ export class PlaceAddPage implements OnDestroy {
 
         this.placeStore.postPlace(place).pipe(takeUntil(this.unsubscribe$)).subscribe(async (res: Place) => {
             await loading.dismiss();
-            await this.navigationService.back('/places');
+            await this.navigationService.back('/more/places');
         },
             (async (error: any) => {
                 await loading.dismiss();

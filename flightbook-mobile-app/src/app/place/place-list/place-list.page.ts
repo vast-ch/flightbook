@@ -100,7 +100,7 @@ export class PlaceListPage implements OnDestroy {
     }
 
     itemTapped(place: Place) {
-        this.navCtrl.navigateForward(`places/${place.id}`);
+        this.navCtrl.navigateForward(`more/places/${place.id}`);
     }
 
     /** Two formats, so the header button opens a picker rather than doubling up. */

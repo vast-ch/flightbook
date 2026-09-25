@@ -46,7 +46,7 @@ export class PlaceEditPage implements OnDestroy {
         this.place = this.placeStore.places().find(place => place.id === this.placeId);
         this.place = structuredClone(this.place);
         if (!this.place) {
-            this.navigationService.back('/places');
+            this.navigationService.back('/more/places');
         }
         this.flightStore.nbFlightsByPlaceId(this.placeId).pipe(takeUntil(this.unsubscribe$)).subscribe((resp: any) => {
             if (resp.nbFlights == 0) {
@@ -62,7 +62,7 @@ export class PlaceEditPage implements OnDestroy {
     }
 
     close() {
-        this.navigationService.back('/places');
+        this.navigationService.back('/more/places');
     }
 
     async savePlace(place: Place) {
@@ -74,7 +74,7 @@ export class PlaceEditPage implements OnDestroy {
         this.placeStore.putPlace(place).pipe(takeUntil(this.unsubscribe$)).subscribe(async (res: Place) => {
             this.flightStore.clearFlights();
             await loading.dismiss();
-            await this.navigationService.back('/places');
+            await this.navigationService.back('/more/places');
         },
             (async (error: any) => {
                 await loading.dismiss();
@@ -98,7 +98,7 @@ export class PlaceEditPage implements OnDestroy {
 
         this.placeStore.deletePlace(this.place).pipe(takeUntil(this.unsubscribe$)).subscribe(async (res: any) => {
             await loading.dismiss();
-            await this.navigationService.back('/places');
+            await this.navigationService.back('/more/places');
         },
             (async (error: any) => {
                 await loading.dismiss();

@@ -11,7 +11,7 @@
     <div class="more-section">
       <div class="fb-section-label">{{ 'groupname.tandem' | translate }}</div>
       <div class="fb-card--flush">
-        <button type="button" class="fb-row more-row" (click)="open('passenger-confirmations')">
+        <button type="button" class="fb-row more-row" (click)="open(['more', 'passenger-confirmations'])">
           <ion-icon name="tandem" class="more-row__icon" aria-hidden="true"></ion-icon>
           <span class="more-row__title">{{ 'more.passengerConfirmations' | translate }}</span>
           <ion-icon name="chevron-forward" class="fb-row__chevron" aria-hidden="true"></ion-icon>
@@ -28,7 +28,7 @@
           <span class="more-row__title">{{ 'groupname.glider' | translate }}</span>
           <ion-icon name="chevron-forward" class="fb-row__chevron" aria-hidden="true"></ion-icon>
         </button>
-        <button type="button" class="fb-row more-row" (click)="open('places')">
+        <button type="button" class="fb-row more-row" (click)="open(['more', 'places'])">
           <ion-icon name="place" class="more-row__icon" aria-hidden="true"></ion-icon>
           <span class="more-row__title">{{ 'groupname.place' | translate }}</span>
           <ion-icon name="chevron-forward" class="fb-row__chevron" aria-hidden="true"></ion-icon>
@@ -52,7 +52,7 @@
         </div>
         <div class="fb-card--flush">
           @for (school of schools(); track school.id) {
-            <button type="button" class="fb-row more-row" (click)="open(['/school', school.id])">
+            <button type="button" class="fb-row more-row" (click)="open(['/more/school', school.id])">
               <!--
                 One school is named in the section label, so the row says what it
                 opens. Several stay named, or the rows would be indistinguishable.
@@ -68,7 +68,7 @@
             </button>
           }
           @if (hasControlSheet()) {
-            <button type="button" class="fb-row more-row" (click)="open('control-sheet')">
+            <button type="button" class="fb-row more-row" (click)="open(['more', 'control-sheet'])">
               <span class="more-row__title">{{ 'buttons.controlSheet' | translate }}</span>
               <ion-icon name="chevron-forward" class="fb-row__chevron" aria-hidden="true"></ion-icon>
             </button>
@@ -189,11 +189,11 @@
     <div class="more-section">
       <div class="fb-section-label">{{ 'more.importExport' | translate }}</div>
       <div class="fb-card--flush">
-        <button type="button" class="fb-row more-row" (click)="open('imports/igc')">
+        <button type="button" class="fb-row more-row" (click)="open(['flights', 'imports', 'igc'])">
           <span class="more-row__title">{{ 'more.importIgc' | translate }}</span>
           <ion-icon name="chevron-forward" class="fb-row__chevron" aria-hidden="true"></ion-icon>
         </button>
-        <button type="button" class="fb-row more-row" (click)="open('imports/data')">
+        <button type="button" class="fb-row more-row" (click)="open(['more', 'imports', 'data'])">
           <span class="more-row__title">{{ 'more.importData' | translate }}</span>
           <ion-icon name="chevron-forward" class="fb-row__chevron" aria-hidden="true"></ion-icon>
         </button>

@@ -7,8 +7,8 @@ import { TabsPage } from './tabs/tabs.page';
 /**
  * Every authenticated screen lives inside the tab shell so the bottom bar stays
  * visible, while the URLs stay exactly as they were - existing routerLinks and
- * the push-notification deep links (/flights/:id, /school/:id) keep working.
- * Login and register sit outside the shell: no tab bar there.
+ * the push-notification deep links (/flights/:id, /more/school/:id) keep
+ * working. Login and register sit outside the shell: no tab bar there.
  */
 const routes: Routes = [
   {
@@ -94,27 +94,38 @@ const routes: Routes = [
         canActivate: [AuthGuardService]
       },
       {
-        path: 'places',
+        /*
+         * Nested under `more`, same reasoning as gliders above - places is
+         * only ever reached from the More menu.
+         */
+        path: 'more/places',
         loadChildren: () => import('./place/place-list/place-list.module').then(m => m.PlaceListPageModule),
         canActivate: [AuthGuardService]
       },
       {
-        path: 'places/add',
+        path: 'more/places/add',
         loadChildren: () => import('./place/place-add/place-add.module').then(m => m.PlaceAddPageModule),
         canActivate: [AuthGuardService]
       },
       {
-        path: 'places/:id',
+        path: 'more/places/:id',
         loadChildren: () => import('./place/place-edit/place-edit.module').then(m => m.PlaceEditPageModule),
         canActivate: [AuthGuardService]
       },
       {
-        path: 'imports/igc',
+        /*
+         * Nested under `flights`, not `more`: unlike places/gliders, this is
+         * opened from Home, Flight Statistics and Flight List's own "import"
+         * actions - all flights-domain pages - so it shares the Flights tab's
+         * stack instead.
+         */
+        path: 'flights/imports/igc',
         loadChildren: () => import('./imports/multiple-igc/multiple-igc.module').then(m => m.MultipleIgcPageModule),
         canActivate: [AuthGuardService]
       },
       {
-        path: 'imports/data',
+        // More-only, unlike imports/igc above - nested under `more` instead.
+        path: 'more/imports/data',
         loadChildren: () => import('./imports/data/data.module').then(m => m.DataPageModule),
         canActivate: [AuthGuardService]
       },
@@ -124,22 +135,37 @@ const routes: Routes = [
         canActivate: [AuthGuardService]
       },
       {
+        /*
+         * NOT nested under `more`, unlike its siblings below: the Stripe
+         * checkout redirect is hardcoded server-side (flightbook-api,
+         * read-only here) to `{origin}/settings/success` and `.../cancel`,
+         * and flightbook-website links straight to /settings from its
+         * premium CTA and the account-deletion page. Moving this path would
+         * break both.
+         */
         path: 'settings',
         loadChildren: () => import('./account/settings/settings.module').then(m => m.SettingsPageModule),
         canActivate: [AuthGuardService]
       },
       {
-        path: 'school/:id',
+        /*
+         * Nested under `more` even though Home's next-appointment card and
+         * push notifications also link here - see NavigationService's
+         * ROOT_SEGMENT_FALLBACKS comment for the accepted trade-off.
+         */
+        path: 'more/school/:id',
         loadChildren: () => import('./school/appointment-list/appointment-list.module').then(m => m.AppointmentListPageModule),
         canActivate: [AuthGuardService]
       },
       {
-        path: 'control-sheet',
+        // Same trade-off as school/:id above - also reachable from Home.
+        path: 'more/control-sheet',
         loadChildren: () => import('./school/control-sheet/control-sheet.module').then(m => m.ControlSheetPageModule),
         canActivate: [AuthGuardService]
       },
       {
-        path: 'passenger-confirmations',
+        // Same trade-off as school/:id above - also reachable from the tab bar's global "+" add-sheet.
+        path: 'more/passenger-confirmations',
         loadChildren: () => import('./tandem/passenger-confirmation-list/passenger-confirmation-list.module').then(m => m.PassengerConfirmationListPageModule),
         canActivate: [AuthGuardService]
       },

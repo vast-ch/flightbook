@@ -74,7 +74,7 @@ export class MultipleIgcPage implements OnInit {
     // Reached from More, Home, the flight list and Statistics, so back pops the
     // history rather than always landing on More.
     close() {
-        this.navigationService.back('more');
+        this.navigationService.back('flights');
     }
 
     ngOnInit() {

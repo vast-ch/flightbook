@@ -14,29 +14,40 @@ const BACK_BUTTON_PRIORITY = 10;
  * `<ion-tabs>` (tabs.page.html) renders its own nested `<ion-router-outlet
  * tabs="true">` internally (baked into Ionic's own component template, not
  * visible from this app's src/ tree). With `tabs="true"` that outlet keeps a
- * SEPARATE navigation stack per top-level route segment - so `more -> places`
- * makes place-list the ROOT of its own "places" stack, with nothing beneath
- * it to pop back to, and switching tabs (home/flights/statistics/more, via
- * IonTabs.select() -> navCtrl.navigateRoot()) only resets the target tab's own
- * stack, never touching the others - so hardware back can never cross from one
- * tab's stack into another's. (Gliders avoids this entirely: its routes are
- * registered under `more/gliders*` - see app-routing.module.ts - so they share
- * More's own stack instead of getting a fresh one.)
+ * SEPARATE navigation stack per top-level route segment - so a page whose
+ * route lived at its own top-level segment (e.g. the old `places`) became the
+ * ROOT of its own empty stack with nothing beneath it to pop back to, and
+ * switching tabs (home/flights/statistics/more, via IonTabs.select() ->
+ * navCtrl.navigateRoot()) only resets the target tab's own stack, never
+ * touching the others - so back could never cross from one tab's stack into
+ * another's.
  *
- * The first group are pages reached from More with nothing else in their own
- * stack; the second are the three non-start tabs, matching Android's own
+ * gliders, places, imports/data, school, control-sheet and
+ * passenger-confirmations all avoid this by being registered under
+ * `more/*` (see app-routing.module.ts), sharing More's own stack instead of
+ * getting a fresh one - which is why they're no longer listed below. The
+ * last three of those are also reachable from Home or the tab bar's global
+ * "+" add-sheet, not just More; nesting them under `more` anyway is a
+ * deliberate, accepted trade-off - back from one of those, reached from
+ * somewhere other than More, may land on More itself (or on whatever else
+ * was already sitting in the shared `more` stack) rather than the pilot's
+ * true previous page. `imports/igc` is reached from flights-domain pages
+ * (Home, Flight Statistics, Flight List) rather than More, so it's nested
+ * under `flights/*` instead. `settings` deliberately stays at its own
+ * top-level segment, unnested: flightbook-api hardcodes its Stripe checkout
+ * redirect to `{origin}/settings/...`, and flightbook-website links straight
+ * to `/settings` - both outside this project's control.
+ *
+ * What remains below are the three real tabs, matching Android's own
  * bottom-navigation guidance that back from a non-start tab should return to
- * the start destination (Home) rather than do nothing. 'home' is deliberately
- * absent: as the start destination, back from there should fall through to
- * the platform default (app minimize/exit), not loop back onto itself.
+ * the start destination (Home) rather than do nothing, plus `settings`
+ * falling back to `more` since it's still a fresh top-level segment. 'home'
+ * is deliberately absent: as the start destination, back from there should
+ * fall through to the platform default (app minimize/exit), not loop back
+ * onto itself.
  */
 const ROOT_SEGMENT_FALLBACKS: Record<string, string> = {
-  places: 'more',
-  imports: 'more',
-  'passenger-confirmations': 'more',
   settings: 'more',
-  'control-sheet': 'more',
-  school: 'more',
   flights: 'home',
   statistics: 'home',
   more: 'home'

@@ -87,6 +87,6 @@ export class AddSheetComponent {
      */
     async tandemConfirmation() {
         await this.dismiss();
-        this.router.navigate(['passenger-confirmations'], { queryParams: { new: 1 } });
+        this.router.navigate(['more', 'passenger-confirmations'], { queryParams: { new: 1 } });
     }
 }
