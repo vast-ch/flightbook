@@ -118,7 +118,7 @@ export class GliderListPage implements OnDestroy {
     }
 
     itemTapped(glider: Glider) {
-        this.navCtrl.navigateForward(`gliders/${glider.id}`);
+        this.navCtrl.navigateForward(`more/gliders/${glider.id}`);
     }
 
     loadData(event: any) {

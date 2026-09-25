@@ -72,17 +72,24 @@ const routes: Routes = [
         canActivate: [AuthGuardService]
       },
       {
-        path: 'gliders',
+        /*
+         * Nested under `more` (not a top-level `gliders` segment) so glider
+         * pages share the `more` tab's ion-router-outlet stack - see
+         * NavigationService's ROOT_SEGMENT_FALLBACKS comment. Reached only
+         * from the More menu, this lets iOS swipe-back from glider-list
+         * reveal More underneath it instead of finding an empty stack.
+         */
+        path: 'more/gliders',
         loadChildren: () => import('./glider/glider-list/glider-list.module').then(m => m.GliderListPageModule),
         canActivate: [AuthGuardService]
       },
       {
-        path: 'gliders/add',
+        path: 'more/gliders/add',
         loadChildren: () => import('./glider/glider-add/glider-add.module').then(m => m.GliderAddPageModule),
         canActivate: [AuthGuardService]
       },
       {
-        path: 'gliders/:id',
+        path: 'more/gliders/:id',
         loadChildren: () => import('./glider/glider-edit/glider-edit.module').then(m => m.GliderEditPageModule),
         canActivate: [AuthGuardService]
       },

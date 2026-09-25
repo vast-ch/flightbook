@@ -46,7 +46,7 @@ export class GliderAddPage implements OnDestroy {
     }
 
     close() {
-        this.navigationService.back('/gliders');
+        this.navigationService.back('/more/gliders');
     }
 
     async saveGlider(glider: Glider) {
@@ -61,7 +61,7 @@ export class GliderAddPage implements OnDestroy {
 
         this.gliderStore.postGlider(glider).pipe(takeUntil(this.unsubscribe$)).subscribe(async (res: Glider) => {
             await loading.dismiss();
-            await this.navigationService.back('/gliders');
+            await this.navigationService.back('/more/gliders');
         },
             (async (resp: any) => {
                 await loading.dismiss();

@@ -195,7 +195,7 @@ export class FlightAddPage implements OnInit, OnDestroy {
             });
 
             await alert.present();
-            await this.router.navigate(['/gliders/add'], { replaceUrl: true });
+            await this.router.navigate(['/more/gliders/add'], { replaceUrl: true });
         }
     }
 }

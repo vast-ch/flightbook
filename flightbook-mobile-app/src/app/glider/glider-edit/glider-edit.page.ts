@@ -47,7 +47,7 @@ export class GliderEditPage implements OnDestroy {
         this.glider = this.gliderStore.gliders().find(glider => glider.id === this.gliderId);
         this.glider = structuredClone(this.glider);
         if (!this.glider) {
-            this.navigationService.back('/gliders');
+            this.navigationService.back('/more/gliders');
         }
         this.flightStore.nbFlightsByGliderId(this.gliderId).pipe(takeUntil(this.unsubscribe$)).subscribe((resp: any) => {
             if (resp.nbFlights == 0) {
@@ -63,7 +63,7 @@ export class GliderEditPage implements OnDestroy {
     }
 
     close() {
-        this.navigationService.back('/gliders');
+        this.navigationService.back('/more/gliders');
     }
 
     async saveGlider(glider: Glider) {
@@ -79,7 +79,7 @@ export class GliderEditPage implements OnDestroy {
         this.gliderStore.putGlider(glider).pipe(takeUntil(this.unsubscribe$)).subscribe(async (res: Glider) => {
             this.flightStore.clearFlights();
             await loading.dismiss();
-            await this.navigationService.back('/gliders');
+            await this.navigationService.back('/more/gliders');
         },
             (async (resp: any) => {
                 await loading.dismiss();
@@ -103,7 +103,7 @@ export class GliderEditPage implements OnDestroy {
 
         this.gliderStore.deleteGlider(this.glider).pipe(takeUntil(this.unsubscribe$)).subscribe(async (res: any) => {
             await loading.dismiss();
-            await this.navigationService.back('/gliders');
+            await this.navigationService.back('/more/gliders');
         },
             (async (error: any) => {
                 await loading.dismiss();

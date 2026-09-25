@@ -8,7 +8,9 @@
 
 <ion-content>
   <div class="form-body">
-    <glider-form [glider]=glider (saveGlider)="saveGlider($event)"></glider-form>
+    @if (glider) {
+      <glider-form [glider]=glider (saveGlider)="saveGlider($event)"></glider-form>
+    }
 
     <div class="secondary-actions">
       <ion-button expand="block" fill="clear" color="danger" [disabled]="deleteDisabled"

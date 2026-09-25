@@ -14,12 +14,14 @@ const BACK_BUTTON_PRIORITY = 10;
  * `<ion-tabs>` (tabs.page.html) renders its own nested `<ion-router-outlet
  * tabs="true">` internally (baked into Ionic's own component template, not
  * visible from this app's src/ tree). With `tabs="true"` that outlet keeps a
- * SEPARATE navigation stack per top-level route segment - so `more -> gliders`
- * makes glider-list the ROOT of its own "gliders" stack, with nothing beneath
+ * SEPARATE navigation stack per top-level route segment - so `more -> places`
+ * makes place-list the ROOT of its own "places" stack, with nothing beneath
  * it to pop back to, and switching tabs (home/flights/statistics/more, via
  * IonTabs.select() -> navCtrl.navigateRoot()) only resets the target tab's own
  * stack, never touching the others - so hardware back can never cross from one
- * tab's stack into another's.
+ * tab's stack into another's. (Gliders avoids this entirely: its routes are
+ * registered under `more/gliders*` - see app-routing.module.ts - so they share
+ * More's own stack instead of getting a fresh one.)
  *
  * The first group are pages reached from More with nothing else in their own
  * stack; the second are the three non-start tabs, matching Android's own
@@ -29,7 +31,6 @@ const BACK_BUTTON_PRIORITY = 10;
  * the platform default (app minimize/exit), not loop back onto itself.
  */
 const ROOT_SEGMENT_FALLBACKS: Record<string, string> = {
-  gliders: 'more',
   places: 'more',
   imports: 'more',
   'passenger-confirmations': 'more',
