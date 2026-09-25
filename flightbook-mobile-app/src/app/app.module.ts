@@ -37,7 +37,7 @@ function getIonicConfig() {
   const isAndroid = isPlatform('android');
   return {
     innerHTMLTemplatesEnabled: true,
-    swipeBackEnabled: isAndroid  // Only enable on Android
+    swipeBackEnabled: true  // Only enable on Android
   };
 }
 
