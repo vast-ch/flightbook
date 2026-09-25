@@ -1,31 +1,22 @@
-<div>
-    <div class="menu-item-wrap">
-        @if (isIos) {
-            <label class="custom-file-upload">
-                @if (multiple) {
-                    <ion-button color="primary" class="upload-btn" (click)="onIosFilesSelect()">
-                        <ion-icon name="document"></ion-icon> IGC
-                    </ion-button>
-                } @else {
-                    <ion-button color="primary" class="upload-btn" (click)="onIosFilesSelect()">
-                        <ion-icon name="document"></ion-icon> IGC
-                    </ion-button>
-                }
-            </label>
-        } @else {
-            <label class="custom-file-upload">
-                @if (multiple) {
-                    <ion-button color="primary" class="upload-btn" (click)="fileUpload.click()">
-                        <input multiple type="file" name="file" (change)="onFilesSelect($event)" #fileUpload />
-                        <ion-icon name="document"></ion-icon> IGC
-                    </ion-button>
-                } @else {
-                    <ion-button color="primary" class="upload-btn" (click)="fileUpload.click()">
-                        <input type="file" name="file" (change)="onFilesSelect($event)" #fileUpload />
-                        <ion-icon name="document"></ion-icon> IGC
-                    </ion-button>
-                }
-            </label>
-        }
-    </div>
-</div>
+<!--
+  The import call-to-action. The labels are inputs so imports/multiple-igc can
+  say "multiple files" without a second copy of the markup.
+-->
+@if (isIos) {
+    <button type="button" class="import-card" (click)="onIosFilesSelect()">
+        <ion-icon name="cloud-upload-outline" class="import-card__icon" aria-hidden="true"></ion-icon>
+        <span class="import-card__text">
+            <span class="import-card__title">{{ titleKey | translate }}</span>
+            <span class="import-card__hint">{{ hintKey | translate }}</span>
+        </span>
+    </button>
+} @else {
+    <button type="button" class="import-card" (click)="fileUpload.click()">
+        <input [multiple]="multiple" type="file" name="file" (change)="onFilesSelect($event)" #fileUpload hidden />
+        <ion-icon name="cloud-upload-outline" class="import-card__icon" aria-hidden="true"></ion-icon>
+        <span class="import-card__text">
+            <span class="import-card__title">{{ titleKey | translate }}</span>
+            <span class="import-card__hint">{{ hintKey | translate }}</span>
+        </span>
+    </button>
+}

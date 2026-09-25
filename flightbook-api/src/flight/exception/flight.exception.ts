@@ -18,6 +18,10 @@ export class FlightException {
         throw new UnprocessableEntityException("Cannot change flight when payment is already completed");
     }
 
+    public static missingDateRangeForDailyStatisticException() {
+        throw new BadRequestException("A 'from' and 'to' date range is required when requesting daily statistics");
+    }
+
     public static customValuesWithoutSchoolException() {
         throw new BadRequestException("Cannot set schoolCustomValues without specifying tandemSchool");
     }

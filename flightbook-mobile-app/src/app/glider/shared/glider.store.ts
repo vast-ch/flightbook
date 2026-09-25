@@ -28,18 +28,16 @@ export class GliderStore {
     filtered: false
   });
   
-  // Public filter
-  public filter: GliderFilter = new GliderFilter();
+  /**
+   * A signal, as the flight filter is: the summary chips derive from it, and a
+   * plain object cannot tell them a single criterion was dropped - `filtered`
+   * stays true when others remain, so nothing downstream would recompute.
+   */
+  public filter = signal<GliderFilter>(new GliderFilter());
   
   // Default limit for pagination
   public defaultLimit = 40;
-  
-  // Flag for list completion
-  public isGliderlistComplete = false;
-  
-  // Flag to disable list
-  public disableList = false;
-  
+
   // Selectors (computed values)
   public gliders = computed(() => this.state().gliders);
   public loading = computed(() => this.state().loading);
@@ -48,12 +46,25 @@ export class GliderStore {
   
   constructor() {}
   
-  getGliders({ limit = null, offset = null, store = true, clearStore = false }: 
-    { limit?: number, offset?: number, store?: boolean, clearStore?: boolean } = {}): Observable<Glider[]> {
-    
+  /**
+   * @param applyFilter pass false to ignore the shared filter for this request.
+   * The manufacturer dropdown needs every brand the pilot owns: filtered by the
+   * brand already chosen, the list would collapse to that one and there would be
+   * no way to pick another.
+   * @param archived overrides the filter's own archived value for this request
+   * only, without writing to the shared filter and without marking the glider
+   * list as filtered. The flight forms need active gliders for their dropdown;
+   * they used to get them by assigning the shared filter and restoring it in the
+   * response handler, which left the list filtered by "Archived: no" on any
+   * error, and - now that the list draws its filter - showed a chip for a filter
+   * the pilot never set.
+   */
+  getGliders({ limit = null, offset = null, store = true, clearStore = false, archived = null, applyFilter = true }:
+    { limit?: number, offset?: number, store?: boolean, clearStore?: boolean, archived?: string, applyFilter?: boolean } = {}): Observable<Glider[]> {
+
     this.state.update(state => ({ ...state, loading: true }));
-    
-    let params: HttpParams = this.createFilterParams(limit, offset);
+
+    let params: HttpParams = this.createFilterParams(limit, offset, archived, applyFilter);
     
     return this.http.get<Glider[]>(`${environment.baseUrl}/gliders`, { params }).pipe(
       tap({
@@ -132,7 +143,6 @@ export class GliderStore {
           loading: false,
           error: null
         }));
-        this.isGliderlistComplete = false;
       }),
       // After posting the glider, get the updated glider list
       concatMap((response: Glider) => {
@@ -203,7 +213,6 @@ export class GliderStore {
           loading: false,
           error: null
         }));
-        this.isGliderlistComplete = false;
       }),
       // After deleting the glider, get the updated glider list
       concatMap((response: any) => {
@@ -227,40 +236,58 @@ export class GliderStore {
     this.state.update(state => ({ ...state, gliders: [] }));
   }
   
-  private createFilterParams(limit: number, offset: number): HttpParams {
+  /** Patches the filter in place, the way FlightStore.updateFilter does. */
+  updateFilter(patch: Partial<GliderFilter>): void {
+    this.filter.update(current => Object.assign(new GliderFilter(), current, patch));
+  }
+
+  resetFilter(): void {
+    this.filter.set(new GliderFilter());
+  }
+
+  private createFilterParams(limit: number, offset: number, archived: string | null = null, applyFilter = true): HttpParams {
     let params = new HttpParams();
-    let filterState = false;
-    
-    if (this.filter.brand && this.filter.brand !== "") {
-      params = params.append('brand', this.filter.brand);
-      filterState = true;
+    // Opting out starts from an empty filter rather than reaching for the stored
+    // one, so every branch below reads the same way.
+    const stored = applyFilter ? this.filter() : new GliderFilter();
+    // The override applies to the request, never to what the list reports as
+    // filtered - the pilot did not ask for it.
+    const effective = archived === null ? stored : Object.assign(new GliderFilter(), stored, { archived });
+
+    if (effective.brand && effective.brand !== "") {
+      params = params.append('brand', effective.brand);
     }
-    
-    if (this.filter.name && this.filter.name !== "") {
-      params = params.append('name', this.filter.name);
-      filterState = true;
+
+    if (effective.name && effective.name !== "") {
+      params = params.append('name', effective.name);
     }
-    
-    if (this.filter.type && this.filter.type !== "") {
-      params = params.append('type', this.filter.type);
-      filterState = true;
+
+    if (effective.type && effective.type !== "") {
+      params = params.append('type', effective.type);
     }
-    
-    if (this.filter.archived && this.filter.archived !== "") {
-      params = params.append('archived', this.filter.archived);
-      filterState = true;
+
+    if (effective.archived && effective.archived !== "") {
+      params = params.append('archived', effective.archived);
     }
-    
+
     if (limit) {
       params = params.append('limit', limit.toString());
     }
-    
+
     if (offset) {
       params = params.append('offset', offset.toString());
     }
-    
-    this.setFilterState(filterState);
+
+    // Neither an override nor an opt-out changes what the list reports as
+    // filtered - the pilot asked for neither.
+    if (archived === null && applyFilter) {
+      this.setFilterState(this.isFilterActive(this.filter()));
+    }
     return params;
+  }
+
+  private isFilterActive(filter: GliderFilter): boolean {
+    return !!(filter.brand || filter.name || filter.type || filter.archived);
   }
   
   private setFilterState(nextState: boolean) {

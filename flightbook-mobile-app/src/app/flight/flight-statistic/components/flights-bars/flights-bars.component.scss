@@ -1,0 +1,125 @@
+:host {
+    display: block;
+
+    /*
+     * The floor a column may never go below. 22px keeps a season no thinner
+     * than the twelve months the design draws in this same card (~24px across
+     * a phone), and leaves the 8.5px printed value its four characters. Past
+     * thirteen seasons the row outgrows the card and scrolls instead of
+     * shrinking to hairlines.
+     */
+    --bar-min: 22px;
+}
+
+/* Scrolls only once the columns hit their floor; below that they fill the card. */
+.chart {
+    overflow-x: auto;
+    overflow-y: hidden;
+    /*
+     * Opens at the newest season rather than the oldest. `rtl` anchors a scroll
+     * box to its right edge, and re-anchors it when the data or the viewport
+     * changes - a scrollLeft written from TypeScript would have to be redone on
+     * every one of those. The rows below flip back to `ltr` so the columns keep
+     * running oldest-to-newest.
+     */
+    direction: rtl;
+    // A horizontal swipe here must not turn into a page or tab gesture.
+    overscroll-behavior-x: contain;
+    // Hidden to match .period__scroll, the page's other horizontal scroller.
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+.bars {
+    display: flex;
+    // Undoes the scroll box's `rtl`; only that box is meant to be flipped.
+    direction: ltr;
+    align-items: flex-end;
+    gap: 4px;
+    height: 96px;
+    margin-top: 16px;
+    border-bottom: 1px solid var(--fb-track);
+    /*
+     * max-content so the baseline runs under every bar rather than stopping at
+     * the scrollport, and min-width so a short logbook still fills the card -
+     * with both, the row is max(its columns, the card).
+     */
+    width: max-content;
+    min-width: 100%;
+
+    &--tight {
+        gap: 2px;
+    }
+
+    // Headroom for the printed numbers: the tallest bar already fills 92 of
+    // the 96px, so without this its label would be clipped by the card.
+    &--valued {
+        height: 118px;
+    }
+}
+
+.bars__value {
+    margin-bottom: 4px;
+    overflow: hidden;
+    text-align: center;
+    font-size: 8.5px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+    white-space: nowrap;
+    color: var(--fb-text-secondary);
+}
+
+.bars__slot {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    // Grows to share spare width, never shrinks past the floor.
+    flex: 1 0 var(--bar-min);
+    min-width: var(--bar-min);
+    height: 100%;
+}
+
+.bars__bar {
+    border-radius: 2px;
+    background: var(--fb-accent);
+
+    &.is-empty {
+        background: var(--fb-track);
+    }
+
+    &.is-peak {
+        background: var(--ion-color-primary);
+    }
+}
+
+.labels {
+    display: flex;
+    direction: ltr;
+    gap: 4px;
+    margin-top: 7px;
+    // Sized exactly as .bars, or the two rows would scroll out of step.
+    width: max-content;
+    min-width: 100%;
+
+    &--tight {
+        gap: 2px;
+    }
+}
+
+.labels__cell {
+    flex: 1 0 var(--bar-min);
+    min-width: var(--bar-min);
+    overflow: hidden;
+    text-align: center;
+    font-size: 9px;
+    font-weight: 500;
+    color: var(--fb-text);
+
+    &.is-quiet {
+        color: #98a4c0;
+    }
+}

@@ -1,13 +1,17 @@
-<ion-header>
-  <ion-toolbar color='primary'>
-    <ion-buttons slot="start">
-      <ion-menu-button></ion-menu-button>
-    </ion-buttons>
-    <ion-title>{{ 'groupname.glider' | translate }}</ion-title>
-  </ion-toolbar>
-</ion-header>
+<div class="form-header">
+  <button type="button" class="icon-button" (click)="close()"
+          [attr.aria-label]="'buttons.cancel' | translate">
+    <ion-icon name="close" aria-hidden="true"></ion-icon>
+  </button>
+  <h1 class="form-header__title">{{ 'glider.new' | translate }}</h1>
+</div>
 
-
-<ion-content class="ion-padding">
-  <glider-form [glider]=glider (saveGlider)="saveGlider($event)"></glider-form>
+<ion-content>
+  <div class="form-body">
+    <glider-form [glider]=glider (saveGlider)="saveGlider($event)"></glider-form>
+  </div>
 </ion-content>
+
+<ion-footer class="form-footer">
+  <ion-button expand="block" type="submit" form="gliderForm">{{ 'buttons.save' | translate }}</ion-button>
+</ion-footer>

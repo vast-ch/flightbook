@@ -1,3 +1,72 @@
-ion-modal.filterDateModal {
-    --backdrop-opacity: 0.3 !important;
+// The sheet's head, body and date pair live in theme/tokens.scss with
+// .fb-chip, .fb-section-label and .form-footer - the appointment filter draws
+// them too. The modal shell is .fb-filter-sheet, also there, because Ionic
+// renders modals at the app root. Only this sheet's own controls are here.
+:host {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+}
+
+// ---- Glider -------------------------------------------------------------
+// The same bordered box as From / To above and the description field below, so
+// the dropdown reads as one of this sheet's controls. The token rules for
+// ion-select are scoped to .fb-row, which the sheet does not use.
+.filter-select {
+    margin-top: 9px;
+    padding: 0 13px;
+    border: 1px solid var(--fb-border);
+    border-radius: 10px;
+    background: var(--fb-surface);
+
+    ion-select {
+        --padding-start: 0;
+        --padding-end: 0;
+        // Matches the height of the description box beside it: 12px of padding
+        // either side of a ~21px line.
+        min-height: 45px;
+        width: 100%;
+
+        &::part(text) {
+            font-size: 13.5px;
+            font-weight: 500;
+            color: var(--fb-text);
+        }
+
+        &::part(icon) {
+            color: var(--fb-text-muted);
+            opacity: 1;
+        }
+    }
+}
+
+// ---- Description --------------------------------------------------------
+.filter-search {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 9px;
+    padding: 12px 13px;
+    border: 1px solid var(--fb-border);
+    border-radius: 10px;
+    background: var(--fb-surface);
+
+    ion-icon {
+        flex: none;
+        font-size: 15px;
+        color: #98a4c0;
+    }
+
+    ion-input {
+        --padding-start: 0;
+        --padding-end: 0;
+        --padding-top: 0;
+        --padding-bottom: 0;
+        --background: transparent;
+        min-height: 0;
+        font-size: 13.5px;
+        font-weight: 400;
+        color: var(--fb-text);
+    }
 }

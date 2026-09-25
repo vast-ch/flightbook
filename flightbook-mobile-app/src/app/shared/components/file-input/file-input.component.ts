@@ -1,17 +1,17 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
-import { AlertController, IonButton, IonIcon } from '@ionic/angular/standalone';
-import { TranslateService } from '@ngx-translate/core';
+import { AlertController, IonIcon } from '@ionic/angular/standalone';
+import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { v4 as uuidv4 } from 'uuid';
 import { FilePicker, PickedFile } from '@capawesome/capacitor-file-picker';
 import { addIcons } from "ionicons";
-import { document } from "ionicons/icons";
+import { cloudUploadOutline } from "ionicons/icons";
 
 @Component({
     selector: 'fb-file-input',
     templateUrl: 'file-input.component.html',
     styleUrls: ['file-input.component.scss'],
-    imports: [IonButton, IonIcon]
+    imports: [IonIcon, TranslateModule]
 })
 export class FileInputComponent implements OnInit {
 
@@ -20,6 +20,13 @@ export class FileInputComponent implements OnInit {
 
     @Input()
     multiple = false;
+
+    /* The card's copy, so a caller importing many files can say so */
+    @Input()
+    titleKey = 'flight.importIgc';
+
+    @Input()
+    hintKey = 'flight.importIgcHint';
 
     progress = 0;
 
@@ -37,7 +44,7 @@ export class FileInputComponent implements OnInit {
         if (Capacitor.getPlatform() == "ios") {
             this.isIos = true;
         }
-        addIcons({ document });
+        addIcons({ cloudUploadOutline });
     }
 
     ngOnInit() {

@@ -1,0 +1,138 @@
+// Colours come from the inverse token set in theme/tokens.scss - the same one
+// the cumulative-airtime card on Statistics uses.
+
+:host {
+  // Above the routed outlet, below Ionic's overlays (10000+) so the
+  // force-update prompt still lands on top of the boot screen.
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+}
+
+.splash {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--fb-inverse-surface);
+}
+
+// ---- Ridgelines ---------------------------------------------------------
+// Set through a class, not the SVG fill attribute: the attribute cannot
+// resolve a custom property, and these two tints are used nowhere else.
+
+.splash__ridges {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.splash__ridge--far {
+  fill: rgba(69, 177, 253, 0.07);
+}
+
+.splash__ridge--near {
+  fill: rgba(69, 177, 253, 0.05);
+}
+
+// ---- Mark, wordmark, progress ------------------------------------------
+
+.splash__body {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+}
+
+.splash__mark {
+  display: block;
+  width: 58px;
+  height: 58px;
+  border-radius: 16px;
+}
+
+.splash__wordmark {
+  font-size: 27px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--fb-inverse-text);
+}
+
+.splash__track {
+  width: 132px;
+  height: 3px;
+  border-radius: 99px;
+  overflow: hidden;
+  background: var(--fb-inverse-hairline);
+}
+
+.splash__bar {
+  width: 38%;
+  height: 100%;
+  border-radius: 99px;
+  background: var(--fb-accent);
+  animation: fb-splash-slide 1400ms ease-in-out infinite;
+}
+
+// Angular prefixes component @keyframes with the encapsulation id, so this
+// ships as _ngcontent-<id>_fb-splash-slide and cannot collide.
+@keyframes fb-splash-slide {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(264%);
+  }
+}
+
+// min-height, not height: a long translation may wrap, and clipping it would be
+// worse than the small shift. Keep the strings short enough that it does not.
+.splash__line {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 17px;
+  padding: 0 24px;
+  font-size: 12.5px;
+  font-weight: 400;
+  text-align: center;
+  color: var(--fb-inverse-text-soft);
+}
+
+// ---- Footer -------------------------------------------------------------
+
+.splash__footer {
+  position: relative;
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 0 26px max(34px, env(safe-area-inset-bottom));
+}
+
+.splash__version {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--fb-inverse-text-soft);
+}
+
+.splash__domain {
+  font-size: 10.5px;
+  font-weight: 400;
+  color: var(--fb-inverse-text-muted);
+}
+
+// An indeterminate bar sliding forever is exactly what this setting is for.
+@media (prefers-reduced-motion: reduce) {
+  .splash__bar {
+    width: 100%;
+    animation: none;
+  }
+}

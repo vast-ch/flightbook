@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { LoadingController, IonHeader, IonToolbar, IonButtons, IonMenuButton, IonTitle, IonContent, IonList, IonItem, IonSpinner, IonButton, IonIcon } from '@ionic/angular/standalone';
+import { LoadingController, IonContent, IonFooter, IonList, IonItem, IonSpinner, IonButton, IonIcon } from '@ionic/angular/standalone';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { Subject, from, firstValueFrom } from 'rxjs';
+import { takeUntil, mergeMap, toArray } from 'rxjs/operators';
 import { Place } from 'src/app/place/shared/place.model';
 import { FileUploadService } from 'src/app/flight/shared/fileupload.service';
 import { Glider } from 'src/app/glider/shared/glider.model';
@@ -13,8 +13,19 @@ import { Flight } from 'src/app/flight/shared/flight.model';
 import { FileInputComponent } from '../../shared/components/file-input/file-input.component';
 import { DatePipe } from '@angular/common';
 import { GliderSelectComponent } from '../../shared/components/glider-select/glider-select.component';
+import { LanguageService } from 'src/app/shared/services/language.service';
+import { NavigationService } from 'src/app/shared/services/navigation.service';
 import { addIcons } from "ionicons";
-import { trashOutline, cloudDoneOutline, alert } from "ionicons/icons";
+import { trashOutline, cloudDoneOutline, alert, chevronBack } from "ionicons/icons";
+
+/**
+ * How many flights save() uploads+posts at once. Unbounded would fire every
+ * upload and POST in the batch simultaneously - fine for a handful of
+ * flights, not for a season's worth of dumped IGC files. Sequential (1) was
+ * the previous behaviour and is safe but slow; this trades a bit of
+ * concurrent server load for a partial speedup.
+ */
+const IMPORT_CONCURRENCY = 2;
 
 @Component({
     selector: 'app-multiple-igc',
@@ -25,12 +36,8 @@ import { trashOutline, cloudDoneOutline, alert } from "ionicons/icons";
         GliderSelectComponent,
         DatePipe,
         TranslateModule,
-        IonHeader,
-        IonToolbar,
-        IonButtons,
-        IonMenuButton,
-        IonTitle,
         IonContent,
+        IonFooter,
         IonList,
         IonItem,
         IonSpinner,
@@ -46,26 +53,41 @@ export class MultipleIgcPage implements OnInit {
     flightStateList: FlightStatus[] = [];
     isSaved = false;
 
+    /** LanguageService, not translate.currentLang: always a locale Angular has data for. */
+    get currentLang(): string {
+        return this.languageService.lang();
+    }
+
     constructor(
         private gliderStore: GliderStore,
         private igcService: IgcService,
         private loadingCtrl: LoadingController,
         private translate: TranslateService,
         private fileUploadService: FileUploadService,
-        private flightStore: FlightStore
+        private flightStore: FlightStore,
+        private navigationService: NavigationService,
+        private languageService: LanguageService
     ) {
-        addIcons({ trashOutline, cloudDoneOutline, alert });
+        addIcons({ trashOutline, cloudDoneOutline, alert, 'chevron-back': chevronBack });
+    }
+
+    // Reached from More, Home, the flight list and Statistics, so back pops the
+    // history rather than always landing on More.
+    close() {
+        this.navigationService.back('flights');
     }
 
     ngOnInit() {
-        if (this.gliderStore.isGliderlistComplete) {
-            this.gliders = this.gliderStore.gliders();
-        } else {
-            this.gliderStore.getGliders({ clearStore: true }).pipe(takeUntil(this.unsubscribe$)).subscribe((resp: Glider[]) => {
-                this.gliderStore.isGliderlistComplete = true;
-                this.gliders = this.gliderStore.gliders();
+        // store/applyFilter false: every imported flight needs the full choice of
+        // wings, and reading the shared store handed this dropdown whatever the
+        // Gliders tab was filtered by - or an empty list, after a sign-out or a
+        // data import had cleared it while the "complete" flag stayed true.
+        this.gliderStore.getGliders({ store: false, applyFilter: false })
+            .pipe(takeUntil(this.unsubscribe$))
+            .subscribe({
+                next: (gliders: Glider[]) => { this.gliders = gliders; },
+                error: () => { }
             });
-        }
     }
 
     async onFilesSelectEvent($event: File[]) {
@@ -108,21 +130,29 @@ export class MultipleIgcPage implements OnInit {
         });
         await loading.present();
 
-        for await (const flightSate of this.flightStateList) {
-            try {
-                if (flightSate.flight.igcFile) {
-                    await this.uploadIgc(flightSate.flight);
-                }
+        await firstValueFrom(
+            from(this.flightStateList).pipe(
+                mergeMap(flightState => this.saveOne(flightState), IMPORT_CONCURRENCY),
+                toArray()
+            )
+        );
 
-                await this.flightStore.postFlight(flightSate.flight).toPromise();
-
-                flightSate.state = State.SAVED;
-            } catch {
-                flightSate.state = State.ERROR;
-            }
-        }
         this.isSaved = true;
         await loading.dismiss();
+    }
+
+    private async saveOne(flightState: FlightStatus): Promise<void> {
+        try {
+            if (flightState.flight.igcFile) {
+                await this.uploadIgc(flightState.flight);
+            }
+
+            await this.flightStore.postFlight(flightState.flight).toPromise();
+
+            flightState.state = State.SAVED;
+        } catch {
+            flightState.state = State.ERROR;
+        }
     }
 
     private async uploadIgc(flight: Flight) {

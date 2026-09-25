@@ -1,18 +1,18 @@
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
-import { AlertController, IonItem, IonInput, IonLabel, IonToggle, IonTextarea, IonButton, IonModal, IonContent, IonDatetime, IonList, IonItemSliding, IonItemOptions, IonItemOption, IonIcon, IonToolbar, IonButtons, IonTitle, IonHeader, IonMenuButton, ModalController, IonApp } from '@ionic/angular/standalone';
+import { AlertController, IonItem, IonInput, IonToggle, IonTextarea, IonModal, IonContent, IonDatetime, IonList, IonItemSliding, IonItemOptions, IonItemOption, IonIcon, ModalController } from '@ionic/angular/standalone';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { Glider, GliderCheck } from 'src/app/glider/shared/glider.model';
 import { FormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { addIcons } from 'ionicons';
-import { add, close, trash } from 'ionicons/icons';
+import { add, chevronForward, close, trash } from 'ionicons/icons';
 import { CheckComponent } from './check/check.component';
 
 @Component({
     selector: 'glider-form',
     templateUrl: 'glider-form.html',
     styleUrls: ['glider-form.scss'],
-    imports: [FormsModule, DatePipe, TranslateModule, IonItem, IonInput, IonLabel, IonToggle, IonTextarea, IonButton, IonModal, IonContent, IonDatetime, IonList, IonItemSliding, IonItemOptions, IonItemOption, IonIcon]
+    imports: [FormsModule, DatePipe, TranslateModule, IonItem, IonInput, IonToggle, IonTextarea, IonModal, IonContent, IonDatetime, IonList, IonItemSliding, IonItemOptions, IonItemOption, IonIcon]
 })
 export class GliderFormComponent implements OnInit {
     @Input()
@@ -28,7 +28,10 @@ export class GliderFormComponent implements OnInit {
         private modalController: ModalController
     ) {
         this.language = this.translate.currentLang;
-        addIcons({ close, trash, add });
+        // chevron-forward is used by the check rows in this template; without
+        // registering it here the icon only resolves if some earlier page
+        // happened to register it, so a deep link to the form renders a gap.
+        addIcons({ close, trash, add, 'chevron-forward': chevronForward });
     }
 
     ngOnInit() {
@@ -76,13 +79,16 @@ export class GliderFormComponent implements OnInit {
         const modal = await this.modalController.create({
             component: CheckComponent,
             componentProps: {
-                gliderCheck: copyGliderCheck
+                gliderCheck: copyGliderCheck,
+                mode: type
             }
         });
         await modal.present();
 
         const { data } = await modal.onWillDismiss();
-        if (data && data.type === 'close') {
+        // No data means a backdrop dismiss; reading data.gliderCheck below
+        // would throw, so treat it the same as an explicit close.
+        if (!data || data.type === 'close') {
             return;
         }
 

@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
-import { AlertController, LoadingController, IonHeader, IonToolbar, IonButtons, IonMenuButton, IonTitle, IonContent, IonSelect, IonSelectOption, IonButton, IonIcon, IonCard, IonCardContent } from '@ionic/angular/standalone';
+import { AlertController, LoadingController, IonContent, IonFooter, IonSelect, IonSelectOption, IonButton, IonIcon } from '@ionic/angular/standalone';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { Subject, firstValueFrom, takeUntil } from 'rxjs';
 import { FilePicker, PickedFile, PickFilesResult } from '@capawesome/capacitor-file-picker';
@@ -9,8 +9,9 @@ import { GliderStore } from 'src/app/glider/shared/glider.store';
 import { PlaceStore } from 'src/app/place/shared/place.store';
 import { ImportService } from '../shared/import.service';
 import { ImportType } from '../shared/import-type.model';
+import { NavigationService } from 'src/app/shared/services/navigation.service';
 import { addIcons } from "ionicons";
-import { document } from "ionicons/icons";
+import { chevronBack, chevronForward, cloudUploadOutline } from "ionicons/icons";
 
 @Component({
     selector: 'app-data',
@@ -18,18 +19,12 @@ import { document } from "ionicons/icons";
     styleUrls: ['./data.page.scss'],
     imports: [
         TranslateModule,
-        IonHeader,
-        IonToolbar,
-        IonButtons,
-        IonMenuButton,
-        IonTitle,
         IonContent,
+        IonFooter,
         IonSelect,
         IonSelectOption,
         IonButton,
-        IonIcon,
-        IonCard,
-        IonCardContent
+        IonIcon
     ]
 })
 export class DataPage implements OnInit, OnDestroy {
@@ -50,13 +45,18 @@ export class DataPage implements OnInit, OnDestroy {
         private importService: ImportService,
         private flightStore: FlightStore,
         private gliderStore: GliderStore,
-        private placeStore: PlaceStore
+        private placeStore: PlaceStore,
+        private navigationService: NavigationService
     ) {
         if (Capacitor.getPlatform() == "ios") {
             this.isIos = true;
         }
         this.initialDataLoad();
-        addIcons({ document });
+        addIcons({ 'chevron-back': chevronBack, 'chevron-forward': chevronForward, cloudUploadOutline });
+    }
+
+    close() {
+        this.navigationService.back('more');
     }
 
     ngOnInit() {
@@ -80,6 +80,9 @@ export class DataPage implements OnInit, OnDestroy {
 
     changeImportType(event: CustomEvent) {
         this.currentType = this.importTypes.find(element => element.type === event.detail.value);
+        // The file was validated against the old type, and the card presents it
+        // under the new one's label - so it cannot carry over.
+        this.file = undefined;
     }
 
     async onFilesSelect(event: any) {
@@ -143,6 +146,12 @@ export class DataPage implements OnInit, OnDestroy {
             this.flightStore.clearFlights();
             this.gliderStore.clearGliders();
             this.placeStore.clearPlaces();
+            // Emptying the caches is not enough: Home and Statistics gate their
+            // reload on `revision === flightStore.dataRevision()`, and an import
+            // that left it untouched read as "your copy is current" - so the
+            // dashboard kept the pre-import totals while the Flights tab, whose
+            // list was simply empty, refetched and disagreed with them.
+            this.flightStore.markDataChanged();
         } catch (error) {
             const alert = await this.alertController.create({
                 header: this.translate.instant('message.errortitle'),
@@ -155,6 +164,7 @@ export class DataPage implements OnInit, OnDestroy {
                 ]
             });
             await alert.present();
+            this.showButton = true;
         }
         await loading.dismiss();
     }

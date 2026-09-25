@@ -1,93 +1,157 @@
-<ion-header>
-  <ion-toolbar color='primary'>
-    <ion-title>{{ 'appointment.appointments' | translate }}</ion-title>
-    <ion-buttons slot="end">
-      <ion-button (click)="close()"><ion-icon name="close"></ion-icon></ion-button>
-    </ion-buttons>
-  </ion-toolbar>
-</ion-header>
-<ion-content class="ion-padding">
-  <ion-item>
-    <ion-label color="primary" position="stacked">{{ 'appointment.subscription' | translate }}</ion-label>
-    <ion-toggle class="subscription" disabled="{{ isDisabled() }}" [(ngModel)]="isSubscribed" (click)="subscribe()" color="primary"></ion-toggle>
-  </ion-item>
-  <ion-item>
-    <ion-label color="primary" position="stacked">{{ 'appointment.state' | translate }}</ion-label>
-    <p class="item-value">{{ 'appointment.stateValue.' + appointment.state| translate }}</p>
-  </ion-item>
-  <ion-item>
-    <ion-label color="primary" position="stacked">{{ 'appointment.dateTime' | translate }}</ion-label>
-    @if(school.timezone) {
-      <p class="item-value">{{ appointment.scheduling | date:'EE dd.MM.yyyy HH:mm':school.timezone:currentLang }}</p>
-    } @else {
-      <p class="item-value">{{ appointment.scheduling | date:'EE dd.MM.yyyy HH:mm':'UTC':currentLang }}</p>
-    }
-  </ion-item>
-  @if(appointment.deadline){
-    <ion-item>
-      <ion-label color="primary" position="stacked">{{ 'appointment.deadline' | translate }}</ion-label>
-      @if(school.timezone) {
-        <p class="item-value">{{ appointment.deadline | date:'EE dd.MM.yyyy HH:mm':school.timezone:currentLang }}</p>
-      } @else {
-        <p class="item-value">{{ appointment.deadline | date:'EE dd.MM.yyyy HH:mm':'UTC':currentLang }}</p>
+<!-- The school is the header meta, as on the control sheet; the state sits opposite -->
+<div class="form-header">
+  <button type="button" class="icon-button" (click)="close()"
+          [attr.aria-label]="'buttons.back' | translate">
+    <ion-icon name="chevron-back" aria-hidden="true"></ion-icon>
+  </button>
+  <span class="form-header__meta">{{ school?.name }}</span>
+  <span class="fb-status fb-status--{{ appointment.state }}">
+    {{ 'appointment.stateValue.' + appointment.state | translate }}
+  </span>
+</div>
+
+<ion-content>
+  <div class="form-body">
+    <div class="appt-detail__eyebrow">{{ appointment.type?.name || ('appointment.appointments' | translate) }}</div>
+    <h1 class="appt-detail__title">
+      {{ appointment.scheduling | date:'EEE d MMMM':timezone:currentLang }}<br>
+      {{ appointment.scheduling | date:'HH:mm':timezone:currentLang }}
+    </h1>
+
+    <!-- Where, and until when you can still change your mind -->
+    <div class="fb-card--flush appt-detail__card appt-detail__card--first">
+      <div class="appt-detail__row">
+        <ion-icon name="place" class="appt-detail__icon is-accent" aria-hidden="true"></ion-icon>
+        <div class="appt-detail__stack">
+          <div class="appt-detail__label">{{ 'appointment.meetingPoint' | translate }}</div>
+          <div class="appt-detail__value">{{ appointment.meetingPoint || '–' }}</div>
+        </div>
+      </div>
+
+      @if (hasDeadline()) {
+        <div class="appt-detail__row">
+          <ion-icon name="time-outline" class="appt-detail__icon" aria-hidden="true"></ion-icon>
+          <div class="appt-detail__stack">
+            <div class="appt-detail__label">{{ 'appointment.closesIn' | translate }}</div>
+            <div class="appt-detail__value">
+              {{ appointment.deadline | date:'EEE d MMMM, HH:mm':timezone:currentLang }}
+            </div>
+          </div>
+          @if (deadlineRelative(); as relative) {
+            <span class="appt-detail__relative">{{ relative }}</span>
+          }
+        </div>
       }
-    </ion-item>
-  }
-  
-  @if (appointment.type) {
-    <ion-item>
-      <ion-label color="primary" position="stacked">{{ 'appointment.type' | translate }}</ion-label>
-      <p class="item-value">{{ appointment.type?.name }}</p>
-    </ion-item>
-  }
-  <ion-item>
-    <ion-label color="primary" position="stacked">{{ 'appointment.meetingPoint' | translate }}</ion-label>
-    <p class="item-value">{{ appointment.meetingPoint }}</p>
-  </ion-item>
-  <ion-item>
-    <ion-label color="primary" position="stacked">{{ 'appointment.instructor' | translate }}</ion-label>
-    <p class="item-value">{{ appointment.instructor?.firstname }} {{ appointment.instructor?.lastname }}</p>
-  </ion-item>
-  @if (appointment.takeOffCoordinator) {
-    <ion-item>
-      <ion-label color="primary" position="stacked">{{ 'appointment.takeOffCoordinator' | translate }}</ion-label>
-      <p class="item-value">{{ appointment.takeOffCoordinator?.firstname }} {{ appointment.takeOffCoordinator?.lastname }}</p>
-    </ion-item>
-  } @else {
-    <ion-item>
-      <ion-label color="primary" position="stacked">{{ 'appointment.takeOffCoordinator' | translate }}</ion-label>
-      <p class="item-value">{{ appointment.takeOffCoordinatorText }}</p>
-    </ion-item>
-  }
-  <ion-item>
-    <ion-label color="primary" position="stacked">{{ 'appointment.description' | translate }}</ion-label>
-    <p class="item-value description">{{ appointment.description }}</p>
-  </ion-item>
-  <ion-item>
-    <ion-label color="primary" position="stacked">
-      @if (appointment.maxPeople) {
-        <span>{{ appointment.countSubscription }}/{{ appointment.maxPeople }} </span>
-      }
-      {{ 'appointment.subscriptions' | translate }}
-    </ion-label>
-    <p class="item-value subscriptions">
-      @for (subscription of subscribed; track subscription.id) {
-        <span class="subscription-item">
-          {{ subscription.user.firstname }} {{ subscription.user.lastname }} @if (subscription?.student?.isTandem) {<ion-icon name="people-outline"></ion-icon>}
-        </span>
-      }
-    </p>
-  </ion-item>
-  @if (waitingList.length > 0) {
-    <ion-item>
-      <ion-label color="primary" position="stacked">{{ 'appointment.waitingList' | translate }}</ion-label>
-      <p class="item-value subscriptions">
-        @for (subscription of waitingList; track subscription.id) {
-          <span class="subscription-item">
-            {{ subscription.user.firstname }} {{ subscription.user.lastname }}  @if (subscription?.student?.isTandem) {<ion-icon name="people-outline"></ion-icon>}
+    </div>
+
+    <!-- Registrations -->
+    <div class="fb-card appt-detail__card">
+      <div class="appt-detail__count">
+        <span class="appt-detail__count-label">{{ 'appointment.subscriptions' | translate }}</span>
+        <span class="appt-detail__count-value">{{ appointment.countSubscription ?? subscribed.length }}</span>
+        @if (appointment.maxPeople) {
+          <span class="appt-detail__count-of">
+            {{ 'home.ofTotal' | translate:{ total: appointment.maxPeople } }}
           </span>
         }
-      </p>
-    </ion-item>
-  }
+      </div>
+
+      @if (spotCells().length > 0) {
+        <div class="spots spots--wide appt-detail__spots">
+          @for (cell of spotCells(); track $index) {
+            <span class="spots__cell" [class.is-taken]="cell === 'taken'"
+                  [class.is-full]="cell === 'full'"></span>
+          }
+        </div>
+      }
+
+      @if (subscribed.length > 0) {
+        <div class="appt-detail__people">
+          @for (subscription of subscribed; track subscription.id) {
+            <div class="appt-detail__person">
+              <span class="fb-avatar-initials" [class.is-self]="isSelf(subscription)"
+                    aria-hidden="true">{{ initials(subscription) }}</span>
+              <span class="appt-detail__person-name" [class.is-self]="isSelf(subscription)">
+                {{ subscription.user.firstname }} {{ subscription.user.lastname }}
+                @if (subscription?.student?.isTandem) {
+                  <ion-icon name="people-outline" aria-hidden="true"></ion-icon>
+                }
+              </span>
+              @if (isSelf(subscription)) {
+                <span class="appt-detail__person-you">{{ 'appointment.you' | translate }}</span>
+              }
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Not in the design, but the data has it and it decides whether you fly -->
+      @if (waitingList.length > 0) {
+        <div class="appt-detail__people">
+          <div class="fb-section-label appt-detail__people-label">{{ 'appointment.waitingList' | translate }}</div>
+          @for (subscription of waitingList; track subscription.id) {
+            <div class="appt-detail__person">
+              <span class="fb-avatar-initials" [class.is-self]="isSelf(subscription)"
+                    aria-hidden="true">{{ initials(subscription) }}</span>
+              <span class="appt-detail__person-name" [class.is-self]="isSelf(subscription)">
+                {{ subscription.user.firstname }} {{ subscription.user.lastname }}
+                @if (subscription?.student?.isTandem) {
+                  <ion-icon name="people-outline" aria-hidden="true"></ion-icon>
+                }
+              </span>
+              @if (isSelf(subscription)) {
+                <span class="appt-detail__person-you">{{ 'appointment.you' | translate }}</span>
+              }
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    <!-- Who is running it -->
+    <div class="fb-card--flush appt-detail__card">
+      <div class="appt-detail__assignee">
+        <span class="appt-detail__assignee-label">{{ 'appointment.instructor' | translate }}</span>
+        @if (appointment.instructor) {
+          <span class="appt-detail__assignee-value">
+            {{ appointment.instructor.firstname }} {{ appointment.instructor.lastname }}
+          </span>
+        } @else {
+          <span class="appt-detail__assignee-value is-placeholder">{{ 'appointment.notAssigned' | translate }}</span>
+        }
+      </div>
+
+      <div class="appt-detail__assignee">
+        <span class="appt-detail__assignee-label">{{ 'appointment.takeOffCoordinator' | translate }}</span>
+        @if (appointment.takeOffCoordinator) {
+          <span class="appt-detail__assignee-value">
+            {{ appointment.takeOffCoordinator.firstname }} {{ appointment.takeOffCoordinator.lastname }}
+          </span>
+        } @else if (appointment.takeOffCoordinatorText) {
+          <span class="appt-detail__assignee-value">{{ appointment.takeOffCoordinatorText }}</span>
+        } @else {
+          <span class="appt-detail__assignee-value is-placeholder">{{ 'appointment.notAssigned' | translate }}</span>
+        }
+      </div>
+    </div>
+
+    @if (appointment.description) {
+      <div class="fb-card appt-detail__card">
+        <div class="appt-detail__label">{{ 'appointment.fromSchool' | translate }}</div>
+        <p class="appt-detail__description">{{ appointment.description }}</p>
+      </div>
+    }
+  </div>
 </ion-content>
+
+<div class="form-footer">
+  <!-- The design has no disabled state; saying why beats a button that does nothing -->
+  @if (isDisabled() && !isPast()) {
+    <p class="appt-detail__closed">{{ 'message.deadlinePassed' | translate }}</p>
+  }
+  <ion-button expand="block" [disabled]="isDisabled()" (click)="subscribe()"
+              [fill]="isSubscribed ? 'outline' : 'solid'"
+              [color]="isSubscribed ? 'danger' : 'primary'">
+    {{ (isSubscribed ? 'appointment.cancelRegistration' : 'appointment.register') | translate }}
+  </ion-button>
+</div>

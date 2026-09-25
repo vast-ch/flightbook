@@ -1,52 +1,40 @@
-import { Component, OnInit, ViewChild, OnDestroy, AfterViewInit } from '@angular/core';
-import { NavController, LoadingController, AlertController, IonHeader, IonToolbar, IonButtons, IonMenuButton, IonTitle, IonButton, IonIcon, IonContent, IonItem, IonGrid, IonRow, IonCol, IonList, IonInfiniteScroll, IonInfiniteScrollContent, IonLabel } from '@ionic/angular/standalone';
+import { ChangeDetectionStrategy, Component, ViewChild, OnDestroy } from '@angular/core';
+import { NavController, LoadingController, ActionSheetController, IonIcon, IonContent, IonItem, IonList, IonInfiniteScroll, IonInfiniteScrollContent } from '@ionic/angular/standalone';
 import { takeUntil } from 'rxjs/operators';
-import { Subject } from 'rxjs';
+import { Subject, firstValueFrom } from 'rxjs';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
-import { Capacitor } from '@capacitor/core';
-import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
-import { FileOpener } from '@capacitor-community/file-opener';
 import { Place } from 'src/app/place/shared/place.model';
 import { XlsxExportService } from 'src/app/shared/services/xlsx-export.service';
+import { SpreadsheetDownloadService } from 'src/app/shared/services/spreadsheet-download.service';
 import { PlaceStore } from '../shared/place.store';
-import { Countries, Country } from 'src/app/place/shared/place.countries';
+import { CountryByCode } from 'src/app/place/shared/place.countries';
 import { json2csv } from 'json-2-csv';
-import * as fileSaver from 'file-saver';
 import { MapUtil } from 'src/app/shared/util/MapUtil';
 import { RouterLink } from '@angular/router';
+import { NavigationService } from 'src/app/shared/services/navigation.service';
 import { FlagsModule } from 'nxt-flags';
 import { addIcons } from "ionicons";
-import { add, locationOutline } from "ionicons/icons";
+import { add, locationOutline, shareOutline, chevronBack, chevronForward } from "ionicons/icons";
 
 @Component({
     selector: 'app-place-list',
     templateUrl: './place-list.page.html',
     styleUrls: ['./place-list.page.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         RouterLink,
         FlagsModule,
         TranslateModule,
-        IonHeader,
-        IonToolbar,
-        IonButtons,
-        IonMenuButton,
-        IonTitle,
-        IonButton,
         IonIcon,
         IonContent,
         IonItem,
-        IonGrid,
-        IonRow,
-        IonCol,
-        IonLabel,
         IonList,
         IonInfiniteScroll,
         IonInfiniteScrollContent
     ]
 })
-export class PlaceListPage implements OnInit, OnDestroy, AfterViewInit {
+export class PlaceListPage implements OnDestroy {
     @ViewChild(IonInfiniteScroll) infiniteScroll: IonInfiniteScroll;
-    @ViewChild(IonContent) content: IonContent;
 
     unsubscribe$ = new Subject<void>();
     // Use signals directly from the store
@@ -55,20 +43,24 @@ export class PlaceListPage implements OnInit, OnDestroy, AfterViewInit {
     public error = this.placeStore.error;
     limit = 50;
     lang: string;
-    countries: Country[] = Countries;
 
     constructor(
         public navCtrl: NavController,
-        private alertController: AlertController,
+        private navigationService: NavigationService,
+        private actionSheetCtrl: ActionSheetController,
         private placeStore: PlaceStore,
         private translate: TranslateService,
         private loadingCtrl: LoadingController,
-        private xlsxExportService: XlsxExportService
+        private xlsxExportService: XlsxExportService,
+        private spreadsheetDownloadService: SpreadsheetDownloadService
     ) {
         this.lang = this.translate.currentLang;
         addIcons({
             add,
             locationOutline,
+            shareOutline,
+            'chevron-back': chevronBack,
+            'chevron-forward': chevronForward,
             'place': 'assets/custom-ion-icons/place.svg'
         });
     }
@@ -86,22 +78,11 @@ export class PlaceListPage implements OnInit, OnDestroy, AfterViewInit {
         await loading.present();
         this.placeStore.getPlaces({ limit: this.limit, clearStore: true })
             .pipe(takeUntil(this.unsubscribe$))
-            .subscribe(async (res: Place[]) => {
-                // @hack for hide export item
-                setTimeout(async () => {
-                    await this.content.scrollToPoint(0, 54);
-                    await loading.dismiss();
-                }, 1);
-            }, async (error: any) => {
+            .subscribe(async () => {
+                await loading.dismiss();
+            }, async () => {
                 await loading.dismiss();
             });
-    }
-
-    ngOnInit() {
-    }
-
-    ngAfterViewInit() {
-        this.content.scrollToPoint(0, 54);
     }
 
     ngOnDestroy() {
@@ -109,8 +90,30 @@ export class PlaceListPage implements OnInit, OnDestroy, AfterViewInit {
         this.unsubscribe$.complete();
     }
 
-    itemTapped(event: MouseEvent, place: Place) {
-        this.navCtrl.navigateForward(`places/${place.id}`);
+    /**
+     * More is only the fallback. The list is also reached by saving a place
+     * added from the flight form, and a hardcoded navigateBack('more') dropped
+     * the pilot on a tab they never came from.
+     */
+    goBack() {
+        this.navigationService.back('more');
+    }
+
+    itemTapped(place: Place) {
+        this.navCtrl.navigateForward(`more/places/${place.id}`);
+    }
+
+    /** Two formats, so the header button opens a picker rather than doubling up. */
+    async openExport() {
+        const sheet = await this.actionSheetCtrl.create({
+            header: this.translate.instant('buttons.export'),
+            buttons: [
+                { text: 'XLSX', handler: () => { this.xlsxExport(); } },
+                { text: 'CSV', handler: () => { this.csvExport(); } },
+                { text: this.translate.instant('buttons.cancel'), role: 'cancel' }
+            ]
+        });
+        await sheet.present();
     }
 
     loadData(event: any) {
@@ -125,116 +128,45 @@ export class PlaceListPage implements OnInit, OnDestroy, AfterViewInit {
     }
 
     getCountryNameByCode(code: string) {
-        return code ? this.countries.find(x => x.code === code).name[this.lang] : "";
+        if (!code) {
+            return "";
+        }
+        // An unknown code used to throw here and take the whole list down with
+        // it; fall back to showing the raw code instead.
+        const country = CountryByCode.get(code);
+        return country?.name[this.lang] ?? code.toUpperCase();
     }
 
+    /**
+     * CSV keeps its own json-2-csv-built shape (raw country code, alphabetical
+     * columns, coordinates as a JSON [lon,lat] string) rather than the
+     * translated headers the other exports use: flightbook-api's `fb_places`
+     * import re-parses this exact CSV by fixed column position, so changing
+     * its shape here would silently break that round trip.
+     */
     async csvExport() {
-        const loading = await this.loadingCtrl.create({
-            message: this.translate.instant('loading.loading')
-        });
-        await loading.present();
-        this.placeStore.getPlaces({ store: false }).pipe(takeUntil(this.unsubscribe$)).subscribe(async (res: Place[]) => {
-            res.forEach((val: Place) => {
-                delete val['id'];
-                val.coordinates = MapUtil.convertEPSG3857ToEPSG4326(val.coordinates)?.flatCoordinates;
-            })
-
-            if (Capacitor.isNativePlatform()) {
-                try {
-                    const data: any = json2csv(res, { emptyFieldValue: '', sortHeader: true });
-                    const path = `csv/places_export.csv`;
-
-                    await loading.dismiss();
-
-                    const result = await Filesystem.writeFile({
-                        path,
-                        data,
-                        directory: Directory.External,
-                        recursive: true,
-                        encoding: Encoding.UTF8
-                    });
-
-                    await FileOpener.open({
-                        filePath: result.uri,
-                        contentType: 'text/plain',
-                        openWithDefault: true
-                    });
-
-                } catch (e) {
-                    await loading.dismiss();
-                    const alert = await this.alertController.create({
-                        header: this.translate.instant('message.infotitle'),
-                        message: this.translate.instant('message.generationError'),
-                        buttons: [this.translate.instant('buttons.done')]
-                    });
-                    await alert.present();
-                }
-            } else {
-                const data: any = json2csv(res, { emptyFieldValue: '', sortHeader: true });
-                await loading.dismiss();
-                var blob = new Blob([data], {
-                    type: "text/csv;charset=utf-8"
+        await this.spreadsheetDownloadService.download({
+            format: 'csv',
+            filenameBase: 'places',
+            generate: async () => {
+                const places = await firstValueFrom(this.placeStore.getPlaces({ store: false }));
+                places.forEach((val: Place) => {
+                    delete val['id'];
+                    val.coordinates = MapUtil.convertEPSG3857ToEPSG4326(val.coordinates)?.flatCoordinates;
                 });
-                fileSaver.saveAs(blob, `places_export_${Date.now()}.csv`);
+                return json2csv(places, { emptyFieldValue: '', sortHeader: true });
             }
-        }, async (error: any) => {
-            await loading.dismiss();
         });
     }
 
     async xlsxExport() {
-        const loading = await this.loadingCtrl.create({
-            message: this.translate.instant('loading.loading')
-        });
-        await loading.present();
-        this.placeStore.getPlaces({ store: false }).pipe(takeUntil(this.unsubscribe$)).subscribe(async (res: Place[]) => {
-            if (Capacitor.isNativePlatform()) {
-                try {
-                    const data: any = await this.xlsxExportService.generatePlacesXlsxFile(res, { bookType: 'xlsx', type: 'base64' });
-                    const path = `xlsx/places_export.xlsx`;
-
-                    const result = await Filesystem.writeFile({
-                        path,
-                        data,
-                        directory: Directory.External,
-                        recursive: true
-                    });
-
-                    await loading.dismiss();
-
-                    try {
-                        await FileOpener.open({
-                            filePath: result.uri,
-                            contentType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-                        });
-                    } catch (error) {
-                        if (Capacitor.getPlatform() == "android") {
-                            const alert = await this.alertController.create({
-                                header: this.translate.instant('message.infotitle'),
-                                message: this.translate.instant('message.downloadExcel'),
-                                buttons: [this.translate.instant('buttons.done')]
-                            });
-                            await alert.present();
-                        } else {
-                            throw error;
-                        }
-                    }
-                } catch (e) {
-                    await loading.dismiss();
-                    const alert = await this.alertController.create({
-                        header: this.translate.instant('message.infotitle'),
-                        message: this.translate.instant('message.generationError'),
-                        buttons: [this.translate.instant('buttons.done')]
-                    });
-                    await alert.present();
-                }
-            } else {
-                const data: any = await this.xlsxExportService.generatePlacesXlsxFile(res, { bookType: 'xlsx', type: 'array' });
-                await loading.dismiss();
-                this.xlsxExportService.saveExcelFile(data, `places`);
+        await this.spreadsheetDownloadService.download({
+            format: 'xlsx',
+            filenameBase: 'places',
+            generate: async (writeOptions) => {
+                const places = await firstValueFrom(this.placeStore.getPlaces({ store: false }));
+                return this.xlsxExportService.generatePlacesXlsxFile(places, writeOptions);
             }
-        }, async (error: any) => {
-            await loading.dismiss();
         });
     }
 }

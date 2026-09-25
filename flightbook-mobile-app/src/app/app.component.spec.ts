@@ -6,7 +6,6 @@ import { Platform } from '@ionic/angular/standalone';
 import { AppComponent } from './app.component';
 import { TranslateModule } from '@ngx-translate/core';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
-import { ServiceWorkerModule } from '@angular/service-worker';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 describe('AppComponent', () => {
@@ -22,8 +21,7 @@ describe('AppComponent', () => {
         TestBed.configureTestingModule({
             declarations: [AppComponent],
             schemas: [CUSTOM_ELEMENTS_SCHEMA],
-            imports: [TranslateModule.forRoot(),
-            ServiceWorkerModule.register('ngsw-worker.js', { enabled: false })],
+            imports: [TranslateModule.forRoot()],
             providers: [
                 { provide: Platform, useValue: platformSpy },
                 provideHttpClient(withInterceptorsFromDi()),

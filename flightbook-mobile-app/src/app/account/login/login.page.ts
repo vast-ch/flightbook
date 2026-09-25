@@ -1,19 +1,18 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
-import { MenuController, NavController, AlertController, LoadingController, IonContent, IonItem, IonInput, IonButton, IonFooter, IonInputPasswordToggle } from '@ionic/angular/standalone';
+import { NavController, AlertController, LoadingController, IonContent, IonInput, IonButton, IonIcon } from '@ionic/angular/standalone';
+import { UpperCasePipe } from '@angular/common';
+import { addIcons } from 'ionicons';
+import { eyeOutline, eyeOffOutline } from 'ionicons/icons';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { Capacitor } from '@capacitor/core';
-import { SplashScreen } from '@capacitor/splash-screen';
-setTimeout(() => {
-    SplashScreen.hide();
-}, 700);
 import HttpStatusCode from '../../shared/util/HttpStatusCode';
-import { environment } from 'src/environments/environment';
 import { AccountService } from '../shared/account.service';
 import { NewsStore } from 'src/app/news/shared/news.store';
-import { App } from '@capacitor/app';
 import { NavigationService } from 'src/app/shared/services/navigation.service';
+import { LanguageService } from 'src/app/shared/services/language.service';
+import { VersionService } from 'src/app/shared/services/version.service';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
@@ -24,12 +23,11 @@ import { ActivatedRoute, Router } from '@angular/router';
     imports: [
         FormsModule,
         TranslateModule,
+        UpperCasePipe,
         IonContent,
-        IonItem,
         IonInput,
         IonButton,
-        IonFooter,
-        IonInputPasswordToggle
+        IonIcon
     ]
 })
 export class LoginPage implements OnInit, OnDestroy {
@@ -38,11 +36,21 @@ export class LoginPage implements OnInit, OnDestroy {
         email: '',
         password: ''
     };
-    version = '';
+    version = inject(VersionService).version;
+
+    readonly languages = ['fr', 'de', 'en', 'it'];
+    showPassword = false;
+
+    get currentLang(): string {
+        return this.languageService.lang();
+    }
+
+    togglePassword() {
+        this.showPassword = !this.showPassword;
+    }
 
     constructor(
         private translate: TranslateService,
-        private menuCtrl: MenuController,
         private navCtrl: NavController,
         private accountService: AccountService,
         private newsStore: NewsStore,
@@ -50,10 +58,10 @@ export class LoginPage implements OnInit, OnDestroy {
         private loadingCtrl: LoadingController,
         private navigationService: NavigationService,
         private route: ActivatedRoute,
-        private router: Router
+        private router: Router,
+        private languageService: LanguageService
     ) {
-        this.menuCtrl.enable(false);
-        this.defineVersion();
+        addIcons({ eyeOutline, eyeOffOutline });
     }
 
     ngOnInit() {
@@ -94,14 +102,6 @@ export class LoginPage implements OnInit, OnDestroy {
         this.unsubscribe$.complete();
     }
 
-    async defineVersion() {
-        if (Capacitor.isNativePlatform()) {
-            this.version = (await App.getInfo()).version;
-        } else {
-            this.version = environment.appVersion;
-        }
-    }
-
     async login(loginForm: any) {
         if (loginForm.valid) {
             let loading = await this.loadingCtrl.create({
@@ -114,15 +114,16 @@ export class LoginPage implements OnInit, OnDestroy {
                     await loading.dismiss();
                     localStorage.setItem('access_token', resp.access_token);
                     localStorage.setItem('refresh_token', resp.refresh_token);
-                    this.menuCtrl.enable(true);
                     this.loginData.email = null;
                     this.loginData.password = null;
                     if (Capacitor.isNativePlatform()) {
-                        // For native, navigate to news page
-                        this.router.navigate([`news`], { replaceUrl: true });
+                        // navigateRoot, not a plain navigate: this resets Ionic's own
+                        // stack so /login isn't left sitting underneath home, which
+                        // would otherwise make hardware-back land back on the login
+                        // screen.
+                        this.navCtrl.navigateRoot('home');
                     } else {
-                        // For web, navigate to home page
-                        this.navigationService.back();
+                        this.navigationService.backToPendingRoute();
                     }
                     
                 },
@@ -153,8 +154,8 @@ export class LoginPage implements OnInit, OnDestroy {
     }
 
     setLanguage(lang: string) {
-        localStorage.setItem('language', lang);
-        this.translate.use(lang);
+        this.languageService.setLanguage(lang);
+        // News is fetched per language, so the cached copy is now the wrong one.
         this.newsStore.clearNews();
     }
 
@@ -228,13 +229,5 @@ export class LoginPage implements OnInit, OnDestroy {
             }
         });
         return true;
-    }
-
-    changeEmail(event: any) {
-        this.loginData.email = event.target.value;
-    }
-
-    changePassword(event: any) {
-        this.loginData.password = event.target.value;
     }
 }

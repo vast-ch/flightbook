@@ -1,115 +1,204 @@
-<ion-header>
-    <ion-toolbar color='primary'>
-        <ion-title>{{ 'buttons.pasengerConfirmations' | translate }}</ion-title>
-        <ion-buttons slot="end">
-            <ion-button (click)="close()"><ion-icon name="close"></ion-icon></ion-button>
-        </ion-buttons>
-    </ion-toolbar>
-</ion-header>
+<!--
+  The language chip switches the whole app while this is open: the passenger has
+  to read what they are signing. The list page restores the pilot's language when
+  the modal closes.
+-->
+<div class="form-header">
+    <button type="button" class="icon-button" (click)="close()"
+            [attr.aria-label]="'buttons.cancel' | translate">
+        <ion-icon name="close" aria-hidden="true"></ion-icon>
+    </button>
+    <h1 class="form-header__title">{{ 'passengerConfirmation.passenger' | translate }}</h1>
+    <button type="button" class="lang-chip" (click)="openLanguagePicker()"
+            [attr.aria-label]="'login.language' | translate">
+        {{ languageCode }}
+    </button>
+</div>
 
-<ion-content class="ion-padding">
-    <div class="language-list">
-        <p>
-        <a (click)="setLanguage('fr')" class="language">{{ 'language.fr' | translate }}</a>
-        <a (click)="setLanguage('de')" class="language">{{ 'language.de' | translate }}</a>
-        <a (click)="setLanguage('en')" class="language">{{ 'language.en' | translate }}</a>
-        <a (click)="setLanguage('it')" class="language">{{ 'language.it' | translate }}</a>
-        </p>
-    </div>
-    <form #form="ngForm" (ngSubmit)="savePassengerConfirmation(form)">
-      @if (schools.length > 0 && type == "add") {  
-      <ion-item class="error-item">
-          <ion-select label="{{ 'passengerConfirmation.tandemSchool' | translate }}" labelPlacement="stacked" [(ngModel)]="passengerData.tandemSchool" name="school"
-            okText="{{ 'buttons.done' | translate }}" cancelText="{{ 'buttons.clear' | translate }}" (ionCancel)="clearSchoolButton()">
-            @for (school of schools; track school.id) {
-              <ion-select-option [value]="school">{{ school.name }}</ion-select-option>
+<ion-content>
+    <form id="passengerForm" #form="ngForm" (ngSubmit)="savePassengerConfirmation()">
+        <div class="form-body">
+
+            @if (!isView) {
+                <div class="steps">
+                    <button type="button" class="steps__item" [class.is-active]="step() === 1"
+                            (click)="step.set(1)">
+                        1 &middot; {{ 'passengerConfirmation.stepDetails' | translate }}
+                    </button>
+                    <span class="steps__line" aria-hidden="true"></span>
+                    <span class="steps__item" [class.is-active]="step() === 2">
+                        2 &middot; {{ 'passengerConfirmation.stepSign' | translate }}
+                    </span>
+                </div>
             }
-          </ion-select>
-        </ion-item>
-      }
-      @if (passengerData.tandemSchool && type == "view") {
-        <ion-item class="error-item">
-          <ion-input [value]="passengerData.tandemSchool.name" readonly name="school" type="text" label="{{ 'passengerConfirmation.tandemSchool' | translate }}" labelPlacement="stacked"></ion-input>
-        </ion-item>
-      }
-        <ion-item class="error-item">
-          <ion-input [value]="dateString" required readonly name="date" type="date" label="{{ 'passengerConfirmation.date' | translate }}*" labelPlacement="stacked"></ion-input>
-        </ion-item>
-        <ion-item class="error-item">
-          <ion-input [(ngModel)]="passengerData.firstname" #firstname="ngModel" required name="firstname" type="text" label="{{ 'account.firstname' | translate }}*" labelPlacement="stacked" [readonly]="type === 'view'"></ion-input>
-          @if (firstname.invalid && (firstname.dirty || firstname.touched)) {
-            <ion-text color="danger" class="error-text">{{ 'message.required' | translate }}</ion-text>
-          }
-        </ion-item>
-        <ion-item class="error-item">
-          <ion-input [(ngModel)]="passengerData.lastname" #lastname="ngModel" required name="lastname" type="text" label="{{ 'account.lastname' | translate }}*" labelPlacement="stacked" [readonly]="type === 'view'"></ion-input>
-          @if (lastname.invalid && (lastname.dirty || lastname.touched)) {
-            <ion-text color="danger" class="error-text">{{ 'message.required' | translate }}</ion-text>
-          }
-        </ion-item>
-        <ion-item class="error-item">
-          <ion-input [(ngModel)]="passengerData.email" #email="ngModel" required name="email" type="text" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" label="{{ 'login.email' | translate }}*" labelPlacement="stacked" [readonly]="type === 'view'"></ion-input>
-          @if (email.invalid && (email.dirty || email.touched)) {
-            @if (email.errors?.pattern) {
-              <ion-text color="danger" class="error-text">{{ 'message.invalidEmail' | translate }}</ion-text>
-            } @else if (email.errors?.required) {
-              <ion-text color="danger" class="error-text">{{ 'message.required' | translate }}</ion-text>
-            }
-          }
-        </ion-item>
-        <ion-item class="error-item">
-          <ion-input [(ngModel)]="passengerData.phone" #phone="ngModel" required name="phone" type="phone" label="{{ 'account.phone' | translate }}*" labelPlacement="stacked" [readonly]="type === 'view'"></ion-input>
-          @if (phone.invalid && (phone.dirty || phone.touched)) {
-            <ion-text color="danger" class="error-text">{{ 'message.required' | translate }}</ion-text>
-          }
-        </ion-item>
-        <ion-item class="error-item">
-            <div class="toggle-wrapper-custom">
-                <ion-label color="primary">
-                    {{ 'passengerConfirmation.validation' | translate }}*
-                </ion-label>
-                <ion-toggle [(ngModel)]="passengerData.validated" #validated="ngModel" name="validated" [disabled]="type === 'view'"></ion-toggle>
-            </div>
-            <ul class="validation-list">
-              @if (passengerData.tandemSchool?.configuration?.tandemModule?.termsAndConditionsLink) {
-                <li>{{ 'passengerConfirmation.termsAndConditions' | translate }} <a target="_blank" [href]="passengerData.tandemSchool?.configuration?.tandemModule?.termsAndConditionsLink">{{ 'passengerConfirmation.open' | translate }}</a></li>
-              }
-              <li>{{ 'passengerConfirmation.fullyUnderstoodInstructions' | translate }}</li>
-              <li>{{ 'passengerConfirmation.undertakePilotInstructions' | translate }}</li>
-              <li>{{ 'passengerConfirmation.noHealthProblems' | translate }}</li>
-              <li>{{ 'passengerConfirmation.understandRisks' | translate }}</li>
-            </ul>
-            @if (!passengerData.validated && validated.touched && type !== 'view') {
-                <ion-text color="danger" class="error-text">{{ 'message.required' | translate }}</ion-text>
-            }
-        </ion-item>
-        <ion-item>
-            <div class="toggle-wrapper-custom">
-                <ion-label color="primary">{{ 'passengerConfirmation.canUseData' | translate }}</ion-label>
-                <ion-toggle [(ngModel)]="passengerData.canUseData" name="canUseData" [disabled]="type === 'view'"></ion-toggle>
-            </div>
-        </ion-item>
-        <ion-item class="error-item">
-          <ion-input [(ngModel)]="passengerData.place" #place="ngModel" required name="place" type="text" label="{{ 'place.place' | translate }}*" labelPlacement="stacked" [readonly]="type === 'view'"></ion-input>
-          @if (place.invalid && (place.dirty || place.touched)) {
-            <ion-text color="danger" class="error-text">{{ 'message.required' | translate }}</ion-text>
-          }
-        </ion-item>
-        <ion-item>
-            <ion-label color="primary" position="stacked">{{ 'passengerConfirmation.signature' | translate }}*</ion-label>
-            <div class="signature-container">
-                <canvas #signatureCanvas [style.pointer-events]="type === 'view' ? 'none' : 'auto'" class="signature-canvas"></canvas>
-                @if (type !== 'view' && signaturePad && !signaturePad.isEmpty()) {
-                    <ion-button fill="clear" size="small" (click)="clearSignature()" class="clear-signature-btn">
-                        <ion-icon name="close" slot="icon-only"></ion-icon>
-                    </ion-button>
+
+            <!--
+              Kept in the DOM across both steps: unmounting would drop the
+              ngModel controls, and with them the form's own validity.
+            -->
+            <div class="fb-card--flush passenger-card" [hidden]="step() !== 1">
+                @if (schools.length > 0 && !isView) {
+                    <div class="fb-row fb-row--select">
+                        <span class="fb-row__label" id="lbl-pc-school">{{ 'passengerConfirmation.tandemSchool' | translate }}</span>
+                        <span class="fb-row__value">
+                            <ion-select [(ngModel)]="passengerData.tandemSchool" name="school"
+                                        toggleIcon="chevron-forward" aria-labelledby="lbl-pc-school"
+                                        okText="{{ 'buttons.done' | translate }}"
+                                        cancelText="{{ 'buttons.clear' | translate }}"
+                                        (ionCancel)="clearSchoolButton()">
+                                @for (school of schools; track school.id) {
+                                    <ion-select-option [value]="school">{{ school.name }}</ion-select-option>
+                                }
+                            </ion-select>
+                        </span>
+                    </div>
+                }
+                @if (passengerData.tandemSchool && isView) {
+                    <div class="fb-row">
+                        <span class="fb-row__label">{{ 'passengerConfirmation.tandemSchool' | translate }}</span>
+                        <span class="fb-row__value">{{ passengerData.tandemSchool.name }}</span>
+                    </div>
+                }
+
+                <div class="fb-row">
+                    <span class="fb-row__label">{{ 'passengerConfirmation.date' | translate }}</span>
+                    <span class="fb-row__value">{{ passengerData.date | date:'dd.MM.yyyy' }}</span>
+                </div>
+
+                <div class="fb-row">
+                    <span class="fb-row__label" id="lbl-pc-firstname">{{ 'account.firstname' | translate }}<span class="fb-row__req" aria-hidden="true">*</span></span>
+                    <span class="fb-row__value">
+                        <ion-input [(ngModel)]="passengerData.firstname" #firstname="ngModel" required
+                                   name="firstname" type="text" aria-labelledby="lbl-pc-firstname"
+                                   [readonly]="isView"></ion-input>
+                    </span>
+                </div>
+                @if (firstname.invalid && (firstname.dirty || firstname.touched)) {
+                    <div class="fb-field__error">{{ 'message.required' | translate }}</div>
+                }
+
+                <div class="fb-row">
+                    <span class="fb-row__label" id="lbl-pc-lastname">{{ 'account.lastname' | translate }}<span class="fb-row__req" aria-hidden="true">*</span></span>
+                    <span class="fb-row__value">
+                        <ion-input [(ngModel)]="passengerData.lastname" #lastname="ngModel" required
+                                   name="lastname" type="text" aria-labelledby="lbl-pc-lastname"
+                                   [readonly]="isView"></ion-input>
+                    </span>
+                </div>
+                @if (lastname.invalid && (lastname.dirty || lastname.touched)) {
+                    <div class="fb-field__error">{{ 'message.required' | translate }}</div>
+                }
+
+                <div class="fb-row">
+                    <span class="fb-row__label" id="lbl-pc-email">{{ 'login.email' | translate }}<span class="fb-row__req" aria-hidden="true">*</span></span>
+                    <span class="fb-row__value">
+                        <ion-input [(ngModel)]="passengerData.email" #email="ngModel" required
+                                   name="email" type="email" inputmode="email"
+                                   pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
+                                   placeholder="name@example.com" aria-labelledby="lbl-pc-email"
+                                   [readonly]="isView"></ion-input>
+                    </span>
+                </div>
+                @if (email.invalid && (email.dirty || email.touched)) {
+                    @if (email.errors?.pattern) {
+                        <div class="fb-field__error">{{ 'message.invalidEmail' | translate }}</div>
+                    } @else if (email.errors?.required) {
+                        <div class="fb-field__error">{{ 'message.required' | translate }}</div>
+                    }
+                }
+
+                <div class="fb-row">
+                    <span class="fb-row__label" id="lbl-pc-phone">{{ 'account.phone' | translate }}<span class="fb-row__req" aria-hidden="true">*</span></span>
+                    <span class="fb-row__value">
+                        <ion-input [(ngModel)]="passengerData.phone" #phone="ngModel" required
+                                   name="phone" type="tel" inputmode="tel"
+                                   aria-labelledby="lbl-pc-phone" [readonly]="isView"></ion-input>
+                    </span>
+                </div>
+                @if (phone.invalid && (phone.dirty || phone.touched)) {
+                    <div class="fb-field__error">{{ 'message.required' | translate }}</div>
+                }
+
+                <div class="fb-row">
+                    <span class="fb-row__label" id="lbl-pc-place">{{ 'place.place' | translate }}<span class="fb-row__req" aria-hidden="true">*</span></span>
+                    <span class="fb-row__value">
+                        <ion-input [(ngModel)]="passengerData.place" #place="ngModel" required
+                                   name="place" type="text" aria-labelledby="lbl-pc-place"
+                                   [readonly]="isView"></ion-input>
+                    </span>
+                </div>
+                @if (place.invalid && (place.dirty || place.touched)) {
+                    <div class="fb-field__error">{{ 'message.required' | translate }}</div>
                 }
             </div>
-        </ion-item>
-        @if (type && type === 'view') {
-            <ion-button color="danger" expand="block" (click)="delete()">{{ 'buttons.delete' | translate }}</ion-button>
-        } @else {
-            <ion-button expand="block" [disabled]="form.invalid || signaturePad?.isEmpty() || !passengerData.validated" type="submit">{{ 'buttons.add' | translate }}</ion-button>
-        }
+
+            <!-- What the passenger is agreeing to -->
+            <div class="fb-card passenger-card" [hidden]="step() !== 1">
+                <p class="declaration__lead">{{ 'passengerConfirmation.validation' | translate }}</p>
+
+                <ul class="declaration__list">
+                    @if (passengerData.tandemSchool?.configuration?.tandemModule?.termsAndConditionsLink) {
+                        <li>
+                            {{ 'passengerConfirmation.termsAndConditions' | translate }}
+                            <a target="_blank" rel="noopener"
+                               [href]="passengerData.tandemSchool.configuration.tandemModule.termsAndConditionsLink">{{ 'passengerConfirmation.open' | translate }}</a>
+                        </li>
+                    }
+                    <li>{{ 'passengerConfirmation.fullyUnderstoodInstructions' | translate }}</li>
+                    <li>{{ 'passengerConfirmation.undertakePilotInstructions' | translate }}</li>
+                    <li>{{ 'passengerConfirmation.noHealthProblems' | translate }}</li>
+                    <li>{{ 'passengerConfirmation.understandRisks' | translate }}</li>
+                </ul>
+
+                <div class="declaration__confirm">
+                    <span class="declaration__confirm-text">{{ 'passengerConfirmation.confirmPoints' | translate }}&nbsp;*</span>
+                    <ion-toggle [(ngModel)]="passengerData.validated" #validated="ngModel"
+                                name="validated" [disabled]="isView"></ion-toggle>
+                </div>
+                @if (!passengerData.validated && validated.touched && !isView) {
+                    <div class="fb-field__error declaration__error">{{ 'message.required' | translate }}</div>
+                }
+
+                <div class="declaration__confirm is-secondary">
+                    <span class="declaration__confirm-text">{{ 'passengerConfirmation.canUseData' | translate }}</span>
+                    <ion-toggle [(ngModel)]="passengerData.canUseData" name="canUseData"
+                                [disabled]="isView"></ion-toggle>
+                </div>
+            </div>
+
+            <!-- Step 2, and the record of what was signed in view mode -->
+            @if (step() === 2 || isView) {
+                <div class="fb-card passenger-card">
+                    <div class="fb-section-label">{{ 'passengerConfirmation.signature' | translate }}@if (!isView) {&nbsp;*}</div>
+                    <div class="signature">
+                        <canvas #signatureCanvas class="signature__canvas"
+                                [style.pointer-events]="isView ? 'none' : 'auto'"></canvas>
+                        @if (!isView && signaturePad && !signaturePad.isEmpty()) {
+                            <button type="button" class="signature__clear" (click)="clearSignature()"
+                                    [attr.aria-label]="'buttons.clear' | translate">
+                                <ion-icon name="close" aria-hidden="true"></ion-icon>
+                            </button>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
     </form>
 </ion-content>
+
+<div class="form-footer">
+    @if (isView) {
+        <ion-button expand="block" color="danger" fill="outline" (click)="delete()">
+            {{ 'buttons.delete' | translate }}
+        </ion-button>
+    } @else if (step() === 1) {
+        <ion-button expand="block" [disabled]="!detailsComplete(form)" (click)="step.set(2)">
+            {{ 'passengerConfirmation.continueToSignature' | translate }}
+        </ion-button>
+    } @else {
+        <ion-button expand="block" type="submit" form="passengerForm"
+                    [disabled]="!detailsComplete(form) || !signaturePad || signaturePad.isEmpty()">
+            {{ 'buttons.save' | translate }}
+        </ion-button>
+    }
+</div>

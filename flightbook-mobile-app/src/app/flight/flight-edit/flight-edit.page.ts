@@ -1,8 +1,11 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { firstValueFrom, Subject } from 'rxjs';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { takeUntil } from 'rxjs/operators';
-import { AlertController, LoadingController, IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonContent, IonButton } from '@ionic/angular/standalone';
+import { AlertController, LoadingController, IonContent, IonButton, IonFooter, IonIcon } from '@ionic/angular/standalone';
+import { DatePipe } from '@angular/common';
+import { addIcons } from 'ionicons';
+import { chevronBack, downloadOutline } from 'ionicons/icons';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import HttpStatusCode from '../../shared/util/HttpStatusCode';
 import { v4 as uuidv4 } from 'uuid';
@@ -12,6 +15,7 @@ import { Glider } from 'src/app/glider/shared/glider.model';
 import { FlightStore } from '../shared/flight.store';
 import { GliderStore } from 'src/app/glider/shared/glider.store';
 import { IgcService } from 'src/app/shared/services/igc.service';
+import { IgcDownloadService } from 'src/app/shared/services/igc-download.service';
 import moment from 'moment';
 import { FileInputComponent } from '../../shared/components/file-input/file-input.component';
 import { FlightFormComponent } from '../../form/flight-form/flight-form';
@@ -22,6 +26,7 @@ import { Place } from 'src/app/place/shared/place.model';
 import { TandemSchoolService } from 'src/app/school/shared/tandem-school.service';
 import { TandemSchoolPaymentState } from '../shared/tandem-school-payment-state';
 import { TandemSchoolData } from '../shared/tandem-school-data.model';
+import { NavigationService } from 'src/app/shared/services/navigation.service';
 
 @Component({
     selector: 'app-flight-edit',
@@ -31,13 +36,11 @@ import { TandemSchoolData } from '../shared/tandem-school-data.model';
         FileInputComponent,
         FlightFormComponent,
         TranslateModule,
-        IonHeader,
-        IonToolbar,
-        IonButtons,
-        IonBackButton,
-        IonTitle,
+        DatePipe,
         IonContent,
-        IonButton
+        IonButton,
+        IonFooter,
+        IonIcon
     ]
 })
 export class FlightEditPage implements OnInit, OnDestroy {
@@ -55,7 +58,7 @@ export class FlightEditPage implements OnInit, OnDestroy {
 
     constructor(
         private activeRoute: ActivatedRoute,
-        private router: Router,
+        private navigationService: NavigationService,
         private flightStore: FlightStore,
         private gliderStore: GliderStore,
         private alertController: AlertController,
@@ -63,10 +66,16 @@ export class FlightEditPage implements OnInit, OnDestroy {
         private loadingCtrl: LoadingController,
         private fileUploadService: FileUploadService,
         private igcService: IgcService,
+        private igcDownloadService: IgcDownloadService,
         private schoolService: SchoolService,
         private tandemSchoolService: TandemSchoolService
     ) {
         this.flightId = +this.activeRoute.snapshot.paramMap.get('id');
+        addIcons({ chevronBack, downloadOutline });
+    }
+
+    back() {
+        this.navigationService.back('/flights');
     }
 
     private async dataLoading() {
@@ -111,19 +120,17 @@ export class FlightEditPage implements OnInit, OnDestroy {
                 this.flight.landing = new Place();
             }
 
-            const archivedValue = this.gliderStore.filter.archived;
-            this.gliderStore.filter.archived = "0";
-            this.gliderStore.getGliders({ store: false }).pipe(takeUntil(this.unsubscribe$)).subscribe((resp: Glider[]) => {
+            // archived: "0" for this request only - see flight-add.
+            this.gliderStore.getGliders({ store: false, archived: "0" }).pipe(takeUntil(this.unsubscribe$)).subscribe((resp: Glider[]) => {
                 this.gliders = resp;
                 if (!this.gliders.find(glider => glider.id === this.flight.glider.id)) {
                     this.gliders.push(this.flight.glider);
                 }
-                this.gliderStore.filter.archived = archivedValue;
             });
             this.loadIgcData();
 
         } catch (error) {
-            this.router.navigate(['/flights'], { replaceUrl: true });
+            await this.navigationService.back('/flights');
         } finally {
             await loading.dismiss();
         }
@@ -158,11 +165,11 @@ export class FlightEditPage implements OnInit, OnDestroy {
                     .pipe(takeUntil(this.unsubscribe$))
                     .subscribe(async (res: Flight[]) => {
                         await loading.dismiss();
-                        await this.router.navigate(['/flights'], { replaceUrl: true });
+                        await this.navigationService.back('/flights');
                     });
             } else {
                 await loading.dismiss();
-                await this.router.navigate(['/flights'], { replaceUrl: true });
+                await this.navigationService.back('/flights');
             }
         },
             (async (resp: any) => {
@@ -188,12 +195,17 @@ export class FlightEditPage implements OnInit, OnDestroy {
         this.flightStore.deleteFlight(this.flight).pipe(takeUntil(this.unsubscribe$)).subscribe({
             next: async () => {
                 await loading.dismiss();
-                await this.router.navigate(['/flights'], { replaceUrl: true });
+                await this.navigationService.back('/flights');
             },
             error: (async (resp: any) => {
                 await loading.dismiss();
             })
         });
+    }
+
+    async downloadIgc() {
+        const filename = `flight_${this.flight.date}_${this.flight.number}.igc`;
+        await this.igcDownloadService.download({ filename, content: this.igcFile });
     }
 
     async copy() {
@@ -234,7 +246,7 @@ export class FlightEditPage implements OnInit, OnDestroy {
     private postFlightRequest(loading: any) {
         this.flightStore.postFlight(this.flight).pipe(takeUntil(this.unsubscribe$)).subscribe(async (res: Flight) => {
             await loading.dismiss();
-            await this.router.navigate(['/flights'], { replaceUrl: true });
+            await this.navigationService.back('/flights');
         },
             (async (resp: any) => {
                 await loading.dismiss();

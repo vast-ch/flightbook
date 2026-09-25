@@ -1,13 +1,16 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component, OnDestroy } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
-import { LoadingController, AlertController, IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonContent, IonButton } from '@ionic/angular/standalone';
+import { LoadingController, AlertController, IonContent, IonFooter, IonButton, IonIcon } from '@ionic/angular/standalone';
 import HttpStatusCode from '../../shared/util/HttpStatusCode';
 import { Place } from 'src/app/place/shared/place.model';
 import { PlaceStore } from '../shared/place.store';
 import { FlightStore } from 'src/app/flight/shared/flight.store';
+import { NavigationService } from 'src/app/shared/services/navigation.service';
+import { addIcons } from 'ionicons';
+import { chevronBack } from 'ionicons/icons';
 import { PlaceFormComponent } from '../../form/place-form/place-form';
 
 @Component({
@@ -17,16 +20,13 @@ import { PlaceFormComponent } from '../../form/place-form/place-form';
     imports: [
         PlaceFormComponent,
         TranslateModule,
-        IonHeader,
-        IonToolbar,
-        IonButtons,
-        IonBackButton,
-        IonTitle,
         IonContent,
-        IonButton
+        IonFooter,
+        IonButton,
+        IonIcon
     ]
 })
-export class PlaceEditPage implements OnInit, OnDestroy {
+export class PlaceEditPage implements OnDestroy {
     unsubscribe$ = new Subject<void>();
     private readonly placeId: number;
     place: Place;
@@ -34,7 +34,7 @@ export class PlaceEditPage implements OnInit, OnDestroy {
 
     constructor(
         private activeRoute: ActivatedRoute,
-        private router: Router,
+        private navigationService: NavigationService,
         private placeStore: PlaceStore,
         private flightStore: FlightStore,
         private translate: TranslateService,
@@ -46,21 +46,23 @@ export class PlaceEditPage implements OnInit, OnDestroy {
         this.place = this.placeStore.places().find(place => place.id === this.placeId);
         this.place = structuredClone(this.place);
         if (!this.place) {
-            this.router.navigate(['/places'], { replaceUrl: true });
+            this.navigationService.back('/more/places');
         }
-        this.flightStore.nbFlightsByPlaceId(this.placeId).subscribe((resp: any) => {
+        this.flightStore.nbFlightsByPlaceId(this.placeId).pipe(takeUntil(this.unsubscribe$)).subscribe((resp: any) => {
             if (resp.nbFlights == 0) {
                 this.deleteDisabled = false;
             }
         });
-    }
-
-    ngOnInit() {
+        addIcons({ 'chevron-back': chevronBack });
     }
 
     ngOnDestroy() {
         this.unsubscribe$.next();
         this.unsubscribe$.complete();
+    }
+
+    close() {
+        this.navigationService.back('/more/places');
     }
 
     async savePlace(place: Place) {
@@ -72,7 +74,7 @@ export class PlaceEditPage implements OnInit, OnDestroy {
         this.placeStore.putPlace(place).pipe(takeUntil(this.unsubscribe$)).subscribe(async (res: Place) => {
             this.flightStore.clearFlights();
             await loading.dismiss();
-            this.router.navigate(['/places'], { replaceUrl: true });
+            await this.navigationService.back('/more/places');
         },
             (async (error: any) => {
                 await loading.dismiss();
@@ -94,9 +96,9 @@ export class PlaceEditPage implements OnInit, OnDestroy {
         });
         await loading.present();
 
-        this.placeStore.deletePlace(this.place).subscribe(async (res: any) => {
+        this.placeStore.deletePlace(this.place).pipe(takeUntil(this.unsubscribe$)).subscribe(async (res: any) => {
             await loading.dismiss();
-            await this.router.navigate(['/places'], { replaceUrl: true });
+            await this.navigationService.back('/more/places');
         },
             (async (error: any) => {
                 await loading.dismiss();

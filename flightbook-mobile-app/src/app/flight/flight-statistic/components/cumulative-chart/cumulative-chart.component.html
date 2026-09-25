@@ -1,0 +1,9 @@
+@if (hasData()) {
+  <div class="cumulative-canvas">
+    <canvas baseChart
+            type="line"
+            [data]="chartData()"
+            [options]="chartOptions">
+    </canvas>
+  </div>
+}

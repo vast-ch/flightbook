@@ -1,41 +1,30 @@
-.upload-btn {
-    margin-right: 10px;
+// .form-header*, .form-body, .form-footer, .fb-card--flush, .fb-row* and
+// .import-card* live in theme/tokens.scss.
+
+// The selected format's own explanation, straight from the API
+.import-hint {
+  margin: 8px 2px 16px;
+  font-size: 11.5px;
+  line-height: 1.55;
+  color: var(--fb-text-secondary);
+  text-wrap: pretty;
 }
 
-input[type="file"] {
-    display: none;
+.import-result {
+  margin-top: 22px;
 }
 
-.fileName {
-    vertical-align: -webkit-baseline-middle;
+.import-result__block {
+  margin-top: 8px;
+
+  & + & {
+    margin-top: 14px;
+  }
 }
 
-ion-card {
-    font-size: 1.1em;
-    margin-top: 12px;
-}
-ion-card label {
-    display: inline-block;
-    width: 180px;
-}
-ion-card .title {
-    font-weight: bold;
-    line-height: 0;
-    margin: 20px 0 20px 0;
-    font-size: 1.1em;
-}
-.card-content-md {
-    padding-top: 0;
-}
-
-.content p {
-    color: var(--ion-text-color-step-600, #666666) !important;
-    margin-left: 0;
-    margin-right: 0;
-    margin-top: 0;
-    margin-bottom: 10px;
-    font-size: 14px;
-    line-height: 20px;
-    text-overflow: inherit;
-    overflow: inherit;
+.import-result__title {
+  padding: 13px 16px 0;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--fb-text);
 }

@@ -2,6 +2,7 @@ export class FlightStatisticDto {
     public type: string;
     public year: string;
     public month: string;
+    public day: string;
     public nbFlights: number;
     public time: number;
     public income: number;
@@ -9,6 +10,12 @@ export class FlightStatisticDto {
     public nbStartplaces: number;
     public nbLandingplaces: number;
     public nbFlightsAlone: number;
+    public paidFlights: number;
     public totalDistance: number;
     public bestDistance: number;
+    public bestDistanceDate: string;
+    public bestDistanceId: number;
+    public longestAirtime: number;
+    public longestAirtimeDate: string;
+    public longestAirtimeId: number;
 }

@@ -4,14 +4,8 @@ platform :android do
   desc "Build a signed release AAB and upload it to Google Play as a draft"
   lane :playstore do
     project_root = File.expand_path("..", Dir.pwd)
-    gradle_file = File.join(project_root, "app", "build.gradle")
 
-    new_version_code = 10060 + ENV["BUILD_NUMBER"].to_i
-
-    android_set_version_code(
-      version_code: new_version_code,
-      gradle_file: gradle_file
-    )
+    ENV["ANDROID_VERSION_CODE"] = (10060 + ENV["BUILD_NUMBER"].to_i).to_s
 
     gradle(
       task: "bundle",

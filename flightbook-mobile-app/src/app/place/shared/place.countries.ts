@@ -1748,3 +1748,7 @@ export const Countries = [
         }
     }
 ];
+
+/** Built once - a linear scan per lookup isn't worth it on a ~250-entry list. */
+export const CountryByCode: ReadonlyMap<string, Country> =
+    new Map(Countries.map(country => [country.code, country]));

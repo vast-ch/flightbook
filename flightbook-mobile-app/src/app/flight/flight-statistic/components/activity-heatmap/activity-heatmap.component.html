@@ -1,0 +1,7 @@
+<div class="heatmap-scroll" #scroller>
+  <div class="heatmap">
+    @for (cell of cells(); track $index) {
+      <div class="heatmap__cell" [attr.data-level]="cell.level" [title]="cell.title"></div>
+    }
+  </div>
+</div>

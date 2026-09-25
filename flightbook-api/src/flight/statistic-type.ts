@@ -1,5 +1,6 @@
 export enum StatisticType {
     YEARLY = "yearly",
     MONTHLY = "monthly",
-    GLOBAL = "global"
+    GLOBAL = "global",
+    DAILY = "daily"
   }

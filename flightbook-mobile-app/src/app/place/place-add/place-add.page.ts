@@ -1,12 +1,14 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnDestroy } from '@angular/core';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { LoadingController, AlertController, IonHeader, IonToolbar, IonButtons, IonMenuButton, IonTitle, IonContent } from '@ionic/angular/standalone';
+import { LoadingController, AlertController, IonContent, IonFooter, IonButton, IonIcon } from '@ionic/angular/standalone';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import HttpStatusCode from '../../shared/util/HttpStatusCode';
 import { Place } from 'src/app/place/shared/place.model';
 import { PlaceStore } from '../shared/place.store';
+import { NavigationService } from 'src/app/shared/services/navigation.service';
+import { addIcons } from 'ionicons';
+import { close } from 'ionicons/icons';
 import { PlaceFormComponent } from '../../form/place-form/place-form';
 
 @Component({
@@ -16,34 +18,34 @@ import { PlaceFormComponent } from '../../form/place-form/place-form';
     imports: [
         PlaceFormComponent,
         TranslateModule,
-        IonHeader,
-        IonToolbar,
-        IonButtons,
-        IonMenuButton,
-        IonTitle,
-        IonContent
+        IonContent,
+        IonFooter,
+        IonButton,
+        IonIcon
     ]
 })
-export class PlaceAddPage implements OnInit, OnDestroy {
+export class PlaceAddPage implements OnDestroy {
     unsubscribe$ = new Subject<void>();
     place: Place;
 
     constructor(
-        private router: Router,
+        private navigationService: NavigationService,
         private translate: TranslateService,
         private placeStore: PlaceStore,
         private loadingCtrl: LoadingController,
         private alertController: AlertController
     ) {
         this.place = new Place();
-    }
-
-    ngOnInit() {
+        addIcons({ close });
     }
 
     ngOnDestroy() {
         this.unsubscribe$.next();
         this.unsubscribe$.complete();
+    }
+
+    close() {
+        this.navigationService.back('/more/places');
     }
 
     async savePlace(place: Place) {
@@ -54,7 +56,7 @@ export class PlaceAddPage implements OnInit, OnDestroy {
 
         this.placeStore.postPlace(place).pipe(takeUntil(this.unsubscribe$)).subscribe(async (res: Place) => {
             await loading.dismiss();
-            await this.router.navigate(['/places'], { replaceUrl: true });
+            await this.navigationService.back('/more/places');
         },
             (async (error: any) => {
                 await loading.dismiss();

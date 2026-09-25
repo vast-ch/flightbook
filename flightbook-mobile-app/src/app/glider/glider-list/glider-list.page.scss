@@ -1,86 +1,86 @@
-ion-item {
+// .list-header*, .list-block, .list-empty and .icon-button live in
+// theme/tokens.scss - shared with the flight and place lists.
+
+// ---- Row ----------------------------------------------------------------
+.glider-row {
   --padding-start: 0;
   --inner-padding-end: 0;
+  --background: var(--fb-surface);
+  --min-height: 0;
+
+  // Separator between siblings only, so the last row never doubles up with the
+  // block's own bottom border. @for leaves comment anchors, not elements, so
+  // the adjacent-sibling combinator still pairs consecutive rows.
+  & + & {
+    border-top: 1px solid var(--fb-hairline);
+  }
 }
 
-ion-grid {
-  width: 100%;
-  margin-top: 5px;
-  margin-bottom: 5px;
-}
-
-.glider-name {
+.glider-row__inner {
   display: flex;
   align-items: center;
-  color: var(--ion-color-primary);
-  font-size: 0.9em;
-  margin-bottom: 4px;
-
-  ion-icon {
-    font-size: 1.2em;
-    color: var(--ion-color-dark-shade);
-    margin-right: 6px;
-  }
-
-  span {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-}
-
-.glider-stats {
-  font-size: 0.8em;
-  color: var(--ion-color-dark-shade);
-
-  ion-col {
-    display: flex;
-    align-items: center;
-
-    &:first-child {
-      // This padding is used to align the checkmark icon with the tandem/solo icon above.
-      padding-left: 2px;
-    }
-  }
-
-  ion-col.stat-icon {
-    justify-content: flex-start;
-
-    ion-icon {
-      margin-left: 30px;
-    }
-  }
-
-  ion-col.time-icon {
-    justify-content: flex-start;
-
-    ion-icon {
-      margin-left: 15px;
-    }
-  }
-
-  ion-col.archive-icon {
-    justify-content: flex-end;
-  }
-
-  ion-icon {
-    margin-right: 4px;
-    font-size: 1.1em;
-  }
-}
-
-.export-buttons ion-button {
+  gap: 12px;
   width: 100%;
-  height: 36px;
+  padding: 15px var(--fb-gutter);
 }
 
-ion-grid,
-ion-col {
-  padding-top: 0;
-  padding-bottom: 0;
-  padding-inline-end: 0.47em;
+.glider-row__icon {
+  flex: none;
+  font-size: 17px;
+  color: var(--fb-text-secondary);
 }
 
-ion-item {
-  --min-height: 48px;
+.glider-row__main {
+  flex: 1;
+  min-width: 0;
+}
+
+.glider-row__top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.glider-row__name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--fb-text);
+}
+
+.glider-row__badge {
+  flex: none;
+  padding: 2px 7px;
+  border-radius: 5px;
+  background: var(--fb-track);
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--fb-text-secondary);
+}
+
+.glider-row__meta {
+  display: flex;
+  gap: 14px;
+  margin-top: 7px;
+  font-size: 11.5px;
+  font-weight: 400;
+  color: var(--fb-text-secondary);
+
+  .is-muted {
+    color: var(--fb-text-muted);
+  }
+}
+
+.glider-row__check {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--fb-text-muted);
 }

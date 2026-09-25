@@ -1,47 +1,76 @@
-<ion-header>
-  <ion-toolbar color='primary'>
-    <ion-title>{{ 'buttons.filter' | translate }}</ion-title>
-  </ion-toolbar>
-</ion-header>
+<!--
+  No Cancel: the sheet edits the shared filter live, so the footer button and the
+  backdrop both simply close it. Clear is the way back to an unfiltered list.
+  Same grammar as the flight and statistics filter.
+-->
+<div class="filter-head">
+  <div class="filter-head__grabber" aria-hidden="true"></div>
+  <div class="filter-head__row">
+    <h1 class="filter-head__title">{{ 'buttons.filter' | translate }}</h1>
+    <button type="button" class="filter-head__clear" [class.is-enabled]="isFiltered()"
+            [disabled]="!isFiltered()" (click)="clearFilter()">
+      {{ 'buttons.clear' | translate }}
+    </button>
+  </div>
+</div>
 
-<ion-content class="ion-padding">
-  <form (ngSubmit)="filterElement()">
-    <ion-item id="filterFrom">
-      <ion-input label="{{ 'filter.from' | translate }}" labelPlacement="stacked" value="{{ filter.from | date:'dd.MM.yyyy' }}"></ion-input>
-    </ion-item>
-    <ion-item id="filterTo">
-      <ion-input label="{{ 'filter.to' | translate }}" labelPlacement="stacked" value="{{ filter.to | date:'dd.MM.yyyy' }}"></ion-input>
-    </ion-item>
-    <ion-item>
-      <ion-select label="{{ 'appointment.state' | translate }}" labelPlacement="stacked" [(ngModel)]="filter.state" name="type" okText="{{ 'buttons.done' | translate }}"
-        cancelText="{{ 'buttons.cancel' | translate }}">
-        <ion-select-option value="">{{ 'appointment.stateValue.ALL' | translate }}</ion-select-option>
-        <ion-select-option value="ANNOUNCED">{{ 'appointment.stateValue.ANNOUNCED' | translate }}</ion-select-option>
-        <ion-select-option value="CONFIRMED">{{ 'appointment.stateValue.CONFIRMED' | translate }}</ion-select-option>
-        <ion-select-option value="CANCELED">{{ 'appointment.stateValue.CANCELED' | translate }}</ion-select-option>
-      </ion-select>
-    </ion-item>
-    <ion-button type="button" (click)="clearFilter()">{{ 'buttons.clear' | translate }}</ion-button>
-    <ion-button type="submit">{{ 'buttons.filter' | translate }}</ion-button>
-  </form>
+<ion-content class="filter-body">
+  <div class="filter-scroll">
+
+    <!-- Period -->
+    <div class="fb-section-label">{{ 'filter.period' | translate }}</div>
+    <div class="filter-dates">
+      <button type="button" class="filter-date" id="appointmentFilterFrom">
+        <span class="filter-date__label">{{ 'filter.from' | translate }}</span>
+        <span class="filter-date__value" [class.is-placeholder]="!filter().from">
+          {{ filter().from ? (filter().from | date:'dd.MM.yyyy') : '–' }}
+        </span>
+      </button>
+      <button type="button" class="filter-date" id="appointmentFilterTo">
+        <span class="filter-date__label">{{ 'filter.to' | translate }}</span>
+        <span class="filter-date__value" [class.is-placeholder]="!filter().to">
+          {{ filter().to ? (filter().to | date:'dd.MM.yyyy') : '–' }}
+        </span>
+      </button>
+    </div>
+
+    <!-- State: a chip row, as the flight filter draws its own short choices -->
+    <div class="fb-section-label filter-label">{{ 'appointment.state' | translate }}</div>
+    <div class="fb-chip-row filter-chips">
+      @for (state of states; track state) {
+        <button type="button" class="fb-chip" [class.fb-chip--active]="filter().state === state"
+                (click)="setState(state)">
+          {{ 'appointment.stateValue.' + (state || 'ALL') | translate }}
+        </button>
+      }
+    </div>
+  </div>
 </ion-content>
 
-<ion-modal class="filterDateModal dateModal" trigger='filterFrom'>
+<div class="form-footer">
+  <ion-button expand="block" (click)="close()">{{ 'buttons.filter' | translate }}</ion-button>
+</div>
+
+<!--
+  Trigger ids of this sheet's own, not the flight filter's: two sheets carrying
+  the same id would each bind whichever button rendered first.
+-->
+<ion-modal class="filterDateModal dateModal" trigger="appointmentFilterFrom">
   <ng-template>
-    <ion-content>
-      <ion-datetime size="cover" presentation="date" [preferWheel]="true" [ngModelOptions]="{standalone: true}" [(ngModel)]="filter.from"  locale="{{ language }}" [showDefaultButtons]="true"
-        doneText="{{ 'buttons.done' | translate }}" cancelText="{{ 'buttons.clear' | translate }}" (ionCancel)="clearDateButton('from')">
-      </ion-datetime>
-    </ion-content>
+    <ion-datetime size="cover" presentation="date" [preferWheel]="true" locale="{{ language }}"
+                  [showDefaultButtons]="true" doneText="{{ 'buttons.done' | translate }}"
+                  cancelText="{{ 'buttons.clear' | translate }}"
+                  (ionCancel)="clearDateButton('from')" (ionChange)="changeDate('from', $event)">
+    </ion-datetime>
   </ng-template>
 </ion-modal>
 
-<ion-modal class="filterDateModal dateModal" trigger='filterTo'>
+<ion-modal class="filterDateModal dateModal" trigger="appointmentFilterTo">
   <ng-template>
-    <ion-content>
-        <ion-datetime size="cover" presentation="date" [preferWheel]="true" [ngModelOptions]="{standalone: true}" [(ngModel)]="filter.to"  locale="{{ language }}" [showDefaultButtons]="true"
-          doneText="{{ 'buttons.done' | translate }}" cancelText="{{ 'buttons.clear' | translate }}" (ionCancel)="clearDateButton('to')">
-        </ion-datetime>
-    </ion-content>
+    <ion-datetime size="cover" presentation="date" [preferWheel]="true" locale="{{ language }}"
+                  [showDefaultButtons]="true" doneText="{{ 'buttons.done' | translate }}"
+                  cancelText="{{ 'buttons.clear' | translate }}"
+                  (ionCancel)="clearDateButton('to')" (ionChange)="changeDate('to', $event)">
+    </ion-datetime>
   </ng-template>
 </ion-modal>

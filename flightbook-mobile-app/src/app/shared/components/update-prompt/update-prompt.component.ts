@@ -1,8 +1,6 @@
 import { Component, Input } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { AlertController, IonButton, IonContent, IonFooter, IonHeader, IonIcon, IonTitle, IonToolbar, ModalController } from '@ionic/angular/standalone';
+import { AlertController, IonButton, IonContent, IonFooter, IonIcon, ModalController } from '@ionic/angular/standalone';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { Browser } from '@capacitor/browser';
 import { UpdateStatus, VersionCheckResponse } from '../../services/version-check.service';
 import { addIcons } from 'ionicons';
 import { alertCircle, informationCircle } from 'ionicons/icons';
@@ -13,10 +11,6 @@ import { NativeMarket } from "@capacitor-community/native-market";
   templateUrl: './update-prompt.component.html',
   styleUrls: ['./update-prompt.component.scss'],
   imports: [
-    CommonModule,
-    IonHeader,
-    IonToolbar,
-    IonTitle,
     IonButton,
     IonIcon,
     IonContent,

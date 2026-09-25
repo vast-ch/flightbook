@@ -2,7 +2,9 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { Router } from '@angular/router';
-import { AlertController, LoadingController, IonHeader, IonToolbar, IonButtons, IonMenuButton, IonTitle, IonContent } from '@ionic/angular/standalone';
+import { AlertController, LoadingController, IonContent, IonFooter, IonButton, IonIcon } from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import { close } from 'ionicons/icons';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import HttpStatusCode from '../../shared/util/HttpStatusCode';
 import { FileUploadService } from 'src/app/flight/shared/fileupload.service';
@@ -18,6 +20,7 @@ import { FlightFormComponent } from '../../form/flight-form/flight-form';
 import { SchoolService } from 'src/app/school/shared/school.service';
 import { School } from 'src/app/school/shared/school.model';
 import { TandemSchoolService } from 'src/app/school/shared/tandem-school.service';
+import { NavigationService } from 'src/app/shared/services/navigation.service';
 
 @Component({
     selector: 'app-flight-add',
@@ -27,12 +30,10 @@ import { TandemSchoolService } from 'src/app/school/shared/tandem-school.service
         FileInputComponent,
         FlightFormComponent,
         TranslateModule,
-        IonHeader,
-        IonToolbar,
-        IonButtons,
-        IonMenuButton,
-        IonTitle,
-        IonContent
+        IonContent,
+        IonFooter,
+        IonButton,
+        IonIcon
     ]
 })
 export class FlightAddPage implements OnInit, OnDestroy {
@@ -45,6 +46,7 @@ export class FlightAddPage implements OnInit, OnDestroy {
 
     constructor(
         private router: Router,
+        private navigationService: NavigationService,
         private flightStore: FlightStore,
         private gliderStore: GliderStore,
         private alertController: AlertController,
@@ -60,6 +62,11 @@ export class FlightAddPage implements OnInit, OnDestroy {
         this.flight.glider = new Glider();
         this.flight.start = new Place();
         this.flight.landing = new Place();
+        addIcons({ close });
+    }
+
+    close() {
+        this.navigationService.back('/flights');
     }
 
     ngOnInit() {
@@ -79,15 +86,17 @@ export class FlightAddPage implements OnInit, OnDestroy {
                 .subscribe((res: Flight[]) => {
                     if (res.length > 0) {
                         this.flight.glider = res[0].glider;
+                        this.ensureSelectedGliderIncluded();
                     }
                 });
         }
 
-        const archivedValue = this.gliderStore.filter.archived;
-        this.gliderStore.filter.archived = "0";
-        this.gliderStore.getGliders({ store: false }).pipe(takeUntil(this.unsubscribe$)).subscribe((resp: Glider[]) => {
+        // archived: "0" for this request only - assigning the shared filter and
+        // restoring it in the handler left the glider list filtered whenever the
+        // request failed.
+        this.gliderStore.getGliders({ store: false, archived: "0" }).pipe(takeUntil(this.unsubscribe$)).subscribe((resp: Glider[]) => {
             this.gliders = resp;
-            this.gliderStore.filter.archived = archivedValue;
+            this.ensureSelectedGliderIncluded();
             this.noGliderCheck();
         });
     }
@@ -113,7 +122,7 @@ export class FlightAddPage implements OnInit, OnDestroy {
             next: async (res: Flight) => {
                 await loading.dismiss();
                 // Navigate back to the flights list and ensure it's refreshed
-                await this.router.navigate(['/flights'], { replaceUrl: true });
+                await this.navigationService.back('/flights');
             },
             error: async (resp: any) => {
                 await loading.dismiss();
@@ -158,12 +167,23 @@ export class FlightAddPage implements OnInit, OnDestroy {
         await loading.present();
 
         this.igcFile = await this.igcService.getIgcFileContentAndPrefillFlight(this.flight, this.flight.igcFile);
-        const glider = this.gliders.find(glider => glider.id === this.flight.glider.id);
-        if (!glider) {
-            this.gliders.push(this.flight.glider);
-        }
+        this.ensureSelectedGliderIncluded();
 
         await loading.dismiss();
+    }
+
+    /**
+     * The dropdown is built from the non-archived glider list, but the
+     * selected glider can be set independently (last flight's glider, an
+     * IGC-prefilled one) and may since have been archived - without this, it
+     * has no matching option and ion-select renders blank with no arrow.
+     * Guarded on an id: a brand-new pilot with no flight history reaches
+     * ngOnInit with the default, unset Glider() and nothing to add yet.
+     */
+    private ensureSelectedGliderIncluded() {
+        if (this.flight.glider?.id && !this.gliders.find(glider => glider.id === this.flight.glider.id)) {
+            this.gliders.push(this.flight.glider);
+        }
     }
 
     private async noGliderCheck() {
@@ -175,7 +195,7 @@ export class FlightAddPage implements OnInit, OnDestroy {
             });
 
             await alert.present();
-            await this.router.navigate(['/gliders/add'], { replaceUrl: true });
+            await this.router.navigate(['/more/gliders/add'], { replaceUrl: true });
         }
     }
 }

@@ -1,13 +1,15 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnDestroy } from '@angular/core';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { LoadingController, AlertController, IonHeader, IonToolbar, IonButtons, IonMenuButton, IonTitle, IonContent } from '@ionic/angular/standalone';
+import { LoadingController, AlertController, IonContent, IonFooter, IonButton, IonIcon } from '@ionic/angular/standalone';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import HttpStatusCode from '../../shared/util/HttpStatusCode';
 import { Glider } from '../shared/glider.model';
 import { GliderStore } from '../shared/glider.store';
+import { NavigationService } from 'src/app/shared/services/navigation.service';
 import moment from 'moment';
+import { addIcons } from 'ionicons';
+import { close } from 'ionicons/icons';
 import { GliderFormComponent } from '../../form/glider-form/glider-form';
 
 @Component({
@@ -17,34 +19,34 @@ import { GliderFormComponent } from '../../form/glider-form/glider-form';
     imports: [
         GliderFormComponent,
         TranslateModule,
-        IonHeader,
-        IonToolbar,
-        IonButtons,
-        IonMenuButton,
-        IonTitle,
-        IonContent
+        IonContent,
+        IonFooter,
+        IonButton,
+        IonIcon
     ]
 })
-export class GliderAddPage implements OnInit, OnDestroy {
+export class GliderAddPage implements OnDestroy {
     unsubscribe$ = new Subject<void>();
     glider: Glider;
 
     constructor(
-        private router: Router,
+        private navigationService: NavigationService,
         private gliderStore: GliderStore,
         private loadingCtrl: LoadingController,
         private alertController: AlertController,
         private translate: TranslateService
     ) {
         this.glider = new Glider();
-    }
-
-    ngOnInit() {
+        addIcons({ close });
     }
 
     ngOnDestroy() {
         this.unsubscribe$.next();
         this.unsubscribe$.complete();
+    }
+
+    close() {
+        this.navigationService.back('/more/gliders');
     }
 
     async saveGlider(glider: Glider) {
@@ -59,7 +61,7 @@ export class GliderAddPage implements OnInit, OnDestroy {
 
         this.gliderStore.postGlider(glider).pipe(takeUntil(this.unsubscribe$)).subscribe(async (res: Glider) => {
             await loading.dismiss();
-            await this.router.navigate(['/gliders'], { replaceUrl: true });
+            await this.navigationService.back('/more/gliders');
         },
             (async (resp: any) => {
                 await loading.dismiss();
