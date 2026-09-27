@@ -98,7 +98,9 @@ export class PaymentFacade {
 
         this.emailService.sendErrorMessageToAdmin("Cancel payment subscription", `<ul><li>id: ${user.id}</li><li>email: ${user.email}</li><li>firstname: ${user.firstname}</li><li>lastname: ${user.lastname}</li><li>Stripe customer id: ${stripeCustomer.id}</li><li>Stripe subscription id: ${stripeSubscription.id}</li></ul>`)
 
-        await this.stripe.subscriptions.cancel(stripeSubscription.id);
+        await this.stripe.subscriptions.update(stripeSubscription.id, {
+            cancel_at_period_end: true,
+        });
     }
 
     async hasUserPayed(id: number): Promise<PaymentStatusDto> {
