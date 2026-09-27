@@ -333,7 +333,7 @@ export class AccountDataPage implements OnInit, OnDestroy {
 
                         this.accountService.cancelPaymentSubscription().pipe(takeUntil(this.unsubscribe$)).subscribe({
                             next: () => {
-                                this.paymentStatus.state = 'CANCELED';
+                                this.paymentService.setPaymentStatus({ ...this.paymentStatus, state: 'CANCELED' });
                                 loading.dismiss();
                             },
                             error: () => {

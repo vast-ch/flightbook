@@ -63,7 +63,7 @@
         </div>
         <div class="next-flight__date">
           <span class="next-flight__day">
-            {{ next.appointment.scheduling | date:'EE dd MMM':undefined:currentLang }}
+            {{ next.appointment.scheduling | date:'EE dd MMM':timezone:currentLang }}
           </span>
           <span class="next-flight__time">
             {{ next.appointment.scheduling | date:'HH:mm' }}
