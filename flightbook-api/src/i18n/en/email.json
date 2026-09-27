@@ -15,7 +15,8 @@
         },
         "informWaitingStudent": {
             "subject": "{school}: Registration for: {date}",
-            "content": "<p>Someone has unsubscribed for the appointment from {date}. You can now participate.</p><p>Appointment information</p><ul><li>Date: {date}</li>{type}<li>Meeting point: {meetingPoint}</li><li>Description: {description}</li><li>Max participants: {maxPeople}</li></ul>"
+            "contentCanParticipate": "<p>Someone has unsubscribed from the appointment on {date}. You can now participate.</p><p>Appointment information</p><ul><li>Date: {date}</li>{type}<li>Meeting point: {meetingPoint}</li><li>Description: {description}</li><li>Max participants: {maxPeople}</li></ul>",
+            "contentMovedUp": "<p>Someone has unsubscribed from the appointment on {date}. You have moved up to position {position} on the waiting list.</p><p>Appointment information</p><ul><li>Date: {date}</li>{type}<li>Meeting point: {meetingPoint}</li><li>Description: {description}</li><li>Max participants: {maxPeople}</li></ul>"
         }
     },
     "enrollment": {
