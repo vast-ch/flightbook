@@ -35,10 +35,6 @@
     <true/>
     <key>LSSupportsOpeningDocumentsInPlace</key>
     <true/>
-    <key>NSPhotoLibraryAddUsageDescription</key>
-    <string>Store camera photos to camera</string>
-    <key>NSPhotoLibraryUsageDescription</key>
-    <string>To Pick Photos from Library</string>
     <key>UIFileSharingEnabled</key>
     <true/>
     <key>UILaunchStoryboardName</key>
