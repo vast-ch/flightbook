@@ -19,18 +19,34 @@ h1::before {
 .subscription-item {
     display: flex;
     align-items: center;
+}
 
-    button[mat-icon-button] {
-        width: 32px;
-        height: 32px;
-        line-height: 32px;
-        padding: 4px;
+.subscriptionItem {
+    height: auto;
+}
+
+.subscription-row {
+    display: flex;
+    flex-direction: column;
+    padding: 12px 0;
+    width: 100%;
+}
+
+.subscription-title {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+
+    mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
     }
 }
 
 .subscription-comment {
-    margin: 0 0 8px 0;
-    padding-left: 4px;
-    font-size: 0.9em;
+    margin: 4px 0 0 0;
+    white-space: pre-wrap;
     color: rgba(0, 0, 0, 0.6);
+    font-size: 0.9em;
 }
