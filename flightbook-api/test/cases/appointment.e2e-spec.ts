@@ -59,6 +59,8 @@ describe('student appointment (e2e)', () => {
   it('/student/schools/:schoolId/appointments/:appointmentId/subscriptions (POST)', async () => {
     // given
     const { studentUser, student, testSchool, appointments } = await testInstance.createSchoolDataWithAppointment();
+    testSchool.configuration.schoolModule.commentsOnSubscription = true;
+    await testInstance.schoolRepository.save(testSchool);
 
     const keycloakToken = JwtTestHelper.createKeycloakToken({ sub: studentUser.id, email: studentUser.email });
 
@@ -66,6 +68,7 @@ describe('student appointment (e2e)', () => {
     return request(testInstance.app.getHttpServer())
       .post(`/student/schools/${testSchool.id}/appointments/${appointments[0].id}/subscriptions`)
       .set('Authorization', `Bearer ${keycloakToken}`)
+      .send({ comment: 'Running a bit late' })
       .expect(201)
       .then(async (response) => {
         expect(response.body.subscriptions).toHaveLength(1);

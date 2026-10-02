@@ -8,6 +8,7 @@ exports[`Schools (e2e) /schools (POST) 1`] = `
   "configuration": {
     "schoolModule": {
       "active": true,
+      "commentsOnSubscription": true,
       "userCanEditControlSheet": true,
       "validateFlights": true,
     },
@@ -31,6 +32,7 @@ exports[`Schools (e2e) /schools (POST) 2`] = `
   "configuration": {
     "schoolModule": {
       "active": true,
+      "commentsOnSubscription": true,
       "userCanEditControlSheet": true,
       "validateFlights": true,
     },

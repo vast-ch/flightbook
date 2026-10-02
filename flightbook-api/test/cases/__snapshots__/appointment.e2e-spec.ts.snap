@@ -180,6 +180,7 @@ exports[`instructor appointment (e2e) /instructor/schools/:id/appointments (POST
   "state": "ANNOUNCED",
   "subscriptions": [
     {
+      "comment": null,
       "student": {
         "isAppointmentActive": true,
         "isArchived": false,
@@ -280,6 +281,7 @@ exports[`instructor appointment (e2e) /instructor/schools/:id/appointments (PUT)
   "state": "CANCELED",
   "subscriptions": [
     {
+      "comment": null,
       "student": {
         "isAppointmentActive": true,
         "isArchived": false,
@@ -452,6 +454,7 @@ exports[`student appointment (e2e) /student/schools/:schoolId/appointments/:appo
     "configuration": {
       "schoolModule": {
         "active": true,
+        "commentsOnSubscription": true,
         "userCanEditControlSheet": true,
         "validateFlights": true,
       },
@@ -498,6 +501,7 @@ exports[`student appointment (e2e) /student/schools/:schoolId/appointments/:appo
   "state": "CONFIRMED",
   "subscriptions": [
     {
+      "comment": "Running a bit late",
       "student": {
         "isAppointmentActive": true,
         "isArchived": false,
@@ -610,6 +614,7 @@ exports[`student appointment (e2e) /student/schools/:schoolId/appointments/:appo
   "state": "CONFIRMED",
   "subscriptions": [
     {
+      "comment": null,
       "student": {
         "isAppointmentActive": true,
         "isArchived": false,
@@ -631,6 +636,7 @@ exports[`student appointment (e2e) /student/schools/:schoolId/appointments/:appo
       "waitingList": false,
     },
     {
+      "comment": null,
       "student": {
         "isAppointmentActive": true,
         "isArchived": false,
