@@ -320,15 +320,24 @@ export class AppointmentListPage implements OnInit, OnDestroy {
             return;
         }
         if (event.detail.checked) {
+            const commentsEnabled = !!this.currentSchool()?.configuration?.schoolModule?.commentsOnSubscription;
             const alert = await this.alertController.create({
                 header: this.translate.instant('message.infotitle'),
                 message: this.translate.instant('message.subscription'),
                 backdropDismiss: false,
+                inputs: commentsEnabled ? [
+                    {
+                        name: 'comment',
+                        type: 'textarea',
+                        placeholder: this.translate.instant('appointment.commentPlaceholder')
+                    }
+                ] : [],
                 buttons: [
                     {
                         text: this.translate.instant('buttons.yes'),
-                        handler: async () => {
-                            const currentAppointment = await firstValueFrom(this.schoolService.subscribeToAppointment(this.schoolId, appointment.id));
+                        handler: async (data) => {
+                            const comment = commentsEnabled ? (data?.comment?.trim() || undefined) : undefined;
+                            const currentAppointment = await firstValueFrom(this.schoolService.subscribeToAppointment(this.schoolId, appointment.id, comment));
                             await this.initialDataLoad();
                             // Home caches the next appointment, including whether
                             // the pilot is registered for it - it has no way to

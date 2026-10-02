@@ -24,7 +24,12 @@ export interface TandemModule {
     flightConfig?: FlightConfig;
 }
 
+export interface SchoolModule {
+    commentsOnSubscription?: boolean;
+}
+
 export interface SchoolConfiguration {
+    schoolModule?: SchoolModule;
     tandemModule?: TandemModule;
 }
 

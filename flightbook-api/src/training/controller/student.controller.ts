@@ -11,6 +11,7 @@ import { EnrollmentFacade } from '../enrollment/enrollment.facade';
 import { CompositeAuthGuard } from '../../auth/guard/composite-auth.guard';
 import { EmergencyContactFacade } from '../emergency-contact/emergency-contact.facade';
 import { EmergencyContactDto } from '../emergency-contact/interface/emergency-contact-dto';
+import { CreateSubscriptionDto } from '../subscription/interface/create-subscription-dto';
 
 @Controller('student')
 @ApiTags('Student')
@@ -79,7 +80,7 @@ export class StudentController {
 
     @UseGuards(CompositeAuthGuard)
     @Post('schools/:schoolId/appointments/:appointmentId/subscriptions')
-    async addSubscriptions(@Param('schoolId') schoolId: number, @Param('appointmentId') appointmentId: number, @Request() req): Promise<AppointmentDto> {
+    async addSubscriptions(@Param('schoolId') schoolId: number, @Param('appointmentId') appointmentId: number, @Body() createSubscriptionDto: CreateSubscriptionDto, @Request() req): Promise<AppointmentDto> {
         const schools = await this.studentFacade.getActiveSchoolsByUserId(req.user.userId)
         const studentInSchool = schools.find((school: SchoolDto) => {
             if (school.id == schoolId) {
@@ -91,7 +92,7 @@ export class StudentController {
             throw new UnauthorizedException();
         }
 
-        return await this.appointmentFacade.addSubscriptionToAppointment(appointmentId, req.user.userId);
+        return await this.appointmentFacade.addSubscriptionToAppointment(appointmentId, req.user.userId, createSubscriptionDto?.comment);
     }
 
     @UseGuards(CompositeAuthGuard)

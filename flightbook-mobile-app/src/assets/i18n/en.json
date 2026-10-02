@@ -388,6 +388,7 @@
         "appointments": "Appointments",
         "subscriptions": "Registrations",
         "subscription": "Registration",
+        "commentPlaceholder": "Comment (optional)",
         "waitingList": "Waiting list",
         "noAppointment": "There are currently no dates for this flight school",
         "type": "Type",

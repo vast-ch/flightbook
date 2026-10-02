@@ -167,15 +167,24 @@ export class AppointmentDetailsComponent implements OnInit {
             return;
         }
         if (!this.isSubscribed) {
+            const commentsEnabled = !!this.school?.configuration?.schoolModule?.commentsOnSubscription;
             const alert = await this.alertController.create({
                 header: this.translate.instant('message.infotitle'),
                 message: this.translate.instant('message.subscription'),
                 backdropDismiss: false,
+                inputs: commentsEnabled ? [
+                    {
+                        name: 'comment',
+                        type: 'textarea',
+                        placeholder: this.translate.instant('appointment.commentPlaceholder')
+                    }
+                ] : [],
                 buttons: [
                     {
                         text: this.translate.instant('buttons.yes'),
-                        handler: async () => {
-                            await firstValueFrom(this.schoolService.subscribeToAppointment(this.school.id, this.appointment.id));
+                        handler: async (data) => {
+                            const comment = commentsEnabled ? (data?.comment?.trim() || undefined) : undefined;
+                            await firstValueFrom(this.schoolService.subscribeToAppointment(this.school.id, this.appointment.id, comment));
                             this.appointment = this.normalizeSchedule(await firstValueFrom(this.schoolService.getAppointment(this.school.id, this.appointment.id)));
                             this.markChanged();
                             this.ngOnInit();
