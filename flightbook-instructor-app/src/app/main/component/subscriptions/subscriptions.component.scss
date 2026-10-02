@@ -19,4 +19,18 @@ h1::before {
 .subscription-item {
     display: flex;
     align-items: center;
+
+    button[mat-icon-button] {
+        width: 32px;
+        height: 32px;
+        line-height: 32px;
+        padding: 4px;
+    }
+}
+
+.subscription-comment {
+    margin: 0 0 8px 0;
+    padding-left: 4px;
+    font-size: 0.9em;
+    color: rgba(0, 0, 0, 0.6);
 }

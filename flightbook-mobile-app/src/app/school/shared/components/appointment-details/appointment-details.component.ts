@@ -10,7 +10,7 @@ import { State } from '../../state';
 import { SpotCell, spotCells } from '../../spots';
 import { DatePipe } from '@angular/common';
 import { addIcons } from "ionicons";
-import { chevronBack, peopleOutline, timeOutline } from "ionicons/icons";
+import { chevronBack, chatbubbleOutline, peopleOutline, timeOutline } from "ionicons/icons";
 import moment from 'moment-timezone';
 import { School } from '../../school.model';
 import { LanguageService } from 'src/app/shared/services/language.service';
@@ -66,6 +66,7 @@ export class AppointmentDetailsComponent implements OnInit {
             'chevron-back': chevronBack,
             'time-outline': timeOutline,
             peopleOutline,
+            chatbubbleOutline,
             place: 'assets/custom-ion-icons/place.svg'
         });
     }
@@ -119,6 +120,27 @@ export class AppointmentDetailsComponent implements OnInit {
 
     isSelf(subscription: Subscription): boolean {
         return subscription.user?.email === this.currentUser?.email;
+    }
+
+    /** Only "me" has a comment worth showing here - other pilots' comments are private to them. */
+    hasOwnComment(subscription: Subscription): boolean {
+        return this.isSelf(subscription) && !!subscription.comment;
+    }
+
+    onPersonClick(subscription: Subscription): void {
+        if (!this.hasOwnComment(subscription)) {
+            return;
+        }
+        this.showComment(subscription);
+    }
+
+    private async showComment(subscription: Subscription) {
+        const alert = await this.alertController.create({
+            header: this.translate.instant('appointment.commentTitle'),
+            message: subscription.comment,
+            buttons: [this.translate.instant('buttons.done')]
+        });
+        alert.present();
     }
 
     /**

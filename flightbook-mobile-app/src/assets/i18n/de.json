@@ -389,6 +389,8 @@
         "subscriptions": "Anmeldungen",
         "subscription": "Anmeldung",
         "commentPlaceholder": "Kommentar (optional)",
+        "commentTitle": "Dein Kommentar",
+        "commentHint": "Deinen Kommentar anzeigen",
         "waitingList": "Warte liste",
         "noAppointment": "Zurzeit gibt es keine Termine für diese Flugschule",
         "type": "Terminart",

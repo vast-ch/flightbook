@@ -389,6 +389,8 @@
         "subscriptions": "Iscrizioni",
         "subscription": "Registrazione",
         "commentPlaceholder": "Commento (opzionale)",
+        "commentTitle": "Il tuo commento",
+        "commentHint": "Mostra il tuo commento",
         "waitingList": "Lista d'attesa",
         "noAppointment": "Al momento non ci sono date per questa scuola",
         "type": "Tipo",

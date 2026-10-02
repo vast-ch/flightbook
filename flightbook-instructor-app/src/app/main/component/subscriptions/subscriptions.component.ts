@@ -14,6 +14,7 @@ export class SubscriptionsComponent implements OnInit {
   appointment: Appointment;
   subscribed: Subscription[] = [];
   waitingList: Subscription[] = [];
+  private expandedComments = new Set<Subscription>();
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: any
@@ -33,6 +34,18 @@ export class SubscriptionsComponent implements OnInit {
   }
 
   ngOnInit(): void {
+  }
+
+  toggleComment(subscription: Subscription): void {
+    if (this.expandedComments.has(subscription)) {
+      this.expandedComments.delete(subscription);
+    } else {
+      this.expandedComments.add(subscription);
+    }
+  }
+
+  isCommentExpanded(subscription: Subscription): boolean {
+    return this.expandedComments.has(subscription);
   }
 
 }

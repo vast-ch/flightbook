@@ -7,25 +7,51 @@
     }{{ 'appointment.registrations' | translate }}</h1>
     <p class="item-value subscriptions">
       @for (subscription of subscribed; track subscription) {
-        <span class="subscription-item">
-          {{ subscription.user?.firstname }} {{ subscription.user?.lastname }} @if (subscription?.student?.isTandem) {
-          <mat-icon>people</mat-icon>
-        }
-      </span>
-    }
-  </p>
+        <div class="subscription-row">
+          <span class="subscription-item">
+            {{ subscription.user?.firstname }} {{ subscription.user?.lastname }}
+            @if (subscription?.student?.isTandem) {
+              <mat-icon>people</mat-icon>
+            }
+            @if (subscription.comment) {
+              <button mat-icon-button
+                      [attr.aria-label]="'appointment.commentHint' | translate"
+                      (click)="toggleComment(subscription)">
+                <mat-icon>comment</mat-icon>
+              </button>
+            }
+          </span>
+          @if (subscription.comment && isCommentExpanded(subscription)) {
+            <p class="subscription-comment">{{ subscription.comment }}</p>
+          }
+        </div>
+      }
+    </p>
   @if (waitingList.length > 0) {
     <div>
       <h1 mat-dialog-title class="waiting-list">{{ 'appointment.waitingList' | translate }}</h1>
       <p class="item-value subscriptions">
         @for (subscription of waitingList; track subscription) {
-          <span class="subscription-item">
-            {{ subscription.user?.firstname }} {{ subscription.user?.lastname }} @if (subscription?.student?.isTandem) {
-            <mat-icon>people</mat-icon>
-          }
-        </span>
-      }
-    </p>
+          <div class="subscription-row">
+            <span class="subscription-item">
+              {{ subscription.user?.firstname }} {{ subscription.user?.lastname }}
+              @if (subscription?.student?.isTandem) {
+                <mat-icon>people</mat-icon>
+              }
+              @if (subscription.comment) {
+                <button mat-icon-button
+                        [attr.aria-label]="'appointment.commentHint' | translate"
+                        (click)="toggleComment(subscription)">
+                  <mat-icon>comment</mat-icon>
+                </button>
+              }
+            </span>
+            @if (subscription.comment && isCommentExpanded(subscription)) {
+              <p class="subscription-comment">{{ subscription.comment }}</p>
+            }
+          </div>
+        }
+      </p>
   </div>
 }
 @if (appointment &&  appointment.guestSubscriptions && appointment.guestSubscriptions.length > 0) {

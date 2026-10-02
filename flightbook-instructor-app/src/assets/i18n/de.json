@@ -362,6 +362,7 @@
         "student": "Schüler*in",
         "waitingList": "Warteliste",
         "noSubscription": "Zurzeit hat es keine Anmeldungen",
+        "commentHint": "Kommentar anzeigen",
         "type": "Terminart",
         "allInstructors": "Alle"
     },
