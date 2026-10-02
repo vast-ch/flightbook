@@ -28,6 +28,7 @@ export class SchoolModule {
   active?: boolean;
   validateFlights?: boolean;
   userCanEditControlSheet?: boolean;
+  commentsOnSubscription?: boolean;
 }
 
 export class SchoolConfig {

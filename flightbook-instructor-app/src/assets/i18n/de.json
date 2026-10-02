@@ -391,6 +391,7 @@
         "value": "Aktiviert",
         "types": {
             "validateFlights": "Flüge validieren",
+            "commentsOnSubscription": "Kommentar bei Anmeldung",
             "googleCalendar": "Google Kalender"
         },
         "googleCalendar": {
