@@ -169,7 +169,8 @@
         "takeOffCoordinator": "Aide au décollage",
         "information": "Informations",
         "level": "Niveau",
-        "comments": "Commentaires"
+        "comments": "Commentaires",
+        "subscriptionComment": "Commentaire à l'inscription"
     },
     "studentNote": {
         "date": "Date",

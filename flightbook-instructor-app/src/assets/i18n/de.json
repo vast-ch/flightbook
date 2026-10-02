@@ -169,7 +169,8 @@
         "takeOffCoordinator": "Startleiter*in",
         "information": "Informationen",
         "level": "Level",
-        "comments": "Bemerkungen"
+        "comments": "Bemerkungen",
+        "subscriptionComment": "Kommentar bei Anmeldung"
     },
     "studentNote": {
         "date": "Datum",
