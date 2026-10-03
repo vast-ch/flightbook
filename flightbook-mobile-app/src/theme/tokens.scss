@@ -1212,6 +1212,14 @@ ion-modal.dateModal.filterDateModal {
   }
 }
 
+// Footers on screens without the tab bar (register, update prompt, modals) sit
+// at the very bottom of the edge-to-edge webview, so they must clear the
+// Android 3-button navigation bar themselves. Footers above the tab bar must
+// not use this: the tab bar already absorbs the inset.
+.form-footer--standalone {
+  padding-bottom: calc(12px + var(--ion-safe-area-bottom, 0px));
+}
+
 /*
  * Import call-to-action — a tinted, bordered button that opens the file picker.
  * Shared by fb-file-input (the flight forms and imports/igc) and imports/data,
