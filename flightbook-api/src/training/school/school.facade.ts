@@ -30,10 +30,11 @@ export class SchoolFacade {
         school.id = null;
         school.address2 = schoolDto.address2 === '' ? null : schoolDto.address2;
         school.configuration = new SchoolConfig();
-        school.configuration.schoolModule = { 
+        school.configuration.schoolModule = {
             active: true,
             validateFlights: true,
-            userCanEditControlSheet: true
+            userCanEditControlSheet: true,
+            commentsOnSubscription: true
         };
         school.configuration.tandemModule = {
             active: false

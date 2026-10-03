@@ -10,7 +10,7 @@ import { State } from '../../state';
 import { SpotCell, spotCells } from '../../spots';
 import { DatePipe } from '@angular/common';
 import { addIcons } from "ionicons";
-import { chevronBack, peopleOutline, timeOutline } from "ionicons/icons";
+import { chevronBack, chatbubbleOutline, peopleOutline, timeOutline } from "ionicons/icons";
 import moment from 'moment-timezone';
 import { School } from '../../school.model';
 import { LanguageService } from 'src/app/shared/services/language.service';
@@ -66,6 +66,7 @@ export class AppointmentDetailsComponent implements OnInit {
             'chevron-back': chevronBack,
             'time-outline': timeOutline,
             peopleOutline,
+            chatbubbleOutline,
             place: 'assets/custom-ion-icons/place.svg'
         });
     }
@@ -121,6 +122,27 @@ export class AppointmentDetailsComponent implements OnInit {
         return subscription.user?.email === this.currentUser?.email;
     }
 
+    /** Only "me" has a comment worth showing here - other pilots' comments are private to them. */
+    hasOwnComment(subscription: Subscription): boolean {
+        return this.isSelf(subscription) && !!subscription.comment;
+    }
+
+    onPersonClick(subscription: Subscription): void {
+        if (!this.hasOwnComment(subscription)) {
+            return;
+        }
+        this.showComment(subscription);
+    }
+
+    private async showComment(subscription: Subscription) {
+        const alert = await this.alertController.create({
+            header: this.translate.instant('appointment.commentTitle'),
+            message: subscription.comment,
+            buttons: [this.translate.instant('buttons.done')]
+        });
+        alert.present();
+    }
+
     /**
      * A school that sets no deadline can still leave an unparseable value behind
      * on the way through the timezone conversion, and the date pipe would render
@@ -167,15 +189,24 @@ export class AppointmentDetailsComponent implements OnInit {
             return;
         }
         if (!this.isSubscribed) {
+            const commentsEnabled = !!this.school?.configuration?.schoolModule?.commentsOnSubscription;
             const alert = await this.alertController.create({
                 header: this.translate.instant('message.infotitle'),
                 message: this.translate.instant('message.subscription'),
                 backdropDismiss: false,
+                inputs: commentsEnabled ? [
+                    {
+                        name: 'comment',
+                        type: 'textarea',
+                        placeholder: this.translate.instant('appointment.commentPlaceholder')
+                    }
+                ] : [],
                 buttons: [
                     {
                         text: this.translate.instant('buttons.yes'),
-                        handler: async () => {
-                            await firstValueFrom(this.schoolService.subscribeToAppointment(this.school.id, this.appointment.id));
+                        handler: async (data) => {
+                            const comment = commentsEnabled ? (data?.comment?.trim() || undefined) : undefined;
+                            await firstValueFrom(this.schoolService.subscribeToAppointment(this.school.id, this.appointment.id, comment));
                             this.appointment = this.normalizeSchedule(await firstValueFrom(this.schoolService.getAppointment(this.school.id, this.appointment.id)));
                             this.markChanged();
                             this.ngOnInit();

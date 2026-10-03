@@ -68,13 +68,22 @@
       @if (subscribed.length > 0) {
         <div class="appt-detail__people">
           @for (subscription of subscribed; track subscription.id) {
-            <div class="appt-detail__person">
+            <div class="appt-detail__person"
+                 [class.is-clickable]="hasOwnComment(subscription)"
+                 [attr.tabindex]="hasOwnComment(subscription) ? 0 : null"
+                 [attr.role]="hasOwnComment(subscription) ? 'button' : null"
+                 [attr.aria-label]="hasOwnComment(subscription) ? ('appointment.commentHint' | translate) : null"
+                 (click)="onPersonClick(subscription)"
+                 (keydown.enter)="onPersonClick(subscription)">
               <span class="fb-avatar-initials" [class.is-self]="isSelf(subscription)"
                     aria-hidden="true">{{ initials(subscription) }}</span>
               <span class="appt-detail__person-name" [class.is-self]="isSelf(subscription)">
                 {{ subscription.user.firstname }} {{ subscription.user.lastname }}
                 @if (subscription?.student?.isTandem) {
                   <ion-icon name="people-outline" aria-hidden="true"></ion-icon>
+                }
+                @if (hasOwnComment(subscription)) {
+                  <ion-icon name="chatbubble-outline" aria-hidden="true"></ion-icon>
                 }
               </span>
               @if (isSelf(subscription)) {
@@ -90,13 +99,22 @@
         <div class="appt-detail__people">
           <div class="fb-section-label appt-detail__people-label">{{ 'appointment.waitingList' | translate }}</div>
           @for (subscription of waitingList; track subscription.id) {
-            <div class="appt-detail__person">
+            <div class="appt-detail__person"
+                 [class.is-clickable]="hasOwnComment(subscription)"
+                 [attr.tabindex]="hasOwnComment(subscription) ? 0 : null"
+                 [attr.role]="hasOwnComment(subscription) ? 'button' : null"
+                 [attr.aria-label]="hasOwnComment(subscription) ? ('appointment.commentHint' | translate) : null"
+                 (click)="onPersonClick(subscription)"
+                 (keydown.enter)="onPersonClick(subscription)">
               <span class="fb-avatar-initials" [class.is-self]="isSelf(subscription)"
                     aria-hidden="true">{{ initials(subscription) }}</span>
               <span class="appt-detail__person-name" [class.is-self]="isSelf(subscription)">
                 {{ subscription.user.firstname }} {{ subscription.user.lastname }}
                 @if (subscription?.student?.isTandem) {
                   <ion-icon name="people-outline" aria-hidden="true"></ion-icon>
+                }
+                @if (hasOwnComment(subscription)) {
+                  <ion-icon name="chatbubble-outline" aria-hidden="true"></ion-icon>
                 }
               </span>
               @if (isSelf(subscription)) {
@@ -144,7 +162,7 @@
   </div>
 </ion-content>
 
-<div class="form-footer">
+<div class="form-footer form-footer--standalone">
   <!-- The design has no disabled state; saying why beats a button that does nothing -->
   @if (isDisabled() && !isPast()) {
     <p class="appt-detail__closed">{{ 'message.deadlinePassed' | translate }}</p>

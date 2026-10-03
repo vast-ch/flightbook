@@ -153,16 +153,22 @@ export class AppointmentFacade {
         return await this.generateWaitingList(AppointmentMapper.toAppointmentDto(appointmentResp), schoolId);
     }
 
-    async addSubscriptionToAppointment(appointmentId: number, userId: number): Promise<AppointmentDto> {
+    async addSubscriptionToAppointment(appointmentId: number, userId: number, comment?: string): Promise<AppointmentDto> {
         const appointment: Appointment = await this.appointmentRepository.getAppointmentById(appointmentId);
-        
+
         if (appointment.deadline && appointment.deadline < new Date()) {
             throw AppointmentException.deadlinePassedException();
         }
-        
+
+        const trimmedComment = comment?.trim() || undefined;
+        if (trimmedComment && !appointment.school.configuration?.schoolModule?.commentsOnSubscription) {
+            throw SubscriptionException.commentsOnSubscriptionDisabledException();
+        }
+
         const user: User = await this.userRepository.getUserById(userId);
         const subscription = new Subscription();
         subscription.user = user
+        subscription.comment = trimmedComment;
         if (!appointment.subscriptions) {
             appointment.subscriptions = []
         } else {

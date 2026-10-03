@@ -27,6 +27,7 @@ export class SchoolSettingComponent implements OnInit {
   private destroyRef = inject(DestroyRef);
   settings = [
     { type: 'validateFlights' },
+    { type: 'commentsOnSubscription' },
     { type: 'googleCalendar' }
   ];
 
@@ -64,6 +65,14 @@ export class SchoolSettingComponent implements OnInit {
       this.school!.configuration = new SchoolConfig();
     }
     this.school!.configuration.schoolModule!.validateFlights = event.checked;
+    this.updateConfiguration();
+  }
+
+  async changeCommentsOnSubscription(event: MatSlideToggleChange) {
+    if (!this.school?.configuration) {
+      this.school!.configuration = new SchoolConfig();
+    }
+    this.school!.configuration.schoolModule!.commentsOnSubscription = event.checked;
     this.updateConfiguration();
   }
 
