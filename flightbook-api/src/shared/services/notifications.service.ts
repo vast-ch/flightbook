@@ -173,7 +173,7 @@ export class NotificationsService {
     }
 
 
-    async sendInformWaitingStudent(appointment: Appointment, subscription: Subscription) {
+    async sendInformWaitingStudent(appointment: Appointment, subscription: Subscription, waitingListPosition: number, canParticipate: boolean) {
 
         if (!subscription.user.notificationToken) {
             Logger.debug("no notification to send for inform waiting student");
@@ -182,10 +182,11 @@ export class NotificationsService {
 
         const i18n = I18nContext.current();
 
-        const body = i18n.t('notification.appointment.informWaitingStudent.body', {
+        const body = i18n.t(`notification.appointment.informWaitingStudent.${canParticipate ? 'bodyCanParticipate' : 'bodyMovedUp'}`, {
             lang: appointment.school.language,
             args: {
-                date: moment(appointment.scheduling).utc().format('DD.MM.YYYY HH:mm')
+                date: moment(appointment.scheduling).utc().format('DD.MM.YYYY HH:mm'),
+                position: waitingListPosition
             }
         });
 
