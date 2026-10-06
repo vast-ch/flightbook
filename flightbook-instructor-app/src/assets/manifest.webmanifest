@@ -1,0 +1,21 @@
+{
+  "name": "Flightbook Instructor",
+  "short_name": "Instructor",
+  "theme_color": "#3880ff",
+  "background_color": "#43B1FD",
+  "display": "standalone",
+  "scope": "/",
+  "start_url": "/",
+  "icons": [
+    {
+      "src": "icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
