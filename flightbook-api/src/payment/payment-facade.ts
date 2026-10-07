@@ -26,17 +26,21 @@ export class PaymentFacade {
         this.endpointSecret = env.STRIPE_ENDPOINT_SECRET;
     }
 
-    async getStripeSession(userId: number, callbackUrl: string, lang: string): Promise<any> {
+    async getStripeSession(userId: number, callbackUrl: string, lang: string, enrollmentToken?: string): Promise<any> {
+        // TODO If enrollmentToken is provided, get the school and set trialDays
+        // The list of schoolId allowed with trial period will be defined in the config file. 
+        const trialDays = 0;
+
         const user = await this.userRepository.getUserById(userId);
 
         // Map your application's language code to a valid Stripe locale
         const validLocales = [
             'de', 'en', 'fr', 'it'
         ];
-        
+
         // Default to 'en' if the provided language isn't supported by Stripe
         let stripeLocale = 'en';
-        
+
         // If the provided lang is valid for Stripe, use it
         if (validLocales.includes(lang)) {
             stripeLocale = lang;
@@ -51,17 +55,25 @@ export class PaymentFacade {
         const sessionParam: Stripe.Checkout.SessionCreateParams = {
             locale: stripeLocale as Stripe.Checkout.SessionCreateParams.Locale,
             payment_method_types: ['card'],
-            line_items: [{
-                price: env.STRIPE_PRICE,
-                quantity: 1,
-            }],
+            line_items: [
+                {
+                    price: env.STRIPE_PRICE,
+                    quantity: 1,
+                },
+                // Add trial fee line item only if trialDays > 0
+                ...(trialDays > 0
+                    ? [{ price: env.STRIPE_TRIAL_FEE_PRICE, quantity: 1 }]
+                    : []),
+            ],
             mode: 'subscription',
+            // Conditionally add subscription_data only if trialDays > 0
+            ...(trialDays > 0 && { subscription_data: { trial_period_days: trialDays } }),
             success_url: `${callbackUrl}/success`,
             cancel_url: `${callbackUrl}/cancel`,
             client_reference_id: userId.toString(),
             allow_promotion_codes: true,
             // Conditionally set either customer or customer_email
-            ...(existingCustomers.data.length > 0 
+            ...(existingCustomers.data.length > 0
                 ? { customer: existingCustomers.data[0].id }
                 : { customer_email: user.email }
             )
@@ -76,12 +88,12 @@ export class PaymentFacade {
             return null;
         }
 
-        const stripeCustomerList = await this.stripe.customers.list({email: user.email});
+        const stripeCustomerList = await this.stripe.customers.list({ email: user.email });
         return stripeCustomerList.data[0] ?? null;
     }
 
     private async findStripeSubscriptionForCustomer(customerId: string): Promise<Stripe.Subscription | null> {
-        const stripeSubscriptionList = await this.stripe.subscriptions.list({customer: customerId});
+        const stripeSubscriptionList = await this.stripe.subscriptions.list({ customer: customerId });
         return stripeSubscriptionList.data[0] ?? null;
     }
 
@@ -174,7 +186,7 @@ export class PaymentFacade {
             customers.data.forEach((customer: Stripe.Customer) => {
                 this.stripe.customers.update(
                     customer.id,
-                    {email: user.email}
+                    { email: user.email }
                 );
             });
         } catch (e: any) {
