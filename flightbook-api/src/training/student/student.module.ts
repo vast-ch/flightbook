@@ -21,7 +21,7 @@ import { School } from '../school/domain/school.entity';
       TeamMemberModule, 
       ControlSheetModule,
       EmergencyContactModule, 
-      forwardRef(() => SchoolModule), 
+      SchoolModule, 
       forwardRef(() => AppointmentModule)
     ],  
     providers: [StudentRepository, SchoolRepository, StudentFacade, NoteRepository],
