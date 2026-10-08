@@ -10,7 +10,6 @@ import { UserReadDto } from './interface/user-read-dto';
 import { UserPasswordWriteDto } from './interface/user-password-write-dto';
 import { InvalidPasswordException } from './exception/invalid-password-exception';
 import { InvalidOldPasswordException } from './exception/invalid-oldpassword-exception';
-import { LoginType } from './login-type';
 import { PaymentFacade } from '../payment/payment-facade';
 import { EmailService } from '../email/email.service';
 import * as crypto from 'crypto';
@@ -47,7 +46,6 @@ export class UserFacade {
         user = plainToClass(User, userWriteDto);
         user.email = user.email.toLowerCase();
         user.password = await this.authService.hashPassword(user.password);
-        user.loginType = LoginType.LOCAL;
         user.createdAt = new Date();
         user.paymentExempted = false;
         
@@ -84,19 +82,6 @@ export class UserFacade {
         await this.userRepository.saveUser(user);
     }
 
-    async createSocialLoginUser(userWriteDto: UserWriteDto, loginType: LoginType, socialLoginId: string): Promise<any> {
-        if (!userWriteDto.email || !userWriteDto.firstname || !userWriteDto.lastname) {
-            throw new InvalidUserException();
-        }
-
-        const user = plainToClass(User, userWriteDto);
-        user.loginType = loginType;
-        user.socialloginId = socialLoginId;
-
-        const userResp: User = await this.userRepository.saveUser(user);
-        return userResp;
-    }
-
     async updateUser(id: number, userWriteDto: UserWriteDto): Promise<any> {
         if (!userWriteDto.email || !userWriteDto.firstname || !userWriteDto.lastname) {
             throw new InvalidUserException();
@@ -104,10 +89,6 @@ export class UserFacade {
 
         const user: User = await this.userRepository.getUserById(id);
         const oldEmail = user.email;
-
-        if (user.loginType != LoginType.LOCAL) {
-            throw new BadRequestException();
-        }
 
         if (user.email !== userWriteDto.email) {
             const userExist: User = await this.userRepository.getUserByEmail(userWriteDto.email);

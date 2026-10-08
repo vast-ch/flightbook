@@ -1,8 +1,10 @@
-import { Module, forwardRef } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthService } from './service/auth.service';
-import { UserModule } from '../user/user.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { User } from '../user/domain/user.entity';
+import { UserRepository } from '../user/user.repository';
 import { PassportModule } from '@nestjs/passport';
 import { LocalStrategy } from './strategy/local.strategy';
 import { AuthController } from './auth.controller';
@@ -23,7 +25,7 @@ import { KeycloakConfig } from './config/keycloak.config';
       maxRedirects: 5,
     }),
     ConfigModule.forRoot(),
-    forwardRef(() => UserModule),
+    TypeOrmModule.forFeature([User]),
     PassportModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
@@ -37,6 +39,7 @@ import { KeycloakConfig } from './config/keycloak.config';
     }),
   ],
   providers: [
+    UserRepository,
     AuthService, 
     LocalStrategy, 
     JwtStrategy, 

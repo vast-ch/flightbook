@@ -39,7 +39,6 @@ describe('Users (e2e)', () => {
           lastname: user.lastname,
           email: user.email,
           config: null,
-          loginType: 'LOCAL',
           phone: null
         });
       });

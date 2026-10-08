@@ -304,7 +304,6 @@ exports[`Instructor Flight Validation (e2e) /instructor/schools/:school_id/stude
       "email": "instructor@instructor.com",
       "firstname": "instructor",
       "lastname": "instructor",
-      "loginType": "LOCAL",
       "phone": null,
     },
     "school": {
