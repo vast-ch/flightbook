@@ -512,7 +512,6 @@ exports[`Schools tandem pilots (e2e) /schools/:id/tandem-pilots/:tandemPilotId/f
       "email": "instructor@instructor.com",
       "firstname": "instructor",
       "lastname": "instructor",
-      "loginType": "LOCAL",
       "phone": null,
     },
     "paymentAmount": 100,

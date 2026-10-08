@@ -4,7 +4,6 @@ import { JwtService } from '@nestjs/jwt';
 import { UserRepository } from '../../user/user.repository';
 import { User } from '../../user/domain/user.entity';
 import * as bcrypt from 'bcrypt';
-import { LoginType } from '../../user/login-type';
 import { EmailService } from '../../email/email.service';
 
 @Injectable()
@@ -14,7 +13,7 @@ export class AuthService {
   async validateUser(email: string, password: string): Promise<User | null> {
     const user = await this.userRepository.getUserByEmail(email);
 
-    if (user && user.loginType == LoginType.LOCAL && await bcrypt.compare(password, user.password) && user.enabled) {
+    if (user && await bcrypt.compare(password, user.password) && user.enabled) {
       return user;
     }
     return null;
