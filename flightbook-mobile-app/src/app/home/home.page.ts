@@ -1,7 +1,7 @@
 import { Component, OnDestroy, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
-import { IonContent, IonSkeletonText, IonIcon } from '@ionic/angular/standalone';
+import { IonContent, IonSkeletonText, IonIcon } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { chevronForward, checkmark } from 'ionicons/icons';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';

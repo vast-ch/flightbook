@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
-import { AlertController, IonIcon } from '@ionic/angular/standalone';
+import { AlertController, IonIcon } from '@ionic/angular';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { v4 as uuidv4 } from 'uuid';
 import { FilePicker, PickedFile } from '@capawesome/capacitor-file-picker';

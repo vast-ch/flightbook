@@ -1,6 +1,6 @@
 # CLAUDE.md — flightbook-mobile-app
 
-Angular 19 (standalone components, signals) + Ionic 8 + Capacitor. A paragliding
+Angular 20 (standalone components, signals) + Ionic 9 + Capacitor. A paragliding
 logbook. This file records what is specific to *this* app and what has actually
 caught people out; the global `~/.claude/CLAUDE.md` still applies for everything
 else.

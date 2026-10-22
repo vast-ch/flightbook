@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { Router } from '@angular/router';
-import { AlertController, LoadingController, IonContent, IonFooter, IonButton, IonIcon } from '@ionic/angular/standalone';
+import { AlertController, LoadingController, IonContent, IonFooter, IonButton, IonIcon } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { close } from 'ionicons/icons';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';

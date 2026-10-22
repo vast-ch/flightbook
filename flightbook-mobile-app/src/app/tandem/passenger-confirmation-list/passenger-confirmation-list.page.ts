@@ -1,7 +1,7 @@
 import { DatePipe } from '@angular/common';
 import { Component, OnDestroy, OnInit, computed, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ModalController, LoadingController, IonIcon, IonContent, IonInfiniteScroll, IonInfiniteScrollContent, AlertController, ActionSheetController } from '@ionic/angular/standalone';
+import { ModalController, LoadingController, IonIcon, IonContent, IonInfiniteScroll, IonInfiniteScrollContent, AlertController, ActionSheetController } from '@ionic/angular';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { firstValueFrom, Subject, takeUntil } from 'rxjs';
 import { addIcons } from "ionicons";

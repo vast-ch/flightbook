@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { AlertController, IonButton, IonContent, IonFooter, IonIcon, ModalController } from '@ionic/angular/standalone';
+import { AlertController, IonButton, IonContent, IonFooter, IonIcon, ModalController } from '@ionic/angular';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { UpdateStatus, VersionCheckResponse } from '../../services/version-check.service';
 import { addIcons } from 'ionicons';

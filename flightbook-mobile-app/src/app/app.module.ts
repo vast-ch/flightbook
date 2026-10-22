@@ -5,7 +5,7 @@ import { HTTP_INTERCEPTORS, HttpClient, provideHttpClient, withInterceptorsFromD
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 
-import { IonicRouteStrategy, provideIonicAngular, IonApp, IonRouterOutlet, isPlatform } from '@ionic/angular/standalone';
+import { IonicRouteStrategy, provideIonicAngular, IonApp, IonRouterOutlet, isPlatform } from '@ionic/angular';
 
 import { AppComponent } from './app.component';
 import { LoadingScreenComponent } from './shared/components/loading-screen/loading-screen.component';

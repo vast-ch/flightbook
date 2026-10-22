@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Router, RoutesRecognized } from '@angular/router';
-import { NavController, Platform } from '@ionic/angular/standalone';
+import { NavController, Platform } from '@ionic/angular';
 
 /**
  * Above Ionic's own hardware-back handler (registered at priority 0 by

@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
-import { AlertController, IonItem, IonInput, IonToggle, IonTextarea, IonModal, IonContent, IonDatetime, IonList, IonItemSliding, IonItemOptions, IonItemOption, IonIcon, ModalController } from '@ionic/angular/standalone';
+import { AlertController, IonItem, IonInput, IonToggle, IonTextarea, IonModal, IonContent, IonDatetime, IonList, IonItemSliding, IonItemOptions, IonItemOption, IonIcon, ModalController } from '@ionic/angular';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { Glider, GliderCheck } from 'src/app/glider/shared/glider.model';
 import { FormsModule } from '@angular/forms';

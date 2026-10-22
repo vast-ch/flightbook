@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output, OnChanges, SimpleChanges } from '@angular/core';
-import { AlertController, IonInput, IonTextarea, IonModal, IonContent, IonDatetime, IonToggle, IonIcon, IonSelectOption, IonSelect } from '@ionic/angular/standalone';
+import { AlertController, IonInput, IonTextarea, IonModal, IonContent, IonDatetime, IonToggle, IonIcon, IonSelectOption, IonSelect } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { chevronForward } from 'ionicons/icons';
 import { FlightValidationState } from 'src/app/flight/shared/flight-validation-state';

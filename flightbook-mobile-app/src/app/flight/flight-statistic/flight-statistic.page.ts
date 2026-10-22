@@ -1,7 +1,7 @@
 import { Component, OnDestroy, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { DatePipe, DecimalPipe } from '@angular/common';
-import { IonButton, IonContent, IonIcon, IonSkeletonText } from '@ionic/angular/standalone';
+import { IonButton, IonContent, IonIcon, IonSkeletonText } from '@ionic/angular';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -13,7 +13,7 @@ import { CumulativeChartComponent } from './components/cumulative-chart/cumulati
 import { FlightFilterComponent } from 'src/app/form/flight-filter/flight-filter.component';
 import { FilterChipsComponent } from 'src/app/form/flight-filter/filter-chips.component';
 import { FlightStore } from 'src/app/flight/shared/flight.store';
-import { ModalController, NavController } from '@ionic/angular/standalone';
+import { ModalController, NavController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { chevronForward, filterOutline, trendingUp } from 'ionicons/icons';
 import { AvatarButtonComponent } from 'src/app/shared/components/avatar-button/avatar-button.component';
