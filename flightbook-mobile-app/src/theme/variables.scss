@@ -42,6 +42,13 @@ ion-select::part(text) {
   color: black;
 }
 
+// Ionic 9 moved the toggle icon inside part(container), which shrinks to its
+// content — the chevron then trails the text instead of sitting at the end of
+// the row as it did in v8. Let the container fill the row again.
+ion-select::part(container) {
+  flex: 1 1 auto;
+}
+
 // form error message
 ion-text.error-text {
   font-size: 12px;
