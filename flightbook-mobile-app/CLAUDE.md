@@ -118,6 +118,11 @@ and `docker` are replaced at build time.
   longer exports `dist/zone-testing`, and ~20 legacy specs still import
   `IonicModule`, removed by the standalone migration. Specs here are effectively
   documentation until that is repaired — do not claim a spec passes.
+- **e2e:** `e2e/` runs Playwright against the built app and a local API
+  (Postgres in Docker, seeded user, no Keycloak). `e2e/compare.sh [ref]`
+  screenshots every screen on a base ref and diffs the working tree against it,
+  plus form flows checked through the API — run it for dependency upgrades and
+  styling changes. See `e2e/README.md`.
 - For anything visual, measuring beats eyeballing. Chrome is available; rendering
   the real built stylesheet and reading geometry out of `getBoundingClientRect()`
   has repeatedly contradicted a plausible-sounding guess. Note that a `padding`
