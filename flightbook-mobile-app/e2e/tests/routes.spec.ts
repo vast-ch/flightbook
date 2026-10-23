@@ -108,11 +108,6 @@ for (const r of routes) {
       if (!r.modal && (await select.count())) {
         await select.click();
         await page.locator('ion-alert, ion-popover, ion-action-sheet, ion-modal').last().waitFor();
-        // Ionic moves focus into the overlay a beat after presenting it; a
-        // screenshot taken before that races the focus ring / highlight.
-        await page.waitForFunction(() =>
-          document.activeElement?.closest('ion-alert, ion-popover, ion-action-sheet, ion-modal'),
-        );
         await settle(page);
         await expect(page).toHaveScreenshot(`${r.name}--select-open.png`);
       }

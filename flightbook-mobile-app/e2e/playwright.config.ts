@@ -16,7 +16,12 @@ export default defineConfig({
   retries: 0,
   reporter: [['list'], ['html', { outputFolder: 'out/report', open: 'never' }]],
   expect: {
-    toHaveScreenshot: { maxDiffPixelRatio: 0.001, animations: 'disabled', caret: 'hide' },
+    toHaveScreenshot: {
+      maxDiffPixelRatio: 0.001,
+      animations: 'disabled',
+      caret: 'hide',
+      stylePath: './screenshot.css',
+    },
   },
   use: {
     baseURL: `http://localhost:${port}`,

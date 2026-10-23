@@ -57,7 +57,9 @@ npm run stack:down
   no student-facing create endpoints, so `stack/seed.mjs` inserts it as SQL.
   Appointments are relative to the database's "today".
 - **Stability:** fixed clock (2026-10-22), `en` locale, Europe/Zurich, Ionic
-  animations off, one worker.
+  animations off, one worker, no network beyond localhost (map tiles get a
+  blank image). `screenshot.css` hides focus indicators while capturing:
+  where Ionic puts focus in an opened overlay is a race.
 - **Baselines** (`__screenshots__/`) are not committed: they depend on the
   machine's Chrome and fonts, and `compare.sh` regenerates them from the base
   ref every time.
