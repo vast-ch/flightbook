@@ -6,8 +6,10 @@ type Route = {
   path: string;
   /** Text that proves the screen rendered its data, not just its shell. */
   shows?: string;
-  /** Reach the screen by clicking this (text, or a `css=` selector) after loading `path`. */
-  via?: string;
+  /** Reach the screen by clicking these, in order (text, or a `css=` selector), after loading `path`. */
+  via?: string | string[];
+  /** The screen is a modal over `path`: skip the open-a-select step behind it. */
+  modal?: boolean;
   /** Where the app should end up (defaults to `path`). */
   lands?: RegExp;
   loggedOut?: boolean;
@@ -17,6 +19,7 @@ type Route = {
 
 const [iota] = SEED.gliders;
 const [niederbauen] = SEED.places;
+const { school } = SEED;
 
 const routes: Route[] = [
   { name: 'home', path: '/home' },
@@ -36,14 +39,30 @@ const routes: Route[] = [
   { name: 'imports-igc', path: '/flights/imports/igc' },
   { name: 'imports-data', path: '/more/imports/data' },
   { name: 'settings', path: '/settings', shows: SEED.user.email },
+  // School: the seeded user is a student and tandem pilot of SEED.school.
+  // With a single school, More names it in the section label and the row
+  // itself reads "Appointments".
+  { name: 'school-appointments', path: '/more', via: 'Appointments', lands: /\/more\/school\/\d+$/, shows: school.appointmentType },
   {
-    name: 'control-sheet',
-    path: '/more/control-sheet',
-    // ControlSheetPage.orderControlSheet() dereferences a null control sheet
-    // for users that have none. Pre-dates Ionic 9.
-    knownErrors: [/reading 'altitudeFlight'/],
+    name: 'appointment-detail',
+    path: '/more',
+    via: ['Appointments', 'css=button.appt-row__open'],
+    lands: /\/more\/school\/\d+$/,
+    shows: 'Bring your own glider.',
+    modal: true,
   },
-  { name: 'passenger-confirmations', path: '/more/passenger-confirmations' },
+  // A user *without* a control sheet makes ControlSheetPage.orderControlSheet()
+  // dereference null ("reading 'altitudeFlight'") — pre-existing, not covered
+  // here because the seeded user has a sheet.
+  { name: 'control-sheet', path: '/more/control-sheet' },
+  { name: 'control-sheet-skill', path: '/more/control-sheet', via: 'css=button.sheet-skill', modal: true },
+  { name: 'passenger-confirmations', path: '/more/passenger-confirmations', shows: school.passengers[0].lastname },
+  {
+    name: 'passenger-confirmation-detail',
+    path: '/more/passenger-confirmations',
+    via: 'css=button.confirm-row',
+    modal: true,
+  },
   { name: 'login', path: '/login', loggedOut: true },
   { name: 'register', path: '/register', loggedOut: true },
 ];
@@ -54,8 +73,8 @@ for (const r of routes) {
 
     test('renders without errors and matches the baseline', async ({ page, consoleErrors }) => {
       await open(page, r.path);
-      if (r.via) {
-        const target = r.via.startsWith('css=') ? page.locator(r.via.slice(4)) : page.getByText(r.via, { exact: true });
+      for (const via of [r.via ?? []].flat()) {
+        const target = via.startsWith('css=') ? page.locator(via.slice(4)) : page.getByText(via, { exact: true });
         await target.first().click();
         await settle(page);
       }
@@ -86,9 +105,14 @@ for (const r of routes) {
       // The first select on the screen, opened: covers alert / popover /
       // action-sheet overlays, whose internals changed in Ionic 9.
       const select = page.locator('ion-select:visible').first();
-      if (await select.count()) {
+      if (!r.modal && (await select.count())) {
         await select.click();
         await page.locator('ion-alert, ion-popover, ion-action-sheet, ion-modal').last().waitFor();
+        // Ionic moves focus into the overlay a beat after presenting it; a
+        // screenshot taken before that races the focus ring / highlight.
+        await page.waitForFunction(() =>
+          document.activeElement?.closest('ion-alert, ion-popover, ion-action-sheet, ion-modal'),
+        );
         await settle(page);
         await expect(page).toHaveScreenshot(`${r.name}--select-open.png`);
       }
