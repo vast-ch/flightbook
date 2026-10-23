@@ -175,71 +175,12 @@
                             "watch": false
                         }
                     }
-                },
-                "lint": {
-                    "builder": "@angular-devkit/build-angular:tslint",
-                    "options": {
-                        "tsConfig": [
-                            "tsconfig.app.json",
-                            "tsconfig.spec.json",
-                            "cypress/tsconfig.json"
-                        ],
-                        "exclude": [
-                            "**/node_modules/**"
-                        ]
-                    }
-                },
-                "e2e": {
-                    "builder": "@cypress/schematic:cypress",
-                    "options": {
-                        "devServerTarget": "app:serve",
-                        "watch": true,
-                        "headless": false
-                    },
-                    "configurations": {
-                        "production": {
-                            "devServerTarget": "app:serve:production"
-                        }
-                    }
-                },
-                "cypress-run": {
-                    "builder": "@cypress/schematic:cypress",
-                    "options": {
-                        "devServerTarget": "app:serve"
-                    },
-                    "configurations": {
-                        "production": {
-                            "devServerTarget": "app:serve:production"
-                        }
-                    }
-                },
-                "cypress-open": {
-                    "builder": "@cypress/schematic:cypress",
-                    "options": {
-                        "watch": true,
-                        "headless": false
-                    }
-                },
-                "ct": {
-                    "builder": "@cypress/schematic:cypress",
-                    "options": {
-                        "devServerTarget": "app:serve",
-                        "watch": true,
-                        "headless": false,
-                        "testingType": "component"
-                    },
-                    "configurations": {
-                        "development": {
-                            "devServerTarget": "app:serve:development"
-                        }
-                    }
                 }
             }
         }
     },
     "cli": {
         "schematicCollections": [
-            "@cypress/schematic",
             "@ionic/angular-toolkit",
             "@schematics/angular"
         ],
