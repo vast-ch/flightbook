@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { LoadingController, AlertController, IonContent, IonFooter, IonIcon, IonInput, IonButton } from '@ionic/angular/standalone';
+import { LoadingController, AlertController, IonContent, IonFooter, IonIcon, IonInput, IonButton } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { arrowBack, eyeOutline, eyeOffOutline } from 'ionicons/icons';
 import { Subject } from 'rxjs';

@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { firstValueFrom, Subject } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { takeUntil } from 'rxjs/operators';
-import { AlertController, LoadingController, IonContent, IonButton, IonFooter, IonIcon } from '@ionic/angular/standalone';
+import { AlertController, LoadingController, IonContent, IonButton, IonFooter, IonIcon } from '@ionic/angular';
 import { DatePipe } from '@angular/common';
 import { addIcons } from 'ionicons';
 import { chevronBack, downloadOutline } from 'ionicons/icons';

@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { NavController } from '@ionic/angular/standalone';
+import { NavController } from '@ionic/angular';
 
 import { GliderEditPage } from './glider-edit.page';
 import { TranslateModule } from '@ngx-translate/core';

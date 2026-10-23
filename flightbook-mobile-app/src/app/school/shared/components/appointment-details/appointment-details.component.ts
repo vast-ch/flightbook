@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { AlertController, ModalController, IonIcon, IonContent, IonButton } from '@ionic/angular/standalone';
+import { AlertController, ModalController, IonIcon, IonContent, IonButton } from '@ionic/angular';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { firstValueFrom } from 'rxjs';
 import { User } from 'src/app/account/shared/user.model';

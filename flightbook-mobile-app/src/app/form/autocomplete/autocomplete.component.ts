@@ -5,7 +5,7 @@ import { Place } from 'src/app/place/shared/place.model';
 import { PlaceStore } from 'src/app/place/shared/place.store';
 import { addIcons } from "ionicons";
 import { close } from "ionicons/icons";
-import { IonIcon } from "@ionic/angular/standalone";
+import { IonIcon } from "@ionic/angular";
 import { TranslateModule } from '@ngx-translate/core';
 
 @Component({

@@ -1,5 +1,5 @@
 import { Component, OnDestroy, signal } from '@angular/core';
-import { ModalController, IonContent, IonInput, IonSelect, IonSelectOption, IonButton } from '@ionic/angular/standalone';
+import { ModalController, IonContent, IonInput, IonSelect, IonSelectOption, IonButton } from '@ionic/angular';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { TranslateModule } from '@ngx-translate/core';

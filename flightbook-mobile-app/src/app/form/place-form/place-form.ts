@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { AlertController, IonInput, IonSelect, IonSelectOption, IonTextarea } from '@ionic/angular/standalone';
+import { AlertController, IonInput, IonSelect, IonSelectOption, IonTextarea } from '@ionic/angular';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { Place } from 'src/app/place/shared/place.model';
 import { Countries, Country } from 'src/app/place/shared/place.countries';

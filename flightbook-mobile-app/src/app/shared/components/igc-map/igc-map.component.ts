@@ -15,7 +15,7 @@ import IGCParser from 'igc-parser';
 import { ConfigurationService } from '../../services/configuration.service';
 import { firstValueFrom } from 'rxjs';
 import { TranslateModule } from '@ngx-translate/core';
-import { IonRange, IonButton, IonIcon } from "@ionic/angular/standalone";
+import { IonRange, IonButton, IonIcon } from "@ionic/angular";
 import { addIcons } from 'ionicons';
 import { play, pause } from 'ionicons/icons';
 import { VARIO_STEPS, varioGradientCss, varioStepColor, varioStepIndex } from './vario-ramp';
