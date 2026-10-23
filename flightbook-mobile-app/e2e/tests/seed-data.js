@@ -14,4 +14,18 @@ export const SEED = {
     { brand: 'Niviuk', name: 'Hook 6', buyDate: '2021-03-15', tandem: false, archived: false },
   ],
   flightCount: 12,
+  // The seeded user is a student *and* a tandem pilot of this school, which
+  // unlocks the school, control-sheet and passenger-confirmation screens.
+  school: {
+    name: 'Test Flight School',
+    instructor: { email: 'instructor@local.test', firstname: 'Ivo', lastname: 'Instructor' },
+    appointmentType: 'Höhenflug',
+    // Days from "today" (the database's, not the app's fixed clock) at 08:00 UTC.
+    appointmentsInDays: [2, 5, 9],
+    passengers: [
+      { firstname: 'Anna', lastname: 'Passenger', place: 'Emmetten' },
+      { firstname: 'Ben', lastname: 'Passenger', place: 'Niederbauen' },
+    ],
+    emergencyContact: { firstname: 'Eva', lastname: 'Contact', phone: '+41790000000' },
+  },
 };
