@@ -9,7 +9,6 @@
     "build": "ng build",
     "docker": "ng build --configuration docker",
     "test": "ng test",
-    "lint": "ng lint",
     "build:native-dev": "ng build --configuration development && npx cap copy",
     "build:native": "ng build --configuration production && npx cap copy",
     "build:android": "ng build --configuration production && npx cap copy android",
@@ -72,7 +71,6 @@
     "@angular/language-service": "^21.2.25",
     "@babel/compat-data": "~7.26.5",
     "@capacitor/cli": "^8.0.0",
-    "@cypress/schematic": "^2.5.1",
     "@ionic/angular-toolkit": "^13.0.0",
     "@types/chart.js": "^2.9.41",
     "@types/file-saver": "^2.0.7",
@@ -91,7 +89,6 @@
     "karma-jasmine-html-reporter": "^2.0.0",
     "playwright": "^1.62.1",
     "ts-node": "~10.9.2",
-    "tslint": "~6.1.3",
     "typescript": "5.9.3"
   },
   "description": "An Ionic project"
