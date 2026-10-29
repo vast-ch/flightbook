@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, ElementRef, Input, OnDestroy, OnInit, ViewEncapsulation, inject } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-import { ModalController, IonContent, IonButton, createGesture, Gesture, GestureDetail } from '@ionic/angular/standalone';
+import { ModalController, IonContent, IonButton, createGesture, Gesture, GestureDetail } from '@ionic/angular';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { StarRatingComponent } from 'src/app/shared/components/star-rating/star-rating.component';
 

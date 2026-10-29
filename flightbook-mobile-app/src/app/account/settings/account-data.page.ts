@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit, effect, inject } from '@angular/core';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
-import { AlertController, LoadingController, NavController, IonContent, IonButton, IonIcon, IonInput, IonTextarea, IonToggle } from '@ionic/angular/standalone';
+import { AlertController, LoadingController, NavController, IonContent, IonButton, IonIcon, IonInput, IonTextarea, IonToggle } from '@ionic/angular';
 import HttpStatusCode from '../../shared/util/HttpStatusCode';
 import { User } from 'src/app/account/shared/user.model';
 import { AccountService } from '../shared/account.service';

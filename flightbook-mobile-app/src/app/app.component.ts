@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit, signal } from '@angular/core';
 
-import { AlertController, IonicSafeString } from '@ionic/angular/standalone';
+import { AlertController, IonicSafeString } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
 import { takeUntil } from 'rxjs/operators';
 import { AccountService } from './account/shared/account.service';

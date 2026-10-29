@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { ModalController, IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel } from '@ionic/angular/standalone';
+import { ModalController, IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel } from '@ionic/angular';
 import { TranslateModule } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { homeOutline, ellipsisHorizontal, add, statsChart } from 'ionicons/icons';

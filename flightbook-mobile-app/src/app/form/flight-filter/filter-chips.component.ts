@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Output, computed, inject } from '@angular/core';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { IonIcon } from '@ionic/angular/standalone';
+import { IonIcon } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { close } from 'ionicons/icons';
 import { FlightStore } from 'src/app/flight/shared/flight.store';

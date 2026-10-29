@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { ModalController, IonContent, IonButton, IonModal, IonDatetime } from '@ionic/angular/standalone';
+import { ModalController, IonContent, IonButton, IonModal, IonDatetime } from '@ionic/angular';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { AppointmentFilter } from '../../appointment-filter.model';
 import { SchoolService } from '../../school.service';

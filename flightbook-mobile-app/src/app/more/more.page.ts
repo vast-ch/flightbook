@@ -1,7 +1,7 @@
 import { Component, OnDestroy, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AlertController, IonContent, IonIcon, IonInput, IonReorder, IonReorderGroup, IonToggle, ReorderEndCustomEvent, ToggleCustomEvent } from '@ionic/angular/standalone';
+import { AlertController, IonContent, IonIcon, IonInput, IonReorder, IonReorderGroup, IonToggle, ReorderEndCustomEvent, ToggleCustomEvent } from '@ionic/angular';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { add, chevronForward, openOutline, remove } from 'ionicons/icons';

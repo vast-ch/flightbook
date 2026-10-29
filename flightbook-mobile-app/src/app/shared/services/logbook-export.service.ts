@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { ActionSheetController, AlertController, LoadingController } from '@ionic/angular/standalone';
+import { ActionSheetController, AlertController, LoadingController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
 import { Capacitor } from '@capacitor/core';
 import { Directory, Filesystem } from '@capacitor/filesystem';

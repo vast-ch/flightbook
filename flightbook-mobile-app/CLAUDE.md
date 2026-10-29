@@ -1,6 +1,6 @@
 # CLAUDE.md — flightbook-mobile-app
 
-Angular 19 (standalone components, signals) + Ionic 8 + Capacitor. A paragliding
+Angular 20 (standalone components, signals) + Ionic 9 + Capacitor. A paragliding
 logbook. This file records what is specific to *this* app and what has actually
 caught people out; the global `~/.claude/CLAUDE.md` still applies for everything
 else.
@@ -13,24 +13,10 @@ file and the surrounding code.
 
 ## Git workflow
 
-- **Commit after every bigger change, as you finish it** — in practice roughly one
-  commit per prompt: when the thing asked for is done and verified, commit it
-  before moving on. Don't let several changes pile up in one working tree, and
-  don't batch them into an omnibus commit at the end. Splitting an interleaved
-  tree afterwards is far harder than committing as you go.
-- If one prompt genuinely contains two unrelated changes, commit them separately
-  rather than stretching the rule to one commit.
-- **Check whether the branch's PR is still open before pushing.** The PRs on this
-  branch merge quickly, and pushes to a branch whose PR has already merged go
-  nowhere visible — the work sits on the branch looking pushed while no PR
-  carries it. This has happened twice.
+- never do a commit. Only if the user ask you to do it.
 
 ## Scope
 
-- `flightbook-api/` is **read-only**. Read it to understand the contract, run its
-  tests, never edit its source, DTOs, entities or migrations. If the work seems
-  to need an API change, say so and stop.
-- The same goes for `flightbook-website/` (which has its own `AGENTS.md`).
 
 ## Styling
 
@@ -114,10 +100,16 @@ and `docker` are replaced at build time.
 - `tsconfig.app.json` sets `"strict": false`. There are ~299 pre-existing strict
   errors; don't add more. `Number.isFinite()` does **not** narrow
   `number | undefined`.
-- **`ng test` is broken repo-wide** and predates the redesign: `zone.js` 0.15 no
-  longer exports `dist/zone-testing`, and ~20 legacy specs still import
-  `IonicModule`, removed by the standalone migration. Specs here are effectively
-  documentation until that is repaired — do not claim a spec passes.
+- **Unit tests:** `npx ng test --watch=false --browsers=ChromeHeadless` (run
+  unsandboxed). Only pure-logic specs live here (`shared/util/format.spec.ts`,
+  `place-map/place-marker.style.spec.ts`); the generated "should create" smoke
+  specs were deleted because they tested nothing the e2e suite doesn't. Add unit
+  specs for logic (formatting, parsing, store calculations), not for rendering.
+- **e2e:** `e2e/` runs Playwright against the built app and a local API
+  (Postgres in Docker, seeded user, no Keycloak). `e2e/compare.sh [ref]`
+  screenshots every screen on a base ref and diffs the working tree against it,
+  plus form flows checked through the API — run it for dependency upgrades and
+  styling changes. See `e2e/README.md`.
 - For anything visual, measuring beats eyeballing. Chrome is available; rendering
   the real built stylesheet and reading geometry out of `getBoundingClientRect()`
   has repeatedly contradicted a plausible-sounding guess. Note that a `padding`
