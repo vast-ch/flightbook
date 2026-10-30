@@ -389,6 +389,7 @@
             "CONFIRMED": "Confirmé",
             "CANCELED": "Annulé"
         },
+        "upcoming": "Rendez-vous à venir",
         "passed": "Rendez-vous passé",
         "subscribeStudent": "Ajouter participants",
         "guestSubscribeStudent": "Ajouter participants externes",

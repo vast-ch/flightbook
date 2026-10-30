@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { Student } from 'src/app/shared/domain/student';
 import { Enrollment } from 'src/app/shared/domain/enrollment';
 import { environment } from 'src/environments/environment';
@@ -87,6 +87,24 @@ export class SchoolService {
   getAppointmentsBySchoolId({ limit = undefined, offset = undefined}: { limit?: number, offset?: number} = {}, id: number): Observable<PagerEntity<Appointment[]>> {
     let params: HttpParams = this.createFilterParams(limit, offset);
     return this.http.get<PagerEntity<Appointment[]>>(`${environment.baseUrl}/instructor/schools/${id}/appointments`, { params });
+  }
+
+  // Deliberately independent of the shared mutable `this.filter`/`this.limit`, so this can run
+  // concurrently with the main list fetch (e.g. refreshing tab counts) without racing it.
+  // `order` is intentionally omitted - findAndCount's total is unaffected by sort direction.
+  getAppointmentCount(id: number, { from, to, instructorId }: { from?: Date; to?: Date; instructorId?: number } = {}): Observable<number> {
+    let params = new HttpParams().set('limit', '1');
+    if (from) {
+      params = params.set('from', moment(from).format('YYYY-MM-DD'));
+    }
+    if (to) {
+      params = params.set('to', moment(to).format('YYYY-MM-DD'));
+    }
+    if (instructorId) {
+      params = params.set('instructorId', instructorId.toString());
+    }
+    return this.http.get<PagerEntity<Appointment[]>>(`${environment.baseUrl}/instructor/schools/${id}/appointments`, { params })
+      .pipe(map(pagerEntity => pagerEntity.totalItems || 0));
   }
 
   postAppointment(id: number, appointment: Appointment): Observable<Appointment> {
@@ -179,6 +197,10 @@ export class SchoolService {
 
     if (this.filter.instructorId) {
       params = params.append('instructorId', this.filter.instructorId?.toString() || '');
+    }
+
+    if (this.filter.order) {
+      params = params.append('order', this.filter.order);
     }
 
     if (limit) {

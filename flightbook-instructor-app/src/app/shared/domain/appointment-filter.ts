@@ -5,6 +5,7 @@ export class AppointmentFilter {
     to: Date | undefined;
     state: State | undefined;
     instructorId: number | undefined;
+    order: 'ASC' | 'DESC' | undefined;
 
     constructor() {}
 }

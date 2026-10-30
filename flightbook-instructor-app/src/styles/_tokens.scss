@@ -41,6 +41,11 @@
   --fb-track-bg: #e1ecf4;
   --fb-divider-faint: #f0f6fa;
   --fb-warn-bg: #fffaf3;
+  // Distinct from --fb-warn-bg above (#fffaf3, the student page's "awaiting validation" row
+  // wash) - the appointment state pill needs its own, more saturated tan/gold pair per the
+  // mockup, so this doesn't repurpose the existing token's value for an unrelated element.
+  --fb-warn-chip-bg: #fdf3e0;
+  --fb-warn-fg: #9a6b12;
   --fb-danger-border: #f3c7c1;
   --fb-danger-hover-bg: #fbe0dc;
   --fb-danger-active: #a13124;

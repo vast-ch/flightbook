@@ -389,6 +389,7 @@
             "CONFIRMED": "Bestätigt",
             "CANCELED": "Abgesagt"
         },
+        "upcoming": "Kommende Termine",
         "passed": "Vergangene Termine",
         "subscribeStudent": "Schüler*in anmelden",
         "guestSubscribeStudent": "Gastschüler*in anmelden",

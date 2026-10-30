@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { firstValueFrom, Subject, takeUntil } from 'rxjs';
@@ -23,7 +23,6 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import { FullCalendarComponent } from '@fullcalendar/angular';
 import interactionPlugin, { Draggable, EventReceiveArg } from '@fullcalendar/interaction';
 import moment from 'moment';
-import { MatTabChangeEvent } from '@angular/material/tabs';
 import { Subscription } from 'src/app/shared/domain/subscription';
 
 @Component({
@@ -40,17 +39,24 @@ export class AppointmentsComponent implements OnInit, OnDestroy, AfterViewInit {
   appointmentTypes: AppointmentType[] = [];
   teamMembers: TeamMember[] = [];
   students: Student[] = [];
-  displayedColumns: string[] = ['edit', 'subscription', 'list', 'scheduling', 'state', 'meetingPoint', 'instructor', 'takeOffCoordinator', 'countSubscription', 'countGuestSubscription', 'countWaitinglist', 'type'];
+  displayedColumns: string[] = ['edit', 'subscription', 'list', 'scheduling', 'state', 'meetingPoint', 'instructor', 'takeOffCoordinator', 'countSubscription', 'countGuestSubscription', 'countWaitinglist'];
   pagerEntity = new PagerEntity<Appointment[]>;
   states = State;
   currentAppointmentFilter: AppointmentFilter;
-  showAdvancedFilters = false;
+
+  // List/calendar toggle (replaces the old List/Calendar mat-tab-group) - see toggleCalendarView().
+  appointmentView: 'list' | 'calendar' = 'list';
+  // Upcoming/Past tablist - see selectTab().
+  appointmentTab: 'upcoming' | 'past' = 'upcoming';
+  upcomingCount = 0;
+  pastCount = 0;
+
   @ViewChild('paginator') paginator: MatPaginator | undefined;
   @ViewChild('calendar') calendarComponent: FullCalendarComponent | undefined;
   @ViewChild('draggableEvents') draggableEvents: ElementRef | undefined;
+  @ViewChildren('tabButton') tabButtons: QueryList<ElementRef<HTMLButtonElement>> | undefined;
   calendarApi: Calendar | undefined;
   draggable: any;
-  isCalendarTabActive = false;
 
   datePipe: DatePipe;
   calendarOptions: CalendarOptions = {
@@ -101,7 +107,7 @@ export class AppointmentsComponent implements OnInit, OnDestroy, AfterViewInit {
 
   initialLoad() {
     if (this.school?.id) {
-      this.loadAppointments(this.school.id);
+      this.selectTab('upcoming');
 
       this.schoolService.getTeamMembers(this.school.id).pipe(takeUntil(this.unsubscribe$)).subscribe((teamMembers: TeamMember[]) => {
         this.teamMembers = teamMembers;
@@ -113,16 +119,24 @@ export class AppointmentsComponent implements OnInit, OnDestroy, AfterViewInit {
 
       this.schoolService.getAppointmentTypesBySchoolId(this.school.id, { archived: false }).pipe(takeUntil(this.unsubscribe$)).subscribe((appointmentTypes: AppointmentType[]) => {
         this.appointmentTypes = appointmentTypes;
-        if (this.displayedColumns.length == 12) {
-          this.displayedColumns.splice(-1);
+        // 'type' is a conditional column - remove it if present, then re-insert right after
+        // 'state' when there is at least one appointment type. Index-based find/remove/insert
+        // (rather than the old length===12 splice(-1) check) so this stays correct however
+        // many times initialLoad() re-runs (school switch) and regardless of column order.
+        const typeIndex = this.displayedColumns.indexOf('type');
+        if (typeIndex !== -1) {
+          this.displayedColumns.splice(typeIndex, 1);
         }
         if (appointmentTypes.length > 0) {
-          this.displayedColumns.push('type');
+          const stateIndex = this.displayedColumns.indexOf('state');
+          this.displayedColumns.splice(stateIndex + 1, 0, 'type');
         }
-        if (this.isCalendarTabActive) {
+        if (this.appointmentView === 'calendar') {
           this.initializeDraggable();
         }
       });
+
+      this.refreshTabCounts();
     }
   }
 
@@ -185,11 +199,13 @@ export class AppointmentsComponent implements OnInit, OnDestroy, AfterViewInit {
         const schoolId = this.school.id;
         this.schoolService.postAppointment(schoolId, response.appointment).pipe(takeUntil(this.unsubscribe$)).subscribe((appointment: Appointment) => {
           this.loadAppointments(schoolId);
+          this.refreshTabCounts();
         })
       } else if (response?.event === "save" && this.school?.id && type == "update") {
         const schoolId = this.school.id;
         this.schoolService.putAppointment(schoolId, response.appointment).pipe(takeUntil(this.unsubscribe$)).subscribe((appointment: Appointment) => {
           this.loadAppointments(schoolId);
+          this.refreshTabCounts();
         })
       }
     });
@@ -254,32 +270,124 @@ export class AppointmentsComponent implements OnInit, OnDestroy, AfterViewInit {
     if (this.school?.id) {
       this.loadAppointments(this.school.id);
     }
+    this.refreshTabCounts();
   }
 
-  toggleAdvancedFilters() {
-    this.showAdvancedFilters = !this.showAdvancedFilters;
+  get selectedInstructorLabel(): string {
+    const instructorId = this.currentAppointmentFilter.instructorId;
+    if (!instructorId) {
+      return this.translate.instant('appointment.allInstructors');
+    }
+    const teamMember = this.teamMembers.find((teamMember: TeamMember) => teamMember.user.id === instructorId);
+    return teamMember ? `${teamMember.user.firstname} ${teamMember.user.lastname}` : this.translate.instant('appointment.allInstructors');
   }
 
-  tabChanged(tabChangeEvent: MatTabChangeEvent) {
-    if (tabChangeEvent.index === 1) {
-      this.isCalendarTabActive = true;
+  /** Upcoming = filter.from = today (ascending); Past = filter.to = today (descending). The
+   *  sort direction is resolved server-side (AppointmentRepository's new `order` param) rather
+   *  than by sorting the fetched page client-side, since the backend paginates before any
+   *  client-side sort could run - a client-side re-sort alone would select the wrong window of
+   *  rows once there are more matching rows than one page. */
+  selectTab(tab: 'upcoming' | 'past') {
+    this.appointmentTab = tab;
+    const today = moment().utc().startOf('day').toDate();
+    if (tab === 'upcoming') {
+      this.currentAppointmentFilter.from = today;
+      this.currentAppointmentFilter.to = undefined;
+      this.currentAppointmentFilter.order = 'ASC';
+    } else {
+      this.currentAppointmentFilter.from = undefined;
+      this.currentAppointmentFilter.to = today;
+      this.currentAppointmentFilter.order = 'DESC';
+    }
+    this.schoolService.filter = this.currentAppointmentFilter;
+    // Matches the paginator's fixed [pageSizeOptions]="[20]" (decision #9) - the old 10/20/50
+    // selector is gone, so the requested page size must always be 20 in list view.
+    this.schoolService.limit = 20;
+    if (this.school?.id) {
+      this.loadAppointments(this.school.id);
+    }
+  }
+
+  /** WAI-ARIA APG tabs pattern, mirrored from students.component.ts's onTabKeydown: Left/Right
+   *  (with wrap-around) and Home/End move focus and select the tab, keeping the tablist a
+   *  single Tab stop (roving tabindex in the template). */
+  onTabKeydown(event: KeyboardEvent): void {
+    const tabs: Array<'upcoming' | 'past'> = ['upcoming', 'past'];
+    const buttons = this.tabButtons?.toArray();
+    if (!buttons || buttons.length === 0) {
+      return;
+    }
+
+    const count = buttons.length;
+    const currentIndex = tabs.indexOf(this.appointmentTab);
+    let newIndex: number;
+    switch (event.key) {
+      case 'ArrowLeft':
+        newIndex = (currentIndex - 1 + count) % count;
+        break;
+      case 'ArrowRight':
+        newIndex = (currentIndex + 1) % count;
+        break;
+      case 'Home':
+        newIndex = 0;
+        break;
+      case 'End':
+        newIndex = count - 1;
+        break;
+      default:
+        return;
+    }
+
+    event.preventDefault();
+    this.selectTab(tabs[newIndex]);
+    buttons[newIndex].nativeElement.focus();
+  }
+
+  /** Capacity dot-matrix for the registrations cell: one dot per seat (maxPeople), filled for
+   *  each existing registration, all filled dots turned 'over' (danger) once at/over capacity.
+   *  Guard: no maxPeople means no dots, just the plain count (mirrors the existing
+   *  @if (element.maxPeople) guard around the "/maxPeople" suffix). */
+  getRegistrationCells(appointment: Appointment): Array<'filled' | 'over' | 'empty'> {
+    if (!appointment.maxPeople) {
+      return [];
+    }
+    const count = appointment.countSubscription || 0;
+    const max = appointment.maxPeople;
+    const overCapacity = count >= max;
+    const cells: Array<'filled' | 'over' | 'empty'> = [];
+    for (let i = 0; i < max; i++) {
+      if (i < count) {
+        cells.push(overCapacity ? 'over' : 'filled');
+      } else {
+        cells.push('empty');
+      }
+    }
+    return cells;
+  }
+
+  /** Toggles between the redesigned Upcoming/Past list and the existing FullCalendar view,
+   *  replacing the old List/Calendar mat-tab-group (decision #1). The active-state affordance
+   *  and the icon swap (calendar_month <-> format_list_bulleted) are this implementation's own
+   *  addition - the mockup only shows an unwired calendar-icon button. */
+  toggleCalendarView() {
+    if (this.appointmentView === 'list') {
+      this.appointmentView = 'calendar';
+      // No leftover tab-scoped sort direction for monthNavigation()'s own date-range fetch.
+      this.schoolService.filter.order = undefined;
       if (this.appointmentTypes.length > 0) {
         this.initializeDraggable();
       }
     } else {
-      this.isCalendarTabActive = false;
-      // Destroy draggable when leaving calendar tab since DOM will be recreated
+      this.appointmentView = 'list';
+      // Destroy draggable when leaving calendar view since DOM will be recreated
       if (this.draggable) {
         this.draggable.destroy();
         this.draggable = null;
       }
-      if (!this.school?.id) {
-        return;
-      }
-      this.schoolService.filter.from = undefined;
-      this.schoolService.filter.to = undefined;
-      this.schoolService.limit = 10;
-      this.loadAppointments(this.school?.id);
+      // Re-apply the currently selected tab's date filter/order and re-fetch - unlike the old
+      // code's bare filter reset (there was no list-tab concept to return to before), leaving
+      // the filter empty here would show an unfiltered, wrongly-sorted list.
+      this.selectTab(this.appointmentTab);
     }
   }
 
@@ -293,7 +401,7 @@ export class AppointmentsComponent implements OnInit, OnDestroy, AfterViewInit {
     // Use requestAnimationFrame to wait for the next render cycle
     requestAnimationFrame(() => {
       this.cdr.detectChanges();
-      
+
       // Try to get the element, if not available, use MutationObserver
       const draggableEl = document.getElementById('draggable-events');
       if (draggableEl) {
@@ -364,7 +472,7 @@ export class AppointmentsComponent implements OnInit, OnDestroy, AfterViewInit {
       deadline.subtract(appointment.type.deadlineOffsetHours, 'hours');
       appointment.deadline = deadline.toDate();
     }
-    
+
     appointment.scheduling = schedulingMoment.toDate();
     this.schoolService.postAppointment(schoolId, appointment).pipe(takeUntil(this.unsubscribe$)).subscribe((appointment: Appointment) => {
       this.loadAppointments(schoolId);
@@ -380,6 +488,26 @@ export class AppointmentsComponent implements OnInit, OnDestroy, AfterViewInit {
     this.schoolService.filter.from = moment(arg.start).utc().toDate();
     this.schoolService.filter.to = moment(arg.end).utc().toDate();
     this.loadAppointments(this.school?.id);
+  }
+
+  /** Tab counts (decision #4): refreshed on school load, on instructor-filter change, and
+   *  after an appointment is added/edited. Deliberately NOT refreshed on state-chip toggle or
+   *  tab switch - those counts must stay stable across those interactions. Uses
+   *  SchoolService.getAppointmentCount(), which is independent of the shared mutable
+   *  `this.filter` so it can't race the main list fetch's own from/to/order. */
+  private refreshTabCounts(): void {
+    if (!this.school?.id) {
+      return;
+    }
+    const schoolId = this.school.id;
+    const today = moment().utc().startOf('day').toDate();
+    const instructorId = this.currentAppointmentFilter.instructorId;
+    this.schoolService.getAppointmentCount(schoolId, { from: today, instructorId }).pipe(takeUntil(this.unsubscribe$)).subscribe((count: number) => {
+      this.upcomingCount = count;
+    });
+    this.schoolService.getAppointmentCount(schoolId, { to: today, instructorId }).pipe(takeUntil(this.unsubscribe$)).subscribe((count: number) => {
+      this.pastCount = count;
+    });
   }
 
 }

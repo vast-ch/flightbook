@@ -1,5 +1,58 @@
+@use '@angular/material' as mat;
+
+// Dialog-scoped styling - documented exception to the shared-partial rule (CONTRACT tier 2):
+// the CDK overlay renders outside .fb-appointment-page, into .cdk-overlay-container appended
+// to <body>, so page-scoped rules can never reach it. Component styles travel with the
+// template wherever it mounts, so this works the same way email-dialog.component.scss does.
+//
+// No wrapper class needed here: this is a component stylesheet (default
+// ViewEncapsulation.Emulated), so Angular already scopes these rules to this component's
+// template - the class-wrapping technique is only needed for the global partials
+// (_appointment-page.scss / _student-page.scss).
+[mat-dialog-title] {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--fb-ink);
+}
+
 mat-form-field {
-    width: 100%;
+  width: 100%;
+  // Label-clipping fix, verbatim from email-dialog.component.scss: an outlined/filled
+  // field's floated label sits above the field's top edge, and Material zeroes the dialog
+  // content's top padding when it follows a mat-dialog-title, leaving no clearance for it.
+  padding-top: 5px;
+
+  @include mat.form-field-overrides(
+    (
+      container-height: 40px,
+      container-vertical-padding: 8px,
+      // Caption-label look (11px/600/uppercase/muted). text-transform has no override key
+      // (checked node_modules/@angular/material/form-field/_m3-form-field.scss - only
+      // size/weight/tracking/color are exposed), so uppercase is a structural fallback
+      // below on .mdc-floating-label, scoped under this component per the CONTRACT.
+      outlined-label-text-size: 11px,
+      outlined-label-text-weight: 600,
+      outlined-label-text-tracking: 0.06em,
+      outlined-label-text-color: var(--fb-text-3),
+      // Outlined fields default to corner-extra-small (4px, verified in
+      // _m3-form-field.scss); the mockup's bordered box wants 9px.
+      outlined-container-shape: 9px,
+    )
+  );
+
+  .mdc-floating-label {
+    text-transform: uppercase;
+  }
+}
+
+.fb-form-row {
+  display: flex;
+  gap: 14px;
+}
+
+mat-dialog-actions {
+  background: var(--fb-fill-subtle);
+  border-top: 1px solid var(--fb-surface-variant);
 }
 
 .subscribe-student {

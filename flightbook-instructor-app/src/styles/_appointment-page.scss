@@ -1,0 +1,487 @@
+@use '@angular/material' as mat;
+
+// Structural styles for the redesigned appointments page. Every selector is nested under
+// .fb-appointment-page (applied to the page's root <div>) per the CONTRACT's styling policy
+// tier 2 - this replaces ::ng-deep and keeps everything leak-proof while being charged
+// against the generous "initial" budget instead of the per-component one.
+//
+// Token-first (tier 1) overrides for the Material components used on this page also live
+// here, each scoped to a `.fb-appointment-page …` selector so they cannot leak onto the
+// other, out-of-scope screens that reuse the same Material components.
+//
+// Deviation from the mockup's literal values, applied deliberately (see INIT.md §5's
+// documented, already-swept-out-twice deviation): `#6c8394` at small sizes (the date cell's
+// month/weekday and the tab-count badge, all <18px here) is ~4.0:1 on white, below AA -
+// those use `--fb-text-3` (#5b7284) instead, same as every other small-text usage on the
+// student page.
+.fb-appointment-page {
+  padding: var(--fb-space-9);
+  background: var(--fb-bg);
+  font-family: Sora, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  color: var(--fb-ink);
+  box-sizing: border-box;
+  min-height: 100%;
+
+  // ---------------------------------------------------------------------------------
+  // Header
+  // ---------------------------------------------------------------------------------
+  .fb-appointment-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--fb-space-7);
+    margin-bottom: var(--fb-space-8);
+  }
+
+  .fb-appointment-header__titles {
+    display: flex;
+    flex-direction: column;
+    gap: var(--fb-space-2);
+
+    h1 {
+      margin: 0;
+      font-size: var(--fb-text-4xl);
+      font-weight: 600;
+      letter-spacing: -0.025em;
+      color: var(--fb-ink);
+    }
+  }
+
+  .fb-appointment-header__eyebrow {
+    font-size: var(--fb-text-xs);
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--fb-text-3);
+  }
+
+  .fb-appointment-header__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--fb-space-5);
+  }
+
+  // Toggles between the redesigned Upcoming/Past list and the existing FullCalendar view,
+  // replacing the old List/Calendar mat-tab-group. Icon swap and pressed state are this
+  // implementation's own addition - the mockup only shows an unwired calendar-icon button.
+  .fb-calendar-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: 1px solid var(--fb-border-subtle);
+    border-radius: var(--fb-radius-md);
+    background: var(--fb-surface);
+    cursor: pointer;
+
+    .mat-icon {
+      font-size: 17px;
+      width: 17px;
+      height: 17px;
+      color: var(--fb-text-2);
+    }
+
+    &:hover {
+      background: var(--fb-fill-subtle);
+    }
+
+    &--active {
+      background: var(--fb-nav-active-bg);
+      border-color: var(--fb-tertiary);
+
+      .mat-icon {
+        color: var(--fb-primary-hover);
+      }
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--fb-focus-ring);
+      outline-offset: 2px;
+    }
+  }
+
+  .fb-add-appointment-button {
+    height: 36px;
+    padding: 0 var(--fb-space-6);
+
+    // Shape (9px) and color="primary" fill/text already come from the app-wide
+    // _m2-compat.scss shim - only size/type differ from the Material defaults here.
+    &.mat-mdc-raised-button {
+      font-size: var(--fb-text-base-plus);
+      font-weight: 600;
+    }
+
+    // Raised buttons don't expose a hover-container-color override key; overriding the same
+    // custom property _m2-compat.scss sets for color="primary" directly is the only way to
+    // get the mockup's solid hover swap instead of Material's default state-layer overlay.
+    &:hover {
+      --mat-button-protected-container-color: var(--fb-primary-active);
+    }
+  }
+
+  // ---------------------------------------------------------------------------------
+  // Upcoming / Past tablist - hand-rolled ARIA tablist (not mat-tab-group), duplicated from
+  // students.component's Active/Archived tablist pattern rather than shared across files
+  // (leak-proof, scoped - see CONTRACT tier 2).
+  // ---------------------------------------------------------------------------------
+  .fb-tab-selector {
+    display: flex;
+    align-items: center;
+    gap: var(--fb-space-8);
+    border-bottom: 1px solid var(--fb-border-subtle);
+    margin-bottom: var(--fb-space-7);
+  }
+
+  .fb-tab {
+    padding: 13px 0 12px;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    background: transparent;
+    font: inherit;
+    font-size: var(--fb-text-base-plus);
+    font-weight: 500;
+    color: var(--fb-text-3);
+    cursor: pointer;
+
+    &--active {
+      border-bottom-color: var(--fb-primary);
+      font-weight: 600;
+      color: var(--fb-ink);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--fb-focus-ring);
+      outline-offset: 2px;
+    }
+  }
+
+  .fb-tab-count {
+    margin-left: 7px;
+    font-size: var(--fb-text-xs-plus);
+    font-weight: 500;
+    color: var(--fb-text-3);
+  }
+
+  // ---------------------------------------------------------------------------------
+  // Toolbar: state chips + instructor filter
+  // ---------------------------------------------------------------------------------
+  .fb-appointment-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--fb-space-6);
+    margin-bottom: var(--fb-space-7);
+  }
+
+  // Hand-rolled state chips (not mat-chip-listbox), same 3 states as before.
+  .fb-state-chips {
+    display: flex;
+    align-items: center;
+    gap: var(--fb-space-4);
+  }
+
+  .fb-state-chip {
+    padding: 9px 13px;
+    border: 1px solid var(--fb-border-subtle);
+    border-radius: var(--fb-radius-pill);
+    background: var(--fb-surface);
+    font: inherit;
+    font-size: var(--fb-text-sm-plus);
+    font-weight: 500;
+    color: var(--fb-text-2);
+    cursor: pointer;
+
+    &:hover {
+      background: var(--fb-fill-subtle);
+    }
+
+    &--active {
+      border-color: var(--fb-tertiary);
+      background: var(--fb-nav-active-bg);
+      color: var(--fb-primary-hover);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--fb-focus-ring);
+      outline-offset: 2px;
+    }
+  }
+
+  // Always-visible pill-styled instructor select (decision #8): real mat-select kept for
+  // accessibility, only the trigger's visible content (person icon + label + chevron) is
+  // restyled. No literal mockup CSS given for this control beyond "pill-styled" - sized and
+  // colored to match the state chips/calendar-toggle next to it.
+  .fb-instructor-select {
+    // No forced width/min-width (round 3 had min-width:190px, wider than the trigger's actual
+    // content and a likely contributor to the arrow sitting away from the pill's right edge) -
+    // size to content + Material's own default outlined-field horizontal padding, same as the
+    // unconstrained .fb-state-chip buttons next to it.
+
+    @include mat.form-field-overrides(
+      (
+        container-height: 36px,
+        container-vertical-padding: 8px,
+        // Half of container-height rather than --fb-radius-pill: Material also uses this value
+        // as the field's horizontal padding, so 99px would push the arrow ~100px off the edge.
+        outlined-container-shape: 18px,
+        outlined-outline-color: var(--fb-border-subtle),
+        outlined-hover-outline-color: var(--fb-border-subtle),
+      )
+    );
+
+    // M3 outlined fields have no official "container-color" override key (only filled fields
+    // do - checked node_modules/@angular/material/form-field/_m3-form-field.scss), so a solid
+    // pill background has to be hand-painted here. Without matching the field's own
+    // outlined-container-shape (18px, above), a plain rectangular background bleeds past the
+    // outline's rounded corners as a mismatched-color sliver - clip it to the same radius.
+    // round 3 also added `overflow: hidden` here, which was never visually verified and is a
+    // plausible contributor to the arrow-position bug (round 4) - dropped; border-radius alone
+    // should already prevent the corner bleed without perturbing the trigger's flex width.
+    .mat-mdc-text-field-wrapper {
+      background: var(--fb-surface);
+      border-radius: 18px;
+    }
+  }
+
+  .fb-instructor-select__trigger {
+    display: flex;
+    align-items: center;
+    gap: var(--fb-space-3);
+    font-size: var(--fb-text-base);
+    font-weight: 500;
+    color: var(--fb-text-2);
+
+    .mat-icon {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+      color: var(--fb-text-3);
+    }
+  }
+
+  // ---------------------------------------------------------------------------------
+  // Table card
+  // ---------------------------------------------------------------------------------
+  .fb-appointment-table-card {
+    background: var(--fb-surface);
+    border: 1px solid var(--fb-border-subtle);
+    border-radius: var(--fb-radius-lg);
+    overflow: hidden;
+  }
+
+  .fb-table-scroll {
+    overflow-x: auto;
+    scrollbar-gutter: stable;
+
+    table {
+      min-width: 960px;
+    }
+  }
+
+  .mat-mdc-header-cell {
+    padding: 11px 14px;
+    font-size: var(--fb-text-xs);
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--fb-text-3);
+    background: var(--fb-fill-subtle);
+    border-bottom: 1px solid var(--fb-border-subtle);
+  }
+
+  .mat-mdc-cell {
+    padding: 12px 14px;
+    font-size: var(--fb-text-base);
+    color: var(--fb-text-2);
+    border-bottom: 1px solid var(--fb-surface-variant);
+  }
+
+  .mat-column-edit,
+  .mat-column-subscription,
+  .mat-column-list {
+    width: 1%;
+    white-space: nowrap;
+    cursor: pointer;
+
+    .mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+      color: var(--fb-text-3);
+    }
+  }
+
+  .mat-column-scheduling {
+    min-width: 110px;
+  }
+
+  .mat-column-meetingPoint {
+    min-width: 140px;
+  }
+
+  .mat-column-instructor,
+  .mat-column-takeOffCoordinator {
+    min-width: 120px;
+  }
+
+  // Date/time cell (scheduling column): day-of-month + month abbrev on the left, time +
+  // weekday on the right.
+  .fb-date-cell {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    column-gap: 10px;
+    row-gap: 2px;
+    align-items: baseline;
+  }
+
+  .fb-date-cell__day {
+    grid-column: 1;
+    grid-row: 1;
+    font-size: var(--fb-text-xl);
+    font-weight: 600;
+    color: var(--fb-ink);
+  }
+
+  .fb-date-cell__month {
+    grid-column: 1;
+    grid-row: 2;
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--fb-text-3);
+  }
+
+  .fb-date-cell__time {
+    grid-column: 2;
+    grid-row: 1;
+    font-size: var(--fb-text-base-plus);
+    font-weight: 600;
+    color: var(--fb-ink);
+  }
+
+  .fb-date-cell__weekday {
+    grid-column: 2;
+    grid-row: 2;
+    font-size: var(--fb-text-xs-plus);
+    color: var(--fb-text-3);
+  }
+
+  // State pill (state column)
+  .fb-state-pill {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: var(--fb-radius-pill);
+    font-size: var(--fb-text-2xs);
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+
+    &--success {
+      background: var(--fb-success-bg);
+      color: var(--fb-success-fg);
+    }
+
+    &--warn {
+      background: var(--fb-warn-chip-bg);
+      color: var(--fb-warn-fg);
+    }
+
+    &--danger {
+      background: var(--fb-danger-bg);
+      color: var(--fb-on-danger-bg);
+    }
+  }
+
+  // Registrations cell: capacity dot-matrix + count
+  .fb-registrations-cell {
+    display: flex;
+    align-items: center;
+    gap: var(--fb-space-3);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .fb-dot-matrix {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px;
+    max-width: 66px;
+  }
+
+  .fb-dot {
+    box-sizing: border-box;
+    width: 7px;
+    height: 7px;
+    border-radius: 1px;
+    border: 1px solid var(--fb-border-subtle);
+    background: transparent;
+
+    &--filled {
+      border-color: var(--fb-tertiary);
+      background: var(--fb-tertiary);
+    }
+
+    &--over {
+      border-color: var(--fb-on-danger-bg);
+      background: var(--fb-on-danger-bg);
+    }
+  }
+
+  // Guest registrations cell
+  .fb-guest-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 7px;
+    border-radius: var(--fb-radius-pill);
+    border: 1px solid #cfe6fa;
+    background: var(--fb-primary-tint-hover);
+    font-size: 11.5px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--fb-primary);
+  }
+
+  .fb-guest-pill--empty {
+    font-size: var(--fb-text-base);
+    color: #93a8b8;
+  }
+
+  mat-paginator {
+    background: var(--fb-fill-subtle);
+    border-top: 1px solid var(--fb-surface-variant);
+  }
+
+  // ---------------------------------------------------------------------------------
+  // Calendar view - functional, unstyled this round (see decision #1). Carried over
+  // verbatim from the old appointments.component.scss, just relocated here.
+  // ---------------------------------------------------------------------------------
+  .fb-appointment-calendar {
+    padding-top: var(--fb-space-4);
+
+    #draggable-events {
+      width: 200px;
+    }
+
+    #draggable-events .draggable-event-item {
+      cursor: move;
+      margin: 3px 0;
+      color: rgb(255, 255, 255);
+      background-color: rgb(56, 128, 255);
+      border-bottom-color: rgb(56, 128, 255);
+      border-radius: 3px;
+      border-bottom-style: solid;
+      border-bottom-width: 1px;
+      padding-left: 3px;
+    }
+
+    .fc-h-event {
+      background-color: rgb(56, 128, 255) !important;
+      border: 1px solid rgb(56, 128, 255) !important;
+    }
+  }
+}
