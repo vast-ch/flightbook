@@ -26,6 +26,66 @@ const userId = psql(
    values ('${user.email}', '${user.firstname}', '${user.lastname}', true, now() - interval '1 day', now(), true, now())
    returning id`,
 );
+// School data has no student-facing create endpoints (instructors create it
+// through the instructor app), so it goes in as SQL.
+const { school } = SEED;
+const q = (s) => `'${String(s).replace(/'/g, "''")}'`;
+const schoolConfig = {
+  schoolModule: { active: true, validateFlights: true, userCanEditControlSheet: true },
+  tandemModule: { active: true },
+};
+// A 1×1 transparent PNG stands in for the passenger's signature. The app
+// stores (and renders as <img src>) the signature pad's full data URL.
+const signature = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
+const schoolId = psql(`
+  with instructor as (
+    insert into data.app_user (email, firstname, lastname, enabled, created_at, validated_at, payment_exempted)
+    values (${q(school.instructor.email)}, ${q(school.instructor.firstname)}, ${q(school.instructor.lastname)}, true, now(), now(), true)
+    returning id
+  ), s as (
+    insert into data.school (name, address1, plz, city, phone, email, language, config)
+    values (${q(school.name)}, 'Seestrasse 1', '6376', 'Emmetten', '+41410000000', 'school@local.test', 'de', ${q(JSON.stringify(schoolConfig))})
+    returning id
+  ), tm as (
+    insert into data.team_member (admin, user_id, school_id) select true, instructor.id, s.id from instructor, s
+  ), st as (
+    insert into data.student (user_id, school_id) select ${userId}, s.id from s
+  ), tp as (
+    insert into data.tandem_pilot (user_id, school_id) select ${userId}, s.id from s
+  )
+  select id from s`);
+psql(`
+  with t as (
+    insert into data.appointment_type (name, school_id, meeting_point, max_people, color, time)
+    values (${q(school.appointmentType)}, ${schoolId}, 'Talstation', 8, '#1e88e5', '08:00') returning id
+  ), a as (
+    insert into data.appointment (scheduling, deadline, meeting_point, max_people, description, state, school_id, instructor_id, appointment_type_id)
+    select date_trunc('day', now()) + make_interval(days => d) + interval '8 hours',
+           date_trunc('day', now()) + make_interval(days => d - 1) + interval '18 hours',
+           'Talstation', 8, 'Bring your own glider.', 'CONFIRMED', ${schoolId},
+           (select id from data.app_user where email = ${q(school.instructor.email)}), t.id
+    from t, unnest(array[${school.appointmentsInDays.join(',')}]) as d
+    returning id, scheduling
+  )
+  insert into data.subscription (appointment_id, user_id, comment)
+  select id, ${userId}, 'See you there' from a order by scheduling limit 1`);
+psql(`
+  with th as (insert into data.training_hill (auslegen, aufziehen, starts, landungen) values (3, 2, 1, 1) returning id),
+       th2 as (insert into data.theory (fluglehre, wetterkunde) values (2, 1) returning id),
+       af as (insert into data.altitude_flight (kreise, acht, landevolte) values (2, 1, 3) returning id),
+       lv as (insert into data.level (start, maneuver, landing) values (2, 1, 1) returning id)
+  insert into data.control_sheet (user_id, "trainingHillId", "theoryId", "altitudeFlightId", "levelId")
+  select ${userId}, th.id, th2.id, af.id, lv.id from th, th2, af, lv`);
+for (const [i, p] of school.passengers.entries()) {
+  psql(`insert into data.passenger_confirmation
+          (firstname, lastname, email, phone, place, date, signature, signature_mime_type, can_use_data, user_id, tandem_school_id)
+        values (${q(p.firstname)}, ${q(p.lastname)}, ${q(`${p.firstname.toLowerCase()}@local.test`)}, '+41790000001', ${q(p.place)},
+                current_date - ${i + 1}, ${q(signature)}, 'image/png', true, ${userId}, ${schoolId})`);
+}
+const ec = school.emergencyContact;
+psql(`insert into data.emergency_contact (firstname, lastname, phone, user_id)
+      values (${q(ec.firstname)}, ${q(ec.lastname)}, ${q(ec.phone)}, ${userId})`);
+
 const now = Math.floor(Date.now() / 1000);
 const token = sign({ sub: Number(userId), email: user.email, iat: now, exp: now + 30 * 24 * 3600 });
 fs.mkdirSync(AUTH_DIR, { recursive: true });
@@ -65,4 +125,4 @@ for (let i = 0; i < SEED.flightCount; i++) {
     shvAlone: false,
   });
 }
-console.log(`seeded user #${userId}: ${places.length} places, ${gliders.length} gliders, ${SEED.flightCount} flights`);
+console.log(`seeded user #${userId}: ${places.length} places, ${gliders.length} gliders, ${SEED.flightCount} flights, school #${schoolId}`);
