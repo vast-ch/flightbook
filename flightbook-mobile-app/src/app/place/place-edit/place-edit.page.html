@@ -8,7 +8,9 @@
 
 <ion-content>
   <div class="form-body">
-    <place-form [place]=place (savePlace)="savePlace($event)"></place-form>
+    @if (place) {
+      <place-form [place]=place (savePlace)="savePlace($event)"></place-form>
+    }
 
     <div class="secondary-actions">
       <ion-button expand="block" fill="clear" color="danger" [disabled]="deleteDisabled"

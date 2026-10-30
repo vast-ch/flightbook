@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, ElementRef, OnDestroy, ViewChild, signal } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
-import { ActionSheetController, IonButton, IonContent, IonIcon, IonInput, IonToggle, ModalController, IonSelect, IonSelectOption } from '@ionic/angular/standalone';
+import { ActionSheetController, IonButton, IonContent, IonIcon, IonInput, IonToggle, ModalController, IonSelect, IonSelectOption } from '@ionic/angular';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { DatePipe } from '@angular/common';
 import { addIcons } from 'ionicons';

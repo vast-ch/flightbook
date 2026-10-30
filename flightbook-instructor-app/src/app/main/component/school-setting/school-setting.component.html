@@ -18,6 +18,9 @@
           @if (setting.type === 'validateFlights') {
             <mat-slide-toggle (change)="changeValidateFlights($event)" [checked]="school?.configuration?.schoolModule?.validateFlights || false" color="primary"></mat-slide-toggle>
           }
+          @if (setting.type === 'commentsOnSubscription') {
+            <mat-slide-toggle (change)="changeCommentsOnSubscription($event)" [checked]="school?.configuration?.schoolModule?.commentsOnSubscription || false" color="primary"></mat-slide-toggle>
+          }
           @if (setting.type === 'googleCalendar') {
             @if (googleCalendarConnected) {
               <div class="google-calendar-config">

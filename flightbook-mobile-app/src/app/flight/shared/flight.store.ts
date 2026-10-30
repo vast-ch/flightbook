@@ -164,10 +164,17 @@ export class FlightStore {
    * @param applyFilter pass false to ignore the shared flight-list filter.
    * The dashboard needs all-time totals regardless of what the user last
    * filtered the flight list by.
+   * @param range 'daily' rows only: the day-range to fill. Uses `set`, not
+   * `append` - the shared filter can carry its own `from`/`to` (a manual date
+   * narrowing), and this would otherwise send the param twice, which the API
+   * receives as an array and cannot parse as a date.
    */
-  getStatistics(type: string, applyFilter: boolean = true): Observable<FlightStatistic[]> {
+  getStatistics(type: string, applyFilter: boolean = true, range?: { from: string, to: string }): Observable<FlightStatistic[]> {
     let params: HttpParams = applyFilter ? this.createFilterParams() : new HttpParams();
     params = params.append('type', type);
+    if (range) {
+      params = params.set('from', range.from).set('to', range.to);
+    }
 
     return this.http.get<FlightStatistic[]>(`${environment.baseUrl}/v2/flights/statistic`, { params });
   }

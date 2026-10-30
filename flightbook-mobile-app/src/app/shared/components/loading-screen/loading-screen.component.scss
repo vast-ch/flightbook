@@ -114,7 +114,7 @@
   flex-direction: column;
   align-items: center;
   gap: 5px;
-  padding: 0 26px max(34px, env(safe-area-inset-bottom));
+  padding: 0 26px max(34px, var(--ion-safe-area-bottom, 0px));
 }
 
 .splash__version {

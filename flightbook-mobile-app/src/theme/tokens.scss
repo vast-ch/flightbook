@@ -256,10 +256,19 @@
   & + .fb-row {
     border-top: 1px solid var(--fb-hairline);
   }
+
+  /*
+   * An <autocomplete> (flight-form's start/landing rows) sits between two
+   * .fb-rows in the DOM, so `& + .fb-row` above never matches across it.
+   * Same separator, bridged over that element.
+   */
+  & + autocomplete + .fb-row {
+    border-top: 1px solid var(--fb-hairline);
+  }
 }
 
 .fb-row__label {
-  flex: 0 0 76px;
+  flex: 0 0 88px;
   /*
    * The design's label column is a fixed 76px and carries no mandatory marker.
    * Ours does, and a label like "Nachname&nbsp;*" is wider than 76px.
@@ -337,14 +346,15 @@ button.fb-row {
   }
 }
 
-/* Toggle sits hard right, label takes the slack */
+/*
+ * Toggle sits hard right, label takes the slack. Only `flex` changes here -
+ * there's no .fb-row__value column to push the toggle to the row's edge, so
+ * the label itself grows. Typography stays the base .fb-row__label style so
+ * toggle rows read the same as every other row.
+ */
 .fb-row--toggle {
   .fb-row__label {
     flex: 1;
-    text-transform: none;
-    font-size: 14px;
-    letter-spacing: 0;
-    color: var(--fb-text);
   }
 }
 
@@ -421,6 +431,20 @@ button.fb-row {
     &::part(icon) {
       color: var(--fb-text-muted);
       opacity: 1;
+      /* Match .fb-row__chevron - Ionic's own default is ~18px. */
+      font-size: 13px;
+    }
+
+    /*
+     * Ionic's "inner" part (text + icon) only stretches full-width itself
+     * when using a stacked/floating label - the label placement this app
+     * doesn't use. Left at its default fit-content width, the icon sits
+     * right after the text instead of flush at the row's end like
+     * .fb-row__chevron.
+     */
+    &::part(inner) {
+      width: 100%;
+      justify-content: space-between;
     }
   }
 
@@ -1186,6 +1210,14 @@ ion-modal.dateModal.filterDateModal {
     font-weight: 600;
     text-transform: none;
   }
+}
+
+// Footers on screens without the tab bar (register, update prompt, modals) sit
+// at the very bottom of the edge-to-edge webview, so they must clear the
+// Android 3-button navigation bar themselves. Footers above the tab bar must
+// not use this: the tab bar already absorbs the inset.
+.form-footer--standalone {
+  padding-bottom: calc(12px + var(--ion-safe-area-bottom, 0px));
 }
 
 /*

@@ -107,6 +107,16 @@ export class SchoolModuleDto {
   @ApiProperty()
   @IsBoolean()
   userCanEditControlSheet: boolean;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsBoolean()
+  commentsOnSubscription?: boolean;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsBoolean()
+  trialEnabled?: boolean;
 }
 
 @Expose()

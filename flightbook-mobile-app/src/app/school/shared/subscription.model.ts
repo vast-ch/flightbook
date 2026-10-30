@@ -6,4 +6,5 @@ export class Subscription {
     user: User;
     student: Student;
     waitingList: boolean;
+    comment?: string;
 }

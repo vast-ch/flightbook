@@ -1,4 +1,4 @@
-import { forwardRef, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TandemPilot } from './tandem-pilot.entity';
 import { TandemPilotRepository } from './tandem-pilot.repository';
@@ -11,7 +11,7 @@ import { FlightModule } from '../../flight/flight.module';
     imports: [
       FlightModule,
       TypeOrmModule.forFeature([TandemPilot]), 
-      forwardRef(() => SchoolModule),
+      SchoolModule,
       PassengerConfirmationModule
     ],  
     providers: [TandemPilotRepository, TandemPilotFacade],

@@ -243,6 +243,23 @@
     white-space: nowrap;
 }
 
+.bests__row--link {
+    width: 100%;
+    appearance: none;
+    border: 0;
+    background: transparent;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.bests__row__chevron {
+    flex: none;
+    align-self: center;
+    font-size: 12px;
+    color: var(--fb-text-muted);
+}
+
 // ---- Period chips -------------------------------------------------------
 // A dozen seasons will not fit a segmented control, so the design pins
 // "All time" and scrolls the rest behind it.

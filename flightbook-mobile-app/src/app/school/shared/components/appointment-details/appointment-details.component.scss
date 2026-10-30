@@ -128,6 +128,15 @@
     display: flex;
     align-items: center;
     gap: 11px;
+
+    &.is-clickable {
+        cursor: pointer;
+
+        &:focus-visible {
+            outline: 2px solid var(--fb-accent);
+            outline-offset: 2px;
+        }
+    }
 }
 
 .appt-detail__person-name {

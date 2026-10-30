@@ -1,7 +1,7 @@
 import { Component, OnDestroy, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AlertController, IonContent, IonIcon, IonInput, IonReorder, IonReorderGroup, ReorderEndCustomEvent } from '@ionic/angular/standalone';
+import { AlertController, IonContent, IonIcon, IonInput, IonReorder, IonReorderGroup, IonToggle, ReorderEndCustomEvent, ToggleCustomEvent } from '@ionic/angular';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { add, chevronForward, openOutline, remove } from 'ionicons/icons';
@@ -10,7 +10,7 @@ import { Capacitor } from '@capacitor/core';
 import { Subject, firstValueFrom } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { AccountService } from '../account/shared/account.service';
-import { Link } from '../account/shared/userConfig.model';
+import { Link, Preparation } from '../account/shared/userConfig.model';
 import { User } from '../account/shared/user.model';
 import { SchoolService } from '../school/shared/school.service';
 import { ControlSheet } from '../shared/domain/control-sheet';
@@ -27,11 +27,6 @@ const DABS_URLS = {
 /** Leading "flight school" in the languages the app ships, plus the English word. */
 const SCHOOL_WORD = /^(flugschule|flight\s+school|paragliding\s+school|school|[ée]cole(\s+de\s+parapente)?|scuola(\s+di\s+parapendio)?)\s+/i;
 
-const SHV_APP_URLS = {
-    ios: 'https://apps.apple.com/us/app/shv-fsvl/id6761252391',
-    other: 'https://play.google.com/store/apps/details?id=ch.shv_fsvl'
-};
-
 @Component({
     selector: 'app-more',
     templateUrl: './more.page.html',
@@ -44,7 +39,8 @@ const SHV_APP_URLS = {
         IonIcon,
         IonInput,
         IonReorder,
-        IonReorderGroup
+        IonReorderGroup,
+        IonToggle
     ]
 })
 export class MorePage implements OnDestroy {
@@ -98,6 +94,9 @@ export class MorePage implements OnDestroy {
     private preparation = computed(() => this.accountService.currentUser$()?.config?.preparation);
 
     public customLinks = computed<Link[]>(() => this.preparation()?.links ?? []);
+
+    /** Drives both the edit-mode toggle's state and whether view mode shows the row at all. */
+    public dabsDisabled = computed(() => !!this.preparation()?.dabsLinkDisabled);
 
     constructor() {
         addIcons({
@@ -159,14 +158,6 @@ export class MorePage implements OnDestroy {
     /** Hosts for the built-in rows, so every row reads the same way. */
     public get dabsHost(): string {
         return this.hostOf(DABS_URLS.today);
-    }
-
-    public get shvHost(): string {
-        return this.hostOf(this.shvUrl());
-    }
-
-    private shvUrl(): string {
-        return Capacitor.getPlatform() === 'ios' ? SHV_APP_URLS.ios : SHV_APP_URLS.other;
     }
 
     /** The design puts the host under the name; the full URL rarely fits. */
@@ -258,16 +249,16 @@ export class MorePage implements OnDestroy {
     /**
      * There is no Save button on this screen, so every change writes through.
      * The user signal is only replaced by a successful response, which is what
-     * lets a failed save leave the list exactly as it was.
+     * lets a failed save leave the state exactly as it was.
      */
-    private async persistLinks(links: Link[]): Promise<boolean> {
+    private async persistPreparation(mutate: (preparation: Preparation) => void): Promise<boolean> {
         const user = structuredClone(this.accountService.currentUser$()) as User;
         if (!user) {
             return false;
         }
         user.config = user.config ?? {};
         user.config.preparation = user.config.preparation ?? {};
-        user.config.preparation.links = links;
+        mutate(user.config.preparation);
 
         try {
             await firstValueFrom(this.accountService.updateUser(user));
@@ -285,13 +276,26 @@ export class MorePage implements OnDestroy {
         }
     }
 
+    private persistLinks(links: Link[]): Promise<boolean> {
+        return this.persistPreparation(preparation => { preparation.links = links; });
+    }
+
     openDabs(when: 'today' | 'tomorrow') {
         Browser.open({ url: DABS_URLS[when] });
     }
 
-    /** Store link for the SHV/FSVL app: App Store on iOS, Play Store elsewhere. */
-    openShvApp() {
-        Browser.open({ url: this.shvUrl() });
+    /**
+     * Toggle-on save-on-change, matching persistLinks. The web component
+     * already flips its own internal state before firing ionChange, so on a
+     * failed save - where the bound signal is left untouched - the control
+     * has to be put back by hand.
+     */
+    async toggleDabsDisabled(event: ToggleCustomEvent) {
+        const disabled = !event.detail.checked;
+        const ok = await this.persistPreparation(preparation => { preparation.dabsLinkDisabled = disabled; });
+        if (!ok) {
+            event.target.checked = !disabled;
+        }
     }
 
     openLink(url: string) {

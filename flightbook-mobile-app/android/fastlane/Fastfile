@@ -13,10 +13,14 @@ platform :android do
       project_dir: project_root
     )
 
+    mapping = File.join(project_root, "app", "build", "outputs", "mapping", "release", "mapping.txt")
+    UI.user_error!("R8 mapping file not found at #{mapping}; minification may be disabled") unless File.exist?(mapping)
+
     upload_to_play_store(
       track: "internal",
       release_status: "draft",
       aab: File.join(project_root, "app", "build", "outputs", "bundle", "release", "app-release.aab"),
+      mapping: mapping,
       skip_upload_metadata: true,
       skip_upload_images: true,
       skip_upload_screenshots: true

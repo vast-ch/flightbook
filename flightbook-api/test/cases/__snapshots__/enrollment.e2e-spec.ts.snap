@@ -12,6 +12,7 @@ exports[`Enrollments (e2e) /:token (GET) 1`] = `
     "configuration": {
       "schoolModule": {
         "active": true,
+        "trialEnabled": true,
         "userCanEditControlSheet": true,
         "validateFlights": true,
       },
@@ -82,6 +83,7 @@ exports[`Enrollments (e2e) /:token Student (POST) 1`] = `
     "configuration": {
       "schoolModule": {
         "active": true,
+        "trialEnabled": true,
         "userCanEditControlSheet": true,
         "validateFlights": true,
       },
@@ -136,14 +138,11 @@ exports[`Enrollments (e2e) /:token Student (POST) 1`] = `
     "keycloakId": null,
     "lastLogin": null,
     "lastname": "user",
-    "loginType": "LOCAL",
     "notificationToken": null,
     "password": null,
     "passwordRequestedAt": null,
     "paymentExempted": true,
     "phone": null,
-    "salt": null,
-    "socialloginId": null,
     "token": null,
     "validatedAt": null,
   },
@@ -160,6 +159,7 @@ exports[`Enrollments (e2e) /:token Team member (POST) 1`] = `
     "configuration": {
       "schoolModule": {
         "active": true,
+        "trialEnabled": true,
         "userCanEditControlSheet": true,
         "validateFlights": true,
       },
@@ -213,14 +213,11 @@ exports[`Enrollments (e2e) /:token Team member (POST) 1`] = `
     "keycloakId": null,
     "lastLogin": null,
     "lastname": "user",
-    "loginType": "LOCAL",
     "notificationToken": null,
     "password": null,
     "passwordRequestedAt": null,
     "paymentExempted": true,
     "phone": null,
-    "salt": null,
-    "socialloginId": null,
     "token": null,
     "validatedAt": null,
   },

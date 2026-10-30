@@ -1,7 +1,7 @@
 import { Component, OnDestroy, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { DatePipe, DecimalPipe } from '@angular/common';
-import { IonButton, IonContent, IonIcon, IonSkeletonText } from '@ionic/angular/standalone';
+import { IonButton, IonContent, IonIcon, IonSkeletonText } from '@ionic/angular';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -13,7 +13,7 @@ import { CumulativeChartComponent } from './components/cumulative-chart/cumulati
 import { FlightFilterComponent } from 'src/app/form/flight-filter/flight-filter.component';
 import { FilterChipsComponent } from 'src/app/form/flight-filter/filter-chips.component';
 import { FlightStore } from 'src/app/flight/shared/flight.store';
-import { ModalController } from '@ionic/angular/standalone';
+import { ModalController, NavController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { chevronForward, filterOutline, trendingUp } from 'ionicons/icons';
 import { AvatarButtonComponent } from 'src/app/shared/components/avatar-button/avatar-button.component';
@@ -47,6 +47,7 @@ export class FlightStatisticPage implements OnDestroy {
     private translate = inject(TranslateService);
     private router = inject(Router);
     private modalCtrl = inject(ModalController);
+    private navCtrl = inject(NavController);
     private flightStore = inject(FlightStore);
     private languageService = inject(LanguageService);
 
@@ -62,7 +63,7 @@ export class FlightStatisticPage implements OnDestroy {
     public heatmap = this.store.heatmap;
     public cumulative = this.store.cumulative;
     public bests = this.store.bests;
-    public firstFlightDate = this.store.firstFlightDate;
+    public firstFlightYear = this.store.firstFlightYear;
 
     /**
      * Total airtime for the selected period, as whole hours - the cumulative
@@ -183,9 +184,9 @@ export class FlightStatisticPage implements OnDestroy {
         const revision = this.flightStore.revision();
         await modal.present();
         await modal.onWillDismiss();
-        // Only if the sheet actually moved the filter: reload() refetches three
-        // aggregates plus the whole unpaginated logbook, and opening the sheet
-        // to look at it used to pay that price.
+        // Only if the sheet actually moved the filter: reload() refetches the
+        // three aggregates (and the selected year's day counts, if any), and
+        // opening the sheet to look at it used to pay that price.
         if (this.flightStore.revision() !== revision) {
             this.reloadForFilter();
         }
@@ -211,7 +212,14 @@ export class FlightStatisticPage implements OnDestroy {
     }
 
     openImport() {
-        this.router.navigate(['imports/igc']);
+        this.router.navigate(['flights/imports/igc']);
+    }
+
+    goToFlight(id: number) {
+        if (!id) {
+            return;
+        }
+        this.navCtrl.navigateForward(`flights/${id}`);
     }
 
     /** Seconds to HH:mm. */

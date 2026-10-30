@@ -6,7 +6,7 @@
   height: 58px;
   padding-top: 6px;
   // The safe-area inset keeps the bar clear of the iOS home indicator.
-  padding-bottom: max(env(safe-area-inset-bottom), 8px);
+  padding-bottom: max(var(--ion-safe-area-bottom, 0px), 8px);
 }
 
 ion-tab-button {

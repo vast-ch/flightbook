@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { AlertController, ModalController, IonIcon } from '@ionic/angular/standalone';
+import { AlertController, ModalController, IonIcon } from '@ionic/angular';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { chevronForward } from 'ionicons/icons';
@@ -87,6 +87,6 @@ export class AddSheetComponent {
      */
     async tandemConfirmation() {
         await this.dismiss();
-        this.router.navigate(['passenger-confirmations'], { queryParams: { new: 1 } });
+        this.router.navigate(['more', 'passenger-confirmations'], { queryParams: { new: 1 } });
     }
 }

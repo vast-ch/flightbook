@@ -1,7 +1,7 @@
 import { DatePipe } from '@angular/common';
 import { Component, Input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { AlertController, IonContent, IonFooter, IonButton, IonTextarea, IonIcon, IonModal, IonDatetime, ModalController } from "@ionic/angular/standalone";
+import { AlertController, IonContent, IonFooter, IonButton, IonTextarea, IonIcon, IonModal, IonDatetime, ModalController } from "@ionic/angular";
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { close, chevronForward } from 'ionicons/icons';

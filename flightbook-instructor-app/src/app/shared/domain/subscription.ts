@@ -6,4 +6,5 @@ export class Subscription {
     user: User | undefined;
     student: Student | undefined;
     waitingList: boolean | undefined;
+    comment: string | undefined;
 }

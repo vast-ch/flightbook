@@ -4,7 +4,7 @@
   background: var(--fb-bg);
   padding: 8px 14px 22px;
   // Keeps the cancel button clear of the iOS home indicator
-  padding-bottom: max(22px, env(safe-area-inset-bottom));
+  padding-bottom: max(22px, var(--ion-safe-area-bottom, 0px));
 }
 
 .add-sheet__grabber {

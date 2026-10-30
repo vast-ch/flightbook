@@ -14,7 +14,8 @@
         },
         "informWaitingStudent": {
             "title": "{school}: Inscription",
-            "body": "Quelqu'un s'est désinscrit pour le rendez-vous du {date}. Vous pouvez maintenant participer."
+            "bodyCanParticipate": "Quelqu'un s'est désinscrit pour le rendez-vous du {date}. Vous pouvez maintenant participer.",
+            "bodyMovedUp": "Quelqu'un s'est désinscrit pour le rendez-vous du {date}. Vous êtes passé à la position {position} sur la liste d'attente."
         }
     },
     "flightValidation": {

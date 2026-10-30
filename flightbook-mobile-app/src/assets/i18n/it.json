@@ -20,6 +20,7 @@
         "save": "Salva",
         "delete": "Elimina",
         "copy": "Copia",
+        "downloadIgc": "Scarica IGC",
         "done": "Ok",
         "cancel": "Annulla",
         "clear": "Elimina",
@@ -162,8 +163,6 @@
         },
         "importIgc": "Importa file IGC",
         "importIgcHint": "Compila data, percorso, tempo e distanza",
-        "placeFlightCount": "{{count}} voli",
-        "placeFlightCountOne": "1 volo",
         "orByHand": "oppure inserisci a mano",
         "vario": {
             "legendLabel": "Colore della traccia: blu discesa, verde costante, rosso salita",
@@ -192,7 +191,7 @@
         "allTime": "Totale",
         "period": "Periodo",
         "flightActivity": "Attività di volo",
-        "kickerAll": "Sempre · {{count}} voli dal {{date}}",
+        "kickerAll": "Sempre · {{count}} voli dal {{year}}",
         "kickerSeason": "Stagione {{year}} · {{count}} voli",
         "flightsPerYear": "Voli per anno",
         "flightsPerMonth": "Voli per mese",
@@ -295,6 +294,8 @@
         "emptyIgcFile": "Questo file IGC è vuoto",
         "igcUploadError": "Il file IGC non può essere caricato",
         "igcCopyError": "Il file IGC non può essere copiato",
+        "igcDownloadError": "Il file IGC non può essere scaricato",
+        "igcDownloadSaved": "Il file IGC è stato salvato in {{location}}.",
         "wrongFileType": "Scegliere un file {{fileType}}",
         "subscription": "Volete davvero iscrivervi a questo appuntamento?",
         "removeSubscription": "Vuoi davvero annullare l'iscrizione?",
@@ -387,6 +388,9 @@
         "appointments": "Date",
         "subscriptions": "Iscrizioni",
         "subscription": "Registrazione",
+        "commentPlaceholder": "Commento (opzionale)",
+        "commentTitle": "Il tuo commento",
+        "commentHint": "Mostra il tuo commento",
         "waitingList": "Lista d'attesa",
         "noAppointment": "Al momento non ci sono date per questa scuola",
         "type": "Tipo",
@@ -796,7 +800,6 @@
         "dabs": "DABS Svizzera",
         "today": "Oggi",
         "tomorrow": "Domani",
-        "shvApp": "App meteo FSVL",
         "beforeYouFly": "Prima di volare",
         "addLink": "Aggiungi un link",
         "saveLink": "Salva il link",
@@ -857,7 +860,7 @@
             "5": "Lettura della manica a vento…",
             "6": "Aggancio all'imbrago…",
             "7": "In attesa di un ciclo…",
-            "8": "Corsa sul pendio…"
+            "8": "Risalire il pendio…"
         },
         "stillConnecting": "Connessione in corso…"
     }

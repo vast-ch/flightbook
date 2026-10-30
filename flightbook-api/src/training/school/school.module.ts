@@ -1,6 +1,5 @@
-import { forwardRef, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { StudentModule } from '../../training/student/student.module';
 import { UserModule } from '../../user/user.module';
 import { School } from './domain/school.entity';
 import { SchoolFacade } from './school.facade';
@@ -11,7 +10,6 @@ import { SharedModule } from '../../shared/shared.module';
   imports: [
     UserModule,
     SharedModule,
-    forwardRef(() => StudentModule), 
     TypeOrmModule.forFeature([School])
   ],
   controllers: [],

@@ -17,7 +17,7 @@ export class PaymentController {
     @Get('stripe/session/:enrollmentToken')
     stripePaymentInstructor(@Headers('accept-language') acceptLanguage: string, @Headers('origin') origin: string, @Request() req, @Param('enrollmentToken') enrollmentToken: string): Promise<any> {
         const callbackUrl = `${origin}/enrollments/${enrollmentToken}`;
-        return this.paymentFacade.getStripeSession(req.user.userId, callbackUrl, acceptLanguage);
+        return this.paymentFacade.getStripeSession(req.user.userId, callbackUrl, acceptLanguage, enrollmentToken);
     }
 
     @UseGuards(CompositeAuthGuard)

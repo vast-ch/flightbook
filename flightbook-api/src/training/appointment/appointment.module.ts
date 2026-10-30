@@ -1,4 +1,4 @@
-import { forwardRef, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { EmailService } from '../../email/email.service';
 import { SharedModule } from '../../shared/shared.module';
@@ -19,7 +19,7 @@ import { Flight } from '../../flight/domain/flight.entity';
   imports: [
     UserModule,
     TypeOrmModule.forFeature([Appointment, AppointmentType, Flight]),
-    forwardRef(() => SchoolModule),
+    SchoolModule,
     SubscriptionModule,
     StudentModule,
     SharedModule

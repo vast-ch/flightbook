@@ -52,6 +52,10 @@ export class EnrollmentComponent implements OnInit, OnDestroy {
     }
   }
 
+  get trialEnabled(): boolean {
+    return this.enrollment?.school?.configuration?.schoolModule?.trialEnabled === true;
+  }
+
   ngOnInit(): void {}
 
   ngOnDestroy() {

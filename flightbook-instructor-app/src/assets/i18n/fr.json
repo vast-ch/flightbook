@@ -70,8 +70,10 @@
         "wrongToken": "Ce token n'existe pas ou n'est pas valide",
         "payment": "Paiement",
         "paymentInformation": "Le carnet de vol coûte 12.- par an <br>Pour que le carnet de vol puisse être partagé avec une école, tu dois régler ce paiement.",
+        "paymentInformationTrial": "Les 60 premiers jours coûtent CHF 2.50, ensuite le carnet de vol coûte CHF 12.– par an.<br>Pour que le carnet de vol puisse être partagé avec une école, tu dois souscrire cet abonnement.",
         "tandemPaymentInformation": "Vous pouvez enregistrer jusqu’à 25 vols gratuitement. <br>Pour une utilisation illimitée, la cotisation annuelle s’élève à CHF 12.–. <br>Le paiement n’est actuellement pas requis.",
-        "paymentResilation": "Une résiliation est possible à la fin de chaque année. Tu en seras informé(e) par e-mail 30 jours avant.",
+        "paymentResilation": "Tu peux résilier à tout moment, la résiliation prend effet à la fin de l'année payée. Tu seras informé(e) par e-mail 30 jours avant chaque renouvellement.",
+        "paymentResilationTrial": "Tu peux résilier à tout moment, la résiliation prend effet à la fin de la période en cours (période d'essai ou année payée). Si tu résilies pendant les 60 jours, aucun autre frais ne sera facturé. Tu seras informé(e) par e-mail 30 jours avant chaque renouvellement.",
         "paymentButton": "Payer",
         "accessTandemFlights": "souhaite avoir accès aux vols biplaces qui sont liés à l'école.",
         "hasTandemAccess": "a désormais accès aux vols biplaces"
@@ -189,7 +191,8 @@
         "takeOffCoordinator": "Aide au décollage",
         "information": "Informations",
         "level": "Niveau",
-        "comments": "Commentaires"
+        "comments": "Commentaires",
+        "subscriptionComment": "Commentaire à l'inscription"
     },
     "studentNote": {
         "date": "Date",
@@ -421,6 +424,7 @@
         "value": "Aktiviert",
         "types": {
             "validateFlights": "Valider les vols",
+            "commentsOnSubscription": "Commentaire à l'inscription",
             "googleCalendar": "Google Agenda"
         },
         "googleCalendar": {

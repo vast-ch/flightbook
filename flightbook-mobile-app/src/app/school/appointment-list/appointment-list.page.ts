@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit, ViewChild, computed, signal } from '@angular/core';
 import moment from 'moment-timezone';
 import { ActivatedRoute } from '@angular/router';
-import { AlertController, LoadingController, ModalController, NavController, IonIcon, IonContent, IonList, IonItem, IonToggle, IonLabel, IonInfiniteScroll, IonInfiniteScrollContent, IonPopover } from '@ionic/angular/standalone';
+import { AlertController, LoadingController, ModalController, NavController, IonIcon, IonContent, IonList, IonItem, IonToggle, IonLabel, IonInfiniteScroll, IonInfiniteScrollContent, IonPopover } from '@ionic/angular';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { firstValueFrom, Subject, takeUntil } from 'rxjs';
 import { AccountService } from 'src/app/account/shared/account.service';
@@ -22,14 +22,10 @@ import { FormsModule } from '@angular/forms';
 import { School } from '../shared/school.model';
 import { LanguageService } from 'src/app/shared/services/language.service';
 import { HomeStore } from 'src/app/home/shared/home.store';
-import { Location } from '@angular/common';
-import { navigateBackOrTo } from 'src/app/shared/util/back-navigation';
+import { NavigationService } from 'src/app/shared/services/navigation.service';
 
 /** How close a registration deadline has to be to earn the notice at the top. */
 const CLOSING_SOON_HOURS = 24;
-
-/** Backstop on the eager upcoming fetch - 20 a page, so 200 dates. */
-const MAX_UPCOMING_PAGES = 10;
 
 @Component({
     selector: 'app-appointment-list',
@@ -135,7 +131,7 @@ export class AppointmentListPage implements OnInit, OnDestroy {
     constructor(
         private activeRoute: ActivatedRoute,
         public navCtrl: NavController,
-        private location: Location,
+        private navigationService: NavigationService,
         private schoolService: SchoolService,
         private translate: TranslateService,
         private loadingCtrl: LoadingController,
@@ -177,7 +173,7 @@ export class AppointmentListPage implements OnInit, OnDestroy {
     // ---- View state -----------------------------------------------------
 
     close() {
-        navigateBackOrTo(this.navCtrl, this.location, 'more');
+        this.navigationService.back('more');
     }
 
     /** LanguageService, not translate.currentLang: reactive, and always a locale Angular has data for. */
@@ -221,11 +217,9 @@ export class AppointmentListPage implements OnInit, OnDestroy {
         const [schools, user, rawAppointments] = await Promise.all([
             this.schoolService.getSchools(),
             firstValueFrom(this.accountService.currentUser()),
-            this.scope() === 'upcoming'
-                ? this.loadAllUpcoming()
-                : firstValueFrom(
-                    this.schoolService.getAppointments({ limit: this.schoolService.defaultLimit }, this.schoolId, 'past')
-                )
+            firstValueFrom(
+                this.schoolService.getAppointments({ limit: this.schoolService.defaultLimit }, this.schoolId, this.scope())
+            )
         ]);
 
         // A newer reload started while this one was in flight; its answer is the
@@ -239,7 +233,7 @@ export class AppointmentListPage implements OnInit, OnDestroy {
 
         this.loadedFilter = requestedFilter;
         this.fetchedCount = rawAppointments.length;
-        this.listComplete.set(this.scope() === 'upcoming' || rawAppointments.length < this.schoolService.defaultLimit);
+        this.listComplete.set(rawAppointments.length < this.schoolService.defaultLimit);
 
         // Enrich appointments with computed state
         const enrichedAppointments = rawAppointments.map(appointment =>
@@ -247,16 +241,12 @@ export class AppointmentListPage implements OnInit, OnDestroy {
         );
 
         const inScope = enrichedAppointments.filter(appointment => this.inScope(appointment));
-        // The endpoint sorts scheduling DESC, which reads correctly for Past but
-        // backwards for Upcoming - where the design lists the nearest date first.
-        if (this.scope() === 'upcoming') {
-            inScope.sort((a, b) => new Date(a.scheduling).getTime() - new Date(b.scheduling).getTime());
-        }
         this.appointments.set(inScope);
 
-        // Upcoming is fully loaded above; only Past pages.
+        // A previous load - possibly the other tab - may have shut the
+        // scroller off; this one starts a fresh page count and needs it back.
         if (this.infiniteScroll) {
-            this.infiniteScroll.disabled = this.scope() === 'upcoming';
+            this.infiniteScroll.disabled = false;
         }
 
         const appointmentToOpen = this.appointments().find((appointment: Appointment) => appointment.id == this.appointmentId);
@@ -277,30 +267,6 @@ export class AppointmentListPage implements OnInit, OnDestroy {
         await loading.dismiss();
     }
 }
-
-    /**
-     * Upcoming is pulled in full rather than paged. The endpoint sorts
-     * scheduling DESC and pages with take/skip, so page one would hold the
-     * furthest-future dates and tomorrow's course would be on the last page.
-     * Ordering cannot be asked for, so every page is fetched and then sorted -
-     * bounded by from=today, which is a school's published dates, not history.
-     */
-    private async loadAllUpcoming(): Promise<Appointment[]> {
-        const all: Appointment[] = [];
-        for (let page = 0; page < MAX_UPCOMING_PAGES; page++) {
-            const batch = await firstValueFrom(this.schoolService.getAppointments({
-                limit: this.schoolService.defaultLimit,
-                offset: all.length
-            }, this.schoolId, 'upcoming'));
-            all.push(...batch);
-            if (batch.length < this.schoolService.defaultLimit) {
-                return all;
-            }
-        }
-        // Hit the cap: say so rather than quietly showing a partial list.
-        console.warn(`More than ${all.length} upcoming appointments; the list is truncated.`);
-        return all;
-    }
 
     /**
      * from/to are date-only, so today's appointments come back for either tab.
@@ -354,15 +320,24 @@ export class AppointmentListPage implements OnInit, OnDestroy {
             return;
         }
         if (event.detail.checked) {
+            const commentsEnabled = !!this.currentSchool()?.configuration?.schoolModule?.commentsOnSubscription;
             const alert = await this.alertController.create({
                 header: this.translate.instant('message.infotitle'),
                 message: this.translate.instant('message.subscription'),
                 backdropDismiss: false,
+                inputs: commentsEnabled ? [
+                    {
+                        name: 'comment',
+                        type: 'textarea',
+                        placeholder: this.translate.instant('appointment.commentPlaceholder')
+                    }
+                ] : [],
                 buttons: [
                     {
                         text: this.translate.instant('buttons.yes'),
-                        handler: async () => {
-                            const currentAppointment = await firstValueFrom(this.schoolService.subscribeToAppointment(this.schoolId, appointment.id));
+                        handler: async (data) => {
+                            const comment = commentsEnabled ? (data?.comment?.trim() || undefined) : undefined;
+                            const currentAppointment = await firstValueFrom(this.schoolService.subscribeToAppointment(this.schoolId, appointment.id, comment));
                             await this.initialDataLoad();
                             // Home caches the next appointment, including whether
                             // the pilot is registered for it - it has no way to
@@ -430,13 +405,6 @@ export class AppointmentListPage implements OnInit, OnDestroy {
     }
 
     loadData(event: any) {
-        // Only Past pages; Upcoming was loaded in full, so appending a DESC page
-        // to an ascending list would interleave dates.
-        if (this.scope() === 'upcoming') {
-            event.target.complete();
-            event.target.disabled = true;
-            return;
-        }
         const generation = this.loadGeneration;
         this.schoolService.getAppointments({
             limit: this.schoolService.defaultLimit,

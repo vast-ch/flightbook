@@ -7,6 +7,7 @@ import { Appointment } from 'src/app/shared/domain/appointment';
 import { GuestSubscription } from 'src/app/shared/domain/guest-subscription';
 import { School } from 'src/app/shared/domain/school';
 import { Student } from 'src/app/shared/domain/student';
+import { Subscription } from 'src/app/shared/domain/subscription';
 import { User } from 'src/app/shared/domain/user';
 import * as pdfMake from "pdfmake/build/pdfmake.min";
 import * as pdfFonts from 'pdfmake/build/vfs_fonts';
@@ -227,6 +228,7 @@ export class StudentListPDFService {
     students.forEach((student: Student) => {
       rowHeight.push(60);
       const lastFlightDate = student.lastFlight ? this.datePipe.transform(student.lastFlight?.date, 'dd.MM.yyyy') : '';
+      const subscriptionComment = appointment?.subscriptions?.find((subscription: Subscription) => subscription.student?.id === student.id)?.comment;
 
       studentPdfData.push([
         {
@@ -289,6 +291,10 @@ export class StudentListPDFService {
         { stack: [
           {text:`${student.lastNote ? this.datePipe.transform(student.lastNote?.date, 'dd.MM.yyyy'):''}`, bold: true },
           {text:`${student.lastNote ? student.lastNote?.text :''}`, fontSize: 8},
+          ...(subscriptionComment ? [
+            {text: this.translate.instant('studentList.subscriptionComment'), bold: true, fontSize: 8, margin: [0, 3, 0, 0]},
+            {text: subscriptionComment, fontSize: 8}
+          ] : [])
         ]},
       ]);
     })

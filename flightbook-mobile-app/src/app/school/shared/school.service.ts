@@ -110,6 +110,8 @@ export class SchoolService {
     if (!scope) {
       return params;
     }
+    params = params.append('sort', 'scheduling');
+    params = params.append('order', scope === 'upcoming' ? 'ASC' : 'DESC');
     // A bound the user set wins - unless the caller opted out of the filter, in
     // which case there is no user bound to defer to. Read only on that path, so
     // an applyFilter: false caller takes no dependency on the shared filter.
@@ -128,8 +130,8 @@ export class SchoolService {
     return this.http.get<Appointment>(`${environment.baseUrl}/student/schools/${schoolId}/appointments/${appointmentId}`);
   }
 
-  subscribeToAppointment(schoolId: number, appointmentId: number): Observable<Appointment> {
-    return this.http.post<Appointment>(`${environment.baseUrl}/student/schools/${schoolId}/appointments/${appointmentId}/subscriptions`, {});
+  subscribeToAppointment(schoolId: number, appointmentId: number, comment?: string): Observable<Appointment> {
+    return this.http.post<Appointment>(`${environment.baseUrl}/student/schools/${schoolId}/appointments/${appointmentId}/subscriptions`, { comment });
   }
 
   deleteAppointmentSubscription(schoolId: number, appointmentId: number): Observable<Appointment> {

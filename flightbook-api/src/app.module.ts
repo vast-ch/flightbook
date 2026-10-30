@@ -22,11 +22,13 @@ import { PaymentModule } from './payment/payment.module';
 import { ConfigurationModule } from './configuration/configuration.module';
 import { TandemModule } from './tandem/tandem.module';
 import * as path from 'path';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
     TypeOrmModule.forRoot(dbConfig),
+    EventEmitterModule.forRoot(),
     I18nModule.forRoot({
       fallbackLanguage: 'en',
       loaderOptions: {

@@ -88,6 +88,11 @@ export class FlightFacade {
             const list: FlightStatisticDto[] = []
             list.push(await this.flightRepository.getGlobalStatistic(token, query));
             return list;
+        } else if (query.type == StatisticType.DAILY) {
+            if (!query.from || !query.to) {
+                FlightException.missingDateRangeForDailyStatisticException();
+            }
+            return this.flightRepository.getStatisticDay(token, query);
         }
         return [];
     }

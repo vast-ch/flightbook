@@ -1,5 +1,5 @@
-import { Component, ViewChild, OnDestroy } from '@angular/core';
-import { NavController, LoadingController, ActionSheetController, IonIcon, IonContent, IonItem, IonList, IonInfiniteScroll, IonInfiniteScrollContent } from '@ionic/angular/standalone';
+import { ChangeDetectionStrategy, Component, ViewChild, OnDestroy } from '@angular/core';
+import { NavController, LoadingController, ActionSheetController, IonIcon, IonContent, IonItem, IonList, IonInfiniteScroll, IonInfiniteScrollContent } from '@ionic/angular';
 import { takeUntil } from 'rxjs/operators';
 import { Subject, firstValueFrom } from 'rxjs';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
@@ -7,12 +7,11 @@ import { Place } from 'src/app/place/shared/place.model';
 import { XlsxExportService } from 'src/app/shared/services/xlsx-export.service';
 import { SpreadsheetDownloadService } from 'src/app/shared/services/spreadsheet-download.service';
 import { PlaceStore } from '../shared/place.store';
-import { Countries, Country } from 'src/app/place/shared/place.countries';
+import { CountryByCode } from 'src/app/place/shared/place.countries';
 import { json2csv } from 'json-2-csv';
 import { MapUtil } from 'src/app/shared/util/MapUtil';
 import { RouterLink } from '@angular/router';
-import { Location } from '@angular/common';
-import { navigateBackOrTo } from 'src/app/shared/util/back-navigation';
+import { NavigationService } from 'src/app/shared/services/navigation.service';
 import { FlagsModule } from 'nxt-flags';
 import { addIcons } from "ionicons";
 import { add, locationOutline, shareOutline, chevronBack, chevronForward } from "ionicons/icons";
@@ -21,6 +20,7 @@ import { add, locationOutline, shareOutline, chevronBack, chevronForward } from 
     selector: 'app-place-list',
     templateUrl: './place-list.page.html',
     styleUrls: ['./place-list.page.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         RouterLink,
         FlagsModule,
@@ -43,11 +43,10 @@ export class PlaceListPage implements OnDestroy {
     public error = this.placeStore.error;
     limit = 50;
     lang: string;
-    countries: Country[] = Countries;
 
     constructor(
         public navCtrl: NavController,
-        private location: Location,
+        private navigationService: NavigationService,
         private actionSheetCtrl: ActionSheetController,
         private placeStore: PlaceStore,
         private translate: TranslateService,
@@ -97,11 +96,11 @@ export class PlaceListPage implements OnDestroy {
      * the pilot on a tab they never came from.
      */
     goBack() {
-        navigateBackOrTo(this.navCtrl, this.location, 'more');
+        this.navigationService.back('more');
     }
 
     itemTapped(place: Place) {
-        this.navCtrl.navigateForward(`places/${place.id}`);
+        this.navCtrl.navigateForward(`more/places/${place.id}`);
     }
 
     /** Two formats, so the header button opens a picker rather than doubling up. */
@@ -134,7 +133,7 @@ export class PlaceListPage implements OnDestroy {
         }
         // An unknown code used to throw here and take the whole list down with
         // it; fall back to showing the raw code instead.
-        const country = this.countries.find(x => x.code === code);
+        const country = CountryByCode.get(code);
         return country?.name[this.lang] ?? code.toUpperCase();
     }
 

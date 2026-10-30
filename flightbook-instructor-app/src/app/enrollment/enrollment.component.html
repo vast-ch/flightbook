@@ -25,8 +25,13 @@
           @if (enrollment.type == 'STUDENT') {
             <mat-step>
               <ng-template matStepLabel>{{ 'enrollment.payment'| translate }}</ng-template>
-              <p [innerHtml]="'enrollment.paymentInformation'| translate"></p>
-              <p class="paymentResilation">({{ 'enrollment.paymentResilation'| translate }})</p>
+              @if (trialEnabled) {
+                <p [innerHtml]="'enrollment.paymentInformationTrial'| translate"></p>
+                <p class="paymentResilation">{{ 'enrollment.paymentResilationTrial'| translate }}</p>
+              } @else {
+                <p [innerHtml]="'enrollment.paymentInformation'| translate"></p>
+                <p class="paymentResilation">{{ 'enrollment.paymentResilation'| translate }}</p>
+              }
               <button mat-raised-button color="primary" (click)="getStripeSession()">{{ 'enrollment.paymentButton'| translate }}</button>
             </mat-step>
           }

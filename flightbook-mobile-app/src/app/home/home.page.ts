@@ -1,7 +1,7 @@
 import { Component, OnDestroy, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
-import { IonContent, IonSkeletonText, IonIcon } from '@ionic/angular/standalone';
+import { IonContent, IonSkeletonText, IonIcon } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { chevronForward, checkmark } from 'ionicons/icons';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
@@ -113,18 +113,18 @@ export class HomePage implements OnDestroy {
     }
 
     openControlSheet() {
-        this.router.navigate(['control-sheet']);
+        this.router.navigate(['more', 'control-sheet']);
     }
 
     openAppointment() {
         const next = this.nextAppointment();
         if (next) {
-            this.router.navigate(['/school/', next.school.id], { queryParams: { appointmentId: next.appointment.id } });
+            this.router.navigate(['/more/school/', next.school.id], { queryParams: { appointmentId: next.appointment.id } });
         }
     }
 
     openImport() {
-        this.router.navigate(['imports/igc']);
+        this.router.navigate(['flights/imports/igc']);
     }
 
 }

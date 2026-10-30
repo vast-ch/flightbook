@@ -1,4 +1,4 @@
-import { Exclude, Expose } from "class-transformer";
+import { Exclude, Expose, Type } from "class-transformer";
 import { IsEmail } from 'class-validator';
 import { SchoolDto } from "../../../training/school/interface/school-dto";
 import { EnrollmentType } from "../enrollment-type";
@@ -9,6 +9,7 @@ export class EnrollmentDto {
     @Expose()
     readonly email: string;
     @Expose()
+    @Type(() => SchoolDto)
     readonly school: SchoolDto;
     @Expose()
     readonly token: string;

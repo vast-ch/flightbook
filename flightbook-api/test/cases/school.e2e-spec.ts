@@ -20,6 +20,7 @@ describe('Schools (e2e)', () => {
   it('/schools (POST)', async () => {
     // given
     const schoolDto = Testdata.createSchoolDto("School 1");
+    schoolDto.configuration!.schoolModule.trialEnabled = false; // Trial property cannot be set by the user, it is set to false by default when creating a school
     const keycloakToken = JwtTestHelper.createKeycloakToken();
 
     //when
@@ -61,6 +62,7 @@ describe('Schools (e2e)', () => {
     expect(school.configuration).toEqual({
       schoolModule: {
         active: true,
+        trialEnabled: true,
         validateFlights: true,
         userCanEditControlSheet: true,
       },
@@ -98,6 +100,7 @@ describe('Schools (e2e)', () => {
     school.configuration = {
       schoolModule: {
         active: false,
+        trialEnabled: true,
         validateFlights: false,
         userCanEditControlSheet: false,
       },

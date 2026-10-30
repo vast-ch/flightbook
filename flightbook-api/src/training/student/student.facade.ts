@@ -224,7 +224,6 @@ export class StudentFacade {
                             firstname: appointment.instructor.firstname,
                             lastname: appointment.instructor.lastname,
                             phone: appointment.instructor.phone,
-                            loginType: appointment.instructor.loginType,
                             flights: []
                         };
                     } else {

@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit, signal } from '@angular/core';
 
-import { AlertController, IonicSafeString } from '@ionic/angular/standalone';
+import { AlertController, IonicSafeString } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
 import { takeUntil } from 'rxjs/operators';
 import { AccountService } from './account/shared/account.service';
@@ -212,7 +212,7 @@ export class AppComponent implements OnDestroy, OnInit {
                                     const schoolId = notification.data.schoolId
                                     const appointmentId = notification.data.appointmentId
                                     this.router.navigate(
-                                        ['/school/', schoolId],
+                                        ['/more/school/', schoolId],
                                         { queryParams: { appointmentId: appointmentId } }
                                     );
                                 } else if (type == "FLIGHT_VALIDATION_REJECTED") {
@@ -243,7 +243,7 @@ export class AppComponent implements OnDestroy, OnInit {
                     const schoolId = notification.notification.data.schoolId
                     const appointmentId = notification.notification.data.appointmentId
                     this.router.navigate(
-                        ['/school/', schoolId],
+                        ['/more/school/', schoolId],
                         { queryParams: { appointmentId: appointmentId } }
                     );
                 } else if (type == "FLIGHT_VALIDATION_REJECTED") {

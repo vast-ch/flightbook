@@ -1,5 +1,5 @@
-import { Component, OnDestroy, ViewChild, Signal } from '@angular/core';
-import { NavController, ModalController, LoadingController, ActionSheetController, IonIcon, IonContent, IonItem, IonList, IonInfiniteScroll, IonInfiniteScrollContent } from '@ionic/angular/standalone';
+import { ChangeDetectionStrategy, Component, OnDestroy, ViewChild, Signal } from '@angular/core';
+import { NavController, ModalController, LoadingController, ActionSheetController, IonIcon, IonContent, IonItem, IonList, IonInfiniteScroll, IonInfiniteScrollContent } from '@ionic/angular';
 import { Subject, firstValueFrom } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { GliderFilterComponent } from '../glider-filter/glider-filter.component';
@@ -9,17 +9,18 @@ import { XlsxExportService } from 'src/app/shared/services/xlsx-export.service';
 import { SpreadsheetDownloadService } from 'src/app/shared/services/spreadsheet-download.service';
 import { Glider } from '../shared/glider.model';
 import { GliderStore } from '../shared/glider.store';
-import { DatePipe, Location } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { HoursFormatPipe } from '../../shared/pipes/hours-format.pipe';
 import { addIcons } from "ionicons";
 import { add, filterOutline, peopleOutline, personOutline, shareOutline, chevronBack, chevronForward } from "ionicons/icons";
-import { navigateBackOrTo } from 'src/app/shared/util/back-navigation';
+import { NavigationService } from 'src/app/shared/services/navigation.service';
 
 @Component({
     selector: 'app-glider-list',
     templateUrl: './glider-list.page.html',
     styleUrls: ['./glider-list.page.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         RouterLink,
         TranslateModule,
@@ -48,7 +49,7 @@ export class GliderListPage implements OnDestroy {
 
     constructor(
         public navCtrl: NavController,
-        private location: Location,
+        private navigationService: NavigationService,
         private gliderStore: GliderStore,
         public modalCtrl: ModalController,
         private actionSheetCtrl: ActionSheetController,
@@ -113,11 +114,11 @@ export class GliderListPage implements OnDestroy {
      * navigateBack('more') dropped the pilot on a tab they never came from.
      */
     goBack() {
-        navigateBackOrTo(this.navCtrl, this.location, 'more');
+        this.navigationService.back('more');
     }
 
     itemTapped(glider: Glider) {
-        this.navCtrl.navigateForward(`gliders/${glider.id}`);
+        this.navCtrl.navigateForward(`more/gliders/${glider.id}`);
     }
 
     loadData(event: any) {
@@ -137,12 +138,21 @@ export class GliderListPage implements OnDestroy {
     async openFilter() {
         const modal = await this.modalCtrl.create({
             component: GliderFilterComponent,
-            componentProps: {
-                infiniteScroll: this.infiniteScroll
-            }
+            cssClass: 'fb-filter-sheet'
         });
 
-        return await modal.present();
+        /*
+         * Compared before and after rather than read off the dismiss role: the
+         * sheet edits the shared filter as it goes, and a backdrop tap or the
+         * Android back button dismisses it without any role of ours. The flight
+         * and appointment filters do the same.
+         */
+        const before = JSON.stringify(this.gliderStore.filter());
+        modal.present();
+        await modal.onWillDismiss();
+        if (JSON.stringify(this.gliderStore.filter()) !== before) {
+            this.reloadForFilter();
+        }
     }
 
     /** Two formats, so the header button opens a picker rather than doubling up. */

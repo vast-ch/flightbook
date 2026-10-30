@@ -70,8 +70,10 @@
         "wrongToken": "Dieses Token gibt es nicht oder ist ungültig",
         "payment": "Zahlung",
         "paymentInformation": "Das Flugbuch kostet pro Jahr 12.- <br>Damit das Flugbuch mit einer Flugschule geteilt werden kann, musst du diese Zahlung begleichen.",
+        "paymentInformationTrial": "Die ersten 60 Tage kosten CHF 2.50, danach kostet das Flugbuch CHF 12.– pro Jahr.<br>Damit das Flugbuch mit einer Flugschule geteilt werden kann, musst du dieses Abo abschliessen.",
         "tandemPaymentInformation": "Sie können bis zu 25 Flüge kostenlos registrieren. <br>Für die uneingeschränkte Nutzung beträgt die Jahresgebühr CHF 12.–. <br>Eine Zahlung ist aktuell nicht erforderlich.",
-        "paymentResilation": "Eine Kündigung ist jeweils per Ende Jahr möglich, worüber du jeweils 30 Tage zuvor per Mail informiert wirst.",
+        "paymentResilation": "Du kannst jederzeit kündigen, die Kündigung gilt jeweils per Ende des bezahlten Jahres. Wir informieren dich 30 Tage vor jeder Verlängerung per Mail.",
+        "paymentResilationTrial": "Du kannst jederzeit kündigen, die Kündigung gilt jeweils per Ende der laufenden Periode (Testphase oder bezahltes Jahr). Kündigst du während der 60 Tage, fallen keine weiteren Kosten an. Wir informieren dich 30 Tage vor jeder Verlängerung per Mail.",
         "paymentButton": "Bezahlen",
         "accessTandemFlights": "möchte Zugriff auf deine Tandemflüge haben welche mit der Flugschule verknüpft sind.",
         "hasTandemAccess": "hat nun Einsicht in deine Tandemflüge"
@@ -189,7 +191,8 @@
         "takeOffCoordinator": "Startleiter*in",
         "information": "Informationen",
         "level": "Level",
-        "comments": "Bemerkungen"
+        "comments": "Bemerkungen",
+        "subscriptionComment": "Kommentar bei Anmeldung"
     },
     "studentNote": {
         "date": "Datum",
@@ -421,6 +424,7 @@
         "value": "Aktiviert",
         "types": {
             "validateFlights": "Flüge validieren",
+            "commentsOnSubscription": "Kommentar bei Anmeldung",
             "googleCalendar": "Google Kalender"
         },
         "googleCalendar": {
