@@ -400,6 +400,7 @@
         "passed": "Rendez-vous passé",
         "subscribeStudent": "Ajouter participants",
         "guestSubscribeStudent": "Ajouter participants externes",
+        "removeSubscription": "Retirer l'inscription",
         "guestStudent": "Élève externes",
         "student": "Élève",
         "waitingList": "Liste d'attente",

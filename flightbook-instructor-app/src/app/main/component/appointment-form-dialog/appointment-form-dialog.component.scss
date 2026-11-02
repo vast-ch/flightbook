@@ -55,23 +55,91 @@ mat-dialog-actions {
   border-top: 1px solid var(--fb-surface-variant);
 }
 
-.subscribe-student {
-    margin-left: 15px;
+.fb-subscription-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 4px;
+  border-top: 1px solid var(--fb-surface-variant);
+
+  // Keeps the last row and the next section's rule apart: subscripts are collapsed here.
+  & + & {
+    margin-top: 14px;
+  }
 }
 
-.subscription-list {
-    margin-left: 30px;
+.fb-subscription-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
 }
 
-.subscription-form-field {
-    width: fit-content;
+.fb-subscription-title {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--fb-ink);
 }
 
-.guestSubscription-form-field {
-    width: 40%;
-    margin-right: 5px;
+.fb-subscription-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+
+  mat-form-field {
+    flex: 1;
+    min-width: 0;
+  }
 }
 
-.guestSubscription-form {
-    margin-top: 10px;
+.fb-subscription-add,
+.fb-subscription-remove {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border-radius: 50%;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 2px solid var(--fb-focus-ring);
+    outline-offset: 2px;
+  }
+
+  .mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.fb-subscription-add {
+  border: 0;
+  background: var(--fb-primary);
+
+  &:hover {
+    background: var(--fb-primary-hover);
+  }
+
+  .mat-icon {
+    color: var(--mat-sys-on-primary);
+  }
+}
+
+.fb-subscription-remove {
+  // Centres on the 40px field box, which sits below the field's 5px padding-top.
+  margin-top: 9px;
+  border: 1px solid var(--fb-danger-border);
+  background: var(--fb-surface);
+
+  &:hover {
+    background: var(--fb-danger-bg);
+  }
+
+  .mat-icon {
+    color: var(--fb-danger);
+  }
 }

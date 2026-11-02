@@ -85,17 +85,19 @@
   <textarea matInput placeholder="{{ 'appointment.description'| translate }}"
   formControlName="description"></textarea>
 </mat-form-field>
-<div class="subscription-form" formArrayName="subscriptions">
-  <button mat-mini-fab color="primary" (click)="addSubscription()">
-    <mat-icon>add</mat-icon>
-  </button>
-  <mat-label class="subscribe-student">{{ 'appointment.subscribeStudent'| translate }}</mat-label>
+<div class="fb-subscription-section" formArrayName="subscriptions">
+  <div class="fb-subscription-header">
+    <button type="button" class="fb-subscription-add" [attr.aria-label]="'appointment.subscribeStudent' | translate" [title]="'appointment.subscribeStudent' | translate" (click)="addSubscription()">
+      <mat-icon aria-hidden="true">add</mat-icon>
+    </button>
+    <span class="fb-subscription-title">{{ 'appointment.subscribeStudent'| translate }}</span>
+  </div>
   @for (subscription of subscriptions.controls; track subscription; let i = $index) {
-    <div class="subscription-list" [formGroupName]="i" #subscriptionFormList>
-      <button mat-mini-fab color="warn" (click)="removeSubscription(i, selectStudent.value)">
-        <mat-icon>remove</mat-icon>
+    <div class="fb-subscription-row" [formGroupName]="i" #subscriptionFormList>
+      <button type="button" class="fb-subscription-remove" [attr.aria-label]="'appointment.removeSubscription' | translate" [title]="'appointment.removeSubscription' | translate" (click)="removeSubscription(i, selectStudent.value)">
+        <mat-icon aria-hidden="true">remove</mat-icon>
       </button>
-      <mat-form-field appearance="outline" floatLabel="always" class="subscription-form-field">
+      <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
         <mat-label>{{ 'appointment.student'| translate }}</mat-label>
         <mat-select #selectStudent formControlName="user" (selectionChange)="selected()">
           @for (student of students; track student) {
@@ -110,22 +112,24 @@
     </div>
   }
 </div>
-<div class="guestSubscription-form" formArrayName="guestSubscriptions">
-  <button mat-mini-fab color="primary" (click)="addGuestSubscription()">
-    <mat-icon>add</mat-icon>
-  </button>
-  <mat-label class="subscribe-student">{{ 'appointment.guestSubscribeStudent'| translate }}</mat-label>
+<div class="fb-subscription-section" formArrayName="guestSubscriptions">
+  <div class="fb-subscription-header">
+    <button type="button" class="fb-subscription-add" [attr.aria-label]="'appointment.guestSubscribeStudent' | translate" [title]="'appointment.guestSubscribeStudent' | translate" (click)="addGuestSubscription()">
+      <mat-icon aria-hidden="true">add</mat-icon>
+    </button>
+    <span class="fb-subscription-title">{{ 'appointment.guestSubscribeStudent'| translate }}</span>
+  </div>
   @for (guestSubscriptions of guestSubscriptions.controls; track guestSubscriptions; let i = $index) {
-    <div class="subscription-list" [formGroupName]="i" #guestSubscriptionFormList>
-      <button mat-mini-fab color="warn" (click)="removeGuestSubscription(i)">
-        <mat-icon>remove</mat-icon>
+    <div class="fb-subscription-row" [formGroupName]="i" #guestSubscriptionFormList>
+      <button type="button" class="fb-subscription-remove" [attr.aria-label]="'appointment.removeSubscription' | translate" [title]="'appointment.removeSubscription' | translate" (click)="removeGuestSubscription(i)">
+        <mat-icon aria-hidden="true">remove</mat-icon>
       </button>
-      <mat-form-field appearance="outline" floatLabel="always" class="guestSubscription-form-field">
+      <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
         <mat-label>{{ 'account.firstname'| translate }}</mat-label>
         <input matInput placeholder="{{ 'account.firstname'| translate }}" type="text"
           formControlName="firstname">
       </mat-form-field>
-      <mat-form-field appearance="outline" floatLabel="always" class="guestSubscription-form-field">
+      <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
         <mat-label>{{ 'account.lastname'| translate }}</mat-label>
         <input matInput placeholder="{{ 'account.lastname'| translate }}" type="text"
           formControlName="lastname">
