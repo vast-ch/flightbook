@@ -109,6 +109,7 @@
             "description": "Beschreibung",
             "diff": "Diff.",
             "instructor": "Fluglehrer*in",
+            "editor": "Bearbeiter*in",
             "alone": "Allein",
             "maneuver": "Manöver",
             "validationState": {

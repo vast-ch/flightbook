@@ -185,9 +185,9 @@
             </ng-container>
           }
 
-          <!-- Instructor Column: the tandem query only joins whoever recorded the payment -->
-          <ng-container matColumnDef="instructor">
-            <th mat-header-cell *matHeaderCellDef>{{ 'student.flight.instructor'| translate }}</th>
+          <!-- Editor Column: the tandem query only joins whoever recorded the payment -->
+          <ng-container matColumnDef="editor">
+            <th mat-header-cell *matHeaderCellDef>{{ 'student.flight.editor'| translate }}</th>
             <td mat-cell *matCellDef="let element">
               @if (element.tandemSchoolData?.instructor; as i) {
                 {{ i.firstname?.charAt(0) }}. {{ i.lastname }}

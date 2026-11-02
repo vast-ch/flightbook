@@ -207,7 +207,7 @@ export class TandemPilotDetailComponent implements OnChanges, OnDestroy {
   buildDisplayedFlightColumns(): void {
     const baseColumns = ['paymentButtons', 'nb', 'date', 'start', 'landing', 'glider', 'time', 'km', 'description'];
     const customFieldKeys = this.getActiveCustomFields().map(f => f.key);
-    const paymentColumns = ['instructor', 'paymentAmount', 'paymentState'];
+    const paymentColumns = ['editor', 'paymentAmount', 'paymentState'];
     
     this.displayedFlightColumns = [...baseColumns, ...customFieldKeys, ...paymentColumns];
   }

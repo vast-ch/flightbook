@@ -109,6 +109,7 @@
             "description": "Description",
             "diff": "Diff.",
             "instructor": "Instructeur",
+            "editor": "Responsable",
             "alone": "Seul",
             "maneuver": "Manoeuvre",
             "validationState": {
