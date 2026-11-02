@@ -1,15 +1,15 @@
-import { Component, EventEmitter, Input, OnChanges, Output, Signal, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, Signal, SimpleChanges, ViewChild } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatExpansionModule } from '@angular/material/expansion';
+import { MatCardModule } from '@angular/material/card';
 import { MatTableModule } from '@angular/material/table';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { TandemPilot } from 'src/app/shared/domain/tandem-pilot';
 import { School } from 'src/app/shared/domain/school';
 import { Flight } from 'src/app/shared/domain/flight';
 import { DeviceSizeService } from 'src/app/core/services/device-size.service';
-import { firstValueFrom, Subject, takeUntil } from 'rxjs';
+import { finalize, firstValueFrom, Subject, Subscription, takeUntil } from 'rxjs';
 import { SchoolService } from 'src/app/core/services/school.service';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { PassengerConfirmation } from 'src/app/shared/domain/passenger-confirmation';
@@ -34,7 +34,7 @@ import { ExportTandemDataService } from 'src/app/core/services/export-tandem-dat
     CommonModule,
     MatButtonModule,
     MatIconModule,
-    MatExpansionModule,
+    MatCardModule,
     MatTableModule,
     MatTooltipModule,
     MatPaginatorModule,
@@ -46,12 +46,16 @@ import { ExportTandemDataService } from 'src/app/core/services/export-tandem-dat
   ],
   providers: [DatePipe]
 })
-export class TandemPilotDetailComponent implements OnChanges {
+export class TandemPilotDetailComponent implements OnChanges, OnDestroy {
   @Input()
   tandemPilot: TandemPilot | undefined;
 
   @Input()
   school: School | undefined;
+
+  /** The list is still loading, so "no pilot selected" would only be a flash. */
+  @Input()
+  listLoading = false;
 
   @Output() backButtonClick = new EventEmitter();
   @Output() removeUserButtonClick = new EventEmitter();
@@ -62,6 +66,17 @@ export class TandemPilotDetailComponent implements OnChanges {
   passengerConfirmations: PassengerConfirmation[] = [];
   passengerConfirmationsPagerEntity: PagerEntity<PassengerConfirmation[]> = new PagerEntity<PassengerConfirmation[]>();
   unsubscribe$ = new Subject<void>();
+
+  readonly currentYear = new Date().getFullYear();
+  periods: (number | 'total')[] = ['total', this.currentYear, this.currentYear - 1]; // @TODO make this dynamic. Need an dedicated statistics endpoint for tandem pilots to get the years with flights. For now, just show the current year and the previous year.
+  period: number | 'total' = this.currentYear;
+
+  flightsLoading = false;
+  passengersLoading = false;
+  // Held per table so a newer load can cancel an older one: rapid pilot or period clicks must
+  // never let a slower, older response overwrite the current data.
+  private flightsSubscription: Subscription | undefined;
+  private passengersSubscription: Subscription | undefined;
 
   @ViewChild('passengerConfirmationsPaginator') passengerConfirmationsPaginator: MatPaginator | undefined;
   @ViewChild('flightsPaginator') flightsPaginator: MatPaginator | undefined;
@@ -91,9 +106,45 @@ export class TandemPilotDetailComponent implements OnChanges {
     }
     
     if (changes['tandemPilot'] && changes['tandemPilot'].currentValue) {
-      this.loadFlights();
-      this.loadPassengerConfirmations(changes['tandemPilot'].currentValue.id);
+      this.reloadTables();
     }
+  }
+
+  ngOnDestroy(): void {
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
+  }
+
+  selectPeriod(period: number | 'total') {
+    if (period === this.period) {
+      return;
+    }
+
+    this.period = period;
+    this.reloadTables(this.flightsPaginator?.pageSize, this.passengerConfirmationsPaginator?.pageSize);
+  }
+
+  /** Pilot or period changed: drop the old rows and counts first, so nothing from the previous
+   *  selection stays on screen while both tables load from page 1. A given page size also stays
+   *  on the cleared pager entity: the paginator binds to it, and would otherwise fall back to 5
+   *  until the response arrives, so a second quick period click would read 5. */
+  private reloadTables(flightsLimit?: number, passengersLimit?: number) {
+    this.flights = [];
+    this.flightsPagerEntity = new PagerEntity<Flight[]>();
+    this.flightsPagerEntity.itemsPerPage = flightsLimit;
+    this.passengerConfirmations = [];
+    this.passengerConfirmationsPagerEntity = new PagerEntity<PassengerConfirmation[]>();
+    this.passengerConfirmationsPagerEntity.itemsPerPage = passengersLimit;
+
+    this.loadFlights(undefined, flightsLimit);
+    if (this.tandemPilot?.id) {
+      this.loadPassengerConfirmations(this.tandemPilot.id, undefined, passengersLimit);
+    }
+  }
+
+  /** Both bounds or neither: the confirmations endpoint only works with both. */
+  private periodRange(): { from?: string, to?: string } {
+    return this.period === 'total' ? {} : { from: `${this.period}-01-01`, to: `${this.period}-12-31` };
   }
 
   loadFlights(offset: number | undefined = undefined, limit = 5) {
@@ -103,8 +154,13 @@ export class TandemPilotDetailComponent implements OnChanges {
       this.flightsPaginator.pageIndex = 0;
     }
 
-    this.schoolService.getTandemPilotFlightsBySchoolIdAndTandemPilotId({ limit, offset }, this.school!.id!, this.tandemPilot.id)
-      .pipe(takeUntil(this.unsubscribe$))
+    // Unsubscribing runs the previous request's finalize, so the flag is set after it. Paging keeps
+    // its rows on screen, which leaves the flag needed only while the table is empty.
+    this.flightsSubscription?.unsubscribe();
+    this.flightsLoading = this.flights.length === 0;
+
+    this.flightsSubscription = this.schoolService.getTandemPilotFlightsBySchoolIdAndTandemPilotId({ limit, offset, ...this.periodRange() }, this.school!.id!, this.tandemPilot.id)
+      .pipe(takeUntil(this.unsubscribe$), finalize(() => this.flightsLoading = false))
       .subscribe((pagerEntity) => {
         this.flightsPagerEntity = pagerEntity;
         this.flights = pagerEntity.entity || [];
@@ -116,13 +172,14 @@ export class TandemPilotDetailComponent implements OnChanges {
       this.passengerConfirmationsPaginator.pageIndex = 0;
     }
 
-    this.schoolService.getPassengerConfirmationsBySchoolIdAndTandemPilotId({ limit, offset }, this.school!.id!, tandemPilotId)
-      .pipe(takeUntil(this.unsubscribe$))
+    this.passengersSubscription?.unsubscribe();
+    this.passengersLoading = this.passengerConfirmations.length === 0;
+
+    this.passengersSubscription = this.schoolService.getPassengerConfirmationsBySchoolIdAndTandemPilotId({ limit, offset, ...this.periodRange() }, this.school!.id!, tandemPilotId)
+      .pipe(takeUntil(this.unsubscribe$), finalize(() => this.passengersLoading = false))
       .subscribe((pagerEntity) => {
         this.passengerConfirmationsPagerEntity = pagerEntity;
-        if (pagerEntity.entity) {
-          this.passengerConfirmations = pagerEntity.entity;
-        }
+        this.passengerConfirmations = pagerEntity.entity || [];
       });
   }
 
@@ -148,9 +205,9 @@ export class TandemPilotDetailComponent implements OnChanges {
   }
 
   buildDisplayedFlightColumns(): void {
-    const baseColumns = ['date', 'start', 'landing', 'time', 'description'];
+    const baseColumns = ['paymentButtons', 'nb', 'date', 'start', 'landing', 'glider', 'time', 'km', 'description'];
     const customFieldKeys = this.getActiveCustomFields().map(f => f.key);
-    const paymentColumns = ['paymentState', 'paymentAmount', 'paymentButtons'];
+    const paymentColumns = ['instructor', 'paymentAmount', 'paymentState'];
     
     this.displayedFlightColumns = [...baseColumns, ...customFieldKeys, ...paymentColumns];
   }
@@ -206,10 +263,11 @@ export class TandemPilotDetailComponent implements OnChanges {
       width: '500px',
       data: { 
         paymentState
-      }
+      },
+      panelClass: 'fb-email-dialog-panel'
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().pipe(takeUntil(this.unsubscribe$)).subscribe(result => {
       if (result && this.school?.id && this.tandemPilot?.id) {
         flight.tandemSchoolData = {
           paymentState: paymentState,
@@ -234,10 +292,11 @@ export class TandemPilotDetailComponent implements OnChanges {
       width: '500px',
       data: {
         title: this.translate.instant('export.exportPilotData')
-      }
+      },
+      panelClass: 'fb-email-dialog-panel'
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().pipe(takeUntil(this.unsubscribe$)).subscribe(result => {
       if (result && this.school?.id && this.tandemPilot?.id) {
         const schoolId = this.school.id;
         const tandemPilotId = this.tandemPilot.id;

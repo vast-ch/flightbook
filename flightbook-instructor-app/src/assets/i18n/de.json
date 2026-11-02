@@ -124,7 +124,9 @@
                 "comment": "Kommentar",
                 "PAID": "Ausbezahlt",
                 "REJECTED": "Abgelehnt",
-                "PENDING": "Angefragt"
+                "PENDING": "Angefragt",
+                "markPaid": "Als ausbezahlt markieren",
+                "markRejected": "Zahlung ablehnen"
             },
             "validationActions": "Aktionen",
             "validateAll": "Alle Flüge im Status \"Angefragt\" validieren",
@@ -170,7 +172,11 @@
         "archived": "Archiviert",
         "noTandemPilotSelected": "Kein Tandempilot wurde ausgewählt.",
         "passengerConfirmations": "Passagierbestätigungen",
-        "pilotName": "Pilotname"
+        "pilotName": "Pilotname",
+        "roleLabel": "Tandempilot",
+        "noTandemPilots": "Keine Tandempiloten vorhanden.",
+        "archiveTandemPilot": "Tandempilot archivieren",
+        "passengers": "Passagiere"
     },
     "passengerConfirmation" : {
         "date": "Datum",

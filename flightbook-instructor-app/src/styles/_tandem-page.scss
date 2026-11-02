@@ -1,0 +1,745 @@
+@use '@angular/material' as mat;
+
+// Structural styles for the redesigned tandem pilots page (list and detail). Every selector is
+// nested under .fb-tandem-page (applied to the page's <mat-sidenav-container> root) per the
+// styling policy tier 2 - this keeps everything leak-proof while being
+// charged against the generous "initial" budget instead of the per-component one.
+//
+// Token-first (tier 1) overrides for the Material components used on this page also live here,
+// each scoped under .fb-tandem-page so they cannot leak onto other screens. The export and
+// payment dialogs render outside this root and are styled from their own component .scss.
+//
+// Deviation from the mockup's literal values, applied deliberately (redesign/INIT.md §5):
+// `#6c8394` at small sizes is below AA on white, so small text uses `--fb-text-3` (#5b7284).
+.fb-tandem-page {
+  height: 100%;
+  background: var(--fb-bg);
+  font-family: Sora, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  color: var(--fb-ink);
+
+  // ---------------------------------------------------------------------------------
+  // List pane
+  // ---------------------------------------------------------------------------------
+  .fb-list-pane {
+    display: flex;
+    flex-direction: column;
+    width: 320px;
+    min-width: 320px;
+    background: var(--fb-surface);
+    border-right: 1px solid var(--fb-border-subtle);
+
+    @media (max-width: 768px) {
+      width: 100%;
+    }
+
+    // The sidenav's real content box: without this the list below cannot take the remaining
+    // height, and the add button and tabs would scroll away with the rows.
+    .mat-drawer-inner-container {
+      display: flex;
+      flex-direction: column;
+    }
+  }
+
+  .fb-list-pane__add {
+    display: flex;
+    flex: none;
+    gap: var(--fb-space-3);
+    padding: var(--fb-space-7) var(--fb-space-8) var(--fb-space-5);
+  }
+
+  .fb-add-tandem-button {
+    flex: 1;
+    min-width: 0;
+    height: 44px;
+
+    @include mat.button-overrides(
+      (
+        protected-container-shape: 10px,
+        protected-horizontal-padding: var(--fb-space-5),
+        protected-label-text-size: var(--fb-text-md),
+        protected-label-text-weight: 600,
+      )
+    );
+
+    .mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+  }
+
+  .fb-export-all-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    border: 1px solid var(--fb-border-subtle);
+    border-radius: var(--fb-radius-md);
+    background: var(--fb-surface);
+
+    // icon-size moves with state-layer-size: see .fb-detail-header below.
+    @include mat.icon-button-overrides(
+      (
+        state-layer-size: 44px,
+        icon-size: 18px,
+      )
+    );
+
+    &:hover {
+      background: var(--fb-fill-subtle);
+    }
+
+    .mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+      color: var(--fb-text-2);
+    }
+  }
+
+  // Hand-rolled ARIA tablist, as on the student page: both tabs share one tabpanel.
+  .fb-tab-selector {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    flex: none;
+    padding: 0 var(--fb-space-8);
+    border-bottom: 1px solid var(--fb-border-subtle);
+  }
+
+  .fb-tab {
+    padding: var(--fb-space-5) 0 11px;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    background: transparent;
+    font: inherit;
+    font-size: var(--fb-text-base-plus);
+    font-weight: 500;
+    color: var(--fb-text-3);
+    cursor: pointer;
+
+    &--active {
+      border-bottom-color: var(--fb-primary);
+      font-weight: 600;
+      color: var(--fb-ink);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--fb-focus-ring);
+      outline-offset: 2px;
+    }
+  }
+
+  // Padding sits on this wrapper, not the form-field host: mat-form-field is content-box, so
+  // padding on the host would overflow the pane (redesign/INIT.md §4).
+  .fb-list-pane__sort {
+    flex: none;
+    padding: var(--fb-space-5) var(--fb-space-8);
+    border-bottom: 1px solid var(--fb-surface-variant);
+  }
+
+  .fb-sort-field {
+    display: block;
+    width: 100%;
+
+    @include mat.form-field-overrides(
+      (
+        outlined-container-shape: var(--fb-radius-md),
+        outlined-outline-color: var(--fb-border-subtle),
+        outlined-hover-outline-color: var(--fb-border-subtle),
+        container-height: 44px,
+        container-vertical-padding: 10px,
+      )
+    );
+
+    &.mat-mdc-form-field {
+      font-size: var(--fb-text-base-plus);
+    }
+
+    .mat-mdc-text-field-wrapper {
+      background: var(--fb-surface);
+    }
+  }
+
+  .fb-tandem-list {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    scrollbar-gutter: stable;
+  }
+
+  .fb-tandem-row {
+    display: block;
+    width: 100%;
+    margin: 0;
+    padding: 14px var(--fb-space-8) 14px 15px;
+    border: 0;
+    border-bottom: 1px solid var(--fb-surface-variant);
+    border-left: 3px solid transparent;
+    background: transparent;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+
+    &:focus-visible {
+      outline: 2px solid var(--fb-focus-ring);
+      // Negative: the row sits flush against the scrolling pane's edge.
+      outline-offset: -2px;
+    }
+
+    &--selected {
+      border-left-color: var(--fb-tertiary);
+      background: var(--fb-nav-active-bg);
+    }
+  }
+
+  .fb-tandem-row__main {
+    display: flex;
+    align-items: center;
+    gap: var(--fb-space-4);
+  }
+
+  .fb-avatar {
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--fb-bg);
+    font-size: var(--fb-text-xs);
+    font-weight: 600;
+    color: var(--fb-text-3);
+  }
+
+  .fb-tandem-row__name {
+    flex: 1;
+    min-width: 0;
+    font-size: var(--fb-text-lg);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--fb-ink);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  // Decorative (aria-hidden), so --fb-text-4 is allowed below 18px.
+  .fb-tandem-row__type {
+    flex: none;
+    font-size: 17px;
+    width: 17px;
+    height: 17px;
+    color: var(--fb-text-4);
+  }
+
+  .fb-empty-list {
+    padding: var(--fb-space-9);
+    text-align: center;
+    font-size: var(--fb-text-sm);
+    color: var(--fb-text-3);
+  }
+
+  // ---------------------------------------------------------------------------------
+  // Detail pane
+  // ---------------------------------------------------------------------------------
+  mat-sidenav-content {
+    background: var(--fb-bg);
+  }
+
+  .fb-detail-pane {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .fb-no-pilot {
+    padding: var(--fb-space-9);
+    text-align: center;
+    font-weight: 600;
+    color: var(--fb-text-3);
+  }
+
+  .fb-detail-header {
+    display: flex;
+    align-items: center;
+    gap: var(--fb-space-6);
+    padding: var(--fb-space-8) var(--fb-space-9);
+    background: var(--fb-surface);
+    border-bottom: 1px solid var(--fb-border-subtle);
+    flex-wrap: wrap;
+
+    // icon-size must move with state-layer-size: overrides() only sets the custom property,
+    // while Material's padding calc is derived from both.
+    @include mat.icon-button-overrides(
+      (
+        state-layer-size: 36px,
+        icon-size: 17px,
+      )
+    );
+  }
+
+  .fb-detail-header__back,
+  .fb-detail-header__action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    border: 1px solid var(--fb-border-subtle);
+    border-radius: var(--fb-radius-md);
+    background: var(--fb-surface);
+
+    &:hover {
+      background: var(--fb-fill-subtle);
+    }
+
+    .mat-icon {
+      color: var(--fb-text-2);
+    }
+  }
+
+  .fb-detail-header__back {
+    margin-left: -4px;
+
+    @include mat.icon-button-overrides(
+      (
+        icon-size: 19px,
+      )
+    );
+
+    .mat-icon {
+      font-size: 19px;
+      width: 19px;
+      height: 19px;
+    }
+  }
+
+  .fb-detail-header__action {
+    .mat-icon {
+      font-size: 17px;
+      width: 17px;
+      height: 17px;
+    }
+  }
+
+  .fb-detail-header__action--danger {
+    border-color: var(--fb-danger-border);
+    background: var(--fb-danger-bg);
+
+    &:hover {
+      background: var(--fb-danger-hover-bg);
+    }
+
+    .mat-icon {
+      color: var(--fb-danger);
+    }
+  }
+
+  .fb-detail-header__title {
+    flex: 1;
+    min-width: 0;
+
+    h1 {
+      margin: var(--fb-space-3) 0 0;
+      font-size: var(--fb-text-4xl);
+      font-weight: 600;
+      line-height: 1.05;
+      letter-spacing: -0.025em;
+      color: var(--fb-ink);
+    }
+  }
+
+  .fb-detail-header__eyebrow {
+    display: flex;
+    align-items: center;
+    gap: var(--fb-space-3);
+  }
+
+  .fb-detail-header__role {
+    font-size: var(--fb-text-xs);
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--fb-text-3);
+  }
+
+  // ---------------------------------------------------------------------------------
+  // Period bar
+  // ---------------------------------------------------------------------------------
+  .fb-period-bar {
+    display: flex;
+    align-items: center;
+    gap: var(--fb-space-5);
+    padding: var(--fb-space-5) var(--fb-space-9);
+    background: var(--fb-surface);
+    border-bottom: 1px solid var(--fb-surface-variant);
+  }
+
+  .fb-period-bar__label {
+    flex: 1;
+    font-size: var(--fb-text-xs);
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--fb-text-3);
+  }
+
+  .fb-period-segments {
+    display: flex;
+    flex: none;
+    border: 1px solid var(--fb-border-subtle);
+    border-radius: var(--fb-radius-md);
+    overflow: hidden;
+    background: var(--fb-surface);
+  }
+
+  .fb-period-segment {
+    flex: none;
+    min-width: 78px;
+    padding: 9px var(--fb-space-6);
+    border: 0;
+    border-left: 1px solid var(--fb-border-subtle);
+    background: transparent;
+    font: inherit;
+    font-size: var(--fb-text-sm-plus);
+    font-weight: 500;
+    color: var(--fb-text-2);
+    text-align: center;
+    cursor: pointer;
+
+    &--active {
+      background: var(--fb-primary);
+      font-weight: 600;
+      color: var(--fb-on-primary);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--fb-focus-ring);
+      // Negative: .fb-period-segments clips anything outside the segment.
+      outline-offset: -2px;
+    }
+  }
+
+  // ---------------------------------------------------------------------------------
+  // Stats strip
+  // ---------------------------------------------------------------------------------
+  .fb-stats-strip {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    background: var(--fb-surface);
+    border-bottom: 1px solid var(--fb-border-subtle);
+  }
+
+  .fb-stat-tile {
+    padding: var(--fb-space-7) var(--fb-space-8);
+    border-right: 1px solid var(--fb-surface-variant);
+    border-bottom: 1px solid var(--fb-surface-variant);
+  }
+
+  .fb-stat-tile__value {
+    font-size: var(--fb-text-3xl);
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: var(--fb-ink);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .fb-stat-tile__label {
+    margin-top: var(--fb-space-4);
+    font-size: var(--fb-text-2xs);
+    font-weight: 500;
+    line-height: 1.2;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--fb-text-3);
+  }
+
+  // ---------------------------------------------------------------------------------
+  // Cards
+  // ---------------------------------------------------------------------------------
+  .fb-card {
+    @include mat.card-overrides(
+      (
+        outlined-container-color: var(--fb-surface),
+        outlined-outline-color: var(--fb-border),
+        outlined-container-shape: var(--fb-radius-lg),
+      )
+    );
+
+    &.mat-mdc-card {
+      padding: 0;
+      overflow: hidden;
+    }
+  }
+
+  .fb-card--passengers {
+    margin: var(--fb-space-8) var(--fb-space-9) 0;
+  }
+
+  .fb-card--flights {
+    margin: var(--fb-space-7) var(--fb-space-9) var(--fb-space-9);
+  }
+
+  .fb-card__header {
+    display: flex;
+    align-items: center;
+    gap: var(--fb-space-5);
+    padding: var(--fb-space-6-plus) var(--fb-space-8);
+    border-bottom: 1px solid var(--fb-surface-variant);
+  }
+
+  .fb-card__title {
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+    font-size: var(--fb-text-md);
+    font-weight: 600;
+    color: var(--fb-ink);
+  }
+
+  // ---------------------------------------------------------------------------------
+  // Tables
+  // ---------------------------------------------------------------------------------
+  .fb-table-scroll {
+    overflow-x: auto;
+
+    @include mat.table-overrides(
+      (
+        header-container-height: 34px,
+        row-item-outline-color: var(--fb-surface-variant),
+      )
+    );
+
+    table {
+      min-width: 1080px;
+    }
+
+    // Undoes the 48px global row height: the mockup's row height comes from the cell padding.
+    .mat-mdc-table .mdc-data-table__row {
+      height: auto;
+    }
+
+    .mat-mdc-header-cell {
+      padding: 11px var(--fb-space-6);
+      border-bottom-color: var(--fb-border-subtle);
+      line-height: normal;
+      font-size: var(--fb-text-xs);
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--fb-text-3);
+      background: var(--fb-fill-subtle);
+    }
+
+    .mat-mdc-cell {
+      padding: 13px var(--fb-space-6);
+      font-size: var(--fb-text-base);
+      color: var(--fb-text-2);
+    }
+  }
+
+  .fb-table-scroll--passengers {
+    table {
+      min-width: 880px;
+    }
+
+    .mat-mdc-header-cell:first-child,
+    .mat-mdc-header-cell:last-child {
+      padding: 11px var(--fb-space-8);
+      white-space: nowrap;
+    }
+
+    .mat-mdc-cell:first-child,
+    .mat-mdc-cell:last-child {
+      padding: 13px var(--fb-space-8);
+    }
+
+    .mat-mdc-cell.mat-column-date {
+      font-variant-numeric: tabular-nums;
+      color: var(--fb-text-3);
+      white-space: nowrap;
+    }
+
+    .mat-mdc-cell.mat-column-name {
+      font-size: var(--fb-text-base-plus);
+      font-weight: 500;
+      color: var(--fb-ink);
+      white-space: nowrap;
+    }
+
+    .mat-mdc-cell.mat-column-phone {
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+  }
+
+  .fb-ads-pill {
+    display: inline-flex;
+    padding: 2px var(--fb-space-3);
+    border-radius: 5px;
+    background: var(--fb-bg);
+    font-size: var(--fb-text-xs-plus);
+    font-weight: 600;
+    color: var(--fb-text-3);
+
+    &--yes {
+      background: var(--fb-success-hover-bg);
+      color: var(--fb-success-fg);
+    }
+  }
+
+  // Scoped to the flights table: the passengers table also has a date column.
+  .fb-table-scroll:not(.fb-table-scroll--passengers) {
+    .mat-column-date,
+    .fb-custom-field-header {
+      white-space: nowrap;
+    }
+
+    .mat-mdc-cell.mat-column-nb {
+      font-weight: 600;
+      color: var(--fb-ink);
+    }
+
+    .mat-mdc-cell.mat-column-glider {
+      color: var(--fb-text-3);
+    }
+
+    .mat-mdc-cell.mat-column-description {
+      min-width: 200px;
+      line-height: 1.45;
+    }
+
+    .mat-mdc-cell.mat-column-instructor {
+      color: var(--fb-text-3);
+      white-space: nowrap;
+    }
+  }
+
+  .fb-row--pending {
+    background: var(--fb-warn-bg);
+  }
+
+  // Flex sits on the inner .fb-flight-actions, never on the <td> (redesign/INIT.md §4).
+  .validation-actions {
+    width: 1%;
+    white-space: nowrap;
+  }
+
+  .fb-flight-actions {
+    display: flex;
+    justify-content: flex-start;
+    gap: var(--fb-space-2);
+    min-width: 62px;
+  }
+
+  .numeric {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .fb-flight-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border-radius: var(--fb-radius-sm);
+
+    @include mat.icon-button-overrides(
+      (
+        state-layer-size: 28px,
+        icon-size: 15px,
+      )
+    );
+
+    .mat-icon {
+      font-size: 15px;
+      width: 15px;
+      height: 15px;
+    }
+
+    &--validate {
+      border: 1px solid var(--fb-success-border);
+      background: var(--fb-success-bg);
+      color: var(--fb-success-fg);
+
+      &:hover {
+        background: var(--fb-success-hover-bg);
+      }
+    }
+
+    &--reject {
+      border: 1px solid var(--fb-danger-border);
+      background: var(--fb-danger-bg);
+      color: var(--fb-on-danger-bg);
+
+      &:hover {
+        background: var(--fb-danger-hover-bg);
+      }
+    }
+  }
+
+  .fb-state-pill {
+    display: inline-block;
+    padding: 3px var(--fb-space-3);
+    border-radius: var(--fb-radius-pill);
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    white-space: nowrap;
+
+    &--paid {
+      background: var(--fb-success-bg);
+      color: var(--fb-success-fg);
+    }
+
+    &--rejected {
+      background: var(--fb-danger-bg);
+      color: var(--fb-on-danger-bg);
+    }
+
+    &--pending {
+      background: var(--fb-bg);
+      color: var(--fb-text-3);
+    }
+  }
+
+  // Sticky: the table above it can be wider than the card and scrolled sideways.
+  .fb-empty-state {
+    position: sticky;
+    left: 0;
+    box-sizing: border-box;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--fb-space-4);
+    padding: var(--fb-space-9);
+    text-align: center;
+
+    .mat-icon {
+      font-size: 32px;
+      width: 32px;
+      height: 32px;
+      color: var(--fb-text-4);
+    }
+
+    span {
+      font-size: var(--fb-text-sm);
+      color: var(--fb-text-3);
+    }
+  }
+
+  mat-paginator {
+    background: var(--fb-fill-subtle);
+    border-top: 1px solid var(--fb-surface-variant);
+  }
+}

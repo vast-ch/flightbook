@@ -1,16 +1,15 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, QueryList, ViewChild, ViewChildren, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatSidenavModule, MatSidenav } from '@angular/material/sidenav';
-import { MatListModule } from '@angular/material/list';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatTabsModule, MatTabChangeEvent, MatTabGroup } from '@angular/material/tabs';
-import { MatBadgeModule } from '@angular/material/badge';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { Subject, takeUntil } from 'rxjs';
+import { finalize, Subject, Subscription, takeUntil } from 'rxjs';
 import { AccountService } from 'src/app/core/services/account.service';
 import { SchoolService } from 'src/app/core/services/school.service';
 import { DeviceSizeService } from 'src/app/core/services/device-size.service';
@@ -32,11 +31,10 @@ import { forkJoin, of } from 'rxjs';
   imports: [
     CommonModule,
     MatSidenavModule,
-    MatListModule,
     MatButtonModule,
     MatIconModule,
-    MatTabsModule,
-    MatBadgeModule,
+    MatFormFieldModule,
+    MatSelectModule,
     MatTooltipModule,
     TranslateModule,
     TandemPilotDetailComponent
@@ -46,11 +44,18 @@ export class TandemPilotsComponent implements OnInit, OnDestroy {
   school: School | undefined;
   selectedTandemPilot: TandemPilot | undefined;
   @ViewChild(MatSidenav) sidenav: MatSidenav | undefined;
-  @ViewChild(MatTabGroup) tabGroup: MatTabGroup | undefined;
+  @ViewChildren('tabButton') tabButtons: QueryList<ElementRef<HTMLButtonElement>> | undefined;
   unsubscribe$ = new Subject<void>();
 
   tandemPilots: TandemPilot[];
   archivedTandemPilots: TandemPilot[];
+  sortBy: string = 'firstname';
+  selectedTabIndex = 0;
+  // Starts true: on a page reload the school only arrives after the first render.
+  listLoading = true;
+  // Held so a newer load can cancel an older one: rapid tab changes must never let a slower
+  // response select a pilot from the list that is no longer displayed.
+  private listSubscription: Subscription | undefined;
 
   constructor(
     private translate: TranslateService,
@@ -63,6 +68,12 @@ export class TandemPilotsComponent implements OnInit, OnDestroy {
   ) {
     this.tandemPilots = [];
     this.archivedTandemPilots = [];
+
+    effect(() => {
+      if (!this.deviceSize.isMobile()) {
+        this.sidenav?.open();
+      }
+    });
   }
 
   ngOnInit(): void {
@@ -73,7 +84,7 @@ export class TandemPilotsComponent implements OnInit, OnDestroy {
     this.accountService.changeSelectedSchool$.pipe(takeUntil(this.unsubscribe$)).subscribe((school: School) => {
       this.school = school;
       this.selectedTandemPilot = undefined;
-      if (this.tabGroup?.selectedIndex == 0) {
+      if (this.selectedTabIndex === 0) {
         this.syncTandemPilotList(false);
       } else {
         this.syncTandemPilotList(true);
@@ -86,14 +97,29 @@ export class TandemPilotsComponent implements OnInit, OnDestroy {
     this.unsubscribe$.complete();
   }
 
+  /** Both tabs share one tabpanel, so this is the only list the template iterates over. */
+  get displayedTandemPilots(): TandemPilot[] {
+    return this.selectedTabIndex === 0 ? this.tandemPilots : this.archivedTandemPilots;
+  }
+
+  initials(tandemPilot: TandemPilot): string {
+    const first = tandemPilot.user?.firstname?.charAt(0) || '';
+    const last = tandemPilot.user?.lastname?.charAt(0) || '';
+    return (first + last).toUpperCase();
+  }
+
   syncTandemPilotList(archived: boolean) {
     if (this.school?.id) {
-      this.schoolService.getTandemPilotsBySchoolId(this.school.id, archived).pipe(takeUntil(this.unsubscribe$)).subscribe((tandemPilots: TandemPilot[]) => {
+      // Unsubscribing runs the previous request's finalize, so the flag is set after it.
+      this.listSubscription?.unsubscribe();
+      this.listLoading = true;
+
+      this.listSubscription = this.schoolService.getTandemPilotsBySchoolId(this.school.id, archived).pipe(takeUntil(this.unsubscribe$), finalize(() => this.listLoading = false)).subscribe((tandemPilots: TandemPilot[]) => {
         if (archived) {
-          this.archivedTandemPilots = tandemPilots.sort(((obj1, obj2) => (obj1.user?.firstname && obj2.user?.firstname && obj1.user?.firstname > obj2.user?.firstname ? 1 : -1)));
+          this.archivedTandemPilots = this.sortTandemPilots(tandemPilots);
           this.selectedTandemPilot = this.archivedTandemPilots[0];
         } else {
-          this.tandemPilots = tandemPilots.sort(((obj1, obj2) => (obj1.user?.firstname && obj2.user?.firstname && obj1.user?.firstname > obj2.user?.firstname ? 1 : -1)));
+          this.tandemPilots = this.sortTandemPilots(tandemPilots);
           this.selectedTandemPilot = this.tandemPilots[0];
         }
       })
@@ -116,10 +142,11 @@ export class TandemPilotsComponent implements OnInit, OnDestroy {
       data: {
         title: this.translate.instant('tandemPilot.addTandemPilot')
       },
-      width: "500px"
+      width: "500px",
+      panelClass: "fb-email-dialog-panel"
     });
 
-    dialogRef.afterClosed().subscribe(response => {
+    dialogRef.afterClosed().pipe(takeUntil(this.unsubscribe$)).subscribe(response => {
       if (response?.event === "send") {
         this.addTandemPilot(response.value);
       }
@@ -149,12 +176,60 @@ export class TandemPilotsComponent implements OnInit, OnDestroy {
     });
   }
 
-  tabChange(event: MatTabChangeEvent) {
-    if (event.index == 0) {
+  tabChange(index: number) {
+    if (index === this.selectedTabIndex) {
+      return;
+    }
+
+    this.selectedTabIndex = index;
+    if (index === 0) {
       this.syncTandemPilotList(false);
     } else {
       this.syncTandemPilotList(true);
     }
+  }
+
+  /** WAI-ARIA APG tabs pattern: Left/Right (with wrap-around) and Home/End move focus and
+   *  select the tab, keeping the tablist a single Tab stop (roving tabindex in the template). */
+  onTabKeydown(event: KeyboardEvent): void {
+    const buttons = this.tabButtons?.toArray();
+    if (!buttons || buttons.length === 0) {
+      return;
+    }
+
+    const count = buttons.length;
+    let newIndex: number;
+    switch (event.key) {
+      case 'ArrowLeft':
+        newIndex = (this.selectedTabIndex - 1 + count) % count;
+        break;
+      case 'ArrowRight':
+        newIndex = (this.selectedTabIndex + 1) % count;
+        break;
+      case 'Home':
+        newIndex = 0;
+        break;
+      case 'End':
+        newIndex = count - 1;
+        break;
+      default:
+        return;
+    }
+
+    event.preventDefault();
+    this.tabChange(newIndex);
+    buttons[newIndex].nativeElement.focus();
+  }
+
+  selectSort(sortBy: string) {
+    this.sortBy = sortBy;
+    this.tandemPilots = this.sortTandemPilots(this.tandemPilots);
+    this.archivedTandemPilots = this.sortTandemPilots(this.archivedTandemPilots);
+  }
+
+  private sortTandemPilots(tandemPilots: TandemPilot[]): TandemPilot[] {
+    const key = this.sortBy === 'lastname' ? 'lastname' : 'firstname';
+    return [...tandemPilots].sort((a, b) => (a.user?.[key] || '').localeCompare(b.user?.[key] || ''));
   }
 
   exportAllPilotsData() {
@@ -162,10 +237,11 @@ export class TandemPilotsComponent implements OnInit, OnDestroy {
       width: '500px',
       data: {
         title: this.translate.instant('export.exportAllPilotsData')
-      }
+      },
+      panelClass: 'fb-email-dialog-panel'
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().pipe(takeUntil(this.unsubscribe$)).subscribe(result => {
       if (result && this.school?.id) {
         forkJoin([
           this.schoolService.getTandemPilotsBySchoolId(this.school.id, false),

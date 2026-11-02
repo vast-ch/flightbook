@@ -1,14 +1,61 @@
+@use '@angular/material' as mat;
+
+// Dialog-scoped styling, modelled on appointment-form-dialog: the CDK overlay renders outside
+// .fb-tandem-page, so the page partial can never reach it.
+[mat-dialog-title] {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--fb-ink);
+}
+
 mat-form-field {
   width: 100%;
-  margin-bottom: 16px;
+  // Material zeroes the dialog content's top padding after a title, so the floated label
+  // needs this clearance to render whole.
+  padding-top: 5px;
+
+  @include mat.form-field-overrides(
+    (
+      container-height: 40px,
+      container-vertical-padding: 8px,
+      outlined-label-text-size: 11px,
+      outlined-label-text-weight: 600,
+      outlined-label-text-tracking: 0.06em,
+      outlined-label-text-color: var(--fb-text-3),
+      outlined-container-shape: 9px,
+    )
+  );
 }
 
-mat-dialog-content {
-  min-width: 400px;
-  padding: 20px;
+// On mat-label, not .mdc-floating-label: that element belongs to MatFormField's own view and
+// does not carry this component's encapsulation attribute. mat-label is projected from here.
+mat-label {
+  text-transform: uppercase;
 }
 
-mat-error {
-  margin-top: 8px;
+.fb-form-row {
+  display: flex;
+  gap: 14px;
+
+  mat-form-field {
+    flex: 1;
+    min-width: 0;
+  }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 0;
+  }
+}
+
+// Negative: the fields above reserve an empty subscript line. Sized like a field-level error.
+form > mat-error {
   display: block;
+  margin: -6px 0 8px;
+  font-size: var(--fb-text-sm-plus);
+}
+
+mat-dialog-actions {
+  background: var(--fb-fill-subtle);
+  border-top: 1px solid var(--fb-surface-variant);
 }

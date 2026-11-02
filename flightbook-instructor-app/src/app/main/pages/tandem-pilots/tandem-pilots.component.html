@@ -1,39 +1,62 @@
-<mat-sidenav-container autosize>
-  <mat-sidenav #sidenav mode="side" opened>
-    <mat-list class="tandem-pilot-list">
-      <mat-list-item>
-        <button class="tandem-pilot-list-button" mat-raised-button color="primary" (click)=openEmailDialog()>{{'tandemPilot.addTandemPilot'| translate }}</button>
-        <button mat-icon-button color="primary" (click)="exportAllPilotsData()" matTooltip="{{ 'export.exportAllPilotsData' | translate }}">
-          <mat-icon>download</mat-icon>
+<mat-sidenav-container class="fb-tandem-page" autosize>
+  <mat-sidenav #sidenav mode="side" opened disableClose class="fb-list-pane">
+    <div class="fb-list-pane__add">
+      <button type="button" mat-raised-button color="primary" class="fb-add-tandem-button" (click)=openEmailDialog()>
+        <mat-icon>group_add</mat-icon>
+        {{ 'tandemPilot.addTandemPilot'| translate }}
+      </button>
+      <button type="button" mat-icon-button class="fb-export-all-button" [attr.aria-label]="'export.exportAllPilotsData' | translate"
+        [matTooltip]="'export.exportAllPilotsData' | translate" (click)="exportAllPilotsData()">
+        <mat-icon>download</mat-icon>
+      </button>
+    </div>
+
+    <div class="fb-tab-selector" role="tablist" [attr.aria-label]="'menu.tandemPilots' | translate" (keydown)="onTabKeydown($event)">
+      <button type="button" role="tab" id="fb-tandem-tab-active" #tabButton class="fb-tab" [class.fb-tab--active]="selectedTabIndex === 0"
+        [attr.aria-selected]="selectedTabIndex === 0" [attr.tabindex]="selectedTabIndex === 0 ? 0 : -1" aria-controls="fb-tandem-list-panel" (click)="tabChange(0)">
+        {{ 'tandemPilot.actif'| translate }}
+      </button>
+      <button type="button" role="tab" id="fb-tandem-tab-archived" #tabButton class="fb-tab" [class.fb-tab--active]="selectedTabIndex === 1"
+        [attr.aria-selected]="selectedTabIndex === 1" [attr.tabindex]="selectedTabIndex === 1 ? 0 : -1" aria-controls="fb-tandem-list-panel" (click)="tabChange(1)">
+        {{ 'tandemPilot.archived'| translate }}
+      </button>
+    </div>
+
+    <div class="fb-list-pane__sort">
+      <mat-form-field class="fb-sort-field" appearance="outline" subscriptSizing="dynamic">
+        <mat-label>{{ 'student.sort.sortBy' | translate }}</mat-label>
+        <mat-select [value]="sortBy" (selectionChange)="selectSort($event.value)">
+          <mat-option value="firstname">
+            {{ 'student.sort.firstname' | translate }}
+          </mat-option>
+          <mat-option value="lastname">
+            {{ 'student.sort.lastname' | translate }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div class="fb-tandem-list" id="fb-tandem-list-panel" role="tabpanel"
+      [attr.aria-labelledby]="selectedTabIndex === 0 ? 'fb-tandem-tab-active' : 'fb-tandem-tab-archived'">
+      @for (pilot of displayedTandemPilots; track pilot.id) {
+        <button type="button" class="fb-tandem-row" [class.fb-tandem-row--selected]="selectedTandemPilot?.id === pilot.id"
+          [attr.aria-current]="selectedTandemPilot?.id === pilot.id ? 'true' : null" (click)="tandemPilotDetail(pilot)">
+          <div class="fb-tandem-row__main">
+            <span class="fb-avatar">{{ initials(pilot) }}</span>
+            <span class="fb-tandem-row__name">{{ pilot.user?.firstname }} {{ pilot.user?.lastname }}</span>
+            <mat-icon class="fb-tandem-row__type" aria-hidden="true">group</mat-icon>
+          </div>
         </button>
-      </mat-list-item>
-      <mat-tab-group mat-align-tabs="start" (selectedTabChange)="tabChange($event)">
-        <mat-tab label="{{ 'tandemPilot.actif'| translate }}">
-          @for (tandemPilot of tandemPilots; track tandemPilot) {
-            <mat-list-item class="tandem-pilot-info" (click)=tandemPilotDetail(tandemPilot)>
-              <p class="tandem-pilot-name">
-                <span>{{ tandemPilot.user?.firstname }} {{ tandemPilot.user?.lastname }}</span>
-                <mat-icon>people</mat-icon>
-              </p>
-            </mat-list-item>
-          }
-        </mat-tab>
-        <mat-tab label="{{ 'tandemPilot.archived'| translate }}">
-          @for (tandemPilot of archivedTandemPilots; track tandemPilot) {
-            <mat-list-item class="tandem-pilot-info" (click)=tandemPilotDetail(tandemPilot)>
-              <p class="tandem-pilot-name">
-                <span>{{ tandemPilot.user?.firstname }} {{ tandemPilot.user?.lastname }}</span>
-                <mat-icon>people</mat-icon>
-              </p>
-            </mat-list-item>
-          }
-        </mat-tab>
-      </mat-tab-group>
-    </mat-list>
+      } @empty {
+        @if (!listLoading) {
+          <p class="fb-empty-list">{{ 'tandemPilot.noTandemPilots'| translate }}</p>
+        }
+      }
+    </div>
   </mat-sidenav>
 
   <mat-sidenav-content>
-    <fb-tandem-pilot-detail [tandemPilot]="selectedTandemPilot" [school]="school" (backButtonClick)=backButton()
-    (removeUserButtonClick)=syncTandemPilotList(false)></fb-tandem-pilot-detail>
+    <fb-tandem-pilot-detail [tandemPilot]="selectedTandemPilot" [school]="school" [listLoading]="listLoading" (backButtonClick)=backButton()
+    (removeUserButtonClick)="syncTandemPilotList(selectedTabIndex === 1)"></fb-tandem-pilot-detail>
   </mat-sidenav-content>
 </mat-sidenav-container>

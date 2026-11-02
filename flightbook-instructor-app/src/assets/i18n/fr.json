@@ -124,7 +124,9 @@
                 "comment": "Commentaire",
                 "PAID": "Payé",
                 "REJECTED": "Refusé",
-                "PENDING": "En attente"
+                "PENDING": "En attente",
+                "markPaid": "Marquer comme payé",
+                "markRejected": "Refuser le paiement"
             },
             "validationActions": "Actions",
             "validateAll": "Valide tous les vols avec le statut \"En attente\"",
@@ -170,7 +172,11 @@
         "archived": "Archivé",
         "noTandemPilotSelected": "Aucun pilote biplace n'a été sélectionné.",
         "passengerConfirmations": "Confirmations des passagers",
-        "pilotName": "Nom du pilote"
+        "pilotName": "Nom du pilote",
+        "roleLabel": "Pilote biplace",
+        "noTandemPilots": "Aucun pilote biplace.",
+        "archiveTandemPilot": "Archiver le pilote biplace",
+        "passengers": "Passagers"
     },
     "passengerConfirmation" : {
         "date": "Date",
