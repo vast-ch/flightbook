@@ -1135,6 +1135,33 @@
     background: var(--fb-warn-bg);
   }
 
+  // Validation state pill, same look as the appointment and tandem flight state pills.
+  .fb-state-pill {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: var(--fb-radius-pill);
+    font-size: var(--fb-text-2xs);
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    white-space: nowrap;
+
+    &--success {
+      background: var(--fb-success-bg);
+      color: var(--fb-success-fg);
+    }
+
+    &--danger {
+      background: var(--fb-danger-bg);
+      color: var(--fb-on-danger-bg);
+    }
+
+    &--pending {
+      background: var(--fb-bg);
+      color: var(--fb-text-3);
+    }
+  }
+
   // Validation action column - leftmost per the mockup, header intentionally blank. The
   // mockup uses a plain table cell with an inner flex wrapper (.fb-flight-actions below)
   // rather than flexing the <td> itself: `display: flex` on a <td> converts it from an

@@ -45,6 +45,8 @@ export class StudentDetailComponent implements OnInit, OnChanges, OnDestroy {
   @ViewChild('table') table: MatTable<Flight> | undefined;
   unsubscribe$ = new Subject<void>();
 
+  readonly FlightValidationState = FlightValidationState;
+
   // For reject comment modal
   showRejectCommentBox = false;
   rejectComment: string = '';

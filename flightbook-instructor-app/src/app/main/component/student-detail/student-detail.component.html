@@ -203,7 +203,11 @@
             <ng-container matColumnDef="validationState">
               <th class="validation-state" mat-header-cell *matHeaderCellDef>{{ 'student.flight.validationState.label'| translate }}</th>
               <td class="validation-state" mat-cell *matCellDef="let element">
-                <span [matTooltip]="element.validation?.comment ? element.validation.comment : ''"
+                <span class="fb-state-pill"
+                  [class.fb-state-pill--success]="element.validation?.state === FlightValidationState.VALIDATED"
+                  [class.fb-state-pill--danger]="element.validation?.state === FlightValidationState.REJECTED"
+                  [class.fb-state-pill--pending]="!isFlightValidated(element)"
+                  [matTooltip]="element.validation?.comment ? element.validation.comment : ''"
                   [matTooltipDisabled]="!element.validation?.comment">
                   @if (!element.validation || !element.validation.state || element.validation.state === '') {
                     {{ 'student.flight.validationState.PENDING'| translate }}
