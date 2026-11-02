@@ -21,12 +21,17 @@
 
   <span class="menu-spacer"></span>
 
-  <button type="button" class="fb-toolbar__school" [matMenuTriggerFor]="schoolMenu">
+  <button type="button" class="fb-toolbar__school" [matMenuTriggerFor]="schoolMenu" [title]="selectedSchool?.name ?? ''" [attr.aria-label]="selectedSchool?.name">
     <mat-icon class="fb-toolbar__school-icon">school</mat-icon>
     <span class="fb-toolbar__school-name">{{ selectedSchool?.name }}</span>
     <mat-icon class="fb-toolbar__school-caret">expand_more</mat-icon>
   </button>
   <mat-menu #schoolMenu="matMenu" [overlapTrigger]="false">
+    <!-- Phones only: the trigger hides the name there, and the list below skips the current school. -->
+    <button mat-menu-item disabled class="fb-toolbar__menu-current">
+      <mat-icon>check</mat-icon>
+      <span>{{ selectedSchool?.name }}</span>
+    </button>
     @for (school of schools; track school) {
       @if (school.id != selectedSchool?.id) {
         <button (click)="switchSchool(school)" mat-menu-item>

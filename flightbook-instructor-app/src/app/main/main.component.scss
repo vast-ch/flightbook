@@ -99,7 +99,9 @@ mat-toolbar.fb-toolbar {
   display: flex;
   align-items: center;
   gap: 8px;
-  flex: none;
+  // Shrinks instead of pushing the toolbar, and so the whole page, past the screen edge.
+  flex: 0 1 auto;
+  min-width: 0;
   height: 36px;
   padding: 0 12px;
   border: 1px solid var(--fb-border-subtle);
@@ -120,10 +122,16 @@ mat-toolbar.fb-toolbar {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  min-width: 0;
   max-width: 220px;
 }
 
+.fb-toolbar__menu-current {
+  display: none;
+}
+
 .fb-toolbar__school-icon {
+  flex: none;
   font-size: 17px;
   width: 17px;
   height: 17px;
@@ -132,6 +140,7 @@ mat-toolbar.fb-toolbar {
 }
 
 .fb-toolbar__school-caret {
+  flex: none;
   font-size: 16px;
   width: 16px;
   height: 16px;
@@ -212,12 +221,28 @@ mat-toolbar.fb-toolbar {
     border-bottom: solid 1px rgba(0, 0, 0, 0.12);
 }
 
-@media screen and (max-width: 570px) {
-    .responsive-menu {
-        display: block;
-    }
+// The toolbar has its own breakpoints: at 1000px the full nav and a 220px school name no longer fit.
+@media screen and (max-width: 1000px) {
+  .responsive-menu {
+    display: block;
+  }
 
-    .toolbar-link {
-        display: none;
-    }
- }
+  .toolbar-link {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .fb-toolbar__wordmark,
+  .fb-toolbar__school-name {
+    display: none;
+  }
+
+  .fb-toolbar__school {
+    padding: 0 8px;
+  }
+
+  .fb-toolbar__menu-current {
+    display: flex;
+  }
+}
