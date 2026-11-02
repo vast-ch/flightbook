@@ -1,12 +1,10 @@
-import { Component, EventEmitter, OnDestroy, OnInit, Output, Signal } from '@angular/core';
-import { ThemePalette } from '@angular/material/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSlideToggleChange } from '@angular/material/slide-toggle';
 import { firstValueFrom, Subject, takeUntil } from 'rxjs';
 import { AccountService } from 'src/app/core/services/account.service';
-import { DeviceSizeService } from 'src/app/core/services/device-size.service';
 import { SchoolService } from 'src/app/core/services/school.service';
-import { CustomFieldDefinition, FlightConfig } from 'src/app/shared/domain/school-config';
+import { CustomFieldDefinition } from 'src/app/shared/domain/school-config';
 import { School } from 'src/app/shared/domain/school';
 import { CustomFieldDialogComponent } from '../custom-field-dialog/custom-field-dialog.component';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
@@ -19,24 +17,16 @@ import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 })
 export class TandemConfigComponent implements OnInit, OnDestroy {
 
-  @Output() backButtonClick = new EventEmitter();
-
-  color: ThemePalette = 'primary';
   school?: School;
   customFields: CustomFieldDefinition[] = [];
-  displayedColumns: string[] = ['label', 'type', 'disabled', 'edit'];
-
-  get isMobile(): Signal<boolean> {
-    return this.deviceSize.isMobile;
-  }
+  displayedColumns: string[] = ['drag', 'label', 'type', 'disabled', 'edit'];
 
   unsubscribe$ = new Subject<void>();
 
   constructor(
     private schoolService: SchoolService,
     private accountService: AccountService,
-    private dialog: MatDialog,
-    private deviceSize: DeviceSizeService
+    private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
@@ -83,10 +73,11 @@ export class TandemConfigComponent implements OnInit, OnDestroy {
         field: { ...field },
         isNew: isNew
       },
-      width: '500px'
+      width: '500px',
+      panelClass: 'fb-email-dialog-panel'
     });
 
-    dialogRef.afterClosed().subscribe(response => {
+    dialogRef.afterClosed().pipe(takeUntil(this.unsubscribe$)).subscribe(response => {
       if (response?.event === 'save') {
         if (isNew) {
           this.addCustomField(response.value);
@@ -135,7 +126,7 @@ export class TandemConfigComponent implements OnInit, OnDestroy {
 
     try {
       await firstValueFrom(
-        this.schoolService.updateSchoolConfiguration(this.school.id, this.school.configuration)
+        this.schoolService.updateSchoolConfiguration(this.school.id, { tandemModule: this.school.configuration.tandemModule })
       );
       this.loadCustomFields();
     } catch (error) {
@@ -148,11 +139,11 @@ export class TandemConfigComponent implements OnInit, OnDestroy {
   }
 
   drop(event: CdkDragDrop<CustomFieldDefinition[]>) {
+    if (event.previousIndex === event.currentIndex) {
+      return;
+    }
+
     moveItemInArray(this.customFields, event.previousIndex, event.currentIndex);
     this.saveConfiguration();
-  }
-
-  backButton() {
-    this.backButtonClick.emit();
   }
 }

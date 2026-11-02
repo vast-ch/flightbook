@@ -1,40 +1,131 @@
+@use '@angular/material' as mat;
+
+// Dialog-scoped styling, modelled on appointment-form-dialog: the CDK overlay renders outside
+// .fb-configuration-page, so the page partial can never reach it.
+[mat-dialog-title] {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--fb-ink);
+}
+
 mat-form-field {
   width: 100%;
+  // Material zeroes the dialog content's top padding after a title, so the floated label
+  // needs this clearance to render whole.
+  padding-top: 5px;
+
+  @include mat.form-field-overrides(
+    (
+      container-height: 40px,
+      container-vertical-padding: 8px,
+      outlined-label-text-size: 11px,
+      outlined-label-text-weight: 600,
+      outlined-label-text-tracking: 0.06em,
+      outlined-label-text-color: var(--fb-text-3),
+      outlined-container-shape: 9px,
+    )
+  );
 }
 
-.toggle-row {
-  margin-bottom: 16px;
+// On mat-label, because the floating label element belongs to MatFormField's own view and does
+// not carry this component's encapsulation attribute. mat-label is projected from here.
+mat-label {
+  text-transform: uppercase;
 }
 
-.options-form {
+.fb-dialog-section {
+  margin: 4px 0 8px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--fb-text-3);
+}
+
+// On the host, via :has, because .mdc-switch belongs to MatSlideToggle's own view and does not
+// carry this component's encapsulation attribute.
+mat-slide-toggle:has(.mdc-switch:focus-visible) {
+  border-radius: 11px;
+  outline: 2px solid var(--fb-focus-ring);
+  outline-offset: 2px;
+}
+
+// The compound selector outranks mat.color-variants-backwards-compatibility: an uncoloured
+// toggle gets .mat-accent, which sets these same variables to the tertiary look.
+mat-slide-toggle.mat-mdc-slide-toggle.mat-accent {
+  @include mat.slide-toggle-overrides(
+    (
+      track-width: 38px,
+      track-height: 22px,
+      track-outline-width: 0,
+      selected-track-outline-width: 0,
+      selected-handle-size: 18px,
+      unselected-handle-size: 18px,
+      pressed-handle-size: 18px,
+      unselected-handle-horizontal-margin: 0 2px,
+      unselected-pressed-handle-horizontal-margin: 0 2px,
+      selected-handle-horizontal-margin: 0 18px,
+      selected-pressed-handle-horizontal-margin: 0 18px,
+      unselected-track-color: var(--fb-track-bg),
+      unselected-hover-track-color: var(--fb-track-bg),
+      unselected-focus-track-color: var(--fb-track-bg),
+      unselected-pressed-track-color: var(--fb-track-bg),
+      unselected-handle-color: var(--fb-surface),
+      unselected-hover-handle-color: var(--fb-surface),
+      unselected-focus-handle-color: var(--fb-surface),
+      unselected-pressed-handle-color: var(--fb-surface),
+      selected-track-color: var(--fb-primary),
+      selected-hover-track-color: var(--fb-primary),
+      selected-focus-track-color: var(--fb-primary),
+      selected-pressed-track-color: var(--fb-primary),
+      selected-handle-color: var(--fb-on-primary),
+      selected-hover-handle-color: var(--fb-on-primary),
+      selected-focus-handle-color: var(--fb-on-primary),
+      selected-pressed-handle-color: var(--fb-on-primary),
+      handle-elevation-shadow: 0 1px 3px rgba(16, 41, 60, 0.28),
+      label-text-size: var(--fb-text-base-plus),
+    )
+  );
+}
+
+.fb-toggle-row {
+  margin-bottom: 12px;
+}
+
+.fb-options-form {
   margin-top: 16px;
-  margin-bottom: 16px;
 }
 
-.options-header {
+.fb-options-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 12px;
 
-  mat-label {
-    font-size: 16px;
-    font-weight: 500;
+  .fb-dialog-section {
+    margin: 0;
   }
 }
 
-.option-item {
+.fb-option-item {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 8px;
   margin-bottom: 8px;
 
+  // 5px is the field's own padding-top: aligns with the box, not the box plus subscript.
   button {
-    flex-shrink: 0;
+    flex: none;
+    margin-top: 5px;
   }
 
-  .option-field {
+  mat-form-field {
     flex: 1;
-    margin-bottom: 0;
+    min-width: 0;
   }
+}
+
+mat-dialog-actions {
+  background: var(--fb-fill-subtle);
+  border-top: 1px solid var(--fb-surface-variant);
 }

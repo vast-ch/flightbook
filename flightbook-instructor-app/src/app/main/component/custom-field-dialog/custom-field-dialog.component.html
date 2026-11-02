@@ -1,6 +1,6 @@
 <h1 mat-dialog-title>{{ title | translate }}</h1>
 <mat-dialog-content [formGroup]="form">
-  <mat-form-field>
+  <mat-form-field appearance="outline" floatLabel="always">
     <mat-label>{{ 'tandemConfig.label' | translate }}</mat-label>
     <input matInput placeholder="{{ 'tandemConfig.label' | translate }}" formControlName="label" required>
     <mat-error>
@@ -8,7 +8,7 @@
     </mat-error>
   </mat-form-field>
 
-  <mat-form-field>
+  <mat-form-field appearance="outline" floatLabel="always">
     <mat-label>{{ 'tandemConfig.fieldType' | translate }}</mat-label>
     <mat-select formControlName="type" required>
       @for (type of fieldTypes; track type.value) {
@@ -19,32 +19,32 @@
     </mat-select>
   </mat-form-field>
 
-  <div class="toggle-row">
-    <mat-slide-toggle formControlName="required" color="primary">
+  <div class="fb-toggle-row">
+    <mat-slide-toggle formControlName="required" [hideIcon]="true">
       {{ 'tandemConfig.required' | translate }}
     </mat-slide-toggle>
   </div>
 
-  <div class="toggle-row">
-    <mat-slide-toggle formControlName="disabled" color="primary">
+  <div class="fb-toggle-row">
+    <mat-slide-toggle formControlName="disabled" [hideIcon]="true">
       {{ 'tandemConfig.disabled' | translate }}
     </mat-slide-toggle>
   </div>
 
   @if (showOptionsField) {
-    <div class="options-form" formArrayName="options">
-      <div class="options-header">
-        <mat-label>{{ 'tandemConfig.options' | translate }}</mat-label>
-        <button mat-mini-fab color="primary" type="button" (click)="addOption()">
+    <div class="fb-options-form" formArrayName="options">
+      <div class="fb-options-header">
+        <span class="fb-dialog-section">{{ 'tandemConfig.options' | translate }}</span>
+        <button mat-mini-fab color="primary" type="button" [attr.aria-label]="'tandemConfig.addOption' | translate" (click)="addOption()">
           <mat-icon>add</mat-icon>
         </button>
       </div>
       @for (option of options.controls; track option; let i = $index) {
-        <div class="option-item">
-          <button mat-icon-button color="warn" type="button" (click)="removeOption(i)" [disabled]="options.length === 1">
+        <div class="fb-option-item">
+          <button mat-icon-button color="warn" type="button" [attr.aria-label]="'tandemConfig.removeOption' | translate: { n: i + 1 }" (click)="removeOption(i)" [disabled]="options.length === 1">
             <mat-icon>remove</mat-icon>
           </button>
-          <mat-form-field class="option-field">
+          <mat-form-field appearance="outline" floatLabel="always">
             <mat-label>{{ 'tandemConfig.option' | translate }} {{i + 1}}</mat-label>
             <input matInput [formControlName]="i" required>
             <mat-error>

@@ -1,35 +1,23 @@
-<mat-sidenav-container autosize>
-  <mat-sidenav #sidenav mode="side" opened>
-    <mat-list class="config-list">
-      <mat-list-item class="config-item" (click)="openDetail('team')">
-        <p matLine>{{ 'team.title'| translate }}</p>
-      </mat-list-item>
-      <mat-list-item class="config-item" (click)="openDetail('appointmentType')">
-        <p matLine>{{ 'appointment.appointment'| translate }}</p>
-      </mat-list-item>
-      <mat-list-item class="config-item" (click)="openDetail('schoolSetting')">
-        <p matLine>{{ 'setting.title'| translate }}</p>
-      </mat-list-item>
-      @if (school?.configuration?.tandemModule?.active) {
-        <mat-list-item class="config-item" (click)="openDetail('tandemConfig')">
-          <p matLine>{{ 'tandemConfig.title' | translate }}</p>
-        </mat-list-item>
-      }
-    </mat-list>
-  </mat-sidenav>
+<div class="fb-configuration-page">
+  <header class="fb-config-header">
+    <div class="fb-config-header__titles">
+      <div class="fb-config-header__eyebrow">{{ school?.name }}</div>
+      <h1>{{ 'menu.configuration' | translate }}</h1>
+    </div>
+  </header>
 
-  <mat-sidenav-content>
-    @if (type=='team') {
-      <fb-team (backButtonClick)=backButton()></fb-team>
-    }
-    @if (type=='appointmentType') {
-      <fb-appointment-type (backButtonClick)=backButton()></fb-appointment-type>
-    }
-    @if (type=='schoolSetting') {
-      <fb-school-setting (backButtonClick)=backButton()></fb-school-setting>
-    }
-    @if (type=='tandemConfig') {
-      <fb-tandem-config (backButtonClick)=backButton()></fb-tandem-config>
-    }
-  </mat-sidenav-content>
-</mat-sidenav-container>
+  <div class="fb-config-grid">
+    <fb-school-setting></fb-school-setting>
+    <fb-team></fb-team>
+  </div>
+
+  <div class="fb-config-section">
+    <fb-appointment-type></fb-appointment-type>
+  </div>
+
+  @if (school?.configuration?.tandemModule?.active) {
+    <div class="fb-config-section">
+      <fb-tandem-config></fb-tandem-config>
+    </div>
+  }
+</div>

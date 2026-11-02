@@ -423,12 +423,23 @@
     "team": {
         "title": "Team",
         "addMember": "Mitglied hinzufügen",
-        "removeMessage": "Möchtest du $REPLACE_NAME wirklich aus dem Team entfernen?"
+        "removeMessage": "Möchtest du $REPLACE_NAME wirklich aus dem Team entfernen?",
+        "role": {
+            "owner": "Inhaber*in",
+            "instructor": "Fluglehrer*in"
+        },
+        "pagerLabel": "{{from}}–{{to}} von {{total}} Mitgliedern",
+        "noMembers": "0 Mitglieder",
+        "removeMember": "{{name}} entfernen",
+        "cannotRemoveSelf": "Du kannst dich nicht selbst entfernen",
+        "cannotRemoveOwner": "Inhaber*innen können nicht entfernt werden",
+        "previousPage": "Vorherige Seite",
+        "nextPage": "Nächste Seite"
     },
     "setting": {
         "title": "Einstellungen",
         "option": "Option",
-        "value": "Aktiviert",
+        "value": "Wert",
         "types": {
             "validateFlights": "Flüge validieren",
             "commentsOnSubscription": "Kommentar bei Anmeldung",
@@ -442,6 +453,7 @@
             "changeCalendar": "Kalender ändern",
             "selectCalendar": "Kalender auswählen",
             "primary": "Primär",
+            "noCalendars": "Keine beschreibbaren Kalender gefunden.",
             "save": "Speichern",
             "cancel": "Abbrechen"
         }
@@ -450,6 +462,12 @@
         "title": "Tandem Zusatzfelder",
         "addField": "Feld hinzufügen",
         "editField": "Feld bearbeiten",
+        "noData": "Keine Zusatzfelder vorhanden.",
+        "disableField": "{{label}} deaktivieren",
+        "editNamed": "{{label}} bearbeiten",
+        "dragToReorder": "Zum Sortieren ziehen",
+        "addOption": "Option hinzufügen",
+        "removeOption": "Option {{n}} entfernen",
         "label": "Bezeichnung",
         "labelRequired": "Bezeichnung ist erforderlich",
         "fieldType": "Typ",
@@ -473,6 +491,11 @@
     "appointmentType": {
         "title": "Terminart",
         "addType": "Hinzufügen",
+        "editType": "Terminart bearbeiten",
+        "noData": "Keine Terminarten vorhanden.",
+        "archiveType": "{{name}} archivieren",
+        "colorOf": "Farbe von {{name}}",
+        "editNamed": "{{name}} ändern",
         "name": "Name",
         "archive": "Archivieren",
         "edit": "Ändern",

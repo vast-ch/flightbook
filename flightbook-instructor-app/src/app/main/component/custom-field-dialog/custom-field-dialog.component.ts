@@ -47,6 +47,11 @@ export class CustomFieldDialogComponent implements OnInit {
       disabled: [this.customField.disabled],
       options: optionsArray
     });
+
+    // The API refuses a changed type, and every later tandem save would then fail too.
+    if (!this.isNew) {
+      this.form.get('type')?.disable();
+    }
   }
 
   ngOnInit(): void {

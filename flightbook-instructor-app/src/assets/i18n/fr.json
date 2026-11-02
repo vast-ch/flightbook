@@ -423,12 +423,23 @@
     "team": {
         "title": "Équipe",
         "addMember": "Ajouter un membre",
-        "removeMessage": "Veux-tu vraiment supprimer $REPLACE_NAME de ton équipe?"
+        "removeMessage": "Veux-tu vraiment supprimer $REPLACE_NAME de ton équipe?",
+        "role": {
+            "owner": "Propriétaire",
+            "instructor": "Instructeur"
+        },
+        "pagerLabel": "{{from}}–{{to}} sur {{total}} membres",
+        "noMembers": "0 membre",
+        "removeMember": "Retirer {{name}}",
+        "cannotRemoveSelf": "Tu ne peux pas te retirer toi-même",
+        "cannotRemoveOwner": "Les propriétaires ne peuvent pas être retirés",
+        "previousPage": "Page précédente",
+        "nextPage": "Page suivante"
     },
     "setting": {
         "title": "Configurations",
         "option": "Option",
-        "value": "Aktiviert",
+        "value": "Valeur",
         "types": {
             "validateFlights": "Valider les vols",
             "commentsOnSubscription": "Commentaire à l'inscription",
@@ -442,6 +453,7 @@
             "changeCalendar": "Changer de calendrier",
             "selectCalendar": "Sélectionner un calendrier",
             "primary": "Principal",
+            "noCalendars": "Aucun calendrier modifiable trouvé.",
             "save": "Enregistrer",
             "cancel": "Annuler"
         }
@@ -450,6 +462,12 @@
         "title": "Champs personnalisés tandem",
         "addField": "Ajouter un champ",
         "editField": "Modifier le champ",
+        "noData": "Aucun champ personnalisé.",
+        "disableField": "Désactiver {{label}}",
+        "editNamed": "Modifier {{label}}",
+        "dragToReorder": "Glisser pour réordonner",
+        "addOption": "Ajouter une option",
+        "removeOption": "Retirer l'option {{n}}",
         "label": "Libellé",
         "labelRequired": "Le libellé est requis",
         "fieldType": "Type",
@@ -471,8 +489,13 @@
         }
     },
     "appointmentType": {
-        "tite": "Type de rdv",
+        "title": "Type de rdv",
         "addType": "Ajouter",
+        "editType": "Modifier le type de rdv",
+        "noData": "Aucun type de rdv.",
+        "archiveType": "Archiver {{name}}",
+        "colorOf": "Couleur de {{name}}",
+        "editNamed": "Modifier {{name}}",
         "name": "Nom",
         "archive": "Archiver",
         "edit": "Modifier",
