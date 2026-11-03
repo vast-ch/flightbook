@@ -9,7 +9,7 @@
            visual state and the icon swap are this implementation's own addition - the mockup
            only shows an unwired calendar-icon button. -->
       <button type="button" class="fb-calendar-toggle" [class.fb-calendar-toggle--active]="appointmentView === 'calendar'"
-        [attr.aria-pressed]="appointmentView === 'calendar'" [title]="'appointment.calendar' | translate"
+        [attr.aria-pressed]="appointmentView === 'calendar'" [attr.aria-label]="'appointment.calendar' | translate" [matTooltip]="'appointment.calendar' | translate"
         (click)="toggleCalendarView()">
         <mat-icon>{{ appointmentView === 'calendar' ? 'format_list_bulleted' : 'calendar_month' }}</mat-icon>
       </button>
@@ -19,6 +19,7 @@
     </div>
   </header>
 
+  <div class="fb-appointment-body">
   @if (appointmentView === 'list') {
     <!-- Hand-rolled ARIA tablist (not mat-tab-group), mirroring students.component.html's
          Active/Archived tablist pattern. -->
@@ -60,7 +61,7 @@
       <!-- Shown at 768px and below only, where the instructor filter is collapsed. -->
       <button type="button" class="fb-filter-toggle" [class.fb-filter-toggle--active]="currentAppointmentFilter.instructorId"
         [attr.aria-expanded]="showAdvancedFilters" [attr.aria-label]="'appointment.advancedFilters' | translate"
-        [title]="'appointment.advancedFilters' | translate" (click)="toggleAdvancedFilters()">
+        [matTooltip]="'appointment.advancedFilters' | translate" (click)="toggleAdvancedFilters()">
         <mat-icon aria-hidden="true">{{ showAdvancedFilters ? 'expand_less' : 'expand_more' }}</mat-icon>
       </button>
 
@@ -91,24 +92,33 @@
           <!-- Action Column -->
           <ng-container matColumnDef="edit">
             <th mat-header-cell *matHeaderCellDef></th>
-            <td mat-cell *matCellDef="let element" (click)="editAppointment(element)">
-              <mat-icon>edit</mat-icon>
+            <td mat-cell *matCellDef="let element">
+              <button type="button" class="fb-row-action" [attr.aria-label]="'appointment.editAppointment' | translate"
+                [matTooltip]="'appointment.editAppointment' | translate" (click)="editAppointment(element)">
+                <mat-icon aria-hidden="true">edit</mat-icon>
+              </button>
             </td>
           </ng-container>
 
           <!-- Action Column -->
           <ng-container matColumnDef="subscription">
             <th mat-header-cell *matHeaderCellDef></th>
-            <td mat-cell *matCellDef="let element" (click)="subscriptionDetail(element)">
-              <mat-icon>group</mat-icon>
+            <td mat-cell *matCellDef="let element">
+              <button type="button" class="fb-row-action" [attr.aria-label]="'appointment.showRegistrations' | translate"
+                [matTooltip]="'appointment.showRegistrations' | translate" (click)="subscriptionDetail(element)">
+                <mat-icon aria-hidden="true">group</mat-icon>
+              </button>
             </td>
           </ng-container>
 
           <!-- Action Column -->
           <ng-container matColumnDef="list">
             <th mat-header-cell *matHeaderCellDef></th>
-            <td mat-cell *matCellDef="let element" (click)="printStudentList(element)">
-              <mat-icon>list_alt</mat-icon>
+            <td mat-cell *matCellDef="let element">
+              <button type="button" class="fb-row-action" [attr.aria-label]="'appointment.printRegistrations' | translate"
+                [matTooltip]="'appointment.printRegistrations' | translate" (click)="printStudentList(element)">
+                <mat-icon aria-hidden="true">list_alt</mat-icon>
+              </button>
             </td>
           </ng-container>
 
@@ -118,9 +128,9 @@
             <td mat-cell *matCellDef="let element">
               <div class="fb-date-cell">
                 <span class="fb-date-cell__day">{{ element.scheduling | date:'d':'UTC' }}</span>
-                <span class="fb-date-cell__month">{{ element.scheduling | date:'MMM':'UTC' }}</span>
+                <span class="fb-date-cell__month">{{ shortDatePart(element.scheduling, 'month') }}</span>
                 <span class="fb-date-cell__time">{{ element.scheduling | date:'HH:mm':'UTC' }}</span>
-                <span class="fb-date-cell__weekday">{{ element.scheduling | date:'EEE':'UTC' }}</span>
+                <span class="fb-date-cell__weekday">{{ shortDatePart(element.scheduling, 'weekday') }}</span>
               </div>
             </td>
           </ng-container>
@@ -239,4 +249,5 @@
       <full-calendar #calendar [options]="calendarOptions"></full-calendar>
     </div>
   }
+  </div>
 </div>

@@ -15,7 +15,6 @@
 // those use `--fb-text-3` (#5b7284) instead, same as every other small-text usage on the
 // student page.
 .fb-appointment-page {
-  padding: var(--fb-space-9);
   background: var(--fb-bg);
   font-family: Sora, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   color: var(--fb-ink);
@@ -25,30 +24,40 @@
   // ---------------------------------------------------------------------------------
   // Header
   // ---------------------------------------------------------------------------------
+  // White header band, same as the student, tandem and configuration pages.
   .fb-appointment-header {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     justify-content: space-between;
     flex-wrap: wrap;
-    gap: var(--fb-space-7);
-    margin-bottom: var(--fb-space-8);
+    gap: var(--fb-space-5) var(--fb-space-7);
+    padding: var(--fb-space-8) var(--fb-space-9);
+    background: var(--fb-surface);
+    border-bottom: 1px solid var(--fb-border-subtle);
   }
 
   .fb-appointment-header__titles {
     display: flex;
     flex-direction: column;
-    gap: var(--fb-space-2);
+    min-width: 0;
 
     h1 {
-      margin: 0;
+      margin: var(--fb-space-3) 0 0;
       font-size: var(--fb-text-4xl);
       font-weight: 600;
+      line-height: 1.05;
       letter-spacing: -0.025em;
       color: var(--fb-ink);
     }
   }
 
+  .fb-appointment-body {
+    padding: var(--fb-space-7) var(--fb-space-9) var(--fb-space-9);
+  }
+
   .fb-appointment-header__eyebrow {
+    min-height: 10px; // reserved: the school name can arrive after the first render
+    line-height: 1;
     font-size: var(--fb-text-xs);
     font-weight: 600;
     letter-spacing: 0.14em;
@@ -214,8 +223,6 @@
   }
 
   @media (max-width: 768px) {
-    padding: var(--fb-space-5);
-
     .fb-appointment-toolbar {
       gap: var(--fb-space-4);
     }
@@ -302,6 +309,22 @@
       background: var(--fb-surface);
       border-radius: 18px;
     }
+
+    // 36px like the chips next to it. Material's 24px select arrow and the select's baseline
+    // gap otherwise stretch the field to 43px whatever container-height says.
+    .mat-mdc-form-field-infix {
+      display: flex;
+      align-items: center;
+      box-sizing: border-box;
+      height: 36px;
+      min-height: 36px;
+      padding-top: 0;
+      padding-bottom: 0;
+    }
+
+    .mat-mdc-select {
+      display: block;
+    }
   }
 
   .fb-instructor-select__trigger {
@@ -325,50 +348,114 @@
   // ---------------------------------------------------------------------------------
   .fb-appointment-table-card {
     background: var(--fb-surface);
-    border: 1px solid var(--fb-border-subtle);
+    border: 1px solid var(--fb-border);
     border-radius: var(--fb-radius-lg);
     overflow: hidden;
   }
 
+  // Same table look as the tandem and configuration pages.
   .fb-table-scroll {
     overflow-x: auto;
     scrollbar-gutter: stable;
 
+    @include mat.table-overrides(
+      (
+        header-container-height: 34px,
+        row-item-outline-color: var(--fb-surface-variant),
+      )
+    );
+
     table {
       min-width: 960px;
     }
+
+    // Undoes the 48px global row height: the row height comes from the cell padding.
+    .mat-mdc-table .mdc-data-table__row {
+      height: auto;
+    }
+
+    .mat-mdc-header-cell {
+      padding: 11px var(--fb-space-6);
+      border-bottom-color: var(--fb-border-subtle);
+      line-height: normal;
+      font-size: var(--fb-text-xs);
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      color: var(--fb-text-3);
+      background: var(--fb-fill-subtle);
+    }
+
+    .mat-mdc-cell {
+      padding: 13px var(--fb-space-6);
+      font-size: var(--fb-text-base);
+      color: var(--fb-text-2);
+    }
+
+    .mat-mdc-header-cell:first-child,
+    .mat-mdc-cell:first-child {
+      padding-left: var(--fb-space-8);
+    }
+
+    .mat-mdc-header-cell:last-child,
+    .mat-mdc-cell:last-child {
+      padding-right: var(--fb-space-8);
+    }
+
+    // The three row actions sit close together, as one group.
+    .mat-column-edit,
+    .mat-column-subscription,
+    .mat-column-list {
+      width: 1%;
+      white-space: nowrap;
+    }
+
+    .mat-mdc-header-cell.mat-column-edit,
+    .mat-mdc-header-cell.mat-column-subscription,
+    .mat-mdc-cell.mat-column-edit,
+    .mat-mdc-cell.mat-column-subscription {
+      padding-right: 0;
+    }
+
+    .mat-mdc-header-cell.mat-column-subscription,
+    .mat-mdc-header-cell.mat-column-list,
+    .mat-mdc-cell.mat-column-subscription,
+    .mat-mdc-cell.mat-column-list {
+      padding-left: var(--fb-space-2);
+    }
   }
 
-  .mat-mdc-header-cell {
-    padding: 11px 14px;
-    font-size: var(--fb-text-xs);
-    font-weight: 600;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--fb-text-3);
-    background: var(--fb-fill-subtle);
-    border-bottom: 1px solid var(--fb-border-subtle);
-  }
-
-  .mat-mdc-cell {
-    padding: 12px 14px;
-    font-size: var(--fb-text-base);
-    color: var(--fb-text-2);
-    border-bottom: 1px solid var(--fb-surface-variant);
-  }
-
-  .mat-column-edit,
-  .mat-column-subscription,
-  .mat-column-list {
-    width: 1%;
-    white-space: nowrap;
+  // Same bordered row button as the configuration tables.
+  .fb-row-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: 1px solid var(--fb-border-subtle);
+    border-radius: 8px;
+    background: var(--fb-surface);
+    vertical-align: middle;
     cursor: pointer;
 
+    &:hover {
+      background: var(--fb-bg);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--fb-focus-ring);
+      outline-offset: 2px;
+    }
+
+    // Global `table .mat-icon { height: 21px }` would otherwise win.
     .mat-icon {
-      font-size: 18px;
-      width: 18px;
-      height: 18px;
-      color: var(--fb-text-3);
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+      color: var(--fb-text-2);
     }
   }
 
@@ -533,6 +620,21 @@
       border-bottom-style: solid;
       border-bottom-width: 1px;
       padding-left: 3px;
+    }
+  }
+
+  // ---------------------------------------------------------------------------------
+  // Mobile page gutter, 12px on every page. Last in the file: same specificity as the
+  // base rules above, so source order decides.
+  // ---------------------------------------------------------------------------------
+  @media (max-width: 768px) {
+    .fb-appointment-header {
+      padding-left: var(--fb-space-5);
+      padding-right: var(--fb-space-5);
+    }
+
+    .fb-appointment-body {
+      padding: var(--fb-space-5);
     }
   }
 }

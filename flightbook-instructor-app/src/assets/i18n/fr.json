@@ -7,9 +7,7 @@
         "tandemPilots": "Pilote biplace",
         "team": "Équipe",
         "configuration": "Configuration",
-        "openMenu": "Ouvrir le menu",
-        "closeMenu": "Fermer le menu",
-        "title": "Menu"
+        "openMenu": "Ouvrir le menu"
     },
     "language": {
         "fr": "Français",
@@ -204,6 +202,7 @@
         "subscriptionComment": "Commentaire à l'inscription"
     },
     "studentNote": {
+        "noNotes": "Aucune note pour le moment",
         "date": "Date",
         "title": "Notes",
         "addNote": "Ajouter une note",
@@ -377,6 +376,9 @@
         "skip": "Passer"
     },
     "appointment": {
+        "editAppointment": "Modifier le rendez-vous",
+        "showRegistrations": "Afficher les inscriptions",
+        "printRegistrations": "Imprimer la liste des inscriptions",
         "appointment": "Rendez-vous",
         "calendar": "Calendrier",
         "list": "Liste",

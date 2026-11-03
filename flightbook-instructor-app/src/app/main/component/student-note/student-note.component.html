@@ -48,10 +48,10 @@
           <span class="fb-note-row__text">{{ note.text }}</span>
           @if (!student?.isArchived) {
             <div class="fb-note-row__actions">
-              <button type="button" class="fb-note-icon-btn fb-note-icon-btn--edit" [attr.aria-label]="'studentNote.edit' | translate" (click)="editNote(note)">
+              <button type="button" class="fb-note-icon-btn fb-note-icon-btn--edit" [attr.aria-label]="'studentNote.edit' | translate" [matTooltip]="'studentNote.edit' | translate" (click)="editNote(note)">
                 <mat-icon>edit</mat-icon>
               </button>
-              <button type="button" class="fb-note-icon-btn fb-note-icon-btn--delete" [attr.aria-label]="'studentNote.remove' | translate" (click)="removeNote(note)">
+              <button type="button" class="fb-note-icon-btn fb-note-icon-btn--delete" [attr.aria-label]="'studentNote.remove' | translate" [matTooltip]="'studentNote.remove' | translate" (click)="removeNote(note)">
                 <mat-icon>delete</mat-icon>
               </button>
             </div>
@@ -65,7 +65,17 @@
         </div>
       </div>
     }
+  } @empty {
+    @if (!(displayAddNote && mode === 'new')) {
+      <div class="fb-empty-state">
+        <mat-icon aria-hidden="true">sticky_note_2</mat-icon>
+        <span>{{ 'studentNote.noNotes' | translate }}</span>
+      </div>
+    }
   }
 </div>
-<mat-paginator #paginator [length]="notesPagerEntity.totalItems" [pageSize]="notesPagerEntity.itemsPerPage" [pageSizeOptions]="[5, 10, 20, 50]" (page)="handleNotePage($event)">
-</mat-paginator>
+<!-- No pager without notes: the empty state above says enough. -->
+@if (notesPagerEntity.totalItems) {
+  <mat-paginator #paginator [length]="notesPagerEntity.totalItems" [pageSize]="notesPagerEntity.itemsPerPage" [pageSizeOptions]="[5, 10, 20, 50]" (page)="handleNotePage($event)">
+  </mat-paginator>
+}

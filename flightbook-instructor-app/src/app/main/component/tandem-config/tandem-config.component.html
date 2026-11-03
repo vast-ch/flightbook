@@ -1,10 +1,7 @@
 <mat-card appearance="outlined" class="fb-card">
   <div class="fb-card__header">
     <h2 class="fb-card__title">{{ 'tandemConfig.title' | translate }}</h2>
-    <button type="button" mat-raised-button color="primary" class="fb-primary-action" (click)="openCustomFieldForm()">
-      <mat-icon aria-hidden="true">add_circle</mat-icon>
-      {{ 'tandemConfig.addField' | translate }}
-    </button>
+    <button type="button" class="fb-text-action" (click)="openCustomFieldForm()">{{ 'tandemConfig.addField' | translate }}</button>
   </div>
   <div class="fb-table-scroll fb-table-scroll--fields">
     <table mat-table [dataSource]="customFields" cdkDropList (cdkDropListDropped)="drop($event)">
@@ -13,7 +10,7 @@
       <ng-container matColumnDef="drag">
         <th mat-header-cell *matHeaderCellDef></th>
         <td mat-cell *matCellDef="let element">
-          <span class="fb-drag-handle" cdkDragHandle [title]="'tandemConfig.dragToReorder' | translate">
+          <span class="fb-drag-handle" cdkDragHandle [matTooltip]="'tandemConfig.dragToReorder' | translate">
             <mat-icon aria-hidden="true">drag_indicator</mat-icon>
           </span>
         </td>

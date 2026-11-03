@@ -58,7 +58,7 @@
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(360px, 100%), 1fr));
     gap: var(--fb-space-7);
-    padding: var(--fb-space-8) var(--fb-space-9) var(--fb-space-9);
+    padding: var(--fb-space-7) var(--fb-space-9);
 
     .fb-card {
       height: 100%;
@@ -66,8 +66,13 @@
     }
   }
 
+  // 16px between sections, like the cards on the other pages; 24px after the last one.
   .fb-config-section {
-    padding: 0 var(--fb-space-9) var(--fb-space-9);
+    padding: 0 var(--fb-space-9) var(--fb-space-7);
+
+    &:last-child {
+      padding-bottom: var(--fb-space-9);
+    }
   }
 
   fb-team,
@@ -115,8 +120,8 @@
   }
 
   .fb-primary-action {
-    height: 34px;
-    padding: 0 13px;
+    height: 36px;
+    padding: 0 var(--fb-space-6);
 
     @include mat.button-overrides(
       (
@@ -126,7 +131,7 @@
     );
 
     &.mat-mdc-raised-button {
-      font-size: var(--fb-text-base);
+      font-size: var(--fb-text-base-plus);
       font-weight: 600;
     }
 
@@ -205,6 +210,10 @@
     font-weight: 600;
     color: var(--fb-primary);
     cursor: pointer;
+
+    &:hover {
+      color: var(--fb-primary-hover);
+    }
   }
 
   // ---------------------------------------------------------------------------------

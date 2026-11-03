@@ -280,6 +280,26 @@ export class AppointmentsComponent implements OnInit, OnDestroy, AfterViewInit {
     this.refreshTabCounts();
   }
 
+  /** Short month or weekday in the app language. The date pipe only knows en-US here: no other
+   *  locale data is registered. Trailing dots ("Di.", "nov.") are dropped for the compact cell. */
+  shortDatePart(date: Date | string | undefined, part: 'month' | 'weekday'): string {
+    if (!date) {
+      return '';
+    }
+    const lang = this.translate.currentLang || this.translate.defaultLang || 'de';
+    const key = `${lang}-${part}`;
+    let formatter = this.dateFormatters.get(key);
+    if (!formatter) {
+      formatter = new Intl.DateTimeFormat(lang, part === 'month'
+        ? { month: 'short', timeZone: 'UTC' }
+        : { weekday: 'short', timeZone: 'UTC' });
+      this.dateFormatters.set(key, formatter);
+    }
+    return formatter.format(new Date(date)).replace(/\.$/, '');
+  }
+
+  private dateFormatters = new Map<string, Intl.DateTimeFormat>();
+
   get selectedInstructorLabel(): string {
     const instructorId = this.currentAppointmentFilter.instructorId;
     if (!instructorId) {

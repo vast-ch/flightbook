@@ -28,6 +28,9 @@
     background: var(--fb-surface);
     border-right: 1px solid var(--fb-border-subtle);
 
+    // M3 rounds the sidenav's outer corners; the list pane is a flat column, like the drawer.
+    @include mat.sidenav-overrides((container-shape: 0));
+
     @media (max-width: 768px) {
       width: 100%;
     }
@@ -541,6 +544,16 @@
       font-size: var(--fb-text-base);
       color: var(--fb-text-2);
     }
+
+    .mat-mdc-header-cell:first-child,
+    .mat-mdc-cell:first-child {
+      padding-left: var(--fb-space-8);
+    }
+
+    .mat-mdc-header-cell:last-child,
+    .mat-mdc-cell:last-child {
+      padding-right: var(--fb-space-8);
+    }
   }
 
   .fb-table-scroll--passengers {
@@ -581,7 +594,7 @@
   .fb-ads-pill {
     display: inline-flex;
     padding: 2px var(--fb-space-3);
-    border-radius: 5px;
+    border-radius: var(--fb-radius-pill);
     background: var(--fb-bg);
     font-size: var(--fb-text-xs-plus);
     font-weight: 600;
@@ -690,7 +703,7 @@
     display: inline-block;
     padding: 3px var(--fb-space-3);
     border-radius: var(--fb-radius-pill);
-    font-size: 9px;
+    font-size: var(--fb-text-2xs);
     font-weight: 600;
     letter-spacing: 0.06em;
     text-transform: uppercase;

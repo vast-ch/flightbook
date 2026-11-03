@@ -87,14 +87,14 @@
 </mat-form-field>
 <div class="fb-subscription-section" formArrayName="subscriptions">
   <div class="fb-subscription-header">
-    <button type="button" class="fb-subscription-add" [attr.aria-label]="'appointment.subscribeStudent' | translate" [title]="'appointment.subscribeStudent' | translate" (click)="addSubscription()">
+    <button type="button" class="fb-subscription-add" [attr.aria-label]="'appointment.subscribeStudent' | translate" [matTooltip]="'appointment.subscribeStudent' | translate" (click)="addSubscription()">
       <mat-icon aria-hidden="true">add</mat-icon>
     </button>
     <span class="fb-subscription-title">{{ 'appointment.subscribeStudent'| translate }}</span>
   </div>
   @for (subscription of subscriptions.controls; track subscription; let i = $index) {
     <div class="fb-subscription-row" [formGroupName]="i" #subscriptionFormList>
-      <button type="button" class="fb-subscription-remove" [attr.aria-label]="'appointment.removeSubscription' | translate" [title]="'appointment.removeSubscription' | translate" (click)="removeSubscription(i, selectStudent.value)">
+      <button type="button" class="fb-subscription-remove" [attr.aria-label]="'appointment.removeSubscription' | translate" [matTooltip]="'appointment.removeSubscription' | translate" (click)="removeSubscription(i, selectStudent.value)">
         <mat-icon aria-hidden="true">remove</mat-icon>
       </button>
       <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
@@ -114,14 +114,14 @@
 </div>
 <div class="fb-subscription-section" formArrayName="guestSubscriptions">
   <div class="fb-subscription-header">
-    <button type="button" class="fb-subscription-add" [attr.aria-label]="'appointment.guestSubscribeStudent' | translate" [title]="'appointment.guestSubscribeStudent' | translate" (click)="addGuestSubscription()">
+    <button type="button" class="fb-subscription-add" [attr.aria-label]="'appointment.guestSubscribeStudent' | translate" [matTooltip]="'appointment.guestSubscribeStudent' | translate" (click)="addGuestSubscription()">
       <mat-icon aria-hidden="true">add</mat-icon>
     </button>
     <span class="fb-subscription-title">{{ 'appointment.guestSubscribeStudent'| translate }}</span>
   </div>
   @for (guestSubscriptions of guestSubscriptions.controls; track guestSubscriptions; let i = $index) {
     <div class="fb-subscription-row" [formGroupName]="i" #guestSubscriptionFormList>
-      <button type="button" class="fb-subscription-remove" [attr.aria-label]="'appointment.removeSubscription' | translate" [title]="'appointment.removeSubscription' | translate" (click)="removeGuestSubscription(i)">
+      <button type="button" class="fb-subscription-remove" [attr.aria-label]="'appointment.removeSubscription' | translate" [matTooltip]="'appointment.removeSubscription' | translate" (click)="removeGuestSubscription(i)">
         <mat-icon aria-hidden="true">remove</mat-icon>
       </button>
       <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">

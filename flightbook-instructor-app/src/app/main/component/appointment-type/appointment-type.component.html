@@ -1,10 +1,7 @@
 <mat-card appearance="outlined" class="fb-card">
   <div class="fb-card__header">
     <h2 class="fb-card__title">{{ 'appointmentType.title'| translate }}</h2>
-    <button type="button" mat-raised-button color="primary" class="fb-primary-action" (click)="openAppointmentTypeForm()">
-      <mat-icon aria-hidden="true">add_circle</mat-icon>
-      {{ 'appointmentType.addType'| translate }}
-    </button>
+    <button type="button" class="fb-text-action" (click)="openAppointmentTypeForm()">{{ 'appointmentType.addType'| translate }}</button>
   </div>
   <div class="fb-table-scroll fb-table-scroll--types">
     <table mat-table [dataSource]="appointmentTypes">
@@ -23,7 +20,7 @@
             type="color"
             class="fb-color-input"
             [attr.aria-label]="'appointmentType.colorOf' | translate: { name: element.name }"
-            [title]="'appointmentType.colorOf' | translate: { name: element.name }"
+            [matTooltip]="'appointmentType.colorOf' | translate: { name: element.name }"
             [value]="element.color || '#3880ff'"
             (change)="changeColor($event.target.value, element)"
           />

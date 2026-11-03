@@ -21,7 +21,7 @@
 
   <span class="menu-spacer"></span>
 
-  <button type="button" class="fb-toolbar__school" [matMenuTriggerFor]="schoolMenu" [title]="selectedSchool?.name ?? ''" [attr.aria-label]="selectedSchool?.name">
+  <button type="button" class="fb-toolbar__school" [matMenuTriggerFor]="schoolMenu" [matTooltip]="selectedSchool?.name ?? ''" [attr.aria-label]="selectedSchool?.name">
     <mat-icon class="fb-toolbar__school-icon">school</mat-icon>
     <span class="fb-toolbar__school-name">{{ selectedSchool?.name }}</span>
     <mat-icon class="fb-toolbar__school-caret">expand_more</mat-icon>
@@ -41,11 +41,11 @@
     }
   </mat-menu>
 
-  <button type="button" class="fb-toolbar__icon-btn" [title]="'buttons.export' | translate" [attr.aria-label]="'buttons.export' | translate" (click)="openExportDialog()">
+  <button type="button" class="fb-toolbar__icon-btn" [matTooltip]="'buttons.export' | translate" [attr.aria-label]="'buttons.export' | translate" (click)="openExportDialog()">
     <mat-icon class="fb-toolbar__icon-btn-icon">download</mat-icon>
   </button>
 
-  <button type="button" class="fb-toolbar__account" [matMenuTriggerFor]="accountMenu" [title]="'account.title' | translate" [attr.aria-label]="'account.title' | translate">
+  <button type="button" class="fb-toolbar__account" [matMenuTriggerFor]="accountMenu" [matTooltip]="'account.title' | translate" [attr.aria-label]="'account.title' | translate">
     {{ accountInitials }}
   </button>
   <mat-menu #accountMenu="matMenu" [overlapTrigger]="false">
@@ -62,12 +62,6 @@
 
 <mat-sidenav-container class="menu-sidenav-container">
   <mat-sidenav #menuSidenav [autoFocus]="false">
-    <div class="fb-drawer__header">
-      <span class="fb-drawer__title">{{ 'menu.title' | translate }}</span>
-      <button type="button" class="fb-drawer__close" [attr.aria-label]="'menu.closeMenu' | translate" (click)="menuSidenav.close()">
-        <mat-icon aria-hidden="true">close</mat-icon>
-      </button>
-    </div>
     <nav>
       <a class="fb-drawer__link" routerLinkActive="fb-drawer__link--active" (click)="menuSidenav.close()" [routerLink]="'/students'">{{ 'menu.students'| translate }}</a>
       <a class="fb-drawer__link" routerLinkActive="fb-drawer__link--active" (click)="menuSidenav.close()" [routerLink]="'/appointments'">{{ 'menu.appointments'| translate }}</a>

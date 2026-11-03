@@ -7,9 +7,7 @@
         "tandemPilots": "Tandempiloten",
         "team": "Team",
         "configuration": "Konfiguration",
-        "openMenu": "Menü öffnen",
-        "closeMenu": "Menü schliessen",
-        "title": "Menü"
+        "openMenu": "Menü öffnen"
     },
     "language": {
         "fr": "Französisch",
@@ -204,6 +202,7 @@
         "subscriptionComment": "Kommentar bei Anmeldung"
     },
     "studentNote": {
+        "noNotes": "Noch keine Notizen",
         "date": "Datum",
         "title": "Notizen",
         "addNote": "Notiz hinzufügen",
@@ -377,6 +376,9 @@
         "skip": "Überspringen"
     },
     "appointment": {
+        "editAppointment": "Termin bearbeiten",
+        "showRegistrations": "Anmeldungen anzeigen",
+        "printRegistrations": "Anmeldeliste drucken",
         "appointment": "Termin",
         "calendar": "Kalender",
         "list": "Liste",

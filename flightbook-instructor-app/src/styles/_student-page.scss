@@ -25,6 +25,9 @@
     background: var(--fb-surface);
     border-right: 1px solid var(--fb-border-subtle);
 
+    // M3 rounds the sidenav's outer corners; the list pane is a flat column, like the drawer.
+    @include mat.sidenav-overrides((container-shape: 0));
+
     @media (max-width: 768px) {
       width: 100%;
     }
@@ -44,6 +47,8 @@
     @include mat.button-overrides(
       (
         protected-container-shape: 10px,
+        protected-label-text-size: var(--fb-text-md),
+        protected-label-text-weight: 600,
       )
     );
   }
@@ -170,9 +175,11 @@
       outline-offset: -2px;
     }
 
-    &--selected {
-      background: var(--fb-surface-active);
-      box-shadow: inset 3px 0 0 var(--fb-primary);
+    // Same selected look as the tandem list and the drawer.
+    &--selected,
+    &--selected:hover {
+      background: var(--fb-nav-active-bg);
+      box-shadow: inset 3px 0 0 var(--fb-tertiary);
 
       .fb-student-row__name {
         font-weight: 700;
@@ -382,7 +389,7 @@
 
   .fb-badge-success {
     padding: 2px 7px;
-    border-radius: 5px;
+    border-radius: var(--fb-radius-pill);
     background: var(--fb-success-bg);
     font-size: var(--fb-text-2xs);
     font-weight: 600;
@@ -402,14 +409,13 @@
   @media (max-width: 768px) {
     .fb-detail-header {
       gap: var(--fb-space-4) var(--fb-space-5);
-      padding: var(--fb-space-7) var(--fb-space-5);
+      padding: var(--fb-space-8) var(--fb-space-5);
     }
 
     .fb-detail-header__title {
       flex: 1 1 calc(100% - 36px - var(--fb-space-5));
 
       h1 {
-        font-size: var(--fb-text-3xl);
         line-height: 1.15;
         overflow-wrap: anywhere;
       }
@@ -1131,27 +1137,54 @@
     }
   }
 
+  // Same table look as the appointment, tandem and configuration pages.
   .fb-table-scroll {
     overflow-x: auto;
     scrollbar-gutter: stable;
 
+    @include mat.table-overrides(
+      (
+        header-container-height: 34px,
+        row-item-outline-color: var(--fb-surface-variant),
+      )
+    );
+
     table {
       min-width: 1080px;
     }
-  }
 
-  .mat-mdc-header-cell {
-    font-size: var(--fb-text-xs);
-    font-weight: 600;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--fb-text-3);
-    background: var(--fb-fill-subtle);
-  }
+    // Undoes the 48px global row height: the row height comes from the cell padding.
+    .mat-mdc-table .mdc-data-table__row {
+      height: auto;
+    }
 
-  .mat-mdc-cell {
-    font-size: var(--fb-text-base);
-    color: var(--fb-text-2);
+    .mat-mdc-header-cell {
+      padding: 11px var(--fb-space-6);
+      border-bottom-color: var(--fb-border-subtle);
+      line-height: normal;
+      font-size: var(--fb-text-xs);
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--fb-text-3);
+      background: var(--fb-fill-subtle);
+    }
+
+    .mat-mdc-cell {
+      padding: 13px var(--fb-space-6);
+      font-size: var(--fb-text-base);
+      color: var(--fb-text-2);
+    }
+
+    .mat-mdc-header-cell:first-child,
+    .mat-mdc-cell:first-child {
+      padding-left: var(--fb-space-8);
+    }
+
+    .mat-mdc-header-cell:last-child,
+    .mat-mdc-cell:last-child {
+      padding-right: var(--fb-space-8);
+    }
   }
 
   // "Awaiting validation" is a pending state, not an error - use the warm/cream warn
@@ -1197,7 +1230,6 @@
   .validation-actions {
     width: 1%;
     white-space: nowrap;
-    padding: 13px 14px;
   }
 
   .fb-flight-actions {
@@ -1338,6 +1370,25 @@
     &:focus-visible {
       outline: 2px solid var(--fb-focus-ring);
       outline-offset: 2px;
+    }
+  }
+
+  // Card body that only holds one action, e.g. "add control sheet".
+  .fb-card__empty-action {
+    padding: var(--fb-space-7) var(--fb-space-8);
+  }
+
+  .fb-card-button {
+    height: 36px;
+    padding: 0 var(--fb-space-6);
+
+    &.mat-mdc-raised-button {
+      font-size: var(--fb-text-base-plus);
+      font-weight: 600;
+    }
+
+    &:hover {
+      --mat-button-protected-container-color: var(--fb-primary-active);
     }
   }
 

@@ -69,7 +69,9 @@
       </mat-expansion-panel>
     </mat-accordion>
   } @else {
-    <button mat-raised-button color="primary" (click)="addControlSheet()">{{ 'buttons.addControlSheet'| translate }}</button>
+    <div class="fb-card__empty-action">
+      <button type="button" mat-raised-button color="primary" class="fb-card-button" (click)="addControlSheet()">{{ 'buttons.addControlSheet'| translate }}</button>
+    </div>
   }
 }
 
