@@ -46,6 +46,8 @@ export class AppointmentsComponent implements OnInit, OnDestroy, AfterViewInit {
 
   // List/calendar toggle (replaces the old List/Calendar mat-tab-group) - see toggleCalendarView().
   appointmentView: 'list' | 'calendar' = 'list';
+  // Mobile only. The filter survives in SchoolService, so an active one must not start hidden.
+  showAdvancedFilters = false;
   // Upcoming/Past tablist - see selectTab().
   appointmentTab: 'upcoming' | 'past' = 'upcoming';
   upcomingCount = 0;
@@ -81,6 +83,7 @@ export class AppointmentsComponent implements OnInit, OnDestroy, AfterViewInit {
     private cdr: ChangeDetectorRef
   ) {
     this.currentAppointmentFilter = this.schoolService.filter;
+    this.showAdvancedFilters = !!this.currentAppointmentFilter.instructorId;
     this.appointments = [];
     this.datePipe = new DatePipe('en-US');
     this.calendarOptions.locale = this.translate.currentLang;
@@ -250,6 +253,10 @@ export class AppointmentsComponent implements OnInit, OnDestroy, AfterViewInit {
     if (this.school?.id) {
       this.loadAppointments(this.school.id, offset, event.pageSize);
     }
+  }
+
+  toggleAdvancedFilters() {
+    this.showAdvancedFilters = !this.showAdvancedFilters;
   }
 
   changeState(state: State) {

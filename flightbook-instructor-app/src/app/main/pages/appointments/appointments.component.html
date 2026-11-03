@@ -57,9 +57,16 @@
         </button>
       </div>
 
+      <!-- Shown at 768px and below only, where the instructor filter is collapsed. -->
+      <button type="button" class="fb-filter-toggle" [class.fb-filter-toggle--active]="currentAppointmentFilter.instructorId"
+        [attr.aria-expanded]="showAdvancedFilters" [attr.aria-label]="'appointment.advancedFilters' | translate"
+        [title]="'appointment.advancedFilters' | translate" (click)="toggleAdvancedFilters()">
+        <mat-icon aria-hidden="true">{{ showAdvancedFilters ? 'expand_less' : 'expand_more' }}</mat-icon>
+      </button>
+
       <!-- Always-visible pill-styled select (decision #8): real mat-select kept for
            accessibility, only the trigger is restyled. -->
-      <mat-form-field class="fb-instructor-select" appearance="outline" subscriptSizing="dynamic">
+      <mat-form-field class="fb-instructor-select" [class.fb-instructor-select--open]="showAdvancedFilters" appearance="outline" subscriptSizing="dynamic">
         <mat-select canSelectNullableOptions [ngModel]="currentAppointmentFilter.instructorId ?? null" (ngModelChange)="changeInstructor($event)">
           <mat-select-trigger class="fb-instructor-select__trigger">
             <mat-icon>person</mat-icon>

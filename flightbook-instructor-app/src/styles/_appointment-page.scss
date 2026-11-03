@@ -178,6 +178,62 @@
     margin-bottom: var(--fb-space-7);
   }
 
+  // Collapses the instructor filter on small screens.
+  .fb-filter-toggle {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: 1px solid var(--fb-border-subtle);
+    border-radius: var(--fb-radius-md);
+    background: var(--fb-surface);
+    cursor: pointer;
+
+    &:focus-visible {
+      outline: 2px solid var(--fb-focus-ring);
+      outline-offset: 2px;
+    }
+
+    .mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+      color: var(--fb-text-2);
+    }
+
+    &--active {
+      border-color: var(--fb-primary);
+
+      .mat-icon {
+        color: var(--fb-primary);
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    padding: var(--fb-space-5);
+
+    .fb-appointment-toolbar {
+      gap: var(--fb-space-4);
+    }
+
+    .fb-filter-toggle {
+      display: flex;
+    }
+
+    .fb-instructor-select {
+      display: none;
+      flex: 1 1 100%;
+
+      &.fb-instructor-select--open {
+        display: block;
+      }
+    }
+  }
+
   // Hand-rolled state chips (not mat-chip-listbox), same 3 states as before.
   .fb-state-chips {
     display: flex;

@@ -1,3 +1,5 @@
+@use '@angular/material' as mat;
+
 // App shell header - see CONTRACT.md "SCOPE EXPANSION (round 2)".
 // The `.mat-toolbar.mat-primary` rule in `_m2-compat.scss` no longer applies here because
 // `color="primary"` was removed from the `<mat-toolbar>` in main.component.html - the M3
@@ -210,15 +212,85 @@ mat-toolbar.fb-toolbar {
 }
 
 .mat-sidenav {
-    width: 225px;
+  width: 264px;
+  max-width: 80%;
+  border-right: 1px solid var(--fb-border-subtle);
+  @include mat.sidenav-overrides((container-shape: 0));
+}
+
+.fb-drawer__header {
+  display: flex;
+  align-items: center;
+  padding: 15px 20px;
+  border-bottom: 1px solid var(--fb-border-subtle);
+}
+
+.fb-drawer__title {
+  flex: 1;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--fb-text-3);
+}
+
+.fb-drawer__close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--fb-bg);
+  }
+
+  .mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: var(--fb-text-3);
+  }
+}
+
+.fb-drawer__link {
+  display: block;
+  padding: 15px 20px;
+  border-bottom: 1px solid var(--fb-surface-variant);
+  border-left: 3px solid transparent;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--fb-text-2);
+  text-decoration: none;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--fb-bg);
+  }
+
+  &.fb-drawer__link--active {
+    border-left-color: var(--fb-focus-ring);
+    background: var(--fb-nav-active-bg);
+    font-weight: 600;
+    color: var(--fb-primary);
+  }
+}
+
+.fb-drawer__close,
+.fb-drawer__link {
+  &:focus-visible {
+    outline: 2px solid var(--fb-focus-ring);
+    outline-offset: -2px;
+  }
 }
 
 .menu-sidenav-container {
     height: 100%;
-}
-
-.side-nav-menu a {
-    border-bottom: solid 1px rgba(0, 0, 0, 0.12);
 }
 
 // The toolbar has its own breakpoints: at 1000px the full nav and a 220px school name no longer fit.

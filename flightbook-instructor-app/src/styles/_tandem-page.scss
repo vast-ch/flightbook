@@ -742,4 +742,22 @@
     background: var(--fb-fill-subtle);
     border-top: 1px solid var(--fb-surface-variant);
   }
+
+  // ---------------------------------------------------------------------------------
+  // Mobile page gutter, same 12px as the appointments page. Last in the file: same
+  // specificity as the base rules above, so source order decides.
+  // ---------------------------------------------------------------------------------
+  @media (max-width: 768px) {
+    .fb-detail-header,
+    .fb-period-bar {
+      padding-left: var(--fb-space-5);
+      padding-right: var(--fb-space-5);
+    }
+
+    .fb-card--passengers,
+    .fb-card--flights {
+      margin-left: var(--fb-space-5);
+      margin-right: var(--fb-space-5);
+    }
+  }
 }

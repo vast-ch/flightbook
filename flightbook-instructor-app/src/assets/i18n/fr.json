@@ -7,7 +7,9 @@
         "tandemPilots": "Pilote biplace",
         "team": "Équipe",
         "configuration": "Configuration",
-        "openMenu": "Ouvrir le menu"
+        "openMenu": "Ouvrir le menu",
+        "closeMenu": "Fermer le menu",
+        "title": "Menu"
     },
     "language": {
         "fr": "Français",
@@ -396,8 +398,9 @@
             "CONFIRMED": "Confirmé",
             "CANCELED": "Annulé"
         },
-        "upcoming": "Rendez-vous à venir",
-        "passed": "Rendez-vous passé",
+        "upcoming": "À venir",
+        "passed": "Passés",
+        "advancedFilters": "Plus de filtres",
         "subscribeStudent": "Ajouter participants",
         "guestSubscribeStudent": "Ajouter participants externes",
         "removeSubscription": "Retirer l'inscription",

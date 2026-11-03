@@ -398,6 +398,31 @@
     gap: var(--fb-space-6);
   }
 
+  // One row cannot hold name, toggles and actions: the name gets its own row.
+  @media (max-width: 768px) {
+    .fb-detail-header {
+      gap: var(--fb-space-4) var(--fb-space-5);
+      padding: var(--fb-space-7) var(--fb-space-5);
+    }
+
+    .fb-detail-header__title {
+      flex: 1 1 calc(100% - 36px - var(--fb-space-5));
+
+      h1 {
+        font-size: var(--fb-text-3xl);
+        line-height: 1.15;
+        overflow-wrap: anywhere;
+      }
+    }
+
+    // Basis 0: the toggles wrap among themselves, not the action buttons onto a third row.
+    .fb-detail-header__toggles {
+      flex: 1 1 0;
+      flex-wrap: wrap;
+      min-width: 0;
+    }
+  }
+
   .fb-detail-header__action--danger {
     border-color: var(--fb-danger-border);
     background: var(--fb-danger-bg);
@@ -1388,6 +1413,32 @@
     &:focus-visible {
       outline: 2px solid var(--fb-focus-ring);
       outline-offset: 2px;
+    }
+  }
+
+  // ---------------------------------------------------------------------------------
+  // Mobile page gutter, same 12px as the appointments page. Last in the file: same
+  // specificity as the base rules above, so source order decides.
+  // ---------------------------------------------------------------------------------
+  @media (max-width: 768px) {
+    .fb-period-bar {
+      padding-left: var(--fb-space-5);
+      padding-right: var(--fb-space-5);
+    }
+
+    .fb-card,
+    .fb-cards-grid {
+      margin-left: var(--fb-space-5);
+      margin-right: var(--fb-space-5);
+    }
+
+    .fb-cards-grid {
+      // 340px is wider than a 360px screen minus the gutters.
+      grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr));
+
+      .fb-card {
+        margin: 0;
+      }
     }
   }
 }

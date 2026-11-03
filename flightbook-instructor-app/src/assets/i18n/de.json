@@ -7,7 +7,9 @@
         "tandemPilots": "Tandempiloten",
         "team": "Team",
         "configuration": "Konfiguration",
-        "openMenu": "Menü öffnen"
+        "openMenu": "Menü öffnen",
+        "closeMenu": "Menü schliessen",
+        "title": "Menü"
     },
     "language": {
         "fr": "Französisch",
@@ -396,8 +398,9 @@
             "CONFIRMED": "Bestätigt",
             "CANCELED": "Abgesagt"
         },
-        "upcoming": "Kommende Termine",
-        "passed": "Vergangene Termine",
+        "upcoming": "Kommende",
+        "passed": "Vergangene",
+        "advancedFilters": "Weitere Filter",
         "subscribeStudent": "Schüler*in anmelden",
         "guestSubscribeStudent": "Gastschüler*in anmelden",
         "removeSubscription": "Anmeldung entfernen",

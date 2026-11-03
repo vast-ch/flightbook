@@ -62,14 +62,20 @@
 
 <mat-sidenav-container class="menu-sidenav-container">
   <mat-sidenav #menuSidenav [autoFocus]="false">
-    <mat-nav-list class="side-nav-menu">
-      <a mat-list-item (click)="menuSidenav.toggle()" [routerLink]="'/students'">{{ 'menu.students'| translate }}</a>
-      <a mat-list-item (click)="menuSidenav.toggle()" [routerLink]="'/appointments'">{{ 'menu.appointments'| translate }}</a>
+    <div class="fb-drawer__header">
+      <span class="fb-drawer__title">{{ 'menu.title' | translate }}</span>
+      <button type="button" class="fb-drawer__close" [attr.aria-label]="'menu.closeMenu' | translate" (click)="menuSidenav.close()">
+        <mat-icon aria-hidden="true">close</mat-icon>
+      </button>
+    </div>
+    <nav>
+      <a class="fb-drawer__link" routerLinkActive="fb-drawer__link--active" (click)="menuSidenav.close()" [routerLink]="'/students'">{{ 'menu.students'| translate }}</a>
+      <a class="fb-drawer__link" routerLinkActive="fb-drawer__link--active" (click)="menuSidenav.close()" [routerLink]="'/appointments'">{{ 'menu.appointments'| translate }}</a>
       @if(selectedSchool?.configuration?.tandemModule?.active) {
-        <a mat-list-item (click)="menuSidenav.toggle()" [routerLink]="'/tandem-pilots'">{{ 'menu.tandemPilots'| translate }}</a>
+        <a class="fb-drawer__link" routerLinkActive="fb-drawer__link--active" (click)="menuSidenav.close()" [routerLink]="'/tandem-pilots'">{{ 'menu.tandemPilots'| translate }}</a>
       }
-      <a mat-list-item (click)="menuSidenav.toggle()" [routerLink]="'/configuration'">{{ 'menu.configuration'| translate }}</a>
-    </mat-nav-list>
+      <a class="fb-drawer__link" routerLinkActive="fb-drawer__link--active" (click)="menuSidenav.close()" [routerLink]="'/configuration'">{{ 'menu.configuration'| translate }}</a>
+    </nav>
   </mat-sidenav>
   <mat-sidenav-content><router-outlet></router-outlet></mat-sidenav-content>
 </mat-sidenav-container>

@@ -690,4 +690,17 @@
       color: var(--fb-text-3);
     }
   }
+
+  // ---------------------------------------------------------------------------------
+  // Mobile page gutter, same 12px as the appointments page. Last in the file: same
+  // specificity as the base rules above, so source order decides.
+  // ---------------------------------------------------------------------------------
+  @media (max-width: 768px) {
+    .fb-config-header,
+    .fb-config-grid,
+    .fb-config-section {
+      padding-left: var(--fb-space-5);
+      padding-right: var(--fb-space-5);
+    }
+  }
 }
