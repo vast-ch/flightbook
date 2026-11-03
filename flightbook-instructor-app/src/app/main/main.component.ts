@@ -61,8 +61,9 @@ export class MainComponent implements OnInit {
 
   openExportDialog(): void {
     const dialogRef = this.dialog.open(InstructorExportComponent, {
-      width: '700px',
-      data: { schools: this.schools }
+      width: '500px',
+      data: { schools: this.schools },
+      panelClass: 'fb-email-dialog-panel'
     });
   }
 

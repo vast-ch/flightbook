@@ -1,6 +1,6 @@
-<h1 mat-dialog-title>{{ 'appointmentExport.title' | translate }}</h1>
+<h2 mat-dialog-title>{{ 'appointmentExport.title' | translate }}</h2>
 <mat-dialog-content [formGroup]="form">
-  <mat-form-field>
+  <mat-form-field appearance="outline">
     <mat-label>{{ 'appointmentExport.school' | translate }}</mat-label>
     <mat-select formControlName="school">
       @for (school of schools; track school) {
@@ -9,7 +9,7 @@
     </mat-select>
   </mat-form-field>
 
-  <mat-form-field>
+  <mat-form-field appearance="outline">
     <mat-label>{{ 'appointment.state' | translate }}</mat-label>
     <mat-select formControlName="state">
       @for (state of states; track state) {
@@ -18,29 +18,31 @@
     </mat-select>
   </mat-form-field>
 
-  <mat-form-field>
-    <mat-label>{{ 'appointmentExport.startDate' | translate }}</mat-label>
-    <input matInput [matDatepicker]="startPicker" formControlName="startDate" required (click)="$any($event.target).select()">
-    <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
-    <mat-datepicker #startPicker></mat-datepicker>
-    @if (form.get('startDate')?.hasError('required')) {
-      <mat-error>
-        {{ 'formMessage.required' | translate }}
-      </mat-error>
-    }
-  </mat-form-field>
+  <div class="fb-form-row">
+    <mat-form-field appearance="outline">
+      <mat-label>{{ 'appointmentExport.startDate' | translate }}</mat-label>
+      <input matInput [matDatepicker]="startPicker" formControlName="startDate" required (click)="$any($event.target).select()">
+      <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
+      <mat-datepicker #startPicker></mat-datepicker>
+      @if (form.get('startDate')?.hasError('required')) {
+        <mat-error>
+          {{ 'formMessage.required' | translate }}
+        </mat-error>
+      }
+    </mat-form-field>
 
-  <mat-form-field>
-    <mat-label>{{ 'appointmentExport.endDate' | translate }}</mat-label>
-    <input matInput [matDatepicker]="endPicker" formControlName="endDate" required (click)="$any($event.target).select()">
-    <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
-    <mat-datepicker #endPicker></mat-datepicker>
-    @if (form.get('endDate')?.hasError('required')) {
-      <mat-error>
-        {{ 'formMessage.required' | translate }}
-      </mat-error>
-    }
-  </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>{{ 'appointmentExport.endDate' | translate }}</mat-label>
+      <input matInput [matDatepicker]="endPicker" formControlName="endDate" required (click)="$any($event.target).select()">
+      <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
+      <mat-datepicker #endPicker></mat-datepicker>
+      @if (form.get('endDate')?.hasError('required')) {
+        <mat-error>
+          {{ 'formMessage.required' | translate }}
+        </mat-error>
+      }
+    </mat-form-field>
+  </div>
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
