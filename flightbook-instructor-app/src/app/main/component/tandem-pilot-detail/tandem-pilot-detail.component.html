@@ -24,15 +24,6 @@
       }
     </header>
 
-    <div class="fb-period-bar">
-      <span class="fb-period-bar__label" id="fb-tandem-period-label">{{ 'student.period.label' | translate }}</span>
-      <div class="fb-period-segments" role="group" aria-labelledby="fb-tandem-period-label">
-        @for (p of periods; track p) {
-          <button type="button" class="fb-period-segment" [class.fb-period-segment--active]="p === period"
-            [attr.aria-pressed]="p === period" (click)="selectPeriod(p)">{{ p === 'total' ? ('student.period.total' | translate) : p }}</button>
-        }
-      </div>
-    </div>
 
     <div class="fb-stats-strip">
       <div class="fb-stat-tile">

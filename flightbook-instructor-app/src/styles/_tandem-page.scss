@@ -368,64 +368,6 @@
   }
 
   // ---------------------------------------------------------------------------------
-  // Period bar
-  // ---------------------------------------------------------------------------------
-  .fb-period-bar {
-    display: flex;
-    align-items: center;
-    gap: var(--fb-space-5);
-    padding: var(--fb-space-5) var(--fb-space-9);
-    background: var(--fb-surface);
-    border-bottom: 1px solid var(--fb-surface-variant);
-  }
-
-  .fb-period-bar__label {
-    flex: 1;
-    font-size: var(--fb-text-xs);
-    font-weight: 600;
-    line-height: 1;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--fb-text-3);
-  }
-
-  .fb-period-segments {
-    display: flex;
-    flex: none;
-    border: 1px solid var(--fb-border-subtle);
-    border-radius: var(--fb-radius-md);
-    overflow: hidden;
-    background: var(--fb-surface);
-  }
-
-  .fb-period-segment {
-    flex: none;
-    min-width: 78px;
-    padding: 9px var(--fb-space-6);
-    border: 0;
-    border-left: 1px solid var(--fb-border-subtle);
-    background: transparent;
-    font: inherit;
-    font-size: var(--fb-text-sm-plus);
-    font-weight: 500;
-    color: var(--fb-text-2);
-    text-align: center;
-    cursor: pointer;
-
-    &--active {
-      background: var(--fb-primary);
-      font-weight: 600;
-      color: var(--fb-on-primary);
-    }
-
-    &:focus-visible {
-      outline: 2px solid var(--fb-focus-ring);
-      // Negative: .fb-period-segments clips anything outside the segment.
-      outline-offset: -2px;
-    }
-  }
-
-  // ---------------------------------------------------------------------------------
   // Stats strip
   // ---------------------------------------------------------------------------------
   .fb-stats-strip {
@@ -761,8 +703,7 @@
   // specificity as the base rules above, so source order decides.
   // ---------------------------------------------------------------------------------
   @media (max-width: 768px) {
-    .fb-detail-header,
-    .fb-period-bar {
+    .fb-detail-header {
       padding-left: var(--fb-space-5);
       padding-right: var(--fb-space-5);
     }

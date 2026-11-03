@@ -160,10 +160,6 @@
         "backToList": "Retour à la liste",
         "toCheck": "{{n}} à vérifier",
         "flightsCount": "{{n}} vols",
-        "period": {
-            "label": "Période",
-            "total": "Total"
-        },
         "sort": {
             "sortBy": "Trier par",
             "firstname": "Prénom",

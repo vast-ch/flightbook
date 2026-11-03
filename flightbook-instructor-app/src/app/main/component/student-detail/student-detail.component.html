@@ -31,16 +31,6 @@
       }
     </header>
 
-    <div class="fb-period-bar">
-      <span class="fb-period-bar__label">{{ 'student.period.label' | translate }}</span>
-      <div class="fb-period-segments">
-        <!-- Single static period until the API exposes real period filtering (see CONTRACT
-             "Period segmented control: OMIT"). Inert markup on purpose - not a <button>/tab,
-             so it doesn't announce an interactive contract it doesn't honour. Shaped so a
-             future @for over real periods drops in without restructuring. -->
-        <span class="fb-period-segment fb-period-segment--active">{{ 'student.period.total' | translate }}</span>
-      </div>
-    </div>
 
     @if (student.statistic) {
       <div class="fb-stats-strip">

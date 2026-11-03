@@ -158,13 +158,13 @@ export class SchoolService {
     return this.http.get<TandemPilot[]>(`${environment.baseUrl}/schools/${id}/tandem-pilots`, { params });
   }
 
-  getPassengerConfirmationsBySchoolIdAndTandemPilotId({ limit = undefined, offset = undefined, from = undefined, to = undefined }: { limit?: number, offset?: number, from?: string, to?: string } = {}, id: number, tandemPilotId: number): Observable<PagerEntity<PassengerConfirmation[]>> {
-    const params: HttpParams = this.createTandemPagingParams(limit, offset, from, to);
+  getPassengerConfirmationsBySchoolIdAndTandemPilotId({ limit = undefined, offset = undefined }: { limit?: number, offset?: number } = {}, id: number, tandemPilotId: number): Observable<PagerEntity<PassengerConfirmation[]>> {
+    const params: HttpParams = this.createTandemPagingParams(limit, offset);
     return this.http.get<PagerEntity<PassengerConfirmation[]>>(`${environment.baseUrl}/schools/${id}/tandem-pilots/${tandemPilotId}/passenger-confirmations`, { params });
   }
 
-  getTandemPilotFlightsBySchoolIdAndTandemPilotId({ limit = undefined, offset = undefined, from = undefined, to = undefined }: { limit?: number, offset?: number, from?: string, to?: string } = {}, id: number, tandemPilotId: number): Observable<PagerEntity<Flight[]>> {
-    const params: HttpParams = this.createTandemPagingParams(limit, offset, from, to);
+  getTandemPilotFlightsBySchoolIdAndTandemPilotId({ limit = undefined, offset = undefined }: { limit?: number, offset?: number } = {}, id: number, tandemPilotId: number): Observable<PagerEntity<Flight[]>> {
+    const params: HttpParams = this.createTandemPagingParams(limit, offset);
     return this.http.get<PagerEntity<Flight[]>>(`${environment.baseUrl}/schools/${id}/tandem-pilots/${tandemPilotId}/flights`, { params });
   }
 
@@ -184,18 +184,14 @@ export class SchoolService {
   }
 
   // Deliberately independent of the shared mutable `this.filter`, which Appointments leaves set:
-  // it would silently narrow the tandem tables. `from` and `to` are only sent as a pair, because
-  // the passenger confirmations endpoint only works with both.
-  private createTandemPagingParams(limit: number | undefined, offset: number | undefined, from: string | undefined, to: string | undefined): HttpParams {
+  // it would silently narrow the tandem tables.
+  private createTandemPagingParams(limit: number | undefined, offset: number | undefined): HttpParams {
     let params = new HttpParams();
     if (limit) {
       params = params.append('limit', limit.toString());
     }
     if (offset) {
       params = params.append('offset', offset.toString());
-    }
-    if (from && to) {
-      params = params.append('from', from).append('to', to);
     }
     return params;
   }

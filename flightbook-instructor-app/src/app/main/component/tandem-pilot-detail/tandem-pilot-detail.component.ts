@@ -67,13 +67,9 @@ export class TandemPilotDetailComponent implements OnChanges, OnDestroy {
   passengerConfirmationsPagerEntity: PagerEntity<PassengerConfirmation[]> = new PagerEntity<PassengerConfirmation[]>();
   unsubscribe$ = new Subject<void>();
 
-  readonly currentYear = new Date().getFullYear();
-  periods: (number | 'total')[] = ['total', this.currentYear, this.currentYear - 1]; // @TODO make this dynamic. Need an dedicated statistics endpoint for tandem pilots to get the years with flights. For now, just show the current year and the previous year.
-  period: number | 'total' = this.currentYear;
-
   flightsLoading = false;
   passengersLoading = false;
-  // Held per table so a newer load can cancel an older one: rapid pilot or period clicks must
+  // Held per table so a newer load can cancel an older one: rapid pilot clicks must
   // never let a slower, older response overwrite the current data.
   private flightsSubscription: Subscription | undefined;
   private passengersSubscription: Subscription | undefined;
@@ -115,19 +111,10 @@ export class TandemPilotDetailComponent implements OnChanges, OnDestroy {
     this.unsubscribe$.complete();
   }
 
-  selectPeriod(period: number | 'total') {
-    if (period === this.period) {
-      return;
-    }
-
-    this.period = period;
-    this.reloadTables(this.flightsPaginator?.pageSize, this.passengerConfirmationsPaginator?.pageSize);
-  }
-
-  /** Pilot or period changed: drop the old rows and counts first, so nothing from the previous
-   *  selection stays on screen while both tables load from page 1. A given page size also stays
-   *  on the cleared pager entity: the paginator binds to it, and would otherwise fall back to 5
-   *  until the response arrives, so a second quick period click would read 5. */
+  /** Pilot changed: drop the old rows and counts first, so nothing from the previous pilot stays
+   *  on screen while both tables load from page 1. A given page size also stays on the cleared
+   *  pager entity: the paginator binds to it, and would otherwise fall back to 5 until the
+   *  response arrives. */
   private reloadTables(flightsLimit?: number, passengersLimit?: number) {
     this.flights = [];
     this.flightsPagerEntity = new PagerEntity<Flight[]>();
@@ -142,11 +129,6 @@ export class TandemPilotDetailComponent implements OnChanges, OnDestroy {
     }
   }
 
-  /** Both bounds or neither: the confirmations endpoint only works with both. */
-  private periodRange(): { from?: string, to?: string } {
-    return this.period === 'total' ? {} : { from: `${this.period}-01-01`, to: `${this.period}-12-31` };
-  }
-
   loadFlights(offset: number | undefined = undefined, limit = 5) {
     if (!this.tandemPilot?.id) return;
 
@@ -159,7 +141,7 @@ export class TandemPilotDetailComponent implements OnChanges, OnDestroy {
     this.flightsSubscription?.unsubscribe();
     this.flightsLoading = this.flights.length === 0;
 
-    this.flightsSubscription = this.schoolService.getTandemPilotFlightsBySchoolIdAndTandemPilotId({ limit, offset, ...this.periodRange() }, this.school!.id!, this.tandemPilot.id)
+    this.flightsSubscription = this.schoolService.getTandemPilotFlightsBySchoolIdAndTandemPilotId({ limit, offset }, this.school!.id!, this.tandemPilot.id)
       .pipe(takeUntil(this.unsubscribe$), finalize(() => this.flightsLoading = false))
       .subscribe((pagerEntity) => {
         this.flightsPagerEntity = pagerEntity;
@@ -175,7 +157,7 @@ export class TandemPilotDetailComponent implements OnChanges, OnDestroy {
     this.passengersSubscription?.unsubscribe();
     this.passengersLoading = this.passengerConfirmations.length === 0;
 
-    this.passengersSubscription = this.schoolService.getPassengerConfirmationsBySchoolIdAndTandemPilotId({ limit, offset, ...this.periodRange() }, this.school!.id!, tandemPilotId)
+    this.passengersSubscription = this.schoolService.getPassengerConfirmationsBySchoolIdAndTandemPilotId({ limit, offset }, this.school!.id!, tandemPilotId)
       .pipe(takeUntil(this.unsubscribe$), finalize(() => this.passengersLoading = false))
       .subscribe((pagerEntity) => {
         this.passengerConfirmationsPagerEntity = pagerEntity;
