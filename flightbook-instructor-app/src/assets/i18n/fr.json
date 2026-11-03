@@ -24,6 +24,10 @@
         "other": "Autre"
     },
     "login": {
+        "role": "Instructeur",
+        "newSchool": "Nouvelle école ?",
+        "showPassword": "Afficher le mot de passe",
+        "hidePassword": "Masquer le mot de passe",
         "title": "Log In",
         "email": "E-Mail",
         "password": "Mot de passe",

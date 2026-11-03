@@ -1,29 +1,279 @@
-mat-card {
-    max-width: 432px;
-    margin: 2em auto;
-    text-align: center;
+@use '@angular/material' as mat;
+
+// Login card from the Claude Design mockup (Login.dc.html). Fields keep Material's floating
+// label like every other form (redesign/INIT.md §5.1), not the mockup's fixed captions.
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: var(--fb-space-9);
+  width: 100%;
+  max-width: 420px;
+  margin: 0 auto;
+  font-family: Sora, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  color: var(--fb-ink);
+  // The enrollment and school-register cards around it centre their text.
+  text-align: left;
+  box-sizing: border-box;
 }
-  
+
+// Only on the /login route; inside the enrollment and school-register steppers it is just the card.
+:host(.fb-login--page) {
+  max-width: none;
+  min-height: 100vh;
+  align-items: center;
+  padding: 56px 20px 32px;
+  background: var(--fb-bg);
+
+  > * {
+    width: 100%;
+    max-width: 420px;
+  }
+}
+
+.fb-login__brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 11px;
+}
+
+.fb-login__logo {
+  display: block;
+  flex: none;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+}
+
+.fb-login__wordmark {
+  font-size: 21px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--fb-ink);
+}
+
+.fb-login__card {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  background: var(--fb-surface);
+  border: 1px solid var(--fb-border-subtle);
+  border-radius: var(--fb-radius-lg);
+  overflow: hidden;
+}
+
+.fb-login__head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--fb-space-2);
+  padding: 22px var(--fb-space-9) var(--fb-space-8);
+  border-bottom: 1px solid var(--fb-surface-variant);
+}
+
+.fb-login__eyebrow {
+  font-size: var(--fb-text-xs);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--fb-text-3);
+}
+
+.fb-login__title {
+  margin: 0;
+  font-size: var(--fb-text-3xl);
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: var(--fb-ink);
+}
+
+.fb-login__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--fb-space-7);
+  padding: 22px var(--fb-space-9) var(--fb-space-9);
+}
+
+.fb-login__error {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--fb-space-4);
+  padding: 11px 13px;
+  border: 1px solid var(--fb-danger-border);
+  border-radius: var(--fb-radius-md);
+  background: var(--fb-danger-bg);
+  font-size: var(--fb-text-base);
+  line-height: 1.45;
+  color: var(--fb-on-danger-bg);
+
+  .mat-icon {
+    flex: none;
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: var(--fb-danger);
+  }
+}
+
 mat-form-field {
-    display: block;
+  display: block;
+  width: 100%;
+
+  @include mat.form-field-overrides(
+    (
+      container-height: 44px,
+      container-vertical-padding: 10px,
+      outlined-container-shape: var(--fb-radius-md),
+      outlined-outline-color: var(--fb-border),
+    )
+  );
 }
 
-.loginError {
-    margin-top: 15px;
-    margin-bottom: 15px;
+.fb-login__password {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--fb-space-3);
 }
 
-.language-list, .forgot-password {
-    text-align: center;
-    margin-top: 20px;
+.fb-login__eye {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  margin-right: 4px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--fb-radius-sm);
+  background: transparent;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--fb-bg);
+  }
+
+  .mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: var(--fb-text-3);
+  }
 }
 
-.language, .register-school, .forgot-password {
-    cursor: pointer;
-    color: var(--ion-color-primary, #3880ff);
-    text-decoration: none;
+.fb-login__link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--fb-space-2);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-weight: 600;
+  color: var(--fb-primary);
+  text-decoration: none;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--fb-primary-hover);
+  }
 }
 
-.fr {
-    margin-right: 10px;
+.fb-login__forgot {
+  font-size: var(--fb-text-sm);
+}
+
+.fb-login__submit {
+  height: 44px;
+  margin-top: var(--fb-space-1);
+
+  @include mat.button-overrides(
+    (
+      protected-label-text-size: var(--fb-text-lg),
+      protected-label-text-weight: 600,
+    )
+  );
+
+  &:hover {
+    --mat-button-protected-container-color: var(--fb-primary-active);
+  }
+
+  .mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.fb-login__foot {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--fb-space-4);
+  padding: var(--fb-space-6) var(--fb-space-9);
+  background: var(--fb-fill-subtle);
+  border-top: 1px solid var(--fb-surface-variant);
+}
+
+.fb-login__foot-text {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--fb-text-sm-plus);
+  color: var(--fb-text-3);
+}
+
+.fb-login__register {
+  font-size: var(--fb-text-base);
+
+  .mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.fb-login__languages {
+  display: flex;
+  justify-content: center;
+}
+
+.fb-login__segments {
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--fb-border-subtle);
+  border-radius: var(--fb-radius-md);
+  background: var(--fb-surface);
+}
+
+.fb-login__segment {
+  height: 30px;
+  padding: 0 13px;
+  border: 0;
+  border-radius: var(--fb-radius-sm);
+  background: transparent;
+  font: inherit;
+  font-size: var(--fb-text-sm-plus);
+  font-weight: 600;
+  color: var(--fb-text-2);
+  cursor: pointer;
+
+  &:hover:not(.fb-login__segment--active) {
+    background: var(--fb-bg);
+  }
+
+  &--active {
+    background: var(--fb-primary);
+    color: var(--fb-on-primary);
+  }
+}
+
+.fb-login__eye,
+.fb-login__link,
+.fb-login__segment {
+  &:focus-visible {
+    outline: 2px solid var(--fb-focus-ring);
+    outline-offset: 2px;
+  }
 }

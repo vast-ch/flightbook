@@ -24,6 +24,10 @@
         "other": "Andere"
     },
     "login": {
+        "role": "Fluglehrer*in",
+        "newSchool": "Neue Flugschule?",
+        "showPassword": "Passwort anzeigen",
+        "hidePassword": "Passwort verbergen",
         "title": "Log In",
         "email": "E-Mail",
         "password": "Passwort",
@@ -343,7 +347,7 @@
         "emailAlreadyAdded": "Diese E-Mail-Adresse wurde bereits hinzugefügt",
         "invalidEmail": "Bitte gib eine gültige E-Mail-Adresse ein.",
         "invalidPassword": "Bitte gib ein gültiges Passwort ein.",
-        "emailpwdnotcorrect": "E-Mail-Adresse oder Password ist nicht korrekt!",
+        "emailpwdnotcorrect": "E-Mail-Adresse oder Passwort ist nicht korrekt!",
         "required": "Dieses Feld ist erforderlich",
         "firstnameRequired": "Vorname ist erforderlich",
         "lastnameRequired": "Nachname ist erforderlich",
