@@ -82,6 +82,9 @@
         "title": "Erreur"
     },
     "student": {
+        "theoryExam": "Examen théorique",
+        "theoryExamPassed": "Réussi",
+        "theoryExamOpen": "Pas encore réussi",
         "information": "Informations",
         "addStudent": "Ajouter un élève",
         "archiveStudentMessage": "Veux-tu vraiment archiver $REPLACE_NAME?",

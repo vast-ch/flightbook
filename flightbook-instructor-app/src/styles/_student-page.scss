@@ -510,7 +510,11 @@
     border-bottom: 1px solid var(--fb-surface-variant);
   }
 
+  // Flex, so a count, its " / target" and the theory-exam icon share one 22px line.
   .fb-stat-tile__value {
+    display: flex;
+    align-items: baseline;
+    height: 22px;
     font-size: var(--fb-text-3xl);
     font-weight: 600;
     line-height: 1;
@@ -519,6 +523,37 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+
+  .fb-stat-tile__unit {
+    font-size: var(--fb-text-base-plus);
+    color: var(--fb-text-3);
+  }
+
+  // Green check when passed, orange cross when open. The hidden text next to it carries the
+  // state for screen readers.
+  .fb-stat-tile__icon {
+    align-self: center;
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+    color: var(--fb-warn-icon);
+
+    &--done {
+      color: var(--fb-success-fg);
+    }
+  }
+
+  .fb-sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
   }
 
   .fb-stat-tile__label {

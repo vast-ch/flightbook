@@ -82,6 +82,9 @@
         "title": "Fehler"
     },
     "student": {
+        "theoryExam": "Theorieprüfung",
+        "theoryExamPassed": "Bestanden",
+        "theoryExamOpen": "Offen",
         "information": "Informationen",
         "addStudent": "Schüler hinzufügen",
         "archiveStudentMessage": "Möchtest du $REPLACE_NAME wirklich archivieren?",

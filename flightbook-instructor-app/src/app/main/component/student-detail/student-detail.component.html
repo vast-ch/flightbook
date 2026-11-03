@@ -44,8 +44,9 @@
 
     @if (student.statistic) {
       <div class="fb-stats-strip">
+        <!-- Counts are shown against the exam requirements (see isExamReady()). -->
         <div class="fb-stat-tile">
-          <div class="fb-stat-tile__value">{{ student.statistic.nbFlights || 0 }}</div>
+          <div class="fb-stat-tile__value">{{ student.statistic.nbFlights || 0 }}<span class="fb-stat-tile__unit">&nbsp;/ 50</span></div>
           <div class="fb-stat-tile__label">{{ 'student.amountofflights'| translate }}</div>
         </div>
         <div class="fb-stat-tile">
@@ -53,20 +54,23 @@
           <div class="fb-stat-tile__label">{{ 'student.flighthour'| translate }}</div>
         </div>
         <div class="fb-stat-tile">
-          <div class="fb-stat-tile__value">{{ student.statistic.average || 0 | hoursFormat }}</div>
-          <div class="fb-stat-tile__label">{{ 'student.average'| translate }}</div>
-        </div>
-        <div class="fb-stat-tile">
-          <div class="fb-stat-tile__value">{{ student.statistic.nbStartplaces || 0 }}</div>
+          <div class="fb-stat-tile__value">{{ student.statistic.nbStartplaces || 0 }}<span class="fb-stat-tile__unit">&nbsp;/ 5</span></div>
           <div class="fb-stat-tile__label">{{ 'student.nbStartplaces' | translate }}</div>
         </div>
         <div class="fb-stat-tile">
-          <div class="fb-stat-tile__value">{{ student.statistic.nbLandingplaces || 0 }}</div>
+          <div class="fb-stat-tile__value">{{ student.statistic.nbLandingplaces || 0 }}<span class="fb-stat-tile__unit">&nbsp;/ 5</span></div>
           <div class="fb-stat-tile__label">{{ 'student.nbLandingplaces' | translate }}</div>
         </div>
         <div class="fb-stat-tile">
-          <div class="fb-stat-tile__value">{{ student.statistic.nbFlightsAlone || 0 }}</div>
+          <div class="fb-stat-tile__value">{{ student.statistic.nbFlightsAlone || 0 }}<span class="fb-stat-tile__unit">&nbsp;/ 1</span></div>
           <div class="fb-stat-tile__label">{{ 'student.nbFlightsAlone' | translate }}</div>
+        </div>
+        <div class="fb-stat-tile">
+          <div class="fb-stat-tile__value">
+            <mat-icon class="fb-stat-tile__icon" [class.fb-stat-tile__icon--done]="!!student.controlSheet?.passTheoryExam" aria-hidden="true">{{ student.controlSheet?.passTheoryExam ? 'check_circle' : 'cancel' }}</mat-icon>
+            <span class="fb-sr-only">{{ (student.controlSheet?.passTheoryExam ? 'student.theoryExamPassed' : 'student.theoryExamOpen') | translate }}</span>
+          </div>
+          <div class="fb-stat-tile__label">{{ 'student.theoryExam' | translate }}</div>
         </div>
       </div>
     }

@@ -97,7 +97,7 @@ export class StudentsComponent implements OnInit, OnDestroy {
   isExamReady(student: Student): boolean {
     const statistic = student.statistic;
     return !!(
-      statistic?.nbFlights && statistic.nbFlights > 50 &&
+      statistic?.nbFlights && statistic.nbFlights >= 50 &&
       statistic?.nbStartplaces && statistic.nbStartplaces >= 5 &&
       statistic?.nbLandingplaces && statistic.nbLandingplaces >= 5 &&
       statistic?.nbFlightsAlone && statistic.nbFlightsAlone >= 1 &&
