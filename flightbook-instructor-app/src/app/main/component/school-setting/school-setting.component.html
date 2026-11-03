@@ -33,7 +33,7 @@
             {{ 'setting.googleCalendar.connected' | translate }}
           </span>
           @if (availableCalendars.length > 0) {
-            <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic" class="fb-calendar__field">
+            <mat-form-field appearance="outline" subscriptSizing="dynamic" class="fb-calendar__field">
               <mat-label>{{ 'setting.googleCalendar.selectCalendar' | translate }}</mat-label>
               <mat-select [(ngModel)]="selectedCalendarId" (selectionChange)="onCalendarChange()" [disabled]="googleCalendarLoading">
                 @for (calendar of availableCalendars; track calendar.id) {

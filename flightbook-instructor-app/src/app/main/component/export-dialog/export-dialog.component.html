@@ -2,7 +2,7 @@
 <mat-dialog-content>
   <form [formGroup]="exportForm">
     <div class="fb-form-row">
-      <mat-form-field appearance="outline" floatLabel="always">
+      <mat-form-field appearance="outline">
         <mat-label>{{ 'export.startDate' | translate }}</mat-label>
         <input matInput [matDatepicker]="startPicker" formControlName="startDate">
         <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
@@ -14,7 +14,7 @@
         }
       </mat-form-field>
 
-      <mat-form-field appearance="outline" floatLabel="always">
+      <mat-form-field appearance="outline">
         <mat-label>{{ 'export.endDate' | translate }}</mat-label>
         <input matInput [matDatepicker]="endPicker" formControlName="endDate">
         <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>

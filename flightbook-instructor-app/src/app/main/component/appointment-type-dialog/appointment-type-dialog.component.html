@@ -1,14 +1,14 @@
 <h1 mat-dialog-title>{{ title }}</h1>
 <mat-dialog-content [formGroup]="form">
   <div class="fb-form-row">
-    <mat-form-field appearance="outline" floatLabel="always" class="fb-form-row__wide">
+    <mat-form-field appearance="outline" class="fb-form-row__wide">
       <mat-label>{{ 'appointmentType.name'| translate }}</mat-label>
-      <input matInput placeholder="{{ 'appointmentType.name'| translate }}" formControlName="name" required>
+      <input matInput formControlName="name" required>
       <mat-error>
         {{ 'formMessage.nameRequired'| translate }}
       </mat-error>
     </mat-form-field>
-    <mat-form-field appearance="outline" floatLabel="always" class="fb-form-row__narrow">
+    <mat-form-field appearance="outline" class="fb-form-row__narrow">
       <mat-label>{{ 'appointmentType.color' | translate }}</mat-label>
       <input matInput type="color" formControlName="color" />
       @if (this.form.controls['color'].hasError('invalidColor')) {
@@ -19,35 +19,35 @@
     </mat-form-field>
   </div>
   <p class="fb-dialog-section">{{ 'appointmentType.default' | translate }}</p>
-  <mat-form-field appearance="outline" floatLabel="always">
+  <mat-form-field appearance="outline">
     <mat-label>{{ 'appointment.meetingPoint'| translate }}</mat-label>
-    <input matInput placeholder="{{ 'appointment.meetingPoint' | translate }}" formControlName="meetingPoint">
+    <input matInput formControlName="meetingPoint">
   </mat-form-field>
-  <mat-form-field appearance="outline" floatLabel="always">
+  <mat-form-field appearance="outline">
     <mat-label>{{ 'appointmentType.time'| translate }}</mat-label>
     <input matInput type="time" formControlName="time">
   </mat-form-field>
   <div>
     <p class="fb-dialog-section">{{ 'appointmentType.deadlineOffsetHours'| translate }}</p>
     <div class="fb-form-row">
-      <mat-form-field appearance="outline" floatLabel="always">
+      <mat-form-field appearance="outline">
         <mat-label>{{ 'appointmentType.deadlineDays'| translate }}</mat-label>
-        <input matInput placeholder="{{ 'appointmentType.deadlineDays'| translate }}" type="number"
+        <input matInput type="number"
           formControlName="deadlineDays" min="0">
       </mat-form-field>
-      <mat-form-field appearance="outline" floatLabel="always">
+      <mat-form-field appearance="outline">
         <mat-label>{{ 'appointmentType.deadlineHours'| translate }}</mat-label>
-        <input matInput placeholder="{{ 'appointmentType.deadlineHours'| translate }}" type="number"
+        <input matInput type="number"
           formControlName="deadlineHours" min="0">
       </mat-form-field>
     </div>
   </div>
-  <mat-form-field appearance="outline" floatLabel="always">
+  <mat-form-field appearance="outline">
     <mat-label>{{ 'appointment.maxPeople'| translate }}</mat-label>
-    <input matInput placeholder="{{ 'appointment.maxPeople'| translate }}" type="number"
+    <input matInput type="number"
       formControlName="maxPeople">
   </mat-form-field>
-  <mat-form-field appearance="outline" floatLabel="always">
+  <mat-form-field appearance="outline">
     <mat-label>{{ 'appointment.instructor'| translate }}</mat-label>
     <mat-select formControlName="instructor">
       <mat-option [value]=""></mat-option>

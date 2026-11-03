@@ -2,7 +2,7 @@
 <mat-dialog-content [formGroup]="form">
     <mat-form-field appearance="outline">
         <mat-label>{{ 'login.email'| translate }}</mat-label>
-        <input matInput placeholder="{{ 'login.email'| translate }}" formControlName="email" required>
+        <input matInput formControlName="email" required>
         <mat-error>
             {{ 'formMessage.invalidEmail'| translate }}
         </mat-error>

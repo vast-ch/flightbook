@@ -18,20 +18,11 @@ mat-form-field {
     (
       container-height: 40px,
       container-vertical-padding: 8px,
-      outlined-label-text-size: 11px,
-      outlined-label-text-weight: 600,
-      outlined-label-text-tracking: 0.06em,
-      outlined-label-text-color: var(--fb-text-3),
       outlined-container-shape: 9px,
     )
   );
 }
 
-// On mat-label, not .mdc-floating-label: that element belongs to MatFormField's own view and
-// does not carry this component's encapsulation attribute. mat-label is projected from here.
-mat-label {
-  text-transform: uppercase;
-}
 
 .fb-form-row {
   display: flex;

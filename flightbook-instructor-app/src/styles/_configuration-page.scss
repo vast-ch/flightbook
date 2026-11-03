@@ -371,10 +371,6 @@
         outlined-container-shape: var(--fb-radius-md),
         outlined-outline-color: var(--fb-border),
         outlined-hover-outline-color: var(--fb-border),
-        outlined-label-text-size: 11px,
-        outlined-label-text-weight: 600,
-        outlined-label-text-tracking: 0.06em,
-        outlined-label-text-color: var(--fb-text-3),
       )
     );
 
@@ -386,14 +382,10 @@
     );
 
     // A block child so a long label ends in an ellipsis in a narrow two-column card, not a hard clip.
-    // 13.3px because the floated label is scaled by 0.75, so it renders at 10px.
     mat-label {
       display: block;
       overflow: hidden;
-      font-size: 13.3px;
-      letter-spacing: 0.08em;
       text-overflow: ellipsis;
-      text-transform: uppercase;
     }
   }
 
