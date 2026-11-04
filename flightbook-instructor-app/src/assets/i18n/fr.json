@@ -66,27 +66,61 @@
         "manage": "Tu peux gérer l'école à l'adresse suivante: <a target='_blank' href='{{link}}'>{{link}}</a>",
         "access": "Accéder"
     },
-    "enrollment": {
-        "title": "Inscription",
-        "accept": "Accepter",
-        "shareFlightbook": "Partager le carnet de vol",
-        "accessFlightbook": "souhaite avoir accès à ton carnet de vol.",
-        "hasAccess": "a désormais accès à ton carnet de vol",
-        "addTeam": "souhaite t'avoir comme membre de l'équipe.",
-        "inTeam": "Tu fais désormais partie de l'équipe de",
-        "acceptQuestion": "Es-tu d'accord ?",
-        "confirmation": "Confirmation",
-        "wrongToken": "Ce token n'existe pas ou n'est pas valide",
-        "payment": "Paiement",
-        "paymentInformation": "Le carnet de vol coûte 12.- par an <br>Pour que le carnet de vol puisse être partagé avec une école, tu dois régler ce paiement.",
-        "paymentInformationTrial": "Les 60 premiers jours coûtent CHF 2.50, ensuite le carnet de vol coûte CHF 12.– par an.<br>Pour que le carnet de vol puisse être partagé avec une école, tu dois souscrire cet abonnement.",
-        "tandemPaymentInformation": "Vous pouvez enregistrer jusqu’à 25 vols gratuitement. <br>Pour une utilisation illimitée, la cotisation annuelle s’élève à CHF 12.–. <br>Le paiement n’est actuellement pas requis.",
-        "paymentResilation": "Tu peux résilier à tout moment, la résiliation prend effet à la fin de l'année payée. Tu seras informé(e) par e-mail 30 jours avant chaque renouvellement.",
-        "paymentResilationTrial": "Tu peux résilier à tout moment, la résiliation prend effet à la fin de la période en cours (période d'essai ou année payée). Si tu résilies pendant les 60 jours, aucun autre frais ne sera facturé. Tu seras informé(e) par e-mail 30 jours avant chaque renouvellement.",
-        "paymentButton": "Payer",
-        "accessTandemFlights": "souhaite avoir accès aux vols biplaces qui sont liés à l'école.",
-        "hasTandemAccess": "a désormais accès aux vols biplaces"
-    },
+        "enrollment": {
+            "title": "Inscription",
+            "accept": "Accepter",
+            "shareFlightbook": "Partager le carnet de vol",
+            "accessFlightbook": "souhaite avoir accès à ton carnet de vol.",
+            "hasAccess": "a désormais accès à ton carnet de vol",
+            "addTeam": "souhaite t'avoir comme membre de l'équipe.",
+            "acceptQuestion": "Es-tu d'accord ?",
+            "confirmation": "Confirmation",
+            "payment": "Paiement",
+            "paymentResilation": "Tu peux résilier à tout moment, la résiliation prend effet à la fin de l'année payée. Tu seras informé(e) par e-mail 30 jours avant chaque renouvellement.",
+            "paymentResilationTrial": "Tu peux résilier à tout moment, la résiliation prend effet à la fin de la période en cours (période d'essai ou année payée). Si tu résilies pendant les 60 jours, aucun autre frais ne sera facturé. Tu seras informé(e) par e-mail 30 jours avant chaque renouvellement.",
+            "paymentButton": "Payer",
+            "accessTandemFlights": "souhaite avoir accès aux vols biplaces qui sont liés à l'école.",
+            "hasTandemAccess": "a désormais accès aux vols biplaces",
+            "invitedBy": "{{school}} t'invite",
+            "role": {
+                "student": "Élève",
+                "team": "Équipe",
+                "tandem": "Pilote biplace"
+            },
+            "invalidTitle": "Invitation non valide",
+            "invalidText": "Ce token n'existe pas ou n'est pas valide. Demande à ton école de t'envoyer une nouvelle invitation.",
+            "loginIntro": "Un compte Flightbook existe déjà pour cet e-mail. Connecte-toi pour continuer.",
+            "createIntro": "Crée ton compte Flightbook pour accepter l'invitation.",
+            "price": {
+                "trial": "CHF 2.50",
+                "trialSub": "pour les 60 premiers jours, ensuite CHF 12.– par an",
+                "trialBadge": "Période d'essai",
+                "year": "CHF 12.–",
+                "yearSub": "par an",
+                "yearBadge": "Abonnement annuel",
+                "tandem": "25 vols",
+                "tandemSub": "gratuits",
+                "tandemBadge": "Optionnel"
+            },
+            "point": {
+                "student": "Pour que le carnet de vol puisse être partagé avec une école, tu dois régler ce paiement.",
+                "studentTrial": "Pour que le carnet de vol puisse être partagé avec une école, tu dois souscrire cet abonnement.",
+                "tandemFree": "Tu peux enregistrer jusqu'à 25 vols et 10 confirmations de passagers gratuitement.",
+                "tandemPrice": "Pour une utilisation illimitée, la cotisation annuelle s'élève à CHF 12.–.",
+                "tandemNoPayment": "Le paiement n'est actuellement pas requis."
+            },
+            "scope": {
+                "student": "L'école voit tes vols, ton niveau de formation et peut valider tes vols.",
+                "team": "Tu as accès à l'Instructor-App de l'école et peux gérer les élèves et les rendez-vous.",
+                "tandem": "L'école voit uniquement les vols biplaces qui sont liés à elle."
+            },
+            "inTeamOf": "Tu fais désormais partie de l'équipe de {{school}}.",
+            "loginHint": "Connecte-toi dans l'{{app}} pour commencer.",
+            "app": {
+                "mobile": "application Flightbook",
+                "instructor": "Instructor-App"
+            }
+        },
     "error": {
         "title": "Erreur"
     },

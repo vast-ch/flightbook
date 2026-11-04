@@ -66,27 +66,61 @@
         "manage": "Du kannst die Flugschule auf der Seite <a target='_blank' href='{{link}}'>{{link}}</a> verwalten.",
         "access": "Zugreifen"
     },
-    "enrollment": {
-        "title": "Einschreibung",
-        "accept": "Akzeptieren",
-        "shareFlightbook": "Flugbuch teilen",
-        "accessFlightbook": "möchte Zugriff auf dein Flugbuch haben.",
-        "hasAccess": "hat nun Einsicht in dein Flugbuch",
-        "addTeam": "möchte dich ins Team aufnehmen.",
-        "inTeam": "Du bist nun im Team von",
-        "acceptQuestion": "Bist du damit einverstanden?",
-        "confirmation": "Bestätigung",
-        "wrongToken": "Dieses Token gibt es nicht oder ist ungültig",
-        "payment": "Zahlung",
-        "paymentInformation": "Das Flugbuch kostet pro Jahr 12.- <br>Damit das Flugbuch mit einer Flugschule geteilt werden kann, musst du diese Zahlung begleichen.",
-        "paymentInformationTrial": "Die ersten 60 Tage kosten CHF 2.50, danach kostet das Flugbuch CHF 12.– pro Jahr.<br>Damit das Flugbuch mit einer Flugschule geteilt werden kann, musst du dieses Abo abschliessen.",
-        "tandemPaymentInformation": "Sie können bis zu 25 Flüge kostenlos registrieren. <br>Für die uneingeschränkte Nutzung beträgt die Jahresgebühr CHF 12.–. <br>Eine Zahlung ist aktuell nicht erforderlich.",
-        "paymentResilation": "Du kannst jederzeit kündigen, die Kündigung gilt jeweils per Ende des bezahlten Jahres. Wir informieren dich 30 Tage vor jeder Verlängerung per Mail.",
-        "paymentResilationTrial": "Du kannst jederzeit kündigen, die Kündigung gilt jeweils per Ende der laufenden Periode (Testphase oder bezahltes Jahr). Kündigst du während der 60 Tage, fallen keine weiteren Kosten an. Wir informieren dich 30 Tage vor jeder Verlängerung per Mail.",
-        "paymentButton": "Bezahlen",
-        "accessTandemFlights": "möchte Zugriff auf deine Tandemflüge haben welche mit der Flugschule verknüpft sind.",
-        "hasTandemAccess": "hat nun Einsicht in deine Tandemflüge"
-    },
+        "enrollment": {
+            "title": "Einschreibung",
+            "accept": "Akzeptieren",
+            "shareFlightbook": "Flugbuch teilen",
+            "accessFlightbook": "möchte Zugriff auf dein Flugbuch haben.",
+            "hasAccess": "hat nun Einsicht in dein Flugbuch",
+            "addTeam": "möchte dich ins Team aufnehmen.",
+            "acceptQuestion": "Bist du damit einverstanden?",
+            "confirmation": "Bestätigung",
+            "payment": "Zahlung",
+            "paymentResilation": "Du kannst jederzeit kündigen, die Kündigung gilt jeweils per Ende des bezahlten Jahres. Wir informieren dich 30 Tage vor jeder Verlängerung per Mail.",
+            "paymentResilationTrial": "Du kannst jederzeit kündigen, die Kündigung gilt jeweils per Ende der laufenden Periode (Testphase oder bezahltes Jahr). Kündigst du während der 60 Tage, fallen keine weiteren Kosten an. Wir informieren dich 30 Tage vor jeder Verlängerung per Mail.",
+            "paymentButton": "Bezahlen",
+            "accessTandemFlights": "möchte Zugriff auf deine Tandemflüge haben welche mit der Flugschule verknüpft sind.",
+            "hasTandemAccess": "hat nun Einsicht in deine Tandemflüge",
+            "invitedBy": "{{school}} lädt dich ein",
+            "role": {
+                "student": "Schüler*in",
+                "team": "Team",
+                "tandem": "Tandempilot*in"
+            },
+            "invalidTitle": "Einladung ungültig",
+            "invalidText": "Dieses Token gibt es nicht oder ist ungültig. Bitte deine Flugschule, dir eine neue Einladung zu senden.",
+            "loginIntro": "Für diese E-Mail existiert bereits ein Flightbook-Konto. Melde dich an, um fortzufahren.",
+            "createIntro": "Erstelle dein Flightbook-Konto, um die Einladung anzunehmen.",
+            "price": {
+                "trial": "CHF 2.50",
+                "trialSub": "für die ersten 60 Tage, danach CHF 12.– pro Jahr",
+                "trialBadge": "Testphase",
+                "year": "CHF 12.–",
+                "yearSub": "pro Jahr",
+                "yearBadge": "Jahresabo",
+                "tandem": "25 Flüge",
+                "tandemSub": "kostenlos",
+                "tandemBadge": "Optional"
+            },
+            "point": {
+                "student": "Damit das Flugbuch mit einer Flugschule geteilt werden kann, musst du diese Zahlung begleichen.",
+                "studentTrial": "Damit das Flugbuch mit einer Flugschule geteilt werden kann, musst du dieses Abo abschliessen.",
+                "tandemFree": "Du kannst bis zu 25 Flüge und 10 Passagierbestätigungen kostenlos registrieren.",
+                "tandemPrice": "Für die uneingeschränkte Nutzung beträgt die Jahresgebühr CHF 12.–.",
+                "tandemNoPayment": "Eine Zahlung ist aktuell nicht erforderlich."
+            },
+            "scope": {
+                "student": "Die Flugschule sieht deine Flüge, deinen Ausbildungsstand und kann Flüge validieren.",
+                "team": "Du erhältst Zugang zur Instructor-App der Flugschule und kannst Schüler*innen und Termine verwalten.",
+                "tandem": "Die Flugschule sieht nur die Tandemflüge, die mit ihr verknüpft sind."
+            },
+            "inTeamOf": "Du bist nun im Team von {{school}}.",
+            "loginHint": "Melde dich in der {{app}} an, um loszulegen.",
+            "app": {
+                "mobile": "Flightbook-App",
+                "instructor": "Instructor-App"
+            }
+        },
     "error": {
         "title": "Fehler"
     },

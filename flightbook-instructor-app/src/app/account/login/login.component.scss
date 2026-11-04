@@ -143,6 +143,14 @@ mat-form-field {
   gap: var(--fb-space-3);
 }
 
+.fb-login__lock {
+  margin-right: var(--fb-space-5);
+  font-size: 17px;
+  width: 17px;
+  height: 17px;
+  color: var(--fb-icon-muted);
+}
+
 .fb-login__eye {
   display: flex;
   align-items: center;

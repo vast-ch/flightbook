@@ -1,5 +1,7 @@
 <!-- Bare form: school registration and enrollment frame it in their own card. -->
 <form class="fb-register-form" [formGroup]="form" (ngSubmit)="onSubmit()">
+  <!-- Optional intro from the embedding page, e.g. the enrollment's info box. -->
+  <ng-content></ng-content>
   @if (registerInvalid) {
     <div class="fb-form-error" role="alert">
       <mat-icon aria-hidden="true">error</mat-icon>
@@ -9,7 +11,10 @@
 
   <mat-form-field appearance="outline" subscriptSizing="dynamic">
     <mat-label>{{ 'login.email' | translate }}</mat-label>
-    <input matInput type="email" formControlName="email" placeholder="name@flugschule.ch" autocomplete="email" required>
+    <input matInput type="email" formControlName="email" autocomplete="email" required>
+    @if (form.controls['email'].disabled) {
+      <mat-icon matSuffix class="fb-lock" aria-hidden="true">lock</mat-icon>
+    }
     <mat-error>{{ 'formMessage.invalidEmail' | translate }}</mat-error>
   </mat-form-field>
 

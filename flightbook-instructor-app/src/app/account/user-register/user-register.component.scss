@@ -69,6 +69,14 @@ app-phone-number {
   }
 }
 
+.fb-lock {
+  margin-right: var(--fb-space-5);
+  font-size: 17px;
+  width: 17px;
+  height: 17px;
+  color: var(--fb-icon-muted);
+}
+
 .fb-eye {
   display: flex;
   align-items: center;

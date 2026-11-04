@@ -15,6 +15,8 @@
   }
 
   <div class="fb-login__body">
+    <!-- Optional intro from the embedding page, e.g. the enrollment's info box. -->
+    <ng-content></ng-content>
     @if (loginInvalid) {
       <div class="fb-login__error" role="alert">
         <mat-icon aria-hidden="true">error</mat-icon>
@@ -24,7 +26,10 @@
 
     <mat-form-field appearance="outline" subscriptSizing="dynamic">
       <mat-label>{{ 'login.email' | translate }}</mat-label>
-      <input matInput type="email" formControlName="email" placeholder="name@flugschule.ch" autocomplete="email" required>
+      <input matInput type="email" formControlName="email" autocomplete="email" required>
+      @if (form.controls['email'].disabled) {
+        <mat-icon matSuffix class="fb-login__lock" aria-hidden="true">lock</mat-icon>
+      }
       <mat-error>{{ 'formMessage.invalidEmail' | translate }}</mat-error>
     </mat-form-field>
 
