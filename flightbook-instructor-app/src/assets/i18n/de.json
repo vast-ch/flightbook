@@ -565,8 +565,12 @@
     },
     "noSchool": {
         "title": "Keine Flugschule gefunden",
-        "message": "Aktuell arbeitest du für keine Flugshule. Du kannst entwerder eine Flugschule erstellen oder auf die Flightbook Applikation wechseln.",
-        "flightbookApp": "Flightbook-App"
+        "message": "Aktuell arbeitest du für keine Flugschule. Du kannst entweder eine Flugschule erstellen oder auf die Flightbook-Applikation wechseln.",
+        "flightbookApp": "Flightbook-App",
+        "registerHint": "Neue Flugschule anlegen und verwalten",
+        "appHint": "Zu deinem persönlichen Flugbuch wechseln",
+        "wrongAccount": "Falsches Konto?",
+        "otherAccount": "Mit anderem Konto anmelden"
     },
     "password": {
         "oldPassword": "Altes Passwort",

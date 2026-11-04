@@ -1,12 +1,43 @@
-<mat-card>
-    <mat-card-title>{{ 'noSchool.title' | translate }}</mat-card-title>
-    <mat-card-content>
-      <p>{{ 'noSchool.message' | translate }}</p>
-      <button mat-raised-button color="primary" class="button-spacing" (click)="navigateToRegister()">
-        {{ 'school.register' | translate }}
-      </button>
-      <button mat-raised-button color="primary" class="button-spacing" (click)="navigateToFlightbook()">
-        {{ 'noSchool.flightbookApp' | translate }}
-      </button>
-    </mat-card-content>
-  </mat-card>
+<div class="fb-no-school">
+  <div class="fb-no-school__column">
+    <div class="fb-no-school__brand">
+      <img src="assets/icon/logo.png" alt="" class="fb-no-school__logo" />
+      <span class="fb-no-school__wordmark">Flightbook</span>
+    </div>
+
+    <section class="fb-no-school__card">
+      <div class="fb-no-school__head">
+        <span class="fb-no-school__icon"><mat-icon aria-hidden="true">domain_disabled</mat-icon></span>
+        <h1 class="fb-no-school__title">{{ 'noSchool.title' | translate }}</h1>
+        <p class="fb-no-school__text">{{ 'noSchool.message' | translate }}</p>
+      </div>
+
+      <div class="fb-no-school__options">
+        <a routerLink="/school/register" class="fb-option fb-option--primary">
+          <mat-icon class="fb-option__icon" aria-hidden="true">add_business</mat-icon>
+          <span class="fb-option__text">
+            <span class="fb-option__title">{{ 'school.register' | translate }}</span>
+            <span class="fb-option__hint">{{ 'noSchool.registerHint' | translate }}</span>
+          </span>
+          <mat-icon class="fb-option__arrow" aria-hidden="true">arrow_forward</mat-icon>
+        </a>
+        <a href="https://m.flightbook.ch" class="fb-option">
+          <mat-icon class="fb-option__icon" aria-hidden="true">menu_book</mat-icon>
+          <span class="fb-option__text">
+            <span class="fb-option__title">{{ 'noSchool.flightbookApp' | translate }}</span>
+            <span class="fb-option__hint">{{ 'noSchool.appHint' | translate }}</span>
+          </span>
+          <mat-icon class="fb-option__arrow" aria-hidden="true">open_in_new</mat-icon>
+        </a>
+      </div>
+
+      <div class="fb-no-school__foot">
+        <span class="fb-no-school__foot-text">{{ 'noSchool.wrongAccount' | translate }}</span>
+        <a routerLink="/login" class="fb-no-school__foot-link">
+          {{ 'noSchool.otherAccount' | translate }}
+          <mat-icon aria-hidden="true">login</mat-icon>
+        </a>
+      </div>
+    </section>
+  </div>
+</div>

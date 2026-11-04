@@ -566,7 +566,11 @@
     "noSchool": {
         "title": "Aucune école liée à ton compte",
         "message": "Actuellement, tu ne travailles pour aucune école. Tu peux soit créer une école, soit passer à l'application Flightbook.",
-        "flightbookApp": "Flightbook-App"
+        "flightbookApp": "Flightbook-App",
+        "registerHint": "Inscrire et gérer une nouvelle école",
+        "appHint": "Passer à ton carnet de vol personnel",
+        "wrongAccount": "Mauvais compte ?",
+        "otherAccount": "Se connecter avec un autre compte"
     },
     "password": {
         "oldPassword": "Ancien mot de passe",
