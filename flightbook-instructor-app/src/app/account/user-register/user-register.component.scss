@@ -1,14 +1,122 @@
-mat-card {
-    max-width: 432px;
-    margin: 2em auto;
-    text-align: center;
-}
-  
-mat-form-field {
-    display: block;
+@use '@angular/material' as mat;
+
+// Bare account form from Register.dc.html, same field look as the login form. Floating labels
+// instead of the mockup's fixed captions (redesign/INIT.md §5.1).
+:host {
+  display: block;
+  // Fills the 560px registration card; centred and capped inside the wider enrollment card.
+  max-width: 560px;
+  margin: 0 auto;
+  font-family: Sora, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  color: var(--fb-ink);
+  text-align: left;
 }
 
-.registerationError {
-    margin-top: 15px;
-    margin-bottom: 15px;
+.fb-register-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--fb-space-7);
+  margin: 0;
+  padding: 22px var(--fb-space-9) var(--fb-space-9);
+}
+
+// On the phone component's host too: the custom properties inherit into its two fields.
+mat-form-field,
+app-phone-number {
+  @include mat.form-field-overrides(
+    (
+      container-height: 44px,
+      container-vertical-padding: 10px,
+      outlined-container-shape: var(--fb-radius-md),
+      outlined-outline-color: var(--fb-border),
+    )
+  );
+}
+
+mat-form-field {
+  display: block;
+  width: 100%;
+}
+
+app-phone-number {
+  display: block;
+}
+
+.fb-form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--fb-space-6);
+}
+
+.fb-form-error {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--fb-space-4);
+  padding: 11px 13px;
+  border: 1px solid var(--fb-danger-border);
+  border-radius: var(--fb-radius-md);
+  background: var(--fb-danger-bg);
+  font-size: var(--fb-text-base);
+  line-height: 1.45;
+  color: var(--fb-on-danger-bg);
+
+  .mat-icon {
+    flex: none;
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: var(--fb-danger);
+  }
+}
+
+.fb-eye {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  margin-right: 4px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--fb-radius-sm);
+  background: transparent;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--fb-bg);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--fb-focus-ring);
+    outline-offset: 2px;
+  }
+
+  .mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: var(--fb-text-3);
+  }
+}
+
+.fb-submit {
+  height: 44px;
+  margin-top: var(--fb-space-1);
+
+  @include mat.button-overrides(
+    (
+      protected-label-text-size: var(--fb-text-lg),
+      protected-label-text-weight: 600,
+    )
+  );
+
+  &:hover:not(:disabled) {
+    --mat-button-protected-container-color: var(--fb-primary-active);
+  }
+
+  .mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
 }

@@ -34,6 +34,9 @@
         "passwordlost": "Mot de passe oublié ?"
     },
     "account": {
+        "hasYes": "Oui, me connecter",
+        "hasNo": "Non, créer un compte",
+        "choiceHint": "Avec un compte existant, tu te connectes. Sinon, tu crées ici un nouveau compte pour l'école.",
         "title": "Compte",
         "register": "Inscription",
         "firstname": "Prénom",
@@ -46,10 +49,12 @@
         "has": "As-tu déjà un compte Flightbook?"
     },
     "school": {
+        "registerEyebrow": "Nouvelle école",
+        "alreadyRegistered": "École déjà inscrite ?",
         "school": "Ecole",
         "register": "Créer une école",
         "confirmation": "Confirmation",
-        "name": "Nom",
+        "name": "Nom de l'école",
         "address": "Adresse",
         "address2": "Adresse 2",
         "zip": "CP",
@@ -364,6 +369,9 @@
         "changeSaved": "Modifications sauvegardées"
     },
     "buttons": {
+        "loginAndContinue": "Se connecter et continuer",
+        "createAccountAndContinue": "Créer un compte et continuer",
+        "back": "Retour",
         "login": "Se connecter",
         "save": "Sauvegarder",
         "done": "Ok",

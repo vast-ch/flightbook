@@ -5,11 +5,14 @@
   </div>
 }
 
-<form class="fb-login__card" [formGroup]="form" (ngSubmit)="onSubmit()">
-  <div class="fb-login__head">
-    <span class="fb-login__eyebrow">{{ 'login.role' | translate }}</span>
-    <h1 class="fb-login__title">{{ 'login.title' | translate }}</h1>
-  </div>
+<!-- Embedded (enrollment, school registration): only the form body, the host page frames it. -->
+<form class="fb-login__card" [class.fb-login__card--bare]="!loginPageRedirect" [formGroup]="form" (ngSubmit)="onSubmit()">
+  @if (loginPageRedirect) {
+    <div class="fb-login__head">
+      <span class="fb-login__eyebrow">{{ 'login.role' | translate }}</span>
+      <h1 class="fb-login__title">{{ 'login.title' | translate }}</h1>
+    </div>
+  }
 
   <div class="fb-login__body">
     @if (loginInvalid) {
@@ -42,12 +45,17 @@
     </div>
 
     <button type="submit" mat-raised-button color="primary" class="fb-login__submit">
-      <mat-icon aria-hidden="true">login</mat-icon>
-      {{ 'buttons.login' | translate }}
+      @if (loginPageRedirect) {
+        <mat-icon aria-hidden="true">login</mat-icon>
+        {{ 'buttons.login' | translate }}
+      } @else {
+        {{ 'buttons.loginAndContinue' | translate }}
+        <mat-icon aria-hidden="true" iconPositionEnd>arrow_forward</mat-icon>
+      }
     </button>
   </div>
 
-  @if (showLanguage) {
+  @if (showLanguage && loginPageRedirect) {
     <div class="fb-login__foot">
       <span class="fb-login__foot-text">{{ 'login.newSchool' | translate }}</span>
       <a class="fb-login__link fb-login__register" href="/school/register">
@@ -58,7 +66,7 @@
   }
 </form>
 
-@if (showLanguage) {
+@if (showLanguage && loginPageRedirect) {
   <div class="fb-login__languages">
     <div class="fb-login__segments">
       @for (lang of languages; track lang) {

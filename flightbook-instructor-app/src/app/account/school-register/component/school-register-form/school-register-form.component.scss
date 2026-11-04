@@ -1,23 +1,130 @@
-mat-card {
-    max-width: 400px;
-    margin: 2em auto;
-    text-align: center;
-}
-  
-.full-width-input {
-    width: 100%;
+@use '@angular/material' as mat;
+
+// Bare school form from Register.dc.html, same field look as the login and account forms.
+:host {
+  display: block;
+  font-family: Sora, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  color: var(--fb-ink);
+  text-align: left;
 }
 
-.full-width-input.plz {
-    width: 20%;
+.fb-register-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--fb-space-7);
+  margin: 0;
+  padding: 22px var(--fb-space-9) var(--fb-space-9);
 }
 
-.full-width-input.city {
-    width: 79%;
-    margin-left: 1%;
+mat-form-field {
+  display: block;
+  width: 100%;
+
+  @include mat.form-field-overrides(
+    (
+      container-height: 44px,
+      container-vertical-padding: 10px,
+      outlined-container-shape: var(--fb-radius-md),
+      outlined-outline-color: var(--fb-border),
+    )
+  );
 }
 
-.registerationError {
-    margin-top: 15px;
-    margin-bottom: 15px;
+.fb-form-row {
+  display: flex;
+  gap: var(--fb-space-4);
+}
+
+.fb-form-row__zip {
+  flex: none;
+  width: 110px;
+}
+
+.fb-form-row__city {
+  flex: 1;
+  min-width: 0;
+}
+
+.fb-form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--fb-space-6);
+}
+
+.fb-form-error {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--fb-space-4);
+  padding: 11px 13px;
+  border: 1px solid var(--fb-danger-border);
+  border-radius: var(--fb-radius-md);
+  background: var(--fb-danger-bg);
+  font-size: var(--fb-text-base);
+  line-height: 1.45;
+  color: var(--fb-on-danger-bg);
+
+  .mat-icon {
+    flex: none;
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: var(--fb-danger);
+  }
+}
+
+.fb-form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--fb-space-4);
+  margin-top: var(--fb-space-1);
+}
+
+.fb-back-button {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--fb-space-2);
+  height: 44px;
+  padding: 0 var(--fb-space-6);
+  border: 1px solid var(--fb-border-subtle);
+  border-radius: var(--fb-radius-md);
+  background: var(--fb-surface);
+  font: inherit;
+  font-size: var(--fb-text-base-plus);
+  font-weight: 600;
+  color: var(--fb-text-2);
+  cursor: pointer;
+
+  &:hover {
+    background: var(--fb-bg);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--fb-focus-ring);
+    outline-offset: 2px;
+  }
+
+  .mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}
+
+// Basis 200px: on phones it drops below "Zurück" at full width instead of wrapping its label.
+.fb-submit {
+  flex: 1 1 200px;
+  height: 44px;
+
+  @include mat.button-overrides(
+    (
+      protected-label-text-size: var(--fb-text-lg),
+      protected-label-text-weight: 600,
+    )
+  );
+
+  &:hover:not(:disabled) {
+    --mat-button-protected-container-color: var(--fb-primary-active);
+  }
 }

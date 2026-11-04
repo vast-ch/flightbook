@@ -1,35 +1,410 @@
-mat-card {
-    max-width: 1100px;
-    margin: 2em auto;
-    text-align: center;
+@use '@angular/material' as mat;
+
+// School registration from the Claude Design mockup (Register.dc.html). The embedded login,
+// account and school forms are bare forms; this card frames them.
+:host {
+  display: block;
+  min-height: 100vh;
+  background: var(--fb-bg);
+  font-family: Sora, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  color: var(--fb-ink);
 }
 
-.mat-card-stepper {
-    max-width: 400px;
-    margin: 2em auto;
-    text-align: center;
+.fb-register-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 40px 20px 32px;
 }
 
-mat-spinner {
-    margin:10% auto;
+// ---------------------------------------------------------------------------------
+// Top row: logo + language switch
+// ---------------------------------------------------------------------------------
+.fb-register__top {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--fb-space-5);
 }
 
-::ng-deep .mat-horizontal-stepper-header{
-    pointer-events: none !important;
+.fb-register__logo {
+  display: block;
+  flex: none;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--fb-radius-md);
 }
 
-.check-icon {
-    margin-top: 20px;
-    margin-bottom: 20px !important;
-    transform: scale(3);
-    color: #48c600;
+.fb-register__wordmark {
+  flex: 1;
+  min-width: 0;
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.02em;
 }
 
-.language {
-    cursor: pointer;
-    color: var(--ion-color-primary, #3880ff);;
+.fb-register__languages {
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--fb-border-subtle);
+  border-radius: var(--fb-radius-md);
+  background: var(--fb-surface);
 }
 
-.fr {
-    margin-right: 10px;
+.fb-register__language {
+  height: 28px;
+  padding: 0 11px;
+  border: 0;
+  border-radius: var(--fb-radius-sm);
+  background: transparent;
+  font: inherit;
+  font-size: var(--fb-text-sm);
+  font-weight: 600;
+  color: var(--fb-text-2);
+  cursor: pointer;
+
+  &:hover:not(.fb-register__language--active) {
+    background: var(--fb-bg);
+  }
+
+  &--active {
+    background: var(--fb-primary);
+    color: var(--fb-on-primary);
+  }
+}
+
+// ---------------------------------------------------------------------------------
+// Card, head and step bar
+// ---------------------------------------------------------------------------------
+.fb-register__card {
+  display: flex;
+  flex-direction: column;
+  background: var(--fb-surface);
+  border: 1px solid var(--fb-border-subtle);
+  border-radius: var(--fb-radius-lg);
+  overflow: hidden;
+}
+
+.fb-register__head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--fb-space-2);
+  padding: 22px var(--fb-space-9) var(--fb-space-8);
+  border-bottom: 1px solid var(--fb-surface-variant);
+}
+
+.fb-register__eyebrow {
+  font-size: var(--fb-text-xs);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--fb-text-3);
+}
+
+.fb-register__title {
+  margin: 0;
+  font-size: var(--fb-text-3xl);
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.fb-steps {
+  display: flex;
+  align-items: center;
+  gap: var(--fb-space-4);
+  margin: 0;
+  padding: var(--fb-space-7) var(--fb-space-9);
+  list-style: none;
+  background: var(--fb-fill-subtle);
+  border-bottom: 1px solid var(--fb-surface-variant);
+}
+
+.fb-steps__item {
+  display: flex;
+  align-items: center;
+  flex: none;
+  gap: var(--fb-space-4);
+  min-width: 0;
+
+  &--line {
+    flex: 1;
+  }
+}
+
+.fb-steps__button {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--fb-space-3);
+  padding: 0;
+  border: 0;
+  border-radius: var(--fb-radius-sm);
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
+
+  &:disabled {
+    cursor: default;
+  }
+}
+
+.fb-steps__dot {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  box-sizing: border-box;
+  border: 1px solid var(--fb-dot-border);
+  border-radius: 50%;
+  background: var(--fb-surface);
+  font-size: var(--fb-text-sm);
+  font-weight: 600;
+  color: var(--fb-text-3);
+
+  &--current {
+    border: 0;
+    background: var(--fb-primary);
+    color: var(--fb-on-primary);
+  }
+
+  &--done {
+    border: 0;
+    background: var(--fb-nav-active-bg);
+    color: var(--fb-primary);
+  }
+
+  .mat-icon {
+    font-size: 15px;
+    width: 15px;
+    height: 15px;
+  }
+}
+
+.fb-steps__label {
+  font-size: var(--fb-text-base);
+  font-weight: 500;
+  white-space: nowrap;
+  color: var(--fb-text-3);
+
+  &--current {
+    font-weight: 600;
+    color: var(--fb-ink);
+  }
+
+  &--done {
+    color: var(--fb-text-2);
+  }
+}
+
+.fb-steps__line {
+  display: block;
+  flex: 1;
+  min-width: 12px;
+  height: 1px;
+  background: var(--fb-border-subtle);
+
+  &--done {
+    background: var(--fb-input-active-border);
+  }
+}
+
+// ---------------------------------------------------------------------------------
+// Step 1: account choice
+// ---------------------------------------------------------------------------------
+.fb-register__choice {
+  display: flex;
+  flex-direction: column;
+  gap: var(--fb-space-5);
+  padding: 22px var(--fb-space-9);
+  border-bottom: 1px solid var(--fb-surface-variant);
+}
+
+.fb-register__question {
+  font-size: var(--fb-text-md);
+  font-weight: 600;
+}
+
+.fb-choice {
+  display: flex;
+  gap: 3px;
+  padding: 3px;
+  border: 1px solid var(--fb-border-subtle);
+  border-radius: 10px;
+  background: var(--fb-bg);
+}
+
+.fb-choice__option {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  gap: var(--fb-space-3);
+  min-height: 42px;
+  padding: 0 var(--fb-space-5);
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  font: inherit;
+  font-size: var(--fb-text-base-plus);
+  font-weight: 600;
+  color: var(--fb-text-2);
+  cursor: pointer;
+
+  &--active {
+    border-color: var(--fb-input-active-border);
+    background: var(--fb-surface);
+    box-shadow: 0 1px 2px rgba(9, 40, 62, 0.08);
+    color: var(--fb-primary);
+  }
+
+  .mat-icon {
+    flex: none;
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.fb-register__hint {
+  display: flex;
+  align-items: center;
+  gap: var(--fb-space-4);
+  margin: 0;
+  padding: var(--fb-space-8) var(--fb-space-9) 22px;
+  font-size: var(--fb-text-base);
+  line-height: 1.5;
+  color: var(--fb-text-3);
+  text-wrap: pretty;
+
+  .mat-icon {
+    flex: none;
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: var(--fb-text-4);
+  }
+}
+
+// The login is capped at 420px for its own page; here it fills the card.
+fb-login {
+  max-width: none;
+}
+
+// ---------------------------------------------------------------------------------
+// Step 3: done
+// ---------------------------------------------------------------------------------
+.fb-register__done {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--fb-space-6);
+  padding: 36px var(--fb-space-9) 32px;
+  text-align: center;
+}
+
+.fb-register__done-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--fb-success-hover-bg);
+
+  .mat-icon {
+    font-size: 30px;
+    width: 30px;
+    height: 30px;
+    color: var(--fb-success-fg);
+  }
+}
+
+.fb-register__done-title {
+  margin: 0;
+  font-size: var(--fb-text-2xl);
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  text-wrap: pretty;
+}
+
+// The link comes from the translation's markup.
+.fb-register__done-text {
+  max-width: 380px;
+  margin: 0;
+  font-size: var(--fb-text-base-plus);
+  line-height: 1.55;
+  color: var(--fb-text-3);
+  text-wrap: pretty;
+}
+
+.fb-register__access {
+  height: 44px;
+  margin-top: var(--fb-space-2);
+  padding: 0 22px;
+
+  @include mat.button-overrides(
+    (
+      protected-label-text-size: var(--fb-text-lg),
+      protected-label-text-weight: 600,
+    )
+  );
+
+  .mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}
+
+// ---------------------------------------------------------------------------------
+// Below the card
+// ---------------------------------------------------------------------------------
+.fb-register__login {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: var(--fb-space-2);
+  margin: 0;
+  font-size: var(--fb-text-base);
+  color: var(--fb-text-3);
+
+  a {
+    font-weight: 600;
+    color: var(--fb-primary);
+    text-decoration: none;
+
+    &:hover {
+      color: var(--fb-primary-hover);
+    }
+  }
+}
+
+.fb-register__language,
+.fb-steps__button,
+.fb-choice__option,
+.fb-register__login a {
+  &:focus-visible {
+    outline: 2px solid var(--fb-focus-ring);
+    outline-offset: 2px;
+  }
+}
+
+// Phones: only the current step keeps a visible label; the others stay readable for screen readers.
+@media (max-width: 480px) {
+  .fb-steps__label:not(.fb-steps__label--current) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
 }

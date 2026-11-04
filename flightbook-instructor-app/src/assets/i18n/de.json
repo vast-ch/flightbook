@@ -34,6 +34,9 @@
         "passwordlost": "Passwort vergessen?"
     },
     "account": {
+        "hasYes": "Ja, anmelden",
+        "hasNo": "Nein, Konto erstellen",
+        "choiceHint": "Mit einem bestehenden Konto meldest du dich an. Sonst erstellst du hier ein neues Konto für die Flugschule.",
         "title": "Konto",
         "register": "Account erstellen",
         "firstname": "Vorname",
@@ -46,19 +49,21 @@
         "has": "Hast du bereits einen Flightbook-Account?"
     },
     "school": {
+        "registerEyebrow": "Neue Flugschule",
+        "alreadyRegistered": "Flugschule bereits registriert?",
         "school": "Schule",
         "register": "Flugschule registrieren",
         "confirmation": "Bestätigung",
-        "name": "Name",
+        "name": "Name der Flugschule",
         "address": "Adresse",
         "address2": "Adresse 2",
         "zip": "PLZ",
         "city": "Stadt",
         "phone": "Telefon",
         "email": "E-Mail",
-        "language": "Kommunkationssprache",
+        "language": "Kommunikationssprache",
         "success": "Die Flugschule {{school}} wurde erstellt",
-        "manage": "Du kannst die Flugschule auf der <a target='_blank' href='{{link}}'>{{link}}</a> Seite verwalten",
+        "manage": "Du kannst die Flugschule auf der Seite <a target='_blank' href='{{link}}'>{{link}}</a> verwalten.",
         "access": "Zugreifen"
     },
     "enrollment": {
@@ -364,6 +369,9 @@
         "changeSaved": "Änderung gespeichert"
     },
     "buttons": {
+        "loginAndContinue": "Anmelden und weiter",
+        "createAccountAndContinue": "Konto erstellen und weiter",
+        "back": "Zurück",
         "login": "Anmelden",
         "save": "Speichern",
         "done": "Ok",

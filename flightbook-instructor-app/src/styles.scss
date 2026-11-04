@@ -91,6 +91,18 @@ table {
   height: 48px;
 }
 
+// The link inside the school-registration confirmation comes from the translation's HTML
+// (innerHTML), so it carries no encapsulation attribute and component styles cannot reach it.
+.fb-register__done-text a {
+  font-weight: 600;
+  color: var(--fb-primary);
+  text-decoration: none;
+
+  &:hover {
+    color: var(--fb-primary-hover);
+  }
+}
+
 // Dialog overlays render into .cdk-overlay-container, appended to <body> - outside
 // .fb-student-page - so this restyle (part of the student page's redesign scope, see
 // CONTRACT phase 6) has to be global. Scoped to the panelClass set on the one in-scope

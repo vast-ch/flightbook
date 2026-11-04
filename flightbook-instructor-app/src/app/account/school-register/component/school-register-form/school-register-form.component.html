@@ -1,59 +1,68 @@
-<mat-card>
-  <mat-card-content>
-    <form [formGroup]="form" (ngSubmit)="onSubmit()">
-      @if (registerInvalid) {
-        <mat-error class="registerationError">
-          {{ 'formMessage.schoolExist' | translate }}
-        </mat-error>
-      }
-      <mat-form-field class="full-width-input">
-        <input matInput placeholder="{{ 'school.name'| translate }}" formControlName="name" required>
-        <mat-error>
-          {{ 'formMessage.nameRequired'| translate }}
-        </mat-error>
-      </mat-form-field>
-      <mat-form-field class="full-width-input">
-        <input matInput placeholder="{{ 'school.address'| translate }}" formControlName="address1" required>
-        <mat-error>
-          {{ 'formMessage.addressRequired'| translate }}
-        </mat-error>
-      </mat-form-field>
-      <mat-form-field class="full-width-input">
-        <input matInput placeholder="{{ 'school.address2'| translate }}" formControlName="address2">
-      </mat-form-field>
-      <mat-form-field class="full-width-input plz">
-        <input matInput placeholder="{{ 'school.zip'| translate }}" formControlName="plz" required>
-        <mat-error>
-          {{ 'formMessage.zipRequired'| translate }}
-        </mat-error>
-      </mat-form-field>
-      <mat-form-field class="full-width-input city">
-        <input matInput placeholder="{{ 'school.city'| translate }}" formControlName="city" required>
-        <mat-error>
-          {{ 'formMessage.cityRequired'| translate }}
-        </mat-error>
-      </mat-form-field>
-      <mat-form-field class="full-width-input">
-        <input matInput placeholder="{{ 'school.phone'| translate }}" formControlName="phone" required>
-        <mat-error>
-          {{ 'formMessage.phoneRequired'| translate }}
-        </mat-error>
-      </mat-form-field>
-      <mat-form-field class="full-width-input">
-        <input matInput placeholder="{{ 'school.email'| translate }}" formControlName="email" required>
-        <mat-error>
-          {{ 'formMessage.emailRequired'| translate }}
-        </mat-error>
-      </mat-form-field>
-      <mat-form-field class="full-width-input">
-        <mat-label>{{ 'school.language'| translate }}</mat-label>
-        <mat-select formControlName="language">
-          <mat-option value="fr">{{ 'language.fr' | translate }}</mat-option>
-          <mat-option value="de">{{ 'language.de' | translate }}</mat-option>
-        </mat-select>
-      </mat-form-field>
+<!-- Bare form inside the registration card (Register.dc.html), floating labels as on every form. -->
+<form class="fb-register-form" [formGroup]="form" (ngSubmit)="onSubmit()">
+  @if (registerInvalid) {
+    <div class="fb-form-error" role="alert">
+      <mat-icon aria-hidden="true">error</mat-icon>
+      <span>{{ 'formMessage.schoolExist' | translate }}</span>
+    </div>
+  }
 
-      <button mat-raised-button color="primary" [disabled]="form.invalid">{{ 'school.register'| translate }}</button>
-    </form>
-  </mat-card-content>
-</mat-card>
+  <mat-form-field appearance="outline" subscriptSizing="dynamic">
+    <mat-label>{{ 'school.name' | translate }}</mat-label>
+    <input matInput formControlName="name" autocomplete="organization" required>
+    <mat-error>{{ 'formMessage.nameRequired' | translate }}</mat-error>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" subscriptSizing="dynamic">
+    <mat-label>{{ 'school.address' | translate }}</mat-label>
+    <input matInput formControlName="address1" autocomplete="address-line1" required>
+    <mat-error>{{ 'formMessage.addressRequired' | translate }}</mat-error>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" subscriptSizing="dynamic">
+    <mat-label>{{ 'school.address2' | translate }}</mat-label>
+    <input matInput formControlName="address2" autocomplete="address-line2">
+  </mat-form-field>
+
+  <div class="fb-form-row">
+    <mat-form-field appearance="outline" subscriptSizing="dynamic" class="fb-form-row__zip">
+      <mat-label>{{ 'school.zip' | translate }}</mat-label>
+      <input matInput formControlName="plz" inputmode="numeric" autocomplete="postal-code" required>
+      <mat-error>{{ 'formMessage.zipRequired' | translate }}</mat-error>
+    </mat-form-field>
+    <mat-form-field appearance="outline" subscriptSizing="dynamic" class="fb-form-row__city">
+      <mat-label>{{ 'school.city' | translate }}</mat-label>
+      <input matInput formControlName="city" autocomplete="address-level2" required>
+      <mat-error>{{ 'formMessage.cityRequired' | translate }}</mat-error>
+    </mat-form-field>
+  </div>
+
+  <div class="fb-form-grid">
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+      <mat-label>{{ 'school.phone' | translate }}</mat-label>
+      <input matInput type="tel" formControlName="phone" autocomplete="tel" required>
+      <mat-error>{{ 'formMessage.phoneRequired' | translate }}</mat-error>
+    </mat-form-field>
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+      <mat-label>{{ 'school.email' | translate }}</mat-label>
+      <input matInput type="email" formControlName="email" placeholder="info@flugschule.ch" required>
+      <mat-error>{{ 'formMessage.emailRequired' | translate }}</mat-error>
+    </mat-form-field>
+  </div>
+
+  <mat-form-field appearance="outline" subscriptSizing="dynamic">
+    <mat-label>{{ 'school.language' | translate }}</mat-label>
+    <mat-select formControlName="language" required>
+      <mat-option value="de">{{ 'language.de' | translate }}</mat-option>
+      <mat-option value="fr">{{ 'language.fr' | translate }}</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <div class="fb-form-actions">
+    <button type="button" class="fb-back-button" (click)="back.emit()">
+      <mat-icon aria-hidden="true">arrow_back</mat-icon>
+      {{ 'buttons.back' | translate }}
+    </button>
+    <button type="submit" mat-raised-button color="primary" class="fb-submit" [disabled]="form.invalid">{{ 'school.register' | translate }}</button>
+  </div>
+</form>
