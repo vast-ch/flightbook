@@ -12,7 +12,7 @@
     <div class="fb-option-row__value">
       @if (school) {
         <mat-slide-toggle [hideIcon]="true" [aria-label]="'setting.types.validateFlights' | translate"
-          [checked]="school?.configuration?.schoolModule?.validateFlights || false" (change)="changeValidateFlights($event)"></mat-slide-toggle>
+          [checked]="school.configuration?.schoolModule?.validateFlights || false" (change)="changeValidateFlights($event)"></mat-slide-toggle>
       } @else {
         <span class="fb-skeleton fb-skeleton--toggle" aria-hidden="true"></span>
       }
@@ -24,7 +24,7 @@
     <div class="fb-option-row__value">
       @if (school) {
         <mat-slide-toggle [hideIcon]="true" [aria-label]="'setting.types.commentsOnSubscription' | translate"
-          [checked]="school?.configuration?.schoolModule?.commentsOnSubscription || false" (change)="changeCommentsOnSubscription($event)"></mat-slide-toggle>
+          [checked]="school.configuration?.schoolModule?.commentsOnSubscription || false" (change)="changeCommentsOnSubscription($event)"></mat-slide-toggle>
       } @else {
         <span class="fb-skeleton fb-skeleton--toggle" aria-hidden="true"></span>
       }

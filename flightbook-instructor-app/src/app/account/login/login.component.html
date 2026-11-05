@@ -50,11 +50,12 @@
     </div>
 
     <button type="submit" mat-raised-button color="primary" class="fb-login__submit">
+      <!-- One icon per @if root, so MatButton projects each into its start/end icon slot -->
       @if (loginPageRedirect) {
         <mat-icon aria-hidden="true">login</mat-icon>
-        {{ 'buttons.login' | translate }}
-      } @else {
-        {{ 'buttons.loginAndContinue' | translate }}
+      }
+      {{ (loginPageRedirect ? 'buttons.login' : 'buttons.loginAndContinue') | translate }}
+      @if (!loginPageRedirect) {
         <mat-icon aria-hidden="true" iconPositionEnd>arrow_forward</mat-icon>
       }
     </button>
