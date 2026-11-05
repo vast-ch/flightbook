@@ -21,11 +21,19 @@
 
   <span class="menu-spacer"></span>
 
-  <button type="button" class="fb-toolbar__school" [matMenuTriggerFor]="schoolMenu" [matTooltip]="selectedSchool?.name ?? ''" [attr.aria-label]="selectedSchool?.name">
+  <!-- With a single school the menu is only needed on phones, where it is the only way to read the name. -->
+  <button type="button" class="fb-toolbar__school" [class.fb-toolbar__school--phone-only]="!hasSeveralSchools" [matMenuTriggerFor]="schoolMenu" [matTooltip]="selectedSchool?.name ?? ''" [attr.aria-label]="selectedSchool?.name">
     <mat-icon class="fb-toolbar__school-icon">school</mat-icon>
     <span class="fb-toolbar__school-name">{{ selectedSchool?.name }}</span>
     <mat-icon class="fb-toolbar__school-caret">expand_more</mat-icon>
   </button>
+  @if (!hasSeveralSchools) {
+    <!-- Larger screens, single school: nothing to switch to, so a plain label instead of the menu trigger. -->
+    <div class="fb-toolbar__school fb-toolbar__school--static">
+      <mat-icon class="fb-toolbar__school-icon" aria-hidden="true">school</mat-icon>
+      <span class="fb-toolbar__school-name">{{ selectedSchool?.name }}</span>
+    </div>
+  }
   <mat-menu #schoolMenu="matMenu" [overlapTrigger]="false">
     <!-- Phones only: the trigger hides the name there, and the list below skips the current school. -->
     <button mat-menu-item disabled class="fb-toolbar__menu-current">

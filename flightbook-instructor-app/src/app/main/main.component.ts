@@ -21,6 +21,10 @@ export class MainComponent implements OnInit {
   selectedSchool: School | undefined;
   currentUser: User | undefined;
 
+  get hasSeveralSchools(): boolean {
+    return (this.schools?.length ?? 0) > 1;
+  }
+
   constructor(
     private accountService: AccountService,
     private router: Router,

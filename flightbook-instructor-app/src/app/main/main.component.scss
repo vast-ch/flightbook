@@ -121,6 +121,21 @@ mat-toolbar.fb-toolbar {
   }
 }
 
+@media screen and (min-width: 481px) {
+  .fb-toolbar__school--phone-only {
+    display: none;
+  }
+}
+
+.fb-toolbar__school--static {
+  box-sizing: border-box;
+  cursor: default;
+
+  &:hover {
+    background: var(--fb-surface);
+  }
+}
+
 .fb-toolbar__school-name {
   white-space: nowrap;
   overflow: hidden;
@@ -313,6 +328,11 @@ mat-toolbar.fb-toolbar {
 
   .fb-toolbar__school {
     padding: 0 8px;
+  }
+
+  // Single school: phones keep the icon-only menu trigger (its menu shows the name), not the label.
+  .fb-toolbar__school--static {
+    display: none;
   }
 
   .fb-toolbar__menu-current {

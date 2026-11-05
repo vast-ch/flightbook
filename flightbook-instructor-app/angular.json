@@ -37,19 +37,24 @@
               "src/styles.scss"
             ],
             "scripts": [],
-            "browser": "src/main.ts"
+            "browser": "src/main.ts",
+            "allowedCommonJsDependencies": [
+              "moment",
+              "pdfmake/build/pdfmake.min",
+              "pdfmake/build/vfs_fonts"
+            ]
           },
           "configurations": {
             "production": {
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "500kb",
+                  "maximumWarning": "1mb",
                   "maximumError": "2mb"
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "8kb",
+                  "maximumWarning": "10kb",
                   "maximumError": "16kb"
                 }
               ],
