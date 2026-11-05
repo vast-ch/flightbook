@@ -1,13 +1,13 @@
 ---
 import Image from '~/components/common/Image.astro';
-import studentImg from '~/assets/images/flightbook/student.png';
-import subscriptionImg from '~/assets/images/flightbook/subscription.png';
-import appointmentImg from '~/assets/images/flightbook/appointment.png';
-import appointmentCreateImg from '~/assets/images/flightbook/appointment-create.png';
-import homeMobileImg from '~/assets/images/flightbook/home-mobile.png';
-import appointmentMobileImg from '~/assets/images/flightbook/appointment-mobile.png';
-import appointmentDetailImg from '~/assets/images/flightbook/appointment-detail.png';
-import placeMobileImg from '~/assets/images/flightbook/place-mobile.png';
+import studentImg from '~/assets/images/flightbook/instructor/student.png';
+import subscriptionImg from '~/assets/images/flightbook/instructor/subscription.png';
+import appointmentImg from '~/assets/images/flightbook/instructor/appointment.png';
+import appointmentCreateImg from '~/assets/images/flightbook/instructor/appointment-create.png';
+import controlSheetDE from '~/assets/images/flightbook/mobile/Apple2DE.png';
+import homeDE from '~/assets/images/flightbook/mobile/Apple1DE.png';
+import controlSheetFR from '~/assets/images/flightbook/mobile/Apple2FR.png';
+import homeFR from '~/assets/images/flightbook/mobile/Apple1FR.png';
 
 interface Feature {
   title: string;
@@ -18,9 +18,10 @@ interface Props {
   title: string;
   features: Feature[];
   cta: string;
+  lang?: 'de' | 'fr';
 }
 
-const { title, features, cta } = Astro.props;
+const { title, features, cta, lang = 'de' } = Astro.props;
 
 // Slider images for feature 2 (Einfache Teilnahmeverwaltung)
 const sliderImages = [
@@ -30,12 +31,17 @@ const sliderImages = [
 ];
 
 // Slider images for feature 3 (Top für Flugschüler)
-const studentSliderImages = [
-  { src: homeMobileImg, alt: 'Home Screen' },
-  { src: appointmentMobileImg, alt: 'Appointments' },
-  { src: appointmentDetailImg, alt: 'Appointment Details' },
-  { src: placeMobileImg, alt: 'Places' },
-];
+const studentSliderImagesByLang = {
+  de: [
+    { src: controlSheetDE, alt: 'Kontrollblatt - SHV-Nachweis und Fortschritt' },
+    { src: homeDE, alt: 'Startseite - Ausbildungsstand' },
+  ],
+  fr: [
+    { src: controlSheetFR, alt: 'Feuille de contrôle - preuve FSVL et progression' },
+    { src: homeFR, alt: "Page d'accueil - état de la formation" },
+  ],
+};
+const studentSliderImages = studentSliderImagesByLang[lang];
 ---
 
 <section id="schools" class="scroll-mt-16 py-16 md:py-20">
@@ -268,7 +274,14 @@ const studentSliderImages = [
 </style>
 
 <script>
+  // Module scripts run once, but ClientRouter swaps the DOM on navigation (e.g. language switch).
+  // Keep the timers at module level so a re-init can stop the ones bound to the old page.
+  let schoolsInterval: number | undefined;
+  let studentInterval: number | undefined;
+
   function initSchoolsSlideshow() {
+    clearInterval(schoolsInterval);
+
     const schoolsSection = document.querySelector('#schools');
     if (!schoolsSection) return;
 
@@ -277,7 +290,6 @@ const studentSliderImages = [
     const prevBtn = schoolsSection.querySelector('.schools-prev');
     const nextBtn = schoolsSection.querySelector('.schools-next');
     let currentSlide = 0;
-    let autoSlideInterval: number;
 
     function showSlide(n: number) {
       slides.forEach((slide) => slide.classList.remove('active'));
@@ -298,11 +310,11 @@ const studentSliderImages = [
     }
 
     function startAutoSlide() {
-      autoSlideInterval = window.setInterval(nextSlide, 5000);
+      schoolsInterval = window.setInterval(nextSlide, 5000);
     }
 
     function stopAutoSlide() {
-      clearInterval(autoSlideInterval);
+      clearInterval(schoolsInterval);
     }
 
     prevBtn?.addEventListener('click', () => {
@@ -328,14 +340,13 @@ const studentSliderImages = [
     startAutoSlide();
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initSchoolsSlideshow);
-  } else {
-    initSchoolsSlideshow();
-  }
+  // Fires on the initial load and after every ClientRouter navigation
+  document.addEventListener('astro:page-load', initSchoolsSlideshow);
 
   // Student slider initialization
   function initStudentSlideshow() {
+    clearInterval(studentInterval);
+
     const schoolsSection = document.querySelector('#schools');
     if (!schoolsSection) return;
 
@@ -344,7 +355,6 @@ const studentSliderImages = [
     const prevBtn = schoolsSection.querySelector('.student-prev');
     const nextBtn = schoolsSection.querySelector('.student-next');
     let currentSlide = 0;
-    let autoSlideInterval: number;
 
     function showSlide(n: number) {
       slides.forEach((slide) => slide.classList.remove('active'));
@@ -365,11 +375,11 @@ const studentSliderImages = [
     }
 
     function startAutoSlide() {
-      autoSlideInterval = window.setInterval(nextSlide, 5000);
+      studentInterval = window.setInterval(nextSlide, 5000);
     }
 
     function stopAutoSlide() {
-      clearInterval(autoSlideInterval);
+      clearInterval(studentInterval);
     }
 
     prevBtn?.addEventListener('click', () => {
@@ -395,9 +405,5 @@ const studentSliderImages = [
     startAutoSlide();
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initStudentSlideshow);
-  } else {
-    initStudentSlideshow();
-  }
+  document.addEventListener('astro:page-load', initStudentSlideshow);
 </script>

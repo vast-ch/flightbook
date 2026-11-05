@@ -1,27 +1,76 @@
-.checks-wrapper {
-    margin-top: 10px;
+// Ionic controls inside .fb-row are styled globally in theme/tokens.scss.
+
+.form-card {
+    margin-top: 12px;
+
+    &:first-of-type {
+        margin-top: 0;
+    }
 }
 
-.checks-header ion-button {
-    float: left;
+// ---- Checks -------------------------------------------------------------
+.checks-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin: 22px 0 9px;
 }
 
-.checks-header {
+// .fb-section-action is a span elsewhere; as a button it needs the reset
+.checks-head .fb-section-action {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    font: inherit;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--ion-color-primary);
+    cursor: pointer;
+}
+
+.checks-list {
+    padding: 0;
+    margin: 0;
+    background: transparent;
+}
+
+.check-row {
+    --padding-start: 0;
+    --inner-padding-end: 0;
+    --background: var(--fb-surface);
+    --min-height: 0;
+
+    // Separator between siblings only - @for leaves comment anchors, so
+    // :last-child cannot be relied on.
+    ion-item-sliding + ion-item-sliding & {
+        border-top: 1px solid var(--fb-hairline);
+    }
+}
+
+.check-row__inner {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding-left: 16px;
-    padding-right: 16px;
-    
-    ion-label {
-        font-size: 16px;
-        font-weight: 500;
-    }
+    width: 100%;
+    padding: 14px 17px;
 }
 
-.checks-wrapper {
-    ion-list {
-        padding-left: 45px;
-        padding-top: 0;
-    }
+.check-row__main {
+    flex: 1;
+    min-width: 0;
+}
+
+.check-row__date {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--fb-text);
+}
+
+.check-row__result {
+    margin-top: 4px;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1.45;
+    color: var(--fb-text-secondary);
+    white-space: pre-wrap;
 }

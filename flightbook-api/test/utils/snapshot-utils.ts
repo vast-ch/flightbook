@@ -4,7 +4,7 @@ export function removeIds(obj: any): any {
   } else if (obj && typeof obj === 'object') {
     const result: any = {};
     for (const [key, value] of Object.entries(obj)) {
-      if (key !== 'id' && key !== 'gliderId' && key !== 'startId' && key !== 'landingId') {
+      if (key !== 'id' && key !== 'gliderId' && key !== 'startId' && key !== 'landingId' && key !== 'bestDistanceId' && key !== 'longestAirtimeId') {
         result[key] = removeIds(value);
       }
     }

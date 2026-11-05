@@ -32,8 +32,10 @@ export class FlightControllerV2 {
     }
 
     @UseGuards(CompositeAuthGuard)
-    @ApiQuery({ name: 'type', required: true, enum: StatisticType })
     @ApiQuery({ name: 'validation-state', required: false, enum: FlightValidationState })
+    @ApiQuery({ name: 'to', required: false, type: String, description: 'YYYY-MM-DD' })
+    @ApiQuery({ name: 'from', required: false, type: String, description: 'YYYY-MM-DD' })
+    @ApiQuery({ name: 'type', required: true, enum: StatisticType })
     @Get('statistic')
     getStatistic(@Request() req, @Query() query): Promise<FlightStatisticDto[]> {
         return this.flightFacade.getStatisticV2(req.user, query);

@@ -1,6 +1,6 @@
 import { Component, Input, OnDestroy, forwardRef } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR, FormsModule, NG_VALIDATORS, Validator, AbstractControl, ValidationErrors } from '@angular/forms';
-import { IonInput, IonSelect, IonSelectOption, IonText } from '@ionic/angular/standalone';
+import { IonInput, IonSelect, IonSelectOption, IonText } from '@ionic/angular';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Subject, takeUntil } from 'rxjs';
 

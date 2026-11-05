@@ -242,7 +242,7 @@ export class EmailService {
         this.sendEmail(email);
     }
 
-    sendInformWaitingStudent(school: SchoolDto, appointment: Appointment, subscription: Subscription) {
+    sendInformWaitingStudent(school: SchoolDto, appointment: Appointment, subscription: Subscription, waitingListPosition: number, canParticipate: boolean) {
         if (!subscription.user.isAppointmentEmailNotificationEnabled()) {
             return;
         }
@@ -262,10 +262,11 @@ export class EmailService {
         description = description.replace(new RegExp("[\r\n]", "gm"), "</br>");
         const maxPeople = appointment.maxPeople || "-";
         const type = i18n.t('email.appointment.type', { lang: appointment.school.language});
-        email.content = i18n.t('email.appointment.informWaitingStudent.content', {
+        email.content = i18n.t(`email.appointment.informWaitingStudent.${canParticipate ? 'contentCanParticipate' : 'contentMovedUp'}`, {
             lang: school.language,
             args: {
                 date: moment(appointment.scheduling).utc().format('DD.MM.YYYY HH:mm'),
+                position: waitingListPosition,
                 type: appointment.type ? `<li>${type}: ${appointment.type.name}</li>` : "",
                 meetingPoint: appointment.meetingPoint || "-",
                 description: description,

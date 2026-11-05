@@ -1,4 +1,4 @@
-import {Exclude, Expose} from "class-transformer";
+import {Exclude, Expose, Type} from "class-transformer";
 import {State} from "../state";
 import {SchoolDto} from "../../school/interface/school-dto";
 import {UserReadDto} from "../../../user/interface/user-read-dto";
@@ -40,6 +40,7 @@ export class AppointmentDto {
 
     @Expose()
     @ApiProperty()
+    @Type(() => SchoolDto)
     readonly school: SchoolDto;
 
     @Expose()

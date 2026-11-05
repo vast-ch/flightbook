@@ -1,0 +1,19 @@
+/*
+ * Applied by Playwright while it takes screenshots only (expect.toHaveScreenshot
+ * stylePath), never to the app under test.
+ *
+ * Where focus lands in an opened overlay is a race: Ionic focuses the
+ * container first and moves on to the selected option a moment later, so the
+ * same build screenshots differently from run to run. Focus indicators are
+ * hidden to keep baselines deterministic; focus behaviour isn't what these
+ * screenshots compare.
+ */
+*:focus,
+*:focus-visible {
+  outline: none !important;
+}
+
+.alert-tappable.ion-focused,
+.alert-button.ion-focused {
+  background: transparent !important;
+}

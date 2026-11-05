@@ -25,10 +25,15 @@
 @import "@ionic/angular/css/text-transformation.css";
 @import "@ionic/angular/css/flex-utils.css";
 
-/* Dark Mode */
-@import '@ionic/angular/css/palettes/dark.system.css';
+/* Typeface — self-hosted so it works offline in the native builds */
+@import '@fontsource/sora/400.css';
+@import '@fontsource/sora/500.css';
+@import '@fontsource/sora/600.css';
 
-/* Android edge-to-edge support */
-.md ion-menu ion-content {
-  --padding-bottom: env(safe-area-inset-bottom);
-}
+/*
+ * Dark mode is intentionally not imported: the redesign is light-only for now.
+ * Re-add '@ionic/angular/css/palettes/dark.class.css' together with a dark
+ * token set in theme/tokens.scss when dark mode gets designed.
+ */
+
+/* The Android edge-to-edge rule for ion-menu went with the side menu. */

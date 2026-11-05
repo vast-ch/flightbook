@@ -1,0 +1,6 @@
+node_modules/
+out/
+.auth/
+# Baselines are machine-specific (fonts, Chrome version) and are regenerated
+# from a base ref by compare.sh, so they are not committed.
+__screenshots__/

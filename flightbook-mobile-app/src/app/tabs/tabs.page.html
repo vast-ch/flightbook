@@ -1,0 +1,31 @@
+<ion-tabs>
+  <ion-tab-bar slot="bottom" class="fb-tab-bar">
+
+    <ion-tab-button tab="home">
+      <ion-icon name="home-outline" aria-hidden="true"></ion-icon>
+      <ion-label>{{ 'tabs.home' | translate }}</ion-label>
+    </ion-tab-button>
+
+    <ion-tab-button tab="flights">
+      <ion-icon name="flight" aria-hidden="true"></ion-icon>
+      <ion-label>{{ 'tabs.flights' | translate }}</ion-label>
+    </ion-tab-button>
+
+    <ion-tab-button class="fb-tab-button--add" (click)="openAddSheet()">
+      <div class="fb-fab" [attr.aria-label]="'buttons.logFlight' | translate">
+        <ion-icon name="add" aria-hidden="true"></ion-icon>
+      </div>
+    </ion-tab-button>
+
+    <ion-tab-button tab="statistics">
+      <ion-icon name="stats-chart" aria-hidden="true"></ion-icon>
+      <ion-label>{{ 'tabs.stats' | translate }}</ion-label>
+    </ion-tab-button>
+
+    <ion-tab-button tab="more">
+      <ion-icon name="ellipsis-horizontal" aria-hidden="true"></ion-icon>
+      <ion-label>{{ 'tabs.more' | translate }}</ion-label>
+    </ion-tab-button>
+
+  </ion-tab-bar>
+</ion-tabs>

@@ -1,9 +1,15 @@
 ---
-import { Image } from 'astro:assets';
-import homeImg from '~/assets/images/flightbook/home.png';
-import statisticImg from '~/assets/images/flightbook/statistic.png';
-import addFlightImg from '~/assets/images/flightbook/add-flight.png';
-import placeImg from '~/assets/images/flightbook/place.png';
+import Image from '~/components/common/Image.astro';
+import home1DE from '~/assets/images/flightbook/mobile/Apple1DE.png';
+import controlSheetDE from '~/assets/images/flightbook/mobile/Apple2DE.png';
+import addFlightDE from '~/assets/images/flightbook/mobile/Apple3DE.png';
+import statisticDE from '~/assets/images/flightbook/mobile/Apple4DE.png';
+import tandemDE from '~/assets/images/flightbook/mobile/Apple5DE.png';
+import home1FR from '~/assets/images/flightbook/mobile/Apple1FR.png';
+import controlSheetFR from '~/assets/images/flightbook/mobile/Apple2FR.png';
+import addFlightFR from '~/assets/images/flightbook/mobile/Apple3FR.png';
+import statisticFR from '~/assets/images/flightbook/mobile/Apple4FR.png';
+import tandemFR from '~/assets/images/flightbook/mobile/Apple5FR.png';
 
 interface Feature {
   title: string;
@@ -14,16 +20,28 @@ interface Props {
   title: string;
   features: Feature[];
   cta: string;
+  lang?: 'de' | 'fr';
 }
 
-const { title, features, cta } = Astro.props;
+const { title, features, cta, lang = 'de' } = Astro.props;
 
-const images = [
-  { src: homeImg, alt: 'Flightbook App Startseite - Übersicht der Flugverwaltung' },
-  { src: statisticImg, alt: 'Flightbook Statistiken - Auswertung von Flugdaten' },
-  { src: addFlightImg, alt: 'Flug hinzufügen - Neue Flüge in Flightbook erfassen' },
-  { src: placeImg, alt: 'Flugplätze verwalten - Start- und Landeplätze' },
-];
+const imagesByLang = {
+  de: [
+    { src: home1DE, alt: 'Flightbook App Startseite - Übersicht der Flugverwaltung' },
+    { src: controlSheetDE, alt: 'Kontrollblatt - SHV-Nachweis erstellen und Fortschritt tracken' },
+    { src: addFlightDE, alt: 'Flug hinzufügen - Neue Flüge in Flightbook erfassen' },
+    { src: statisticDE, alt: 'Flightbook Statistiken - Auswertung von Flugdaten' },
+    { src: tandemDE, alt: 'Tandem-Bestätigung ausfüllen - für brevetierte Tandempilot:innen' },
+  ],
+  fr: [
+    { src: home1FR, alt: "Page d'accueil de l'app Flightbook - aperçu de la gestion des vols" },
+    { src: controlSheetFR, alt: 'Feuille de contrôle - établir la preuve FSVL et suivre la progression' },
+    { src: addFlightFR, alt: 'Ajouter un vol - saisir de nouveaux vols dans Flightbook' },
+    { src: statisticFR, alt: 'Statistiques Flightbook - analyse des données de vol' },
+    { src: tandemFR, alt: 'Remplir la confirmation tandem - pour pilotes tandem brevetés' },
+  ],
+};
+const images = imagesByLang[lang];
 
 const icons = [
   `<path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4M12,6A6,6 0 0,0 6,12A6,6 0 0,0 12,18A6,6 0 0,0 18,12A6,6 0 0,0 12,6Z"/>`,
@@ -64,44 +82,28 @@ const icons = [
       </div>
 
       <!-- Slideshow Column -->
-      <div class="relative max-w-md mx-auto lg:mx-0">
-        <div class="slideshow-container relative rounded-lg overflow-hidden shadow-xl bg-gray-100 dark:bg-gray-800">
-          {
-            images.map((img, index) => (
-              <div class:list={['slide', index === 0 && 'active']}>
-                <Image src={img.src} alt={img.alt} class="w-full h-auto max-h-[600px] object-contain" loading="lazy" />
-              </div>
-            ))
-          }
-
-          <!-- Navigation arrows -->
-          <button
-            class="slide-nav prev absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors"
-            aria-label="Previous slide"
-          >
-            &#10094;
-          </button>
-          <button
-            class="slide-nav next absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors"
-            aria-label="Next slide"
-          >
-            &#10095;
-          </button>
-
-          <!-- Slide indicators -->
-          <div class="slide-indicators absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+      <div class="flex justify-center">
+        <div class="max-w-[250px] w-full">
+          <div class="premium-slideshow-container relative rounded-lg overflow-hidden shadow-lg bg-gray-100 dark:bg-gray-800">
             {
-              images.map((_, index) => (
-                <button
-                  class:list={[
-                    'indicator w-3 h-3 rounded-full bg-white/50 hover:bg-white/80 transition-colors',
-                    index === 0 && 'active bg-white',
-                  ]}
-                  aria-label={`Go to slide ${index + 1}`}
-                  data-slide={index}
-                />
+              images.map((img, index) => (
+                <div class:list={['premium-slide', index === 0 && 'active']}>
+                  <Image
+                    src={img.src}
+                    alt={img.alt}
+                    class="w-full h-auto"
+                    loading="lazy"
+                    widths={[250, 300]}
+                    sizes="250px"
+                  />
+                </div>
               ))
             }
+            <button class="premium-prev" aria-label="Previous slide">&#10094;</button>
+            <button class="premium-next" aria-label="Next slide">&#10095;</button>
+          </div>
+          <div class="premium-dots-container text-center mt-4">
+            {images.map((_, index) => <span class:list={['premium-dot', index === 0 && 'active']} data-slide={index} />)}
           </div>
         </div>
       </div>
@@ -116,63 +118,134 @@ const icons = [
 </section>
 
 <style>
-  .slide {
+  .premium-slideshow-container {
+    position: relative;
+  }
+
+  .premium-slide {
     display: none;
   }
-  .slide.active {
+
+  .premium-slide.active {
     display: block;
   }
-  .indicator.active {
-    background-color: white;
+
+  .premium-prev,
+  .premium-next {
+    cursor: pointer;
+    position: absolute;
+    top: 50%;
+    width: auto;
+    margin-top: -22px;
+    padding: 12px;
+    color: white;
+    font-weight: bold;
+    font-size: 16px;
+    transition: 0.3s ease;
+    border-radius: 0 3px 3px 0;
+    user-select: none;
+    background-color: rgba(0, 0, 0, 0.5);
+    border: none;
+  }
+
+  .premium-next {
+    right: 0;
+    border-radius: 3px 0 0 3px;
+  }
+
+  .premium-prev:hover,
+  .premium-next:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+  }
+
+  .premium-dots-container {
+    text-align: center;
+    padding: 10px 0;
+  }
+
+  .premium-dot {
+    cursor: pointer;
+    height: 10px;
+    width: 10px;
+    margin: 0 3px;
+    background-color: #bbb;
+    border-radius: 50%;
+    display: inline-block;
+    transition: background-color 0.3s ease;
+  }
+
+  .premium-dot.active,
+  .premium-dot:hover {
+    background-color: #1b3e71;
   }
 </style>
 
 <script>
-  let currentSlideIndex = 0;
-  const slides = document.querySelectorAll('.slide');
-  const indicators = document.querySelectorAll('.indicator');
+  // Module scripts run once, but ClientRouter swaps the DOM on navigation (e.g. language switch).
+  // Keep the timer at module level so a re-init can stop the one bound to the old page.
+  let autoSlideInterval: number | undefined;
 
-  function showSlide(index: number) {
-    slides.forEach((slide) => slide.classList.remove('active'));
-    indicators.forEach((indicator) => indicator.classList.remove('active'));
+  function initPremiumSlideshow() {
+    clearInterval(autoSlideInterval);
 
-    if (slides[index]) {
-      slides[index].classList.add('active');
-      indicators[index]?.classList.add('active');
+    const premiumSection = document.querySelector('#premium');
+    if (!premiumSection) return;
+
+    const slides = premiumSection.querySelectorAll('.premium-slide');
+    const dots = premiumSection.querySelectorAll('.premium-dot');
+    const prevBtn = premiumSection.querySelector('.premium-prev');
+    const nextBtn = premiumSection.querySelector('.premium-next');
+    let currentSlide = 0;
+
+    function showSlide(n: number) {
+      slides.forEach((slide) => slide.classList.remove('active'));
+      dots.forEach((dot) => dot.classList.remove('active'));
+
+      currentSlide = (n + slides.length) % slides.length;
+
+      slides[currentSlide].classList.add('active');
+      dots[currentSlide].classList.add('active');
     }
-  }
 
-  function changeSlide(direction: number) {
-    currentSlideIndex += direction;
-
-    if (currentSlideIndex >= slides.length) {
-      currentSlideIndex = 0;
-    } else if (currentSlideIndex < 0) {
-      currentSlideIndex = slides.length - 1;
+    function nextSlide() {
+      showSlide(currentSlide + 1);
     }
 
-    showSlide(currentSlideIndex);
-  }
+    function prevSlide() {
+      showSlide(currentSlide - 1);
+    }
 
-  // Navigation buttons
-  document.querySelector('.slide-nav.prev')?.addEventListener('click', () => changeSlide(-1));
-  document.querySelector('.slide-nav.next')?.addEventListener('click', () => changeSlide(1));
+    function startAutoSlide() {
+      autoSlideInterval = window.setInterval(nextSlide, 5000);
+    }
 
-  // Indicators
-  indicators.forEach((indicator, index) => {
-    indicator.addEventListener('click', () => {
-      currentSlideIndex = index;
-      showSlide(currentSlideIndex);
+    function stopAutoSlide() {
+      clearInterval(autoSlideInterval);
+    }
+
+    prevBtn?.addEventListener('click', () => {
+      prevSlide();
+      stopAutoSlide();
+      startAutoSlide();
     });
-  });
 
-  // Auto-advance slideshow
-  let autoSlideInterval = setInterval(() => changeSlide(1), 4000);
+    nextBtn?.addEventListener('click', () => {
+      nextSlide();
+      stopAutoSlide();
+      startAutoSlide();
+    });
 
-  // Pause on hover
-  const container = document.querySelector('.slideshow-container');
-  container?.addEventListener('mouseenter', () => clearInterval(autoSlideInterval));
-  container?.addEventListener('mouseleave', () => {
-    autoSlideInterval = setInterval(() => changeSlide(1), 4000);
-  });
+    dots.forEach((dot, index) => {
+      dot.addEventListener('click', () => {
+        showSlide(index);
+        stopAutoSlide();
+        startAutoSlide();
+      });
+    });
+
+    startAutoSlide();
+  }
+
+  // Fires on the initial load and after every ClientRouter navigation
+  document.addEventListener('astro:page-load', initPremiumSlideshow);
 </script>

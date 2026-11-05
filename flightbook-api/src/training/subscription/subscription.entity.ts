@@ -28,4 +28,7 @@ export class Subscription {
         default: () => "CURRENT_TIMESTAMP",
     })
     timestamp: Date;
+
+    @Column("text", { name: "comment", nullable: true })
+    comment?: string;
 }

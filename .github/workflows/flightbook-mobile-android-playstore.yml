@@ -11,6 +11,7 @@ on:
 jobs:
   playstore:
     runs-on: ubuntu-24.04
+    timeout-minutes: 15
     env:
       BUNDLE_GEMFILE: ${{ github.workspace }}/flightbook-mobile-app/android/Gemfile
     steps:

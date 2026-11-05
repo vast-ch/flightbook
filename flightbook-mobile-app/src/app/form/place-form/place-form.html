@@ -1,20 +1,56 @@
-<form #form="ngForm" (ngSubmit)="saveElement(form)">
-  <ion-item>
-    <ion-input label="{{ 'place.name' | translate }} *" labelPlacement="stacked" required clearInput [(ngModel)]="place.name" type="text" name="name"></ion-input>
-  </ion-item>
-  <ion-item>
-    <ion-input label="{{ 'place.altitude' | translate }}" labelPlacement="stacked" clearInput [(ngModel)]="place.altitude" type="number" name="altitude"></ion-input>
-  </ion-item>
-  <ion-item>
-    <ion-select label="{{ 'place.country' | translate }}" labelPlacement="stacked" [(ngModel)]="place.country" name="country" okText="{{ 'buttons.done' | translate }}" cancelText="{{ 'buttons.clear' | translate }}" (ionCancel)="clearCountry()">
-      @for (country of countries; track country.code) {
-        <ion-select-option value="{{ country.code }}">{{ country.name[this.lang] }}</ion-select-option>
-      }     
-    </ion-select>
-  </ion-item>
-  <ion-item>
-    <ion-textarea label="{{ 'place.notes' | translate }}" labelPlacement="stacked" rows="4" type="text" [(ngModel)]="place.notes" name="notes"></ion-textarea>
-  </ion-item>
-  <fb-place-map [place]="place" [placeName]="place?.name"></fb-place-map>
-  <ion-button expand="block" type="submit" >{{ 'buttons.save' | translate }}</ion-button>
+<!--
+  The submit button lives in the host page's ion-footer and reaches this form
+  through form="placeForm", which keeps ngSubmit and Enter-to-submit working
+  without a @ViewChild.
+-->
+<form id="placeForm" #form="ngForm" (ngSubmit)="saveElement(form)">
+
+  <div class="fb-card--flush form-card">
+    <div class="fb-row">
+      <span class="fb-row__label" id="lbl-place-name">{{ 'place.name' | translate }}<span class="fb-row__req" aria-hidden="true">*</span></span>
+      <span class="fb-row__value">
+        <ion-input required clearInput [(ngModel)]="place.name" type="text" name="name"
+                   aria-labelledby="lbl-place-name"></ion-input>
+      </span>
+    </div>
+
+    <div class="fb-row">
+      <span class="fb-row__label" id="lbl-place-altitude">{{ 'place.altitude' | translate }}</span>
+      <span class="fb-row__value">
+        <ion-input clearInput [(ngModel)]="place.altitude" type="number" name="altitude"
+                   aria-labelledby="lbl-place-altitude"></ion-input>
+      </span>
+    </div>
+
+    <div class="fb-row fb-row--select">
+      <span class="fb-row__label" id="lbl-place-country">{{ 'place.country' | translate }}</span>
+      <span class="fb-row__value">
+        <ion-select [(ngModel)]="place.country" name="country" toggleIcon="chevron-forward"
+                    aria-labelledby="lbl-place-country"
+                    okText="{{ 'buttons.done' | translate }}"
+                    cancelText="{{ 'buttons.clear' | translate }}"
+                    (ionCancel)="clearCountry()">
+          @for (country of countries; track country.code) {
+            <ion-select-option value="{{ country.code }}">{{ country.name[this.lang] }}</ion-select-option>
+          }
+        </ion-select>
+      </span>
+    </div>
+  </div>
+
+  <div class="fb-card--flush form-card">
+    <div class="fb-row fb-row--stack">
+      <span class="fb-row__label" id="lbl-place-notes">{{ 'place.notes' | translate }}</span>
+      <span class="fb-row__value">
+        <ion-textarea rows="4" [(ngModel)]="place.notes" name="notes"
+                      aria-labelledby="lbl-place-notes"></ion-textarea>
+      </span>
+    </div>
+  </div>
+
+  <div class="fb-section-label form-section-label">{{ 'place.coordinates' | translate }}</div>
+  <div class="fb-card--flush form-card form-card--map">
+    <fb-place-map [place]="place" [placeName]="place?.name"></fb-place-map>
+  </div>
+  <div class="fb-empty-hint map-hint">{{ 'place.mapHint' | translate }}</div>
 </form>

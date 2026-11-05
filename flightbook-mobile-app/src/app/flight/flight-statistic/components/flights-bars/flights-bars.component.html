@@ -1,0 +1,22 @@
+<!--
+    One scroll box around both rows: scrolling them separately would let
+    a label drift away from the bar it names.
+-->
+<div class="chart">
+    <div class="bars" [class.bars--tight]="tight()" [class.bars--valued]="valued()">
+        @for (slot of slots(); track $index) {
+            <div class="bars__slot">
+                @if (valued()) {
+                    <div class="bars__value">{{ slot.text }}</div>
+                }
+                <div class="bars__bar" [class.is-empty]="slot.bar.empty" [class.is-peak]="slot.bar.peak"
+                     [style.height]="height(slot.bar)"></div>
+            </div>
+        }
+    </div>
+    <div class="labels" [class.labels--tight]="tight()">
+        @for (slot of slots(); track $index) {
+            <div class="labels__cell" [class.is-quiet]="slot.bar.empty">{{ slot.bar.label }}</div>
+        }
+    </div>
+</div>

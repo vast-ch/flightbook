@@ -14,7 +14,8 @@
         },
         "informWaitingStudent": {
             "title": "{school}: Registration for: {date}",
-            "body": "Someone has unsubscribed for the appointment from {date}. You can now participate."
+            "bodyCanParticipate": "Someone has unsubscribed from the appointment on {date}. You can now participate.",
+            "bodyMovedUp": "Someone has unsubscribed from the appointment on {date}. You have moved up to position {position} on the waiting list."
         }
     },
     "flightValidation": {

@@ -1,26 +1,111 @@
+:host {
+  display: block;
+
+  // OL chrome (attribution control) picks these up - cleaner than fighting
+  // ol.css selectors, which load after the theme and would otherwise win.
+  --ol-background-color: var(--fb-surface);
+  --ol-subtle-background-color: var(--fb-surface);
+  --ol-partial-background-color: rgba(255, 255, 255, 0.75);
+  --ol-foreground-color: var(--fb-text);
+  --ol-subtle-foreground-color: var(--fb-text-secondary);
+}
+
+.map-frame {
+  position: relative;
+}
+
 .igc-map {
   display: block;
-  margin-left: auto;
-  margin-right: auto;
-  height: 50vh;
-  border: 5px solid #555;
+  // Host decides the height; the rounded card supplies the framing that the
+  // old 5px grey border used to.
+  height: var(--fb-igc-map-height, 280px);
 }
 
-.range-slider {
-  margin-top: 2vh;
+// ---- Legend -------------------------------------------------------------
+.legend {
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 9px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid var(--fb-border);
+  pointer-events: none;
+}
+
+// Text never wears the ramp colours
+.legend__label {
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--fb-text-secondary);
+}
+
+.legend__bar {
   display: block;
-  margin-left: auto;
-  margin-right: auto;
-  width: 100%;
-  height: var(--height);
-  cursor: grab;
-  touch-action: pan-y;
+  width: 76px;
+  height: 7px;
+  border-radius: 999px;
 }
 
-.info {
-  margin-top: 0px;
+// ---- Readout ------------------------------------------------------------
+.readout {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 7px 10px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid var(--fb-border);
+  pointer-events: none;
+  text-align: right;
 }
 
-.info ul {
-  list-style-type: none;
+.readout__time {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--fb-text);
+}
+
+.readout__alt {
+  font-size: 11px;
+  color: var(--fb-text-secondary);
+}
+
+// ---- Playback -----------------------------------------------------------
+.playback {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px 4px 4px;
+  border-top: 1px solid var(--fb-hairline);
+}
+
+.playback__button {
+  --padding-start: 8px;
+  --padding-end: 8px;
+  --color: var(--ion-color-primary);
+  flex: none;
+  height: 40px;
+  margin: 0;
+
+  ion-icon {
+    font-size: 20px;
+  }
+}
+
+.playback__range {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  --bar-height: 3px;
+  --bar-background: var(--fb-track);
+  --bar-background-active: var(--ion-color-primary);
+  --knob-size: 16px;
 }

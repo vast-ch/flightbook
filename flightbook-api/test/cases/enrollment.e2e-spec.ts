@@ -41,6 +41,33 @@ describe('Enrollments (e2e)', () => {
       });
   });
 
+  it('/:token (GET) does not expose Google Calendar tokens', async () => {
+    // given
+    const school = Testdata.createSchool("School 1");
+    school.configuration = {
+      ...school.configuration,
+      googleCalendar: {
+        accessToken: 'test-access-token',
+        refreshToken: 'test-refresh-token',
+        calendarId: 'primary',
+        tokenExpiry: new Date(Date.now() + 3600000)
+      }
+    };
+    await testInstance.schoolRepository.save(school);
+    const enrollment = Testdata.createEnrollment(school, Testdata.EMAIL, EnrollmentType.STUDENT);
+    await testInstance.enrollmentRepository.save(enrollment);
+
+    //when
+    return request(testInstance.app.getHttpServer())
+      .get(`/enrollments/${enrollment.token}`)
+      .expect(200)
+      .then(async (response) => {
+        expect(response.text).not.toContain('test-access-token');
+        expect(response.text).not.toContain('test-refresh-token');
+        expect(response.body.school.configuration.googleCalendar).toEqual({ calendarId: 'primary' });
+      });
+  });
+
   it('/:token Team member (POST)', async () => {
     // given
     const school = Testdata.createSchool("School 1");

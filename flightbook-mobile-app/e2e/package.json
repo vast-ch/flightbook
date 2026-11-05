@@ -1,0 +1,16 @@
+{
+  "name": "flightbook-mobile-e2e",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "stack:up": "./stack/up.sh",
+    "stack:down": "./stack/down.sh",
+    "test": "playwright test",
+    "baseline": "playwright test --update-snapshots",
+    "compare": "./compare.sh",
+    "report": "playwright show-report out/report"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.56.0"
+  }
+}

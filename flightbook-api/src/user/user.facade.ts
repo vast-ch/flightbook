@@ -10,8 +10,8 @@ import { UserReadDto } from './interface/user-read-dto';
 import { UserPasswordWriteDto } from './interface/user-password-write-dto';
 import { InvalidPasswordException } from './exception/invalid-password-exception';
 import { InvalidOldPasswordException } from './exception/invalid-oldpassword-exception';
-import { LoginType } from './login-type';
-import { PaymentFacade } from '../payment/payment-facade';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { USER_EMAIL_CHANGED, UserEmailChangedEvent } from './event/user-email-changed.event';
 import { EmailService } from '../email/email.service';
 import * as crypto from 'crypto';
 import { UserException } from './exception/user.exception';
@@ -24,7 +24,7 @@ export class UserFacade {
     constructor(
         private userRepository: UserRepository,
         private authService: AuthService,
-        private paymentFacade: PaymentFacade,
+        private eventEmitter: EventEmitter2,
         private emailService: EmailService,
         private keycloakService: KeycloakService
     ) {}
@@ -47,7 +47,6 @@ export class UserFacade {
         user = plainToClass(User, userWriteDto);
         user.email = user.email.toLowerCase();
         user.password = await this.authService.hashPassword(user.password);
-        user.loginType = LoginType.LOCAL;
         user.createdAt = new Date();
         user.paymentExempted = false;
         
@@ -84,19 +83,6 @@ export class UserFacade {
         await this.userRepository.saveUser(user);
     }
 
-    async createSocialLoginUser(userWriteDto: UserWriteDto, loginType: LoginType, socialLoginId: string): Promise<any> {
-        if (!userWriteDto.email || !userWriteDto.firstname || !userWriteDto.lastname) {
-            throw new InvalidUserException();
-        }
-
-        const user = plainToClass(User, userWriteDto);
-        user.loginType = loginType;
-        user.socialloginId = socialLoginId;
-
-        const userResp: User = await this.userRepository.saveUser(user);
-        return userResp;
-    }
-
     async updateUser(id: number, userWriteDto: UserWriteDto): Promise<any> {
         if (!userWriteDto.email || !userWriteDto.firstname || !userWriteDto.lastname) {
             throw new InvalidUserException();
@@ -104,10 +90,6 @@ export class UserFacade {
 
         const user: User = await this.userRepository.getUserById(id);
         const oldEmail = user.email;
-
-        if (user.loginType != LoginType.LOCAL) {
-            throw new BadRequestException();
-        }
 
         if (user.email !== userWriteDto.email) {
             const userExist: User = await this.userRepository.getUserByEmail(userWriteDto.email);
@@ -134,7 +116,7 @@ export class UserFacade {
         const userResp: User = await this.userRepository.saveUser(user);
 
         if (oldEmail !== userResp.email) {
-            this.paymentFacade.updatePaymentUser(userResp, oldEmail);
+            this.eventEmitter.emit(USER_EMAIL_CHANGED, new UserEmailChangedEvent(userResp, oldEmail));
         }
         return plainToClass(UserReadDto, userResp);
     }

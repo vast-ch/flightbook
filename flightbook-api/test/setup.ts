@@ -46,6 +46,8 @@ const init = async () => {
     process.env.MAP_URL = 'https://example.com/map';
     process.env.MAP_ATTRIBUTIONS = 'Test Attribution';
     process.env.MAP_CROSS_ORIGIN = 'anonymous';
+    process.env.MAP_TERRAIN_URL = 'https://example.com/terrain';
+    process.env.MAP_TERRAIN_ATTRIBUTIONS = 'Test Terrain Attribution';
 
     // Create test DataSource
     const testDataSource = new DataSource({

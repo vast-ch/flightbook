@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ModalController } from '@ionic/angular/standalone';
+import { ModalController } from '@ionic/angular';
 import { VersionCheckService, UpdateStatus, VersionCheckResponse } from '../services/version-check.service';
 import { UpdatePromptComponent } from '../components/update-prompt/update-prompt.component';
 

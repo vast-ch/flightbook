@@ -3,64 +3,27 @@ ion-modal.timeModal {
     --max-height: 252px;
 }
 
-:host ::ng-deep ion-input.test .native-wrapper .native-input {
-    display: none !important;
+// ---- Layout ------------------------------------------------------------
+.form-card {
+    margin-top: 12px;
+
+    &:first-of-type {
+        margin-top: 0;
+    }
 }
 
-:host ::ng-deep .ios ion-input ion-toggle {
-  margin-top: 3px !important;
+.form-card--map {
+    // The card supplies the framing the map's own 5px border used to.
+    --fb-igc-map-height: 280px;
 }
 
-:host ::ng-deep ion-item ion-label p {
-  display: block;
-  margin: 0;
-  padding: 0;
+.form-section-label {
+    margin: 22px 0 9px;
 }
 
-// Validation information
-ion-item.validation ion-label .validation-row {
-    display: flex;
-    flex-direction: row;
-    align-items: flex-start;
-    margin: 0;
-    padding: 0;
-    font-size: 14px;
-    color: rgb(102, 102, 102) !important;
+.form-banner {
+    margin-bottom: 12px;
 }
 
-ion-item.validation ion-label .validation-row:first-of-type {
-    margin-top: 5px;
-}
-
-ion-item.validation ion-label .validation-label {
-    display: inline-block;
-    min-width: 93px;
-    font-weight: 500;
-}
-
-// Payment information
-ion-item.payment ion-label .payment-row {
-    display: flex;
-    flex-direction: row;
-    align-items: flex-start;
-    margin: 0;
-    padding: 0;
-    font-size: 14px;
-    color: rgb(102, 102, 102) !important;
-}
-
-ion-item.payment ion-label .payment-row:first-of-type {
-    margin-top: 5px;
-}
-
-ion-item.payment ion-label .payment-label {
-    display: inline-block;
-    min-width: 120px;
-    font-weight: 500;
-}
-
-// customSchoolFields
-.customSchoolFields p {
-    margin-top: 10px;
-    font-weight: bold;
-}
+// Ionic controls inside .fb-row, and the stacked textarea row, are styled
+// globally in theme/tokens.scss - all three redesigned forms share them.

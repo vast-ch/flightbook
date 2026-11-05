@@ -1,55 +1,111 @@
-<form #form="ngForm" (ngSubmit)="saveElement(form)">
-  <ion-item id="buyDateInput">
-    <ion-input label="{{ 'glider.buydate' | translate }}" labelPlacement="stacked" value="{{ glider.buyDate | date:'dd.MM.yyyy' }}"></ion-input>
-  </ion-item>
-  <ion-item>
-    <ion-input label="{{ 'glider.brand' | translate }} *" labelPlacement="stacked" required clearInput [(ngModel)]="glider.brand" type="text" name="brand"></ion-input>
-  </ion-item>
-  <ion-item>
-    <ion-input label="{{ 'glider.name' | translate }} *" labelPlacement="stacked" required [(ngModel)]="glider.name" type="text" name="name"></ion-input>
-  </ion-item>
-  <ion-item>
-    <ion-input label="{{ 'glider.color' | translate }}" labelPlacement="stacked" [(ngModel)]="glider.color" type="text" name="color"></ion-input>
-  </ion-item>
-  <ion-item>
-    <ion-label color="primary" position="stacked">{{ 'glider.tandem' | translate }}</ion-label>
-    <ion-toggle [(ngModel)]="glider.tandem" name="tandem"></ion-toggle>
-  </ion-item>
-  @if (displayArchived) {
-    <ion-item>
-      <ion-label color="primary" position="stacked">{{ 'glider.archive' | translate }}</ion-label>
-      <ion-toggle [(ngModel)]="glider.archived" name="archived"></ion-toggle>
-    </ion-item>
-  }
-  <ion-item>
-    <ion-textarea label="{{ 'glider.note' | translate }}" labelPlacement="stacked" [(ngModel)]="glider.note" name="note" autocomplete="on" autocorrect="on" auto-grow="true"></ion-textarea>
-  </ion-item>
-  <div class="checks-wrapper">
-    <div class="checks-header">
-      <ion-button size="small" shape="round" id="addCheckButton" (click)="gliderCheckAddButton()">
-        <ion-icon slot="icon-only" name="add"></ion-icon>
-      </ion-button>
-      <ion-label lines="none">{{ 'glider.check.title' | translate }}</ion-label>
+<!--
+  The submit button lives in the host page's ion-footer and reaches this form
+  through form="gliderForm", which keeps ngSubmit and Enter-to-submit working
+  without a @ViewChild.
+-->
+<form id="gliderForm" #form="ngForm" (ngSubmit)="saveElement(form)">
+
+  <div class="fb-card--flush form-card">
+    <div class="fb-row">
+      <span class="fb-row__label" id="lbl-brand">{{ 'glider.brand' | translate }}<span class="fb-row__req" aria-hidden="true">*</span></span>
+      <span class="fb-row__value">
+        <ion-input required clearInput [(ngModel)]="glider.brand" type="text" name="brand"
+                   aria-labelledby="lbl-brand"></ion-input>
+      </span>
     </div>
-    <ion-list>
-      @for (check of glider.checks; track check) {
-        <ion-item-sliding>
-          <ion-item button detail (click)="manageCheckModal(check, 'edit')">
-            <ion-label>
-              <h3>{{ check.date | date:'dd.MM.yyyy' }}</h3>
-              <p style="white-space: pre-wrap;">{{ check.result }}</p>
-            </ion-label>
-          </ion-item>
-          <ion-item-options side="end">
-            <ion-item-option color="danger" (click)="deleteCheckItem(check)">
-              <ion-icon slot="icon-only" name="trash"></ion-icon>
-            </ion-item-option>
-          </ion-item-options>
-      </ion-item-sliding>
-      }
-    </ion-list>
+
+    <div class="fb-row">
+      <span class="fb-row__label" id="lbl-name">{{ 'glider.name' | translate }}<span class="fb-row__req" aria-hidden="true">*</span></span>
+      <span class="fb-row__value">
+        <ion-input required clearInput [(ngModel)]="glider.name" type="text" name="name"
+                   aria-labelledby="lbl-name"></ion-input>
+      </span>
+    </div>
+
+    <div class="fb-row">
+      <span class="fb-row__label" id="lbl-color">{{ 'glider.color' | translate }}</span>
+      <span class="fb-row__value">
+        <ion-input clearInput [(ngModel)]="glider.color" type="text" name="color"
+                   aria-labelledby="lbl-color"></ion-input>
+      </span>
+    </div>
+
+    <!-- type="button" is mandatory: inside a form a bare button submits -->
+    <button type="button" id="buyDateInput" class="fb-row">
+      <span class="fb-row__label">{{ 'glider.buydate' | translate }}</span>
+      <span class="fb-row__value" [class.is-placeholder]="!glider.buyDate">
+        @if (glider.buyDate) {
+          {{ glider.buyDate | date:'dd.MM.yyyy' }}
+        } @else {
+          {{ 'glider.buydate' | translate }}
+        }
+      </span>
+      <ion-icon class="fb-row__chevron" name="chevron-forward" aria-hidden="true"></ion-icon>
+    </button>
   </div>
-  <ion-button expand="block" type="submit">{{ 'buttons.save' | translate }}</ion-button>
+
+  <div class="fb-card--flush form-card">
+    <div class="fb-row fb-row--toggle">
+      <span class="fb-row__label">{{ 'glider.tandem' | translate }}</span>
+      <ion-toggle [(ngModel)]="glider.tandem" name="tandem"
+                  [attr.aria-label]="'glider.tandem' | translate"></ion-toggle>
+    </div>
+
+    @if (displayArchived) {
+      <div class="fb-row fb-row--toggle">
+        <span class="fb-row__label">{{ 'glider.archived' | translate }}</span>
+        <ion-toggle [(ngModel)]="glider.archived" name="archived"
+                    [attr.aria-label]="'glider.archived' | translate"></ion-toggle>
+      </div>
+    }
+  </div>
+
+  <div class="fb-card--flush form-card">
+    <div class="fb-row fb-row--stack">
+      <span class="fb-row__label" id="lbl-note">{{ 'glider.note' | translate }}</span>
+      <span class="fb-row__value">
+        <ion-textarea [(ngModel)]="glider.note" name="note" autocomplete="on" autocorrect="on"
+                      auto-grow="true" aria-labelledby="lbl-note"></ion-textarea>
+      </span>
+    </div>
+  </div>
+
+  <div class="checks-head">
+    <span class="fb-section-label">{{ 'glider.check.title' | translate }}</span>
+    <button type="button" class="fb-section-action" (click)="gliderCheckAddButton()">
+      {{ 'buttons.add' | translate }}
+    </button>
+  </div>
+
+  @if (glider.checks?.length > 0) {
+    <div class="fb-card--flush">
+      <ion-list class="checks-list">
+        @for (check of glider.checks; track check) {
+          <ion-item-sliding>
+            <ion-item button detail="false" lines="none" class="check-row"
+                      (click)="manageCheckModal(check, 'edit')">
+              <div class="check-row__inner">
+                <div class="check-row__main">
+                  <div class="check-row__date">{{ check.date | date:'dd.MM.yyyy' }}</div>
+                  @if (check.result) {
+                    <div class="check-row__result">{{ check.result }}</div>
+                  }
+                </div>
+                <ion-icon class="fb-row__chevron" name="chevron-forward" aria-hidden="true"></ion-icon>
+              </div>
+            </ion-item>
+            <ion-item-options side="end">
+              <ion-item-option color="danger" (click)="deleteCheckItem(check)">
+                <ion-icon slot="icon-only" name="trash"></ion-icon>
+              </ion-item-option>
+            </ion-item-options>
+          </ion-item-sliding>
+        }
+      </ion-list>
+    </div>
+  } @else {
+    <div class="fb-empty-hint">{{ 'emptylist' | translate }}</div>
+  }
 </form>
 
 <ion-modal class="dateModal" trigger='buyDateInput'>

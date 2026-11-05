@@ -4,10 +4,6 @@ import { UserRepository } from '../user/user.repository';
 import { AuthService } from './service/auth.service';
 import { EmailBodyDto } from '../email/email-body-dto';
 import { EmailService } from '../email/email.service';
-import { OAuth2Client } from 'google-auth-library';
-import { UserFacade } from '../user/user.facade';
-import { LoginType } from '../user/login-type';
-import { UserAlreadyExistsException } from '../user/exception/user-already-exists-exception';
 import { LoginDto } from './interface/login-dto';
 import { KeycloakService } from './service/keycloak.service';
 
@@ -15,7 +11,6 @@ import { KeycloakService } from './service/keycloak.service';
 export class AuthFacade {
     constructor(
         private userRepository: UserRepository,
-        private userFacade: UserFacade,
         private authService: AuthService,
         private emailService: EmailService,
         private keycloakService: KeycloakService
@@ -127,39 +122,6 @@ export class AuthFacade {
             await this.emailService.sendEmail(emailBody);
         } catch (e) {
             throw new HttpException("Email service is unavailable", 503);
-        }
-    }
-
-    async googleLogin(token: string, language: string) {
-        const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
-        try {
-            const ticket = await client.verifyIdToken({
-                idToken: token,
-                audience: process.env.GOOGLE_CLIENT_ID
-            })
-            const payload = ticket.getPayload();
-
-            const user = await this.userRepository.getUserByEmail(payload.email);
-
-            if (user) {
-                if (LoginType.GOOGLE == user.loginType && user.socialloginId == payload.sub && user.enabled) {
-                    return this.authService.login(user, language);
-                } else {
-                    throw new UserAlreadyExistsException();
-                }
-            } else {
-                const createdUser = await this.userFacade.createSocialLoginUser({
-                    firstname: payload.given_name,
-                    lastname: payload.family_name,
-                    email: payload.email,
-                    phone: null,
-                    password: null
-                }, LoginType.GOOGLE, payload.sub);
-
-                return this.authService.login(createdUser, language);
-            }
-        } catch (exception) {
-            throw new UnauthorizedException();
         }
     }
 }

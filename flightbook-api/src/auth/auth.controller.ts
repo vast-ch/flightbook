@@ -15,11 +15,6 @@ export class AuthController {
         return this.authFacade.login(loginDto, language);
     }
 
-    @Post('google/login/:token')
-    async googleLogin(@Param('token') token: string, @Headers('accept-language') language: string) {
-        return this.authFacade.googleLogin(token, language);
-    }
-
     @ApiOperation({ deprecated: true })
     @Get('refresh/:token')
     @ApiParam({name: 'token', required: true, schema: { oneOf: [{type: 'string'}]}})

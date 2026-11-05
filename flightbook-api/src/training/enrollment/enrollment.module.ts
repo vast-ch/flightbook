@@ -1,4 +1,4 @@
-import { forwardRef, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Enrollment } from './enrollment.entity';
 import { EnrollmentRepository } from './enrollment.repository';
@@ -19,11 +19,11 @@ import { TandemPilotModule } from '../tandem-pilot/tandem-pilot.module';
     imports: [
         HttpModule,
         TypeOrmModule.forFeature([Enrollment, Note, ControlSheet]),
-        forwardRef(() => StudentModule),
+        StudentModule,
         UserModule,
-        forwardRef(() => SchoolModule),
-        forwardRef(() => TeamMemberModule),
-        forwardRef(() => TandemPilotModule)
+        SchoolModule,
+        TeamMemberModule,
+        TandemPilotModule
     ],
     providers: [EnrollmentRepository, EnrollmentFacade, EmailService, NoteRepository, ControlSheetRepository],
     exports: [EnrollmentRepository, EnrollmentFacade],

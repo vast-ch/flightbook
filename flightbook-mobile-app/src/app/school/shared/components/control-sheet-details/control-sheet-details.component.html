@@ -1,16 +1,34 @@
-<ion-header>
-    <ion-toolbar color='primary'>
-        <ion-title>{{ ('controlSheet.' + type + '.' + key + '.title') | translate }}</ion-title>
-        <ion-buttons slot="end">
-            <ion-button (click)="close()"><ion-icon name="close"></ion-icon></ion-button>
-        </ion-buttons>
-    </ion-toolbar>
-</ion-header>
-<ion-content class="ion-padding">
-    @if ((('controlSheet.' + type + '.' + key + '.video') | translate) != 'controlSheet.' + type + '.' + key + '.video') {
-        <div class="video-container">
-            <iframe [src]="getSafeUrl(('controlSheet.' + type + '.' + key + '.video') | translate)" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-        </div>
-    }
-    <div class="content" [innerHTML]="('controlSheet.' + type + '.' + key + '.content') | translate"></div>
+<!--
+    One sheet per skill: rate it at the top, read what it asks of you below.
+    The head is fixed, the coaching copy scrolls.
+-->
+<div class="skill-sheet__head">
+    <div class="skill-sheet__grabber" aria-hidden="true"></div>
+    <h2 class="skill-sheet__title">{{ titleKey | translate }}</h2>
+    <fb-star-rating class="skill-sheet__stars" [edit]="canEdit" [selectedRating]="rating"
+                    (selectEvent)="onRate($event)"></fb-star-rating>
+    <p class="skill-sheet__level">{{ levelKey | translate }}</p>
+</div>
+
+<ion-content class="skill-sheet__body">
+    <div class="skill-sheet__scroll">
+        <!--
+            Test the resolved value, not the key. Every `video` entry is present but
+            null for 42 of the 48 skills, so the old key comparison was always true
+            and rendered an <iframe src="null">.
+        -->
+        @if (safeVideoUrl) {
+            <div class="video-container">
+                <iframe [src]="safeVideoUrl" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+            </div>
+        }
+
+        @if (content) {
+            <div class="skill-sheet__content" [innerHTML]="content"></div>
+        }
+
+        <ion-button expand="block" class="skill-sheet__done" (click)="close()">
+            {{ 'buttons.done' | translate }}
+        </ion-button>
+    </div>
 </ion-content>

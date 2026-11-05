@@ -4,6 +4,8 @@ exports[`ConfigurationController (e2e) /map (GET) 1`] = `
 {
   "attributions": "Test Attribution",
   "crossOrigin": "anonymous",
+  "terrainAttributions": "Test Terrain Attribution",
+  "terrainUrl": "https://example.com/terrain",
   "url": "https://example.com/map",
 }
 `;
