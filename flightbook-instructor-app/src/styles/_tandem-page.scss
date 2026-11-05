@@ -256,6 +256,33 @@
     flex-direction: column;
   }
 
+  // Loading skeletons (list rows, whole detail pane); the bars come from _skeleton.scss.
+  .fb-tandem-row--skeleton {
+    cursor: default;
+
+    &:hover {
+      background: transparent;
+    }
+
+    .fb-tandem-row__main {
+      align-items: center;
+    }
+  }
+
+  .fb-detail-header__title--skeleton {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: var(--fb-space-3);
+    min-width: 0;
+  }
+
+  .fb-stat-tile--skeleton {
+    display: flex;
+    flex-direction: column;
+    gap: var(--fb-space-3);
+  }
+
   .fb-no-pilot {
     padding: var(--fb-space-9);
     text-align: center;

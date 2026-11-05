@@ -50,7 +50,18 @@
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
       <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
     </table>
-    @if (!typesLoading && appointmentTypes.length === 0) {
+    @if (typesLoading && appointmentTypes.length === 0) {
+      <div aria-busy="true">
+        <span class="fb-sr-only">{{ 'message.loading' | translate }}</span>
+        @for (row of [0, 1, 2]; track row) {
+          <div class="fb-skeleton-row" aria-hidden="true">
+            <span class="fb-skeleton fb-skeleton--text" [style.width.px]="110 + row * 23 % 50"></span>
+            <span class="fb-skeleton fb-skeleton--text" style="width: 70px"></span>
+            <span class="fb-skeleton fb-skeleton--text fb-skeleton-row__wide"></span>
+          </div>
+        }
+      </div>
+    } @else if (appointmentTypes.length === 0) {
       <div class="fb-empty-state">
         <mat-icon>list_alt</mat-icon>
         <span>{{ 'appointmentType.noData' | translate }}</span>

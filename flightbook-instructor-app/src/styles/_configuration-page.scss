@@ -455,6 +455,13 @@
     min-width: 0;
   }
 
+  // Loading skeleton of a team row (bars from _skeleton.scss): name over e-mail.
+  .fb-team-row__text--skeleton {
+    display: flex;
+    flex-direction: column;
+    gap: var(--fb-space-3);
+  }
+
   .fb-team-row__name {
     font-size: var(--fb-text-base-plus);
     font-weight: 500;
@@ -527,6 +534,12 @@
     padding: 11px var(--fb-space-8);
     background: var(--fb-fill-subtle);
     border-top: 1px solid var(--fb-surface-variant);
+  }
+
+  // Placeholder of the "Verbinden" button while the Google-Calendar status check runs.
+  .fb-calendar__skeleton {
+    width: 120px;
+    height: 36px;
   }
 
   .fb-team-pager__label {

@@ -1,7 +1,7 @@
 import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { MatPaginator } from '@angular/material/paginator';
-import { Subject, takeUntil } from 'rxjs';
+import { finalize, Subject, Subscription, takeUntil } from 'rxjs';
 import { StudentService } from 'src/app/core/services/student.service';
 import { Note } from 'src/app/shared/domain/note';
 import { PagerEntity } from 'src/app/shared/domain/pagerEntity';
@@ -25,6 +25,8 @@ export class StudentNoteComponent implements OnDestroy, OnChanges {
   notes: Note[] = [];
   notesPagerEntity = new PagerEntity<Note[]>;
   mode: string = 'new';
+  loading = false;
+  private notesSubscription: Subscription | undefined;
 
   unsubscribe$ = new Subject<void>();
 
@@ -37,7 +39,12 @@ export class StudentNoteComponent implements OnDestroy, OnChanges {
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['student'] && changes['student'].currentValue) {
-      this.loadStudentNotes(changes['student'].currentValue.id!);      
+      // Another student: drop the previous one's notes so they never show under the new name.
+      if (changes['student'].previousValue?.id !== changes['student'].currentValue.id) {
+        this.notes = [];
+        this.notesPagerEntity = new PagerEntity<Note[]>;
+      }
+      this.loadStudentNotes(changes['student'].currentValue.id!);
     }
   }
 
@@ -51,11 +58,15 @@ export class StudentNoteComponent implements OnDestroy, OnChanges {
       this.paginator.pageIndex = 0;
     }
 
-    this.studentService.getNotesByStudentId({ limit, offset }, studentId).pipe(takeUntil(this.unsubscribe$)).subscribe((pagerEntity: PagerEntity<Note[]>) => {
+    // The newest request wins, so a fast student switch can't show an older student's notes.
+    this.notesSubscription?.unsubscribe();
+    this.loading = true;
+    this.notesSubscription = this.studentService.getNotesByStudentId({ limit, offset }, studentId).pipe(
+      takeUntil(this.unsubscribe$),
+      finalize(() => this.loading = false)
+    ).subscribe((pagerEntity: PagerEntity<Note[]>) => {
       this.notesPagerEntity = pagerEntity;
-      if (pagerEntity.entity) {
-        this.notes = pagerEntity.entity;
-      }
+      this.notes = pagerEntity.entity ?? [];
     });
   }
 

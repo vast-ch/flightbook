@@ -27,11 +27,23 @@
 
     <div class="fb-stats-strip">
       <div class="fb-stat-tile">
-        <div class="fb-stat-tile__value">{{ flightsPagerEntity.totalItems ?? '–' }}</div>
+        <div class="fb-stat-tile__value">
+          @if (flightsLoading && flightsPagerEntity.totalItems === undefined) {
+            <span class="fb-skeleton fb-skeleton--value" style="width: 48px" aria-hidden="true"></span>
+          } @else {
+            {{ flightsPagerEntity.totalItems ?? '–' }}
+          }
+        </div>
         <div class="fb-stat-tile__label">{{ 'student.amountofflights'| translate }}</div>
       </div>
       <div class="fb-stat-tile">
-        <div class="fb-stat-tile__value">{{ passengerConfirmationsPagerEntity.totalItems ?? '–' }}</div>
+        <div class="fb-stat-tile__value">
+          @if (passengersLoading && passengerConfirmationsPagerEntity.totalItems === undefined) {
+            <span class="fb-skeleton fb-skeleton--value" style="width: 48px" aria-hidden="true"></span>
+          } @else {
+            {{ passengerConfirmationsPagerEntity.totalItems ?? '–' }}
+          }
+        </div>
         <div class="fb-stat-tile__label">{{ 'tandemPilot.passengers'| translate }}</div>
       </div>
     </div>
@@ -89,7 +101,19 @@
           <tr mat-header-row *matHeaderRowDef="displayedPassengerColumns"></tr>
           <tr mat-row *matRowDef="let row; columns: displayedPassengerColumns;"></tr>
         </table>
-        @if (!passengersLoading && passengerConfirmations.length === 0) {
+        @if (passengersLoading && passengerConfirmations.length === 0) {
+          <div aria-busy="true">
+            <span class="fb-sr-only">{{ 'message.loading' | translate }}</span>
+            @for (row of skeletonRows; track row) {
+              <div class="fb-skeleton-row" aria-hidden="true">
+                <span class="fb-skeleton fb-skeleton--text" style="width: 76px"></span>
+                <span class="fb-skeleton fb-skeleton--text" [style.width.px]="110 + row * 9 % 40"></span>
+                <span class="fb-skeleton fb-skeleton--text" [style.width.px]="96 + row * 13 % 36"></span>
+                <span class="fb-skeleton fb-skeleton--text fb-skeleton-row__wide"></span>
+              </div>
+            }
+          </div>
+        } @else if (passengerConfirmations.length === 0) {
           <div class="fb-empty-state">
             <mat-icon>list_alt</mat-icon>
             <span>{{ 'passengerConfirmation.noData' | translate }}</span>
@@ -216,7 +240,19 @@
           <tr mat-header-row *matHeaderRowDef="displayedFlightColumns"></tr>
           <tr mat-row *matRowDef="let row; columns: displayedFlightColumns;" [class.fb-row--pending]="!row.tandemSchoolData?.paymentState"></tr>
         </table>
-        @if (!flightsLoading && flights.length === 0) {
+        @if (flightsLoading && flights.length === 0) {
+          <div aria-busy="true">
+            <span class="fb-sr-only">{{ 'message.loading' | translate }}</span>
+            @for (row of skeletonRows; track row) {
+              <div class="fb-skeleton-row" aria-hidden="true">
+                <span class="fb-skeleton fb-skeleton--text" style="width: 76px"></span>
+                <span class="fb-skeleton fb-skeleton--text" [style.width.px]="110 + row * 9 % 40"></span>
+                <span class="fb-skeleton fb-skeleton--text" [style.width.px]="96 + row * 13 % 36"></span>
+                <span class="fb-skeleton fb-skeleton--text fb-skeleton-row__wide"></span>
+              </div>
+            }
+          </div>
+        } @else if (flights.length === 0) {
           <div class="fb-empty-state">
             <mat-icon>list_alt</mat-icon>
             <span>{{ 'student.flight.noData' | translate }}</span>
@@ -228,6 +264,43 @@
       </mat-paginator>
     </mat-card>
   </div>
-} @else if (!listLoading) {
+} @else if (listLoading) {
+  <!-- Whole-pane skeleton while the pilot list loads: the real header, tile and card boxes, so nothing jumps. -->
+  <div class="fb-detail-pane" aria-busy="true">
+    <span class="fb-sr-only">{{ 'message.loading' | translate }}</span>
+    <div class="fb-detail-pane__skeleton" aria-hidden="true">
+      <header class="fb-detail-header">
+        <div class="fb-detail-header__title fb-detail-header__title--skeleton">
+          <span class="fb-skeleton fb-skeleton--text" style="width: 90px"></span>
+          <span class="fb-skeleton fb-skeleton--value" style="width: 220px; max-width: 100%"></span>
+        </div>
+        <span class="fb-skeleton fb-skeleton--circle" style="width: 36px; height: 36px"></span>
+        <span class="fb-skeleton fb-skeleton--circle" style="width: 36px; height: 36px"></span>
+      </header>
+
+      <div class="fb-stats-strip">
+        @for (tile of [0, 1]; track tile) {
+          <div class="fb-stat-tile fb-stat-tile--skeleton">
+            <span class="fb-skeleton fb-skeleton--value" style="width: 48px"></span>
+            <span class="fb-skeleton fb-skeleton--text" style="width: 84px"></span>
+          </div>
+        }
+      </div>
+
+      @for (card of [0, 1]; track card) {
+        <mat-card appearance="outlined" class="fb-card" [class.fb-card--passengers]="card === 0" [class.fb-card--flights]="card === 1">
+          <div class="fb-card__header"><span class="fb-skeleton fb-skeleton--text" [style.width.px]="card ? 70 : 160"></span></div>
+          @for (row of skeletonRows; track row) {
+            <div class="fb-skeleton-row">
+              <span class="fb-skeleton fb-skeleton--text" style="width: 76px"></span>
+              <span class="fb-skeleton fb-skeleton--text" style="width: 120px"></span>
+              <span class="fb-skeleton fb-skeleton--text fb-skeleton-row__wide"></span>
+            </div>
+          }
+        </mat-card>
+      }
+    </div>
+  </div>
+} @else {
   <p class="fb-no-pilot">{{ 'tandemPilot.noTandemPilotSelected'| translate }}</p>
 }

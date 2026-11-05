@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { TranslateService } from '@ngx-translate/core';
-import { firstValueFrom, Subject, Subscription, takeUntil } from 'rxjs';
+import { finalize, firstValueFrom, Subject, Subscription, takeUntil } from 'rxjs';
 import { AccountService } from 'src/app/core/services/account.service';
 import { SchoolService } from 'src/app/core/services/school.service';
 import { School } from 'src/app/shared/domain/school';
@@ -23,6 +23,10 @@ export class TeamComponent implements OnInit, OnDestroy {
   teamPage = 0;
   // Held so a slow response for a previous school cannot land after a switch.
   private teamSubscription: Subscription | undefined;
+  /** The member list is loading: the card shows skeleton rows instead of "no members". Starts
+   *  true: on a page reload the school only arrives after the first render. */
+  teamLoading = true;
+  readonly skeletonRows = ['55%', '40%', '62%'];
 
   unsubscribe$ = new Subject<void>();
 
@@ -80,8 +84,13 @@ export class TeamComponent implements OnInit, OnDestroy {
 
   syncTeamMemberList() {
     if (this.school?.id) {
+      // Unsubscribing runs the previous request's finalize, so the flag is set after it.
       this.teamSubscription?.unsubscribe();
-      this.teamSubscription = this.schoolService.getTeamMembers(this.school.id).pipe(takeUntil(this.unsubscribe$)).subscribe((teamMembers: TeamMember[]) => {
+      this.teamLoading = true;
+      this.teamSubscription = this.schoolService.getTeamMembers(this.school.id).pipe(
+        takeUntil(this.unsubscribe$),
+        finalize(() => this.teamLoading = false)
+      ).subscribe((teamMembers: TeamMember[]) => {
         this.teamMembers = teamMembers.sort(((member1, member2) => (member1?.user?.firstname && member2?.user?.firstname && member1?.user?.firstname > member2?.user?.firstname ? 1 : -1)));
         this.teamPage = Math.min(this.teamPage, this.teamPageCount - 1);
       })

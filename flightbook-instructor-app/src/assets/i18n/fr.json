@@ -396,6 +396,7 @@
         "phoneInvalidFormat": "Le numéro de téléphone doit avoir le format suivant: {{format}}"
     },
     "message": {
+        "loading": "Chargement des données…",
         "error": "Une erreur est survenue. Veuillez réessayer plus tard ou envoyer un email a : yannick.lagger@flightbook.ch",
         "403": "Vous n'êtes pas autorisé(e) à effectuer cette requête",
         "noFlight": "Cet élève n’a aucun vol",
@@ -421,6 +422,7 @@
         "skip": "Passer"
     },
     "appointment": {
+        "noAppointments": "Aucun rendez-vous",
         "editAppointment": "Modifier le rendez-vous",
         "showRegistrations": "Afficher les inscriptions",
         "printRegistrations": "Imprimer la liste des inscriptions",

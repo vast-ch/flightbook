@@ -69,6 +69,8 @@ export class TandemPilotDetailComponent implements OnChanges, OnDestroy {
 
   flightsLoading = false;
   passengersLoading = false;
+  /** Placeholder rows for the table skeletons and the whole-pane skeleton. */
+  readonly skeletonRows = [0, 1, 2, 3, 4];
   // Held per table so a newer load can cancel an older one: rapid pilot clicks must
   // never let a slower, older response overwrite the current data.
   private flightsSubscription: Subscription | undefined;
@@ -136,10 +138,9 @@ export class TandemPilotDetailComponent implements OnChanges, OnDestroy {
       this.flightsPaginator.pageIndex = 0;
     }
 
-    // Unsubscribing runs the previous request's finalize, so the flag is set after it. Paging keeps
-    // its rows on screen, which leaves the flag needed only while the table is empty.
+    // Unsubscribing runs the previous request's finalize, so the flag is set after it.
     this.flightsSubscription?.unsubscribe();
-    this.flightsLoading = this.flights.length === 0;
+    this.flightsLoading = true;
 
     this.flightsSubscription = this.schoolService.getTandemPilotFlightsBySchoolIdAndTandemPilotId({ limit, offset }, this.school!.id!, this.tandemPilot.id)
       .pipe(takeUntil(this.unsubscribe$), finalize(() => this.flightsLoading = false))
@@ -155,7 +156,7 @@ export class TandemPilotDetailComponent implements OnChanges, OnDestroy {
     }
 
     this.passengersSubscription?.unsubscribe();
-    this.passengersLoading = this.passengerConfirmations.length === 0;
+    this.passengersLoading = true;
 
     this.passengersSubscription = this.schoolService.getPassengerConfirmationsBySchoolIdAndTandemPilotId({ limit, offset }, this.school!.id!, tandemPilotId)
       .pipe(takeUntil(this.unsubscribe$), finalize(() => this.passengersLoading = false))
@@ -168,6 +169,8 @@ export class TandemPilotDetailComponent implements OnChanges, OnDestroy {
   handlePassengerConfirmationPage(event: any) {
     let offset = event.pageIndex * event.pageSize;
     if (this.tandemPilot?.id) {
+      // The table shows the skeleton rows until the new page arrives.
+      this.passengerConfirmations = [];
       this.loadPassengerConfirmations(this.tandemPilot?.id, offset, event.pageSize);
     }
   }
@@ -175,6 +178,7 @@ export class TandemPilotDetailComponent implements OnChanges, OnDestroy {
   handleFlightsPage(event: any) {
     let offset = event.pageIndex * event.pageSize;
     if (this.tandemPilot?.id) {
+      this.flights = [];
       this.loadFlights(offset, event.pageSize);
     }
   }

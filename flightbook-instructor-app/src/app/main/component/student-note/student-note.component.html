@@ -66,7 +66,18 @@
       </div>
     }
   } @empty {
-    @if (!(displayAddNote && mode === 'new')) {
+    @if (loading) {
+      <div aria-busy="true">
+        <span class="fb-sr-only">{{ 'message.loading' | translate }}</span>
+        @for (row of [0, 1, 2]; track row) {
+          <div class="fb-note-row fb-note-row--skeleton" aria-hidden="true">
+            <span class="fb-skeleton fb-skeleton--text" style="width: 85%"></span>
+            <span class="fb-skeleton fb-skeleton--text" [style.width]="row === 1 ? '45%' : '60%'"></span>
+            <span class="fb-skeleton fb-skeleton--text" style="width: 90px"></span>
+          </div>
+        }
+      </div>
+    } @else if (!(displayAddNote && mode === 'new')) {
       <div class="fb-empty-state">
         <mat-icon aria-hidden="true">sticky_note_2</mat-icon>
         <span>{{ 'studentNote.noNotes' | translate }}</span>

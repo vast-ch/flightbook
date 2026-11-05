@@ -1,7 +1,13 @@
 <div class="fb-configuration-page">
   <header class="fb-config-header">
     <div class="fb-config-header__titles">
-      <div class="fb-config-header__eyebrow">{{ school?.name }}</div>
+      <div class="fb-config-header__eyebrow">
+        @if (school) {
+          {{ school.name }}
+        } @else {
+          <span class="fb-skeleton fb-skeleton--text" style="width: 110px" aria-hidden="true"></span>
+        }
+      </div>
       <h1>{{ 'menu.configuration' | translate }}</h1>
     </div>
   </header>

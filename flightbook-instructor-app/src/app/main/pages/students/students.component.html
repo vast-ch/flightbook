@@ -10,11 +10,17 @@
     <div class="fb-tab-selector" role="tablist" (keydown)="onTabKeydown($event)">
       <button type="button" role="tab" id="fb-student-tab-active" #tabButton class="fb-tab" [class.fb-tab--active]="selectedTabIndex === 0"
         [attr.aria-selected]="selectedTabIndex === 0" [attr.tabindex]="selectedTabIndex === 0 ? 0 : -1" aria-controls="fb-student-list-panel" (click)="tabChange(0)">
-        {{ 'student.actif'| translate }}<span class="fb-tab-count">{{ activeCount }}</span>
+        {{ 'student.actif'| translate }}
+        @if (!(loading && selectedTabIndex === 0)) {
+          <span class="fb-tab-count">{{ activeCount }}</span>
+        }
       </button>
       <button type="button" role="tab" id="fb-student-tab-archived" #tabButton class="fb-tab" [class.fb-tab--active]="selectedTabIndex === 1"
         [attr.aria-selected]="selectedTabIndex === 1" [attr.tabindex]="selectedTabIndex === 1 ? 0 : -1" aria-controls="fb-student-list-panel" (click)="tabChange(1)">
-        {{ 'student.archived'| translate }}<span class="fb-tab-count">{{ archivedCount }}</span>
+        {{ 'student.archived'| translate }}
+        @if (!(loading && selectedTabIndex === 1)) {
+          <span class="fb-tab-count">{{ archivedCount }}</span>
+        }
       </button>
     </div>
 
@@ -44,34 +50,48 @@
     </div>
 
     <div class="fb-student-list" id="fb-student-list-panel" role="tabpanel"
-      [attr.aria-labelledby]="selectedTabIndex === 0 ? 'fb-student-tab-active' : 'fb-student-tab-archived'">
-      @for (student of displayedStudents; track student.id) {
-        <button type="button" class="fb-student-row" [class.fb-student-row--selected]="selectedStudent?.id === student.id" (click)="studentDetail(student)">
-          <div class="fb-student-row__main">
-            <span class="fb-avatar">{{ initials(student) }}</span>
-            <span class="fb-student-row__name">{{ student.user?.firstname }} {{ student.user?.lastname }}</span>
-            @if (school?.configuration?.schoolModule?.validateFlights && student.countNotValidatedFlights && student.countNotValidatedFlights > 0) {
-              <span class="fb-pill-danger">{{ 'student.toCheck' | translate: {n: student.countNotValidatedFlights} }}</span>
-            }
-            <mat-icon class="fb-student-row__type" aria-hidden="true">{{ student.isTandem ? 'people' : 'person' }}</mat-icon>
-            @if (isExamReady(student)) {
-              <mat-icon class="fb-student-row__exam" aria-hidden="false" [attr.aria-label]="'student.examReady' | translate">verified</mat-icon>
-            }
+      [attr.aria-labelledby]="selectedTabIndex === 0 ? 'fb-student-tab-active' : 'fb-student-tab-archived'" [attr.aria-busy]="loading">
+      @if (loading) {
+        <span class="fb-sr-only">{{ 'message.loading' | translate }}</span>
+        @for (width of skeletonRows; track $index) {
+          <div class="fb-student-row fb-student-row--skeleton" aria-hidden="true">
+            <div class="fb-student-row__main">
+              <span class="fb-skeleton fb-skeleton--avatar"></span>
+              <span class="fb-skeleton fb-skeleton--text" [style.width]="width"></span>
+            </div>
+            <span class="fb-skeleton fb-skeleton--text fb-student-row__skeleton-line" style="width: 58%"></span>
+            <span class="fb-skeleton fb-skeleton--text fb-student-row__skeleton-line" style="width: 34%"></span>
           </div>
-          <div class="fb-student-row__meta">
-            <span>{{ 'student.flightsCount' | translate: {n: student.statistic?.nbFlights || 0} }}</span>
-            <span>{{ 'student.lastflight'| translate }} {{ student.lastFlight?.date | date:'dd.MM.yyyy' }}</span>
-          </div>
-          <div class="fb-student-row__glider">{{ student.lastFlight?.glider?.brand }} {{ student.lastFlight?.glider?.name }}</div>
-        </button>
-      } @empty {
-        <p class="fb-empty-list">{{ 'student.noStudents'| translate }}</p>
+        }
+      } @else {
+        @for (student of displayedStudents; track student.id) {
+          <button type="button" class="fb-student-row" [class.fb-student-row--selected]="selectedStudent?.id === student.id" (click)="studentDetail(student)">
+            <div class="fb-student-row__main">
+              <span class="fb-avatar">{{ initials(student) }}</span>
+              <span class="fb-student-row__name">{{ student.user?.firstname }} {{ student.user?.lastname }}</span>
+              @if (school?.configuration?.schoolModule?.validateFlights && student.countNotValidatedFlights && student.countNotValidatedFlights > 0) {
+                <span class="fb-pill-danger">{{ 'student.toCheck' | translate: {n: student.countNotValidatedFlights} }}</span>
+              }
+              <mat-icon class="fb-student-row__type" aria-hidden="true">{{ student.isTandem ? 'people' : 'person' }}</mat-icon>
+              @if (isExamReady(student)) {
+                <mat-icon class="fb-student-row__exam" aria-hidden="false" [attr.aria-label]="'student.examReady' | translate">verified</mat-icon>
+              }
+            </div>
+            <div class="fb-student-row__meta">
+              <span>{{ 'student.flightsCount' | translate: {n: student.statistic?.nbFlights || 0} }}</span>
+              <span>{{ 'student.lastflight'| translate }} {{ student.lastFlight?.date | date:'dd.MM.yyyy' }}</span>
+            </div>
+            <div class="fb-student-row__glider">{{ student.lastFlight?.glider?.brand }} {{ student.lastFlight?.glider?.name }}</div>
+          </button>
+        } @empty {
+          <p class="fb-empty-list">{{ 'student.noStudents'| translate }}</p>
+        }
       }
     </div>
   </mat-sidenav>
 
   <mat-sidenav-content>
-    <fb-student-detail [student]="selectedStudent" [school]="school" (backButtonClick)=backButton()
+    <fb-student-detail [student]="selectedStudent" [school]="school" [loading]="loading && !selectedStudent" (backButtonClick)=backButton()
     (removeUserButtonClick)=syncStudentList(false) (validateFlightsButtonClick)=updateFlightsBadge($event)></fb-student-detail>
   </mat-sidenav-content>
 </mat-sidenav-container>

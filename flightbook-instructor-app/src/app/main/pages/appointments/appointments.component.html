@@ -28,13 +28,19 @@
         [class.fb-tab--active]="appointmentTab === 'upcoming'" [attr.aria-selected]="appointmentTab === 'upcoming'"
         [attr.tabindex]="appointmentTab === 'upcoming' ? 0 : -1" aria-controls="fb-appointment-table-panel"
         (click)="selectTab('upcoming')">
-        {{ 'appointment.upcoming' | translate }}<span class="fb-tab-count">{{ upcomingCount }}</span>
+        {{ 'appointment.upcoming' | translate }}
+        @if (upcomingCount !== null) {
+          <span class="fb-tab-count">{{ upcomingCount }}</span>
+        }
       </button>
       <button type="button" role="tab" id="fb-appointment-tab-past" #tabButton class="fb-tab"
         [class.fb-tab--active]="appointmentTab === 'past'" [attr.aria-selected]="appointmentTab === 'past'"
         [attr.tabindex]="appointmentTab === 'past' ? 0 : -1" aria-controls="fb-appointment-table-panel"
         (click)="selectTab('past')">
-        {{ 'appointment.passed' | translate }}<span class="fb-tab-count">{{ pastCount }}</span>
+        {{ 'appointment.passed' | translate }}
+        @if (pastCount !== null) {
+          <span class="fb-tab-count">{{ pastCount }}</span>
+        }
       </button>
     </div>
 
@@ -231,6 +237,29 @@
           <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
           <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
         </table>
+        @if (loading && appointments.length === 0) {
+          <div aria-busy="true">
+            <span class="fb-sr-only">{{ 'message.loading' | translate }}</span>
+            @for (row of skeletonRows; track row) {
+              <div class="fb-skeleton-row" aria-hidden="true">
+                <!-- Date cell: day + month over time + weekday -->
+                <span class="fb-skeleton-stack">
+                  <span class="fb-skeleton fb-skeleton--title" style="width: 54px"></span>
+                  <span class="fb-skeleton fb-skeleton--text" style="width: 70px"></span>
+                </span>
+                <span class="fb-skeleton fb-skeleton--toggle" style="width: 72px"></span>
+                <span class="fb-skeleton fb-skeleton--text" [style.width.px]="90 + row * 11 % 40"></span>
+                <span class="fb-skeleton fb-skeleton--text" [style.width.px]="80 + row * 17 % 50"></span>
+                <span class="fb-skeleton fb-skeleton--text fb-skeleton-row__wide"></span>
+              </div>
+            }
+          </div>
+        } @else if (appointments.length === 0) {
+          <div class="fb-empty-state">
+            <mat-icon aria-hidden="true">event_busy</mat-icon>
+            <span>{{ 'appointment.noAppointments' | translate }}</span>
+          </div>
+        }
       </div>
       <mat-paginator #paginator [length]="pagerEntity.totalItems" [pageSize]="pagerEntity.itemsPerPage"
         [pageSizeOptions]="[10, 20, 50]" (page)="handlePage($event)">

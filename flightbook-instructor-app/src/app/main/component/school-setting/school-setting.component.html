@@ -10,16 +10,24 @@
   <div class="fb-option-row">
     <span class="fb-option-row__label">{{ 'setting.types.validateFlights' | translate }}</span>
     <div class="fb-option-row__value">
-      <mat-slide-toggle [hideIcon]="true" [aria-label]="'setting.types.validateFlights' | translate" [disabled]="!school"
-        [checked]="school?.configuration?.schoolModule?.validateFlights || false" (change)="changeValidateFlights($event)"></mat-slide-toggle>
+      @if (school) {
+        <mat-slide-toggle [hideIcon]="true" [aria-label]="'setting.types.validateFlights' | translate"
+          [checked]="school?.configuration?.schoolModule?.validateFlights || false" (change)="changeValidateFlights($event)"></mat-slide-toggle>
+      } @else {
+        <span class="fb-skeleton fb-skeleton--toggle" aria-hidden="true"></span>
+      }
     </div>
   </div>
 
   <div class="fb-option-row">
     <span class="fb-option-row__label">{{ 'setting.types.commentsOnSubscription' | translate }}</span>
     <div class="fb-option-row__value">
-      <mat-slide-toggle [hideIcon]="true" [aria-label]="'setting.types.commentsOnSubscription' | translate" [disabled]="!school"
-        [checked]="school?.configuration?.schoolModule?.commentsOnSubscription || false" (change)="changeCommentsOnSubscription($event)"></mat-slide-toggle>
+      @if (school) {
+        <mat-slide-toggle [hideIcon]="true" [aria-label]="'setting.types.commentsOnSubscription' | translate"
+          [checked]="school?.configuration?.schoolModule?.commentsOnSubscription || false" (change)="changeCommentsOnSubscription($event)"></mat-slide-toggle>
+      } @else {
+        <span class="fb-skeleton fb-skeleton--toggle" aria-hidden="true"></span>
+      }
     </div>
   </div>
 
@@ -50,8 +58,12 @@
             {{ 'setting.googleCalendar.disconnect' | translate }}
           </button>
         </div>
+      } @else if (!calendarChecked) {
+        <!-- The status check is running: a placeholder for the button, not a disabled "Verbinden". -->
+        <span class="fb-skeleton fb-calendar__skeleton" aria-hidden="true"></span>
+        <span class="fb-sr-only">{{ 'message.loading' | translate }}</span>
       } @else {
-        <button type="button" mat-raised-button color="primary" class="fb-primary-action" [disabled]="googleCalendarLoading || !calendarChecked" (click)="connectGoogleCalendar()">
+        <button type="button" mat-raised-button color="primary" class="fb-primary-action" [disabled]="googleCalendarLoading" (click)="connectGoogleCalendar()">
           {{ 'setting.googleCalendar.connect' | translate }}
         </button>
       }

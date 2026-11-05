@@ -5,7 +5,7 @@ import { MatSlideToggleChange } from '@angular/material/slide-toggle';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
-import { firstValueFrom, Subject, takeUntil } from 'rxjs';
+import { finalize, firstValueFrom, Subject, Subscription, takeUntil } from 'rxjs';
 import { DeviceSizeService } from 'src/app/core/services/device-size.service';
 import { PdfExportService } from 'src/app/core/services/pdf-export.service';
 import { StudentService } from 'src/app/core/services/student.service';
@@ -30,6 +30,18 @@ export class StudentDetailComponent implements OnInit, OnChanges, OnDestroy {
 
   @Input()
   school: School | undefined;
+
+  /** The student list is loading and no student is known yet: show the whole-page skeleton. */
+  @Input()
+  loading = false;
+
+  flightsLoading = false;
+  emergencyLoading = false;
+  /** Placeholder rows for the flights table skeleton. */
+  readonly skeletonFlightRows = [0, 1, 2, 3, 4];
+  readonly skeletonTiles = [0, 1, 2, 3, 4, 5];
+  private flightsSubscription: Subscription | undefined;
+  private emergencySubscription: Subscription | undefined;
 
   @Output() backButtonClick = new EventEmitter();
 
@@ -100,12 +112,13 @@ export class StudentDetailComponent implements OnInit, OnChanges, OnDestroy {
   ngOnChanges(changes: SimpleChanges) {
     if (changes['student'] && changes['student'].currentValue) {
       this.closeRejectCommentBox();
+      // Another student: drop the previous one's data so it never shows under the new name.
+      if (changes['student'].previousValue?.id !== changes['student'].currentValue.id) {
+        this.flights = [];
+        this.flightPagerEntity = new PagerEntity<Flight[]>;
+      }
       this.loadStudentFLights(changes['student'].currentValue.id);
-      this.studentService.getEmergencyContactsByStudentId(changes['student'].currentValue.id).pipe(takeUntil(this.unsubscribe$)).subscribe((emergencyContacts: EmergencyContact[]) => {
-        if (emergencyContacts?.length > 0) {
-          this.emergencyContact = emergencyContacts[0];
-        }
-      });
+      this.loadEmergencyContact(changes['student'].currentValue.id);
     }
 
     // Update displayedColumns when school changes
@@ -127,10 +140,29 @@ export class StudentDetailComponent implements OnInit, OnChanges, OnDestroy {
       this.paginator.pageIndex = 0;
     }
 
-    this.studentService.getFlightsByStudentId({ limit, offset }, studentId).pipe(takeUntil(this.unsubscribe$)).subscribe((pagerEntity: PagerEntity<Flight[]>) => {
+    // The newest request wins, so a fast student switch can't show an older student's flights.
+    this.flightsSubscription?.unsubscribe();
+    this.flightsLoading = true;
+    this.flightsSubscription = this.studentService.getFlightsByStudentId({ limit, offset }, studentId).pipe(
+      takeUntil(this.unsubscribe$),
+      finalize(() => this.flightsLoading = false)
+    ).subscribe((pagerEntity: PagerEntity<Flight[]>) => {
       this.flightPagerEntity = pagerEntity;
-      if (pagerEntity.entity) {
-        this.flights = pagerEntity.entity;
+      this.flights = pagerEntity.entity ?? [];
+    });
+  }
+
+  private loadEmergencyContact(studentId: number) {
+    this.emergencySubscription?.unsubscribe();
+    // Reset first: a student without a contact must not keep showing the previous student's.
+    this.emergencyContact = new EmergencyContact();
+    this.emergencyLoading = true;
+    this.emergencySubscription = this.studentService.getEmergencyContactsByStudentId(studentId).pipe(
+      takeUntil(this.unsubscribe$),
+      finalize(() => this.emergencyLoading = false)
+    ).subscribe((emergencyContacts: EmergencyContact[]) => {
+      if (emergencyContacts?.length > 0) {
+        this.emergencyContact = emergencyContacts[0];
       }
     });
   }
@@ -139,6 +171,8 @@ export class StudentDetailComponent implements OnInit, OnChanges, OnDestroy {
     this.closeRejectCommentBox();
     let offset = event.pageIndex * event.pageSize;
     if (this.student?.id) {
+      // The table shows the skeleton rows until the new page arrives.
+      this.flights = [];
       this.loadStudentFLights(this.student?.id, offset, event.pageSize);
     }
   }

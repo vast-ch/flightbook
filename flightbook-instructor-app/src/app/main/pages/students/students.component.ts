@@ -11,7 +11,7 @@ import { EmailDialogComponent } from '../../component/email-dialog/email-dialog.
 import { TranslateService } from '@ngx-translate/core';
 import { DeviceSizeService } from 'src/app/core/services/device-size.service';
 import { MatSidenav } from '@angular/material/sidenav';
-import { Subject, takeUntil } from 'rxjs';
+import { finalize, Subject, Subscription, takeUntil } from 'rxjs';
 
 @Component({
     selector: 'fb-students',
@@ -31,6 +31,10 @@ export class StudentsComponent implements OnInit, OnDestroy {
   archivedStudents: Student[];
   sortBy: string = 'firstname';
   selectedTabIndex = 0;
+  loading = false;
+  /** Placeholder rows for the list skeleton; the widths vary so it reads as names, not a grid. */
+  readonly skeletonRows = ['62%', '48%', '70%', '55%', '45%', '66%'];
+  private listSubscription: Subscription | undefined;
 
   constructor(
     private translate: TranslateService,
@@ -107,7 +111,16 @@ export class StudentsComponent implements OnInit, OnDestroy {
 
   syncStudentList(archived: boolean, onlyChangeStatistics: boolean = false) {
     if (this.school?.id) {
-      this.schoolService.getStudentsBySchoolId(this.school.id, archived).pipe(takeUntil(this.unsubscribe$)).subscribe((students: Student[]) => {
+      // A newer request wins: a fast tab or school switch must not let an older response overwrite the list.
+      this.listSubscription?.unsubscribe();
+      // The statistics refresh after validating keeps the list on screen instead of flashing the skeleton.
+      if (!onlyChangeStatistics) {
+        this.loading = true;
+      }
+      this.listSubscription = this.schoolService.getStudentsBySchoolId(this.school.id, archived).pipe(
+        takeUntil(this.unsubscribe$),
+        finalize(() => this.loading = false)
+      ).subscribe((students: Student[]) => {
         if (archived) {
           this.archivedStudents = students.sort(((obj1, obj2) => (obj1.user?.firstname && obj2.user?.firstname && obj1.user?.firstname > obj2.user?.firstname ? 1 : -1)));
           this.selectedStudent = this.archivedStudents[0];
@@ -201,6 +214,10 @@ export class StudentsComponent implements OnInit, OnDestroy {
   }
 
   tabChange(index: number) {
+    if (index !== this.selectedTabIndex) {
+      // The detail pane shows its skeleton until the other list arrives, not the previous tab's student.
+      this.selectedStudent = undefined;
+    }
     this.selectedTabIndex = index;
     if (index === 0) {
       this.syncStudentList(false);

@@ -4,7 +4,20 @@
     <button type="button" class="fb-text-action" (click)="openEmailDialog()">{{ 'team.addMember'| translate }}</button>
   </div>
 
-  <ul class="fb-team-list">
+  <ul class="fb-team-list" [attr.aria-busy]="teamLoading && teamMembers.length === 0">
+    @if (teamLoading && teamMembers.length === 0) {
+      <li class="fb-sr-only">{{ 'message.loading' | translate }}</li>
+      @for (width of skeletonRows; track $index) {
+        <li class="fb-team-row" aria-hidden="true">
+          <span class="fb-skeleton fb-skeleton--avatar"></span>
+          <div class="fb-team-row__text fb-team-row__text--skeleton">
+            <span class="fb-skeleton fb-skeleton--text" [style.width]="width"></span>
+            <span class="fb-skeleton fb-skeleton--text" style="width: 70%"></span>
+          </div>
+          <span class="fb-skeleton fb-skeleton--toggle" style="width: 64px"></span>
+        </li>
+      }
+    }
     @for (member of pagedMembers; track member.id) {
       <li class="fb-team-row">
         <span class="fb-avatar" aria-hidden="true">{{ initials(member) }}</span>
@@ -34,7 +47,9 @@
 
   <div class="fb-team-pager">
     <span class="fb-team-pager__label">
-      @if (teamMembers.length > 0) {
+      @if (teamLoading && teamMembers.length === 0) {
+        <span class="fb-skeleton fb-skeleton--text" style="width: 90px" aria-hidden="true"></span>
+      } @else if (teamMembers.length > 0) {
         {{ 'team.pagerLabel' | translate: pagerRange }}
       } @else {
         {{ 'team.noMembers' | translate }}

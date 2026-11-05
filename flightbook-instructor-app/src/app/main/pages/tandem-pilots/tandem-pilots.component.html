@@ -37,18 +37,28 @@
     </div>
 
     <div class="fb-tandem-list" id="fb-tandem-list-panel" role="tabpanel"
-      [attr.aria-labelledby]="selectedTabIndex === 0 ? 'fb-tandem-tab-active' : 'fb-tandem-tab-archived'">
-      @for (pilot of displayedTandemPilots; track pilot.id) {
-        <button type="button" class="fb-tandem-row" [class.fb-tandem-row--selected]="selectedTandemPilot?.id === pilot.id"
-          [attr.aria-current]="selectedTandemPilot?.id === pilot.id ? 'true' : null" (click)="tandemPilotDetail(pilot)">
-          <div class="fb-tandem-row__main">
-            <span class="fb-avatar">{{ initials(pilot) }}</span>
-            <span class="fb-tandem-row__name">{{ pilot.user?.firstname }} {{ pilot.user?.lastname }}</span>
-            <mat-icon class="fb-tandem-row__type" aria-hidden="true">group</mat-icon>
+      [attr.aria-labelledby]="selectedTabIndex === 0 ? 'fb-tandem-tab-active' : 'fb-tandem-tab-archived'" [attr.aria-busy]="listLoading">
+      @if (listLoading) {
+        <span class="fb-sr-only">{{ 'message.loading' | translate }}</span>
+        @for (width of skeletonRows; track $index) {
+          <div class="fb-tandem-row fb-tandem-row--skeleton" aria-hidden="true">
+            <div class="fb-tandem-row__main">
+              <span class="fb-skeleton fb-skeleton--avatar"></span>
+              <span class="fb-skeleton fb-skeleton--text" [style.width]="width"></span>
+            </div>
           </div>
-        </button>
-      } @empty {
-        @if (!listLoading) {
+        }
+      } @else {
+        @for (pilot of displayedTandemPilots; track pilot.id) {
+          <button type="button" class="fb-tandem-row" [class.fb-tandem-row--selected]="selectedTandemPilot?.id === pilot.id"
+            [attr.aria-current]="selectedTandemPilot?.id === pilot.id ? 'true' : null" (click)="tandemPilotDetail(pilot)">
+            <div class="fb-tandem-row__main">
+              <span class="fb-avatar">{{ initials(pilot) }}</span>
+              <span class="fb-tandem-row__name">{{ pilot.user?.firstname }} {{ pilot.user?.lastname }}</span>
+              <mat-icon class="fb-tandem-row__type" aria-hidden="true">group</mat-icon>
+            </div>
+          </button>
+        } @empty {
           <p class="fb-empty-list">{{ 'tandemPilot.noTandemPilots'| translate }}</p>
         }
       }

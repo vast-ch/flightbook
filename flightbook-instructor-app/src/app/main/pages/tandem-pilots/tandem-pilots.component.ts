@@ -53,6 +53,8 @@ export class TandemPilotsComponent implements OnInit, OnDestroy {
   selectedTabIndex = 0;
   // Starts true: on a page reload the school only arrives after the first render.
   listLoading = true;
+  /** Placeholder rows for the list skeleton; the widths vary so it reads as names, not a grid. */
+  readonly skeletonRows = ['62%', '48%', '70%', '55%', '45%', '66%'];
   // Held so a newer load can cancel an older one: rapid tab changes must never let a slower
   // response select a pilot from the list that is no longer displayed.
   private listSubscription: Subscription | undefined;
@@ -181,6 +183,8 @@ export class TandemPilotsComponent implements OnInit, OnDestroy {
       return;
     }
 
+    // The detail pane shows its skeleton until the other list arrives, not the previous tab's pilot.
+    this.selectedTandemPilot = undefined;
     this.selectedTabIndex = index;
     if (index === 0) {
       this.syncTandemPilotList(false);

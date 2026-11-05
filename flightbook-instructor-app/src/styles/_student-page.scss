@@ -274,6 +274,24 @@
   // ---------------------------------------------------------------------------------
   // Detail pane
   // ---------------------------------------------------------------------------------
+  // List skeleton (students.component, while the list loads): real row box, bars from _skeleton.scss.
+  .fb-student-row--skeleton {
+    cursor: default;
+
+    &:hover {
+      background: transparent;
+    }
+
+    .fb-student-row__main {
+      align-items: center;
+    }
+  }
+
+  .fb-student-row__skeleton-line {
+    margin-top: var(--fb-space-3);
+    margin-left: 38px;
+  }
+
   mat-sidenav-content {
     background: var(--fb-bg);
   }
@@ -490,18 +508,6 @@
     &--done {
       color: var(--fb-success-fg);
     }
-  }
-
-  .fb-sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    margin: -1px;
-    padding: 0;
-    overflow: hidden;
-    clip: rect(0 0 0 0);
-    white-space: nowrap;
-    border: 0;
   }
 
   .fb-stat-tile__label {
@@ -1393,6 +1399,38 @@
     span {
       font-size: var(--fb-text-sm);
       color: var(--fb-text-3);
+    }
+  }
+
+  // ---------------------------------------------------------------------------------
+  // Loading skeletons (detail pane, flights, notes, emergency contact)
+  // ---------------------------------------------------------------------------------
+  .fb-detail-header__title--skeleton {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: var(--fb-space-3);
+    min-width: 0;
+  }
+
+  .fb-stat-tile--skeleton {
+    display: flex;
+    flex-direction: column;
+    gap: var(--fb-space-3);
+  }
+
+  .fb-emergency-item__skeleton {
+    width: 60%;
+    margin: 5px 0 4px;
+  }
+
+  .fb-note-row--skeleton {
+    display: flex;
+    flex-direction: column;
+    gap: var(--fb-space-3);
+
+    &:hover {
+      background: transparent;
     }
   }
 

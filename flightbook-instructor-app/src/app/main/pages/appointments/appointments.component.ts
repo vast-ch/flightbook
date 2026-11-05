@@ -1,7 +1,7 @@
 import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
-import { firstValueFrom, Subject, takeUntil } from 'rxjs';
+import { finalize, firstValueFrom, Subject, Subscription as RxSubscription, takeUntil } from 'rxjs';
 import { AccountService } from 'src/app/core/services/account.service';
 import { SchoolService } from 'src/app/core/services/school.service';
 import { StudentListPDFService } from 'src/app/core/services/student-list-pdf.service';
@@ -50,8 +50,13 @@ export class AppointmentsComponent implements OnInit, OnDestroy, AfterViewInit {
   showAdvancedFilters = false;
   // Upcoming/Past tablist - see selectTab().
   appointmentTab: 'upcoming' | 'past' = 'upcoming';
-  upcomingCount = 0;
-  pastCount = 0;
+  // null until the count request answers: the tab hides its pill instead of flashing "0".
+  upcomingCount: number | null = null;
+  pastCount: number | null = null;
+  /** The list request is running; with no rows on screen the table shows skeleton rows. */
+  loading = false;
+  readonly skeletonRows = [0, 1, 2, 3, 4, 5];
+  private appointmentsSubscription: RxSubscription | undefined;
 
   @ViewChild('paginator') paginator: MatPaginator | undefined;
   @ViewChild('calendar') calendarComponent: FullCalendarComponent | undefined;
@@ -100,6 +105,8 @@ export class AppointmentsComponent implements OnInit, OnDestroy, AfterViewInit {
     this.accountService.changeSelectedSchool$.pipe(takeUntil(this.unsubscribe$)).subscribe((school: School) => {
       this.school = school;
       this.appointmentTypes = [];
+      this.upcomingCount = null;
+      this.pastCount = null;
       this.initialLoad();
     });
   }
@@ -149,11 +156,22 @@ export class AppointmentsComponent implements OnInit, OnDestroy, AfterViewInit {
     this.draggable?.destroy();
   }
 
-  loadAppointments(schoolId: number, offset: number | undefined = undefined, limit = this.schoolService.limit) {
+  /** `keepRows` is for the quiet refresh after a save: the rows stay instead of the skeleton. */
+  loadAppointments(schoolId: number, offset: number | undefined = undefined, limit = this.schoolService.limit, keepRows = false) {
     if (!offset && this.paginator) {
       this.paginator.pageIndex = 0;
     }
-    this.schoolService.getAppointmentsBySchoolId({ limit, offset }, schoolId).pipe(takeUntil(this.unsubscribe$)).subscribe({
+    // The newest request wins: a fast tab, filter or page change must not show an older answer.
+    // Unsubscribing runs the previous request's finalize, so the flag is set after it.
+    this.appointmentsSubscription?.unsubscribe();
+    if (!keepRows) {
+      this.appointments = [];
+    }
+    this.loading = true;
+    this.appointmentsSubscription = this.schoolService.getAppointmentsBySchoolId({ limit, offset }, schoolId).pipe(
+      takeUntil(this.unsubscribe$),
+      finalize(() => this.loading = false)
+    ).subscribe({
       next: (pagerEntity: PagerEntity<Appointment[]>) => {
         this.pagerEntity = pagerEntity;
         if (pagerEntity.entity) {
@@ -201,13 +219,13 @@ export class AppointmentsComponent implements OnInit, OnDestroy, AfterViewInit {
       if (response?.event === "save" && this.school?.id && type == "add") {
         const schoolId = this.school.id;
         this.schoolService.postAppointment(schoolId, response.appointment).pipe(takeUntil(this.unsubscribe$)).subscribe((appointment: Appointment) => {
-          this.loadAppointments(schoolId);
+          this.loadAppointments(schoolId, undefined, undefined, true);
           this.refreshTabCounts();
         })
       } else if (response?.event === "save" && this.school?.id && type == "update") {
         const schoolId = this.school.id;
         this.schoolService.putAppointment(schoolId, response.appointment).pipe(takeUntil(this.unsubscribe$)).subscribe((appointment: Appointment) => {
-          this.loadAppointments(schoolId);
+          this.loadAppointments(schoolId, undefined, undefined, true);
           this.refreshTabCounts();
         })
       }
@@ -502,7 +520,7 @@ export class AppointmentsComponent implements OnInit, OnDestroy, AfterViewInit {
 
     appointment.scheduling = schedulingMoment.toDate();
     this.schoolService.postAppointment(schoolId, appointment).pipe(takeUntil(this.unsubscribe$)).subscribe((appointment: Appointment) => {
-      this.loadAppointments(schoolId);
+      this.loadAppointments(schoolId, undefined, undefined, true);
     });
   }
 

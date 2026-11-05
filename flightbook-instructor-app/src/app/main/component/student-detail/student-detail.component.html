@@ -233,7 +233,20 @@
           [ngClass]="{'not-validated-row': school?.configuration?.schoolModule?.validateFlights && !isFlightValidated(row)}"></tr>
           <tr mat-row *matRowDef="let row; columns: ['rejectRow']; when: isRejectRow"></tr>
         </table>
-        @if (flights.length === 0) {
+        @if (flightsLoading && flights.length === 0) {
+          <div class="fb-skeleton-rows" aria-busy="true">
+            <span class="fb-sr-only">{{ 'message.loading' | translate }}</span>
+            @for (row of skeletonFlightRows; track row) {
+              <div class="fb-skeleton-row" aria-hidden="true">
+                <span class="fb-skeleton fb-skeleton--text" style="width: 28px"></span>
+                <span class="fb-skeleton fb-skeleton--text" style="width: 76px"></span>
+                <span class="fb-skeleton fb-skeleton--text" [style.width.px]="110 + row * 9 % 40"></span>
+                <span class="fb-skeleton fb-skeleton--text" [style.width.px]="96 + row * 13 % 36"></span>
+                <span class="fb-skeleton fb-skeleton--text fb-skeleton-row__wide"></span>
+              </div>
+            }
+          </div>
+        } @else if (flights.length === 0) {
           <div class="fb-empty-state">
             <mat-icon>list_alt</mat-icon>
             <span>{{ 'student.flight.noData' | translate }}</span>
@@ -250,7 +263,17 @@
         <h2 class="fb-card__title">{{ 'emergencyContact.title'| translate }}</h2>
         <span class="fb-card__header-note"><mat-icon>lock</mat-icon>{{ 'emergencyContact.providedByStudent' | translate }}</span>
       </div>
-      @if (emergencyContact) {
+      @if (emergencyLoading) {
+        <div class="fb-emergency-grid" aria-busy="true">
+          <span class="fb-sr-only">{{ 'message.loading' | translate }}</span>
+          @for (label of ['emergencyContact.firstname', 'emergencyContact.lastname', 'emergencyContact.phone', 'emergencyContact.additionalInformation']; track label) {
+            <div class="fb-emergency-item" aria-hidden="true">
+              <span class="fb-emergency-item__label">{{ label | translate }}</span>
+              <span class="fb-skeleton fb-skeleton--text fb-emergency-item__skeleton"></span>
+            </div>
+          }
+        </div>
+      } @else if (emergencyContact) {
         <div class="fb-emergency-grid">
           <div class="fb-emergency-item">
             <span class="fb-emergency-item__label">{{ 'emergencyContact.firstname' | translate }}</span>
@@ -271,6 +294,71 @@
         </div>
       }
     </mat-card>
+  </div>
+} @else if (loading) {
+  <!-- Whole-page skeleton while the student list loads: the real header, tile and card boxes, so nothing jumps. -->
+  <div class="fb-detail-pane" aria-busy="true">
+    <span class="fb-sr-only">{{ 'message.loading' | translate }}</span>
+    <div class="fb-detail-pane__skeleton" aria-hidden="true">
+      <header class="fb-detail-header">
+        <div class="fb-detail-header__title fb-detail-header__title--skeleton">
+          <span class="fb-skeleton fb-skeleton--text" style="width: 90px"></span>
+          <span class="fb-skeleton fb-skeleton--value" style="width: 220px; max-width: 100%"></span>
+        </div>
+        <span class="fb-skeleton fb-skeleton--circle" style="width: 36px; height: 36px"></span>
+        <span class="fb-skeleton fb-skeleton--circle" style="width: 36px; height: 36px"></span>
+      </header>
+
+      <div class="fb-stats-strip">
+        @for (tile of skeletonTiles; track tile) {
+          <div class="fb-stat-tile fb-stat-tile--skeleton">
+            <span class="fb-skeleton fb-skeleton--value" style="width: 56px"></span>
+            <span class="fb-skeleton fb-skeleton--text" style="width: 84px"></span>
+          </div>
+        }
+      </div>
+
+      <mat-card appearance="outlined" class="fb-card">
+        <div class="fb-card__header"><span class="fb-skeleton fb-skeleton--text" style="width: 110px"></span></div>
+        <div class="fb-skeleton-rows">
+          @for (row of [0, 1, 2]; track row) {
+            <div class="fb-skeleton-row">
+              <span class="fb-skeleton fb-skeleton--text" style="width: 90px"></span>
+              <span class="fb-skeleton fb-skeleton--text" style="width: 120px"></span>
+            </div>
+          }
+        </div>
+      </mat-card>
+
+      <div class="fb-cards-grid">
+        @for (card of [0, 1]; track card) {
+          <mat-card appearance="outlined" class="fb-card">
+            <div class="fb-card__header"><span class="fb-skeleton fb-skeleton--text" style="width: 120px"></span></div>
+            <div class="fb-skeleton-rows">
+              @for (row of [0, 1, 2, 3]; track row) {
+                <div class="fb-skeleton-row">
+                  <span class="fb-skeleton fb-skeleton--text fb-skeleton-row__wide"></span>
+                </div>
+              }
+            </div>
+          </mat-card>
+        }
+      </div>
+
+      <mat-card appearance="outlined" class="fb-card">
+        <div class="fb-card__header"><span class="fb-skeleton fb-skeleton--text" style="width: 70px"></span></div>
+        <div class="fb-skeleton-rows">
+          @for (row of skeletonFlightRows; track row) {
+            <div class="fb-skeleton-row">
+              <span class="fb-skeleton fb-skeleton--text" style="width: 28px"></span>
+              <span class="fb-skeleton fb-skeleton--text" style="width: 76px"></span>
+              <span class="fb-skeleton fb-skeleton--text" style="width: 120px"></span>
+              <span class="fb-skeleton fb-skeleton--text fb-skeleton-row__wide"></span>
+            </div>
+          }
+        </div>
+      </mat-card>
+    </div>
   </div>
 } @else {
   <p class="fb-no-student">{{ 'student.noStudentSelected'| translate }}</p>
