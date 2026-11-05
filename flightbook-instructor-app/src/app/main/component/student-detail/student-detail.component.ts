@@ -121,17 +121,23 @@ export class StudentDetailComponent implements OnInit, OnChanges, OnDestroy {
       this.loadEmergencyContact(changes['student'].currentValue.id);
     }
 
-    // Update displayedColumns when school changes
-    if (changes['school'] && changes['school'].currentValue) {
-      // Reset to base columns first to avoid duplicates
-      const baseColumns = ['nb', 'date', 'start', 'landing', 'glider', 'time', 'km', 'description', 'instructor', 'alone'];
+    // Columns depend on both the school config and whether the student is archived
+    if (changes['school'] || changes['student']) {
+      this.updateDisplayedColumns();
+    }
+  }
 
+  private updateDisplayedColumns() {
+    const baseColumns = ['nb', 'date', 'start', 'landing', 'glider', 'time', 'km', 'description', 'instructor', 'alone'];
+
+    if (!this.school?.configuration?.schoolModule?.validateFlights) {
+      this.displayedColumns = baseColumns;
+    } else if (this.student?.isArchived) {
+      // Archived students are read-only: keep the validation state, drop the actions
+      this.displayedColumns = [...baseColumns, 'validationState'];
+    } else {
       // Validation actions go FIRST (mockup), validation state stays LAST
-      if (changes['school'].currentValue.configuration?.schoolModule?.validateFlights) {
-        this.displayedColumns = ['validationButton', ...baseColumns, 'validationState'];
-      } else {
-        this.displayedColumns = baseColumns;
-      }
+      this.displayedColumns = ['validationButton', ...baseColumns, 'validationState'];
     }
   }
 

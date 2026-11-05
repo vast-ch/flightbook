@@ -103,7 +103,7 @@
     <mat-card appearance="outlined" class="fb-card fb-card--flights">
       <div class="fb-card__header">
         <h2 class="fb-card__title">{{ 'student.flights'| translate }}</h2>
-        @if (school?.configuration?.schoolModule?.validateFlights) {
+        @if (school?.configuration?.schoolModule?.validateFlights && !student.isArchived) {
           <button type="button" class="fb-validate-all-button" [matTooltip]="'student.flight.validateAll'| translate" (click)="validateAllFlights()">
             <mat-icon>done_all</mat-icon>{{ 'student.flight.validateAllAction' | translate }}
           </button>
@@ -189,7 +189,7 @@
           <!-- Alone Column -->
           <ng-container matColumnDef="alone">
             <th class="alone" mat-header-cell *matHeaderCellDef>{{ 'student.flight.alone'| translate }}</th>
-            <td class="alone" mat-cell *matCellDef="let element"><mat-slide-toggle [(ngModel)]="element.shvAlone" color="primary" (change)="changeAloneValue(element)"></mat-slide-toggle></td>
+            <td class="alone" mat-cell *matCellDef="let element"><mat-slide-toggle [(ngModel)]="element.shvAlone" color="primary" [disabled]="!!student.isArchived" (change)="changeAloneValue(element)"></mat-slide-toggle></td>
           </ng-container>
 
           <!-- Validation Column -->
@@ -230,7 +230,7 @@
 
           <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
           <tr mat-row *matRowDef="let row; columns: displayedColumns;"
-          [ngClass]="{'not-validated-row': school?.configuration?.schoolModule?.validateFlights && !isFlightValidated(row)}"></tr>
+          [ngClass]="{'not-validated-row': school?.configuration?.schoolModule?.validateFlights && !student.isArchived && !isFlightValidated(row)}"></tr>
           <tr mat-row *matRowDef="let row; columns: ['rejectRow']; when: isRejectRow"></tr>
         </table>
         @if (flightsLoading && flights.length === 0) {

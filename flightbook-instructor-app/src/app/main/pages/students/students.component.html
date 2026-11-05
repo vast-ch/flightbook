@@ -69,7 +69,7 @@
             <div class="fb-student-row__main">
               <span class="fb-avatar">{{ initials(student) }}</span>
               <span class="fb-student-row__name">{{ student.user?.firstname }} {{ student.user?.lastname }}</span>
-              @if (school?.configuration?.schoolModule?.validateFlights && student.countNotValidatedFlights && student.countNotValidatedFlights > 0) {
+              @if (school?.configuration?.schoolModule?.validateFlights && !student.isArchived && student.countNotValidatedFlights && student.countNotValidatedFlights > 0) {
                 <span class="fb-pill-danger">{{ 'student.toCheck' | translate: {n: student.countNotValidatedFlights} }}</span>
               }
               <mat-icon class="fb-student-row__type" aria-hidden="true">{{ student.isTandem ? 'people' : 'person' }}</mat-icon>
