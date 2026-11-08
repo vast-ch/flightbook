@@ -1,6 +1,7 @@
 import { DatePipe } from '@angular/common';
 import { Injectable } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
+import { TCreatedPdf } from 'pdfmake/build/pdfmake';
 import { TDocumentDefinitions } from 'pdfmake/interfaces';
 import { Flight } from 'src/app/shared/domain/flight';
 import { User } from 'src/app/shared/domain/user';
@@ -16,7 +17,8 @@ export class PdfExportService {
     (<any>pdfMake).addVirtualFileSystem(pdfFonts);
   }
 
-  async generatePdf(flights: Flight[], user: User, generateFrom?: string): Promise<any> {
+  /** Builds the flightbook PDF; the caller opens it, or downloads it when the browser blocks the new window. */
+  async generatePdf(flights: Flight[], user: User, generateFrom?: string): Promise<TCreatedPdf> {
     if (!generateFrom) {
       generateFrom = 'https://flightbook.ch';
     }
@@ -301,6 +303,6 @@ export class PdfExportService {
       }
     };
 
-    return pdfMake.createPdf(docDefinition).open();
+    return pdfMake.createPdf(docDefinition);
   }
 }

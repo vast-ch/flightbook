@@ -401,6 +401,7 @@
         "403": "Du hast keine Berechtigung für diese Abfrage",
         "noFlight": "Dieser Schüler*in hat keinen Flug",
         "pdfDownloaded": "Das PDF wurde heruntergeladen",
+        "exportReady": "Der Export ist bereit. Möchtest du ihn öffnen?",
         "changeSaved": "Änderung gespeichert"
     },
     "buttons": {
@@ -419,6 +420,7 @@
         "no": "Nein",
         "change_password": "Passwort ändern",
         "export": "Exportieren",
+        "open": "Öffnen",
         "skip": "Überspringen"
     },
     "appointment": {

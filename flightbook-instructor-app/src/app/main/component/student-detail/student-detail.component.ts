@@ -8,6 +8,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { finalize, firstValueFrom, Subject, Subscription, takeUntil } from 'rxjs';
 import { DeviceSizeService } from 'src/app/core/services/device-size.service';
 import { PdfExportService } from 'src/app/core/services/pdf-export.service';
+import { PdfOpenService } from 'src/app/core/services/pdf-open.service';
 import { StudentService } from 'src/app/core/services/student.service';
 import { ControlSheet } from 'src/app/shared/domain/control-sheet';
 import { EmergencyContact } from 'src/app/shared/domain/emergency-contact';
@@ -73,6 +74,7 @@ export class StudentDetailComponent implements OnInit, OnChanges, OnDestroy {
     private deviceSize: DeviceSizeService,
     private translate: TranslateService,
     private pdfExportService: PdfExportService,
+    private pdfOpenService: PdfOpenService,
     private snackBar: MatSnackBar,
     private dialog: MatDialog
   ) {
@@ -238,7 +240,9 @@ export class StudentDetailComponent implements OnInit, OnChanges, OnDestroy {
     }
     // We revert to have the oldest flight at position 1
     flights.entity = flights.entity?.reverse();
-    this.pdfExportService.generatePdf(flights.entity!, this.student?.user);
+    const pdf = await this.pdfExportService.generatePdf(flights.entity!, this.student.user);
+    const name = [this.student.user.firstname, this.student.user.lastname].filter(Boolean).join('-');
+    this.pdfOpenService.open(pdf, `${name || 'student'}-flightbook.pdf`);
   }
 
   changeAloneValue(flight: Flight) {

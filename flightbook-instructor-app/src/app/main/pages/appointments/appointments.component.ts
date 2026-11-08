@@ -4,6 +4,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { finalize, firstValueFrom, Subject, Subscription as RxSubscription, takeUntil } from 'rxjs';
 import { AccountService } from 'src/app/core/services/account.service';
 import { SchoolService } from 'src/app/core/services/school.service';
+import { PdfOpenService } from 'src/app/core/services/pdf-open.service';
 import { StudentListPDFService } from 'src/app/core/services/student-list-pdf.service';
 import { Appointment } from 'src/app/shared/domain/appointment';
 import { AppointmentFilter } from 'src/app/shared/domain/appointment-filter';
@@ -82,6 +83,7 @@ export class AppointmentsComponent implements OnInit, OnDestroy, AfterViewInit {
     private schoolService: SchoolService,
     private accountService: AccountService,
     private studentListPDFService: StudentListPDFService,
+    private pdfOpenService: PdfOpenService,
     private dialog: MatDialog,
     private snackBar: MatSnackBar,
     private translate: TranslateService,
@@ -253,17 +255,8 @@ export class AppointmentsComponent implements OnInit, OnDestroy, AfterViewInit {
         students.splice(studentIndex, 1);
       }
     });
-    try {
-      const pdf = await this.studentListPDFService.generatePdf_V2(students, this.school, appointment);
-      pdf.open();
-    } catch (error: any) {
-      const pdf = await this.studentListPDFService.generatePdf_V2(students, this.school, appointment);
-      pdf.download(`${this.datePipe.transform(appointment.scheduling, 'yyyy.MM.dd')}-registrations.pdf`);
-      this.snackBar.open(this.translate.instant('message.pdfDownloaded'), this.translate.instant('buttons.done'), {
-        horizontalPosition: 'center',
-        verticalPosition: 'top',
-      });
-    }
+    const pdf = await this.studentListPDFService.generatePdf_V2(students, this.school, appointment);
+    this.pdfOpenService.open(pdf, `${this.datePipe.transform(appointment.scheduling, 'yyyy.MM.dd')}-registrations.pdf`);
   }
 
   handlePage(event: any) {

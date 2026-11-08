@@ -401,6 +401,7 @@
         "403": "Vous n'êtes pas autorisé(e) à effectuer cette requête",
         "noFlight": "Cet élève n’a aucun vol",
         "pdfDownloaded": "Le PDF a été téléchargé",
+        "exportReady": "L'export est prêt. Voulez-vous l'ouvrir ?",
         "changeSaved": "Modifications sauvegardées"
     },
     "buttons": {
@@ -419,6 +420,7 @@
         "no": "Non",
         "change_password": "Changer le mot de passe",
         "export": "Exporter",
+        "open": "Ouvrir",
         "skip": "Passer"
     },
     "appointment": {
