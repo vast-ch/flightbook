@@ -51,6 +51,7 @@ export class AppointmentFacade {
     ) { }
 
     async createAppointment(schoolId: number, appointmentDto: AppointmentDto): Promise<AppointmentDto> {
+        this.subscriptionsValidityCheck(appointmentDto);
         let appointment: Appointment = plainToInstance(Appointment, appointmentDto);
         await this.appointmentValidityCheck(appointmentDto, schoolId, appointment);
 
@@ -85,6 +86,9 @@ export class AppointmentFacade {
     }
 
     async updateAppointment(id: number, schoolId: number, appointmentDto: AppointmentDto): Promise<AppointmentDto> {
+        // Validate before touching anything: a subscription without a user would
+        // otherwise be treated as "removed" and deleted before the update fails.
+        this.subscriptionsValidityCheck(appointmentDto);
         let appointment: Appointment = await this.appointmentRepository.getAppointmentById(id);
         await this.appointmentValidityCheck(appointmentDto, schoolId, appointment);
 
@@ -106,7 +110,6 @@ export class AppointmentFacade {
 
         subscriptionsToRemove.forEach((subscription: Subscription) => {
             appointment.removeUserSubscription(subscription.user.id);
-            this.subscriptionRepository.remove(subscription);
         });
 
         // add new subscriptions
@@ -118,15 +121,18 @@ export class AppointmentFacade {
         });
 
         // Update or clear removed guestsubscriptions
+        const guestSubscriptionsToRemove: GuestSubscription[] = [];
         appointment.guestSubscriptions.forEach((guestSubscription: GuestSubscription) => {
             const guestSubscriptionDto = appointmentDto.guestSubscriptions.find((guestSubscriptionDto: GuestSubscriptionDto) => guestSubscriptionDto.id === guestSubscription.id);
             if (guestSubscriptionDto) {
                 guestSubscription.firstname = guestSubscriptionDto.firstname;
                 guestSubscription.lastname = guestSubscriptionDto.lastname;
             } else {
-                appointment.removeGuestUserSubscription(guestSubscription.id);
-                this.guestSubscriptionRepository.remove(guestSubscription);
+                guestSubscriptionsToRemove.push(guestSubscription);
             }
+        });
+        guestSubscriptionsToRemove.forEach((guestSubscription: GuestSubscription) => {
+            appointment.removeGuestUserSubscription(guestSubscription.id);
         });
 
         // add new guest subscriptions
@@ -137,11 +143,20 @@ export class AppointmentFacade {
             }
         });
 
-        if (previousState != appointmentDto.state) {
-            this.notificationsService.sendAppointmentStateChanged(appointment);
-        }
+        // Removals and the update succeed or fail together.
+        const appointmentResp: Appointment = await this.appointmentRepository.manager.transaction(async (entityManager) => {
+            if (subscriptionsToRemove.length > 0) {
+                await entityManager.remove(subscriptionsToRemove);
+            }
+            if (guestSubscriptionsToRemove.length > 0) {
+                await entityManager.remove(guestSubscriptionsToRemove);
+            }
+            return await entityManager.save(appointment);
+        });
 
-        const appointmentResp: Appointment = await this.appointmentRepository.save(appointment);
+        if (previousState != appointmentDto.state) {
+            this.notificationsService.sendAppointmentStateChanged(appointmentResp);
+        }
 
         // Sync to Google Calendar
         try {
@@ -278,6 +293,13 @@ export class AppointmentFacade {
     async getAppointmentById(id: number): Promise<AppointmentDto> {
         const appointment = await this.appointmentRepository.getAppointmentById(id);
         return await this.generateWaitingList(AppointmentMapper.toAppointmentDto(appointment), appointment.school.id);
+    }
+
+    private subscriptionsValidityCheck(appointmentDto: AppointmentDto) {
+        const subscriptions = appointmentDto.subscriptions ?? [];
+        if (subscriptions.some((subscriptionDto: SubscriptionDto) => !subscriptionDto?.user?.email)) {
+            AppointmentException.invalidSubscription();
+        }
     }
 
     private async appointmentValidityCheck(appointmentDto: AppointmentDto, schoolId: number, appointment: Appointment) {

@@ -1,8 +1,9 @@
-import { AfterViewChecked, AfterViewInit, ChangeDetectorRef, Component, ElementRef, Inject, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { AfterViewChecked, ChangeDetectorRef, Component, DestroyRef, ElementRef, Inject, OnInit, QueryList, ViewChildren } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormArray, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { ThemePalette } from '@angular/material/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { MatSelect, MatSelectChange } from '@angular/material/select';
+import { MatSelectChange } from '@angular/material/select';
 import { Appointment } from 'src/app/shared/domain/appointment';
 import { AppointmentType } from 'src/app/shared/domain/appointment-type-dto';
 import { State } from 'src/app/shared/domain/state';
@@ -12,7 +13,7 @@ import { User } from 'src/app/shared/domain/user';
 import { AppointmentsComponent } from '../../pages/appointments/appointments.component';
 import { GuestSubscription } from 'src/app/shared/domain/guest-subscription';
 import moment from 'moment';
-import { combineLatest, skip, startWith } from 'rxjs';
+import { combineLatest, Observable, skip, startWith } from 'rxjs';
 
 @Component({
   selector: 'app-appointment-form-dialog',
@@ -20,18 +21,23 @@ import { combineLatest, skip, startWith } from 'rxjs';
   styleUrls: ['./appointment-form-dialog.component.scss'],
   standalone: false
 })
-export class AppointmentFormDialogComponent implements OnInit, AfterViewInit, AfterViewChecked {
+export class AppointmentFormDialogComponent implements OnInit, AfterViewChecked {
 
   form: UntypedFormGroup;
   states = Object.keys(State);
   private appointment: Appointment;
-  students: Student[];
+  /** Students that can be added. Empty until the page's student list has loaded. */
+  students: Student[] = [];
+  studentsLoaded = false;
   appointmentTypes: AppointmentType[];
   selectedStudents = new Set<string>();
+  /** Users of the subscriptions the appointment already has, by email. Existing
+   *  rows are shown and saved from these — never looked up in `students`, which
+   *  may still be loading or not contain the subscriber (e.g. archived student). */
+  private existingSubscribers = new Map<string, User>();
 
   @ViewChildren('subscriptionFormList') subscriptionFormList?: QueryList<ElementRef>
   @ViewChildren('guestSubscriptionFormList') guestSubscriptionFormList?: QueryList<ElementRef>
-  @ViewChildren("selectStudent") selectStudent?: QueryList<MatSelect>;
 
   public color: ThemePalette = 'primary';
 
@@ -39,16 +45,25 @@ export class AppointmentFormDialogComponent implements OnInit, AfterViewInit, Af
     private fb: UntypedFormBuilder,
     public dialogRef: MatDialogRef<AppointmentsComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
-    private cdRef: ChangeDetectorRef
+    private cdRef: ChangeDetectorRef,
+    destroyRef: DestroyRef
   ) {
     this.appointment = data.appointment;
-    this.students = data.students;
     this.appointmentTypes = data.appointmentTypes;
+
+    (data.students$ as Observable<Student[] | null>).pipe(takeUntilDestroyed(destroyRef)).subscribe((students: Student[] | null) => {
+      this.students = students ?? [];
+      this.studentsLoaded = students !== null;
+    });
 
     const subscriptionFbArray = this.fb.array([]);
     this.appointment.subscriptions.forEach((subscription: Subscription) => {
+      if (subscription.user?.email) {
+        this.existingSubscribers.set(subscription.user.email, subscription.user);
+      }
       subscriptionFbArray.push(this.fb.group({
-        user: [subscription.user?.email, Validators.required]
+        user: [subscription.user?.email, Validators.required],
+        existing: [true]
       }));
     });
 
@@ -83,8 +98,6 @@ export class AppointmentFormDialogComponent implements OnInit, AfterViewInit, Af
       subscriptions: subscriptionFbArray,
       guestSubscriptions: guestSubscriptionFbArray
     });
-  }
-  ngAfterViewInit(): void {
     this.selected();
   }
 
@@ -111,12 +124,19 @@ export class AppointmentFormDialogComponent implements OnInit, AfterViewInit, Af
     return this.selectedStudents.has(email);
   }
 
+  /** Emails already in the list (existing and newly picked), hidden from the other selects. */
   selected() {
-    this.selectedStudents?.clear();
-    this.selectStudent?.forEach(ls => {
-      const selectedVal = ls.value;
-      if (selectedVal && selectedVal !== "undefined") this.selectedStudents?.add(selectedVal);
+    this.selectedStudents.clear();
+    this.subscriptions.value.forEach((row: { user: { email: string } }) => {
+      if (row.user?.email) {
+        this.selectedStudents.add(row.user.email);
+      }
     });
+  }
+
+  existingSubscriberName(email: string): string {
+    const user = this.existingSubscribers.get(email);
+    return `${user?.firstname ?? ''} ${user?.lastname ?? ''}`.trim() || email;
   }
 
   onCancel(): void {
@@ -189,7 +209,7 @@ export class AppointmentFormDialogComponent implements OnInit, AfterViewInit, Af
       this.appointment.subscriptions = [];
       subscriptionList.forEach((subscriptionUser: any) => {
         const subscription = new Subscription();
-        subscription.user = this.findUserByEmail(subscriptionUser.user);
+        subscription.user = this.existingSubscribers.get(subscriptionUser.user) ?? this.findUserByEmail(subscriptionUser.user);
         this.appointment.subscriptions.push(subscription);
       })
 
@@ -221,9 +241,12 @@ export class AppointmentFormDialogComponent implements OnInit, AfterViewInit, Af
   }
 
   addSubscription() {
-    this.selected();
+    if (!this.studentsLoaded) {
+      return;
+    }
     const subscriptionForm = this.fb.group({
-      user: ['', Validators.required]
+      user: ['', Validators.required],
+      existing: [false]
     });
 
     this.subscriptions.push(subscriptionForm);
@@ -233,9 +256,9 @@ export class AppointmentFormDialogComponent implements OnInit, AfterViewInit, Af
     }, 0);
   }
 
-  removeSubscription(index: number, email: string) {
-    this.selectedStudents.delete(email);
+  removeSubscription(index: number) {
     this.subscriptions.removeAt(index);
+    this.selected();
   }
 
   get guestSubscriptions(): FormArray {

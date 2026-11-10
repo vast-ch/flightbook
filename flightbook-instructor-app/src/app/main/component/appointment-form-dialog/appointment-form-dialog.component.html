@@ -85,28 +85,32 @@
 </mat-form-field>
 <div class="fb-subscription-section" formArrayName="subscriptions">
   <div class="fb-subscription-header">
-    <button type="button" class="fb-subscription-add" [attr.aria-label]="'appointment.subscribeStudent' | translate" [matTooltip]="'appointment.subscribeStudent' | translate" (click)="addSubscription()">
+    <button type="button" class="fb-subscription-add" [attr.aria-label]="'appointment.subscribeStudent' | translate" [matTooltip]="'appointment.subscribeStudent' | translate" [disabled]="!studentsLoaded" (click)="addSubscription()">
       <mat-icon aria-hidden="true">add</mat-icon>
     </button>
     <span class="fb-subscription-title">{{ 'appointment.subscribeStudent'| translate }}</span>
   </div>
   @for (subscription of subscriptions.controls; track subscription; let i = $index) {
     <div class="fb-subscription-row" [formGroupName]="i" #subscriptionFormList>
-      <button type="button" class="fb-subscription-remove" [attr.aria-label]="'appointment.removeSubscription' | translate" [matTooltip]="'appointment.removeSubscription' | translate" (click)="removeSubscription(i, selectStudent.value)">
+      <button type="button" class="fb-subscription-remove" [attr.aria-label]="'appointment.removeSubscription' | translate" [matTooltip]="'appointment.removeSubscription' | translate" (click)="removeSubscription(i)">
         <mat-icon aria-hidden="true">remove</mat-icon>
       </button>
-      <mat-form-field appearance="outline" subscriptSizing="dynamic">
-        <mat-label>{{ 'appointment.student'| translate }}</mat-label>
-        <mat-select #selectStudent formControlName="user" (selectionChange)="selected()">
-          @for (student of students; track student) {
-            @if (subscription.value.user === student.user?.email || !isSelected(student.user?.email)) {
-              <mat-option [value]="student.user?.email">
-                {{student.user?.firstname}} {{student.user?.lastname}}
-              </mat-option>
+      @if (subscription.value.existing) {
+        <span class="fb-subscription-name">{{ existingSubscriberName(subscription.value.user) }}</span>
+      } @else {
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+          <mat-label>{{ 'appointment.student'| translate }}</mat-label>
+          <mat-select formControlName="user" (selectionChange)="selected()">
+            @for (student of students; track student) {
+              @if (subscription.value.user === student.user?.email || !isSelected(student.user?.email)) {
+                <mat-option [value]="student.user?.email">
+                  {{student.user?.firstname}} {{student.user?.lastname}}
+                </mat-option>
+              }
             }
-          }
-        </mat-select>
-      </mat-form-field>
+          </mat-select>
+        </mat-form-field>
+      }
     </div>
   }
 </div>

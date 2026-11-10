@@ -1,7 +1,7 @@
 import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
-import { finalize, firstValueFrom, Subject, Subscription as RxSubscription, takeUntil } from 'rxjs';
+import { BehaviorSubject, finalize, firstValueFrom, Subject, Subscription as RxSubscription, takeUntil } from 'rxjs';
 import { AccountService } from 'src/app/core/services/account.service';
 import { SchoolService } from 'src/app/core/services/school.service';
 import { PdfOpenService } from 'src/app/core/services/pdf-open.service';
@@ -39,7 +39,8 @@ export class AppointmentsComponent implements OnInit, OnDestroy, AfterViewInit {
   appointments: Appointment[];
   appointmentTypes: AppointmentType[] = [];
   teamMembers: TeamMember[] = [];
-  students: Student[] = [];
+  /** null while loading. An open edit dialog subscribes, so it picks the list up when it arrives. */
+  students$ = new BehaviorSubject<Student[] | null>(null);
   displayedColumns: string[] = ['edit', 'subscription', 'list', 'scheduling', 'state', 'meetingPoint', 'instructor', 'takeOffCoordinator', 'countSubscription', 'countGuestSubscription', 'countWaitinglist'];
   pagerEntity = new PagerEntity<Appointment[]>;
   states = State;
@@ -125,8 +126,9 @@ export class AppointmentsComponent implements OnInit, OnDestroy, AfterViewInit {
         this.teamMembers = teamMembers;
       })
 
+      this.students$.next(null);
       this.schoolService.getStudentsBySchoolId(this.school.id, false).pipe(takeUntil(this.unsubscribe$)).subscribe((students: Student[]) => {
-        this.students = students.sort(((obj1, obj2) => (obj1.user?.firstname && obj2.user?.firstname && obj1.user?.firstname > obj2.user?.firstname ? 1 : -1)));
+        this.students$.next(students.sort(((obj1, obj2) => (obj1.user?.firstname && obj2.user?.firstname && obj1.user?.firstname > obj2.user?.firstname ? 1 : -1))));
       })
 
       this.schoolService.getAppointmentTypesBySchoolId(this.school.id, { archived: false }).pipe(takeUntil(this.unsubscribe$)).subscribe((appointmentTypes: AppointmentType[]) => {
@@ -211,7 +213,7 @@ export class AppointmentsComponent implements OnInit, OnDestroy, AfterViewInit {
       width: "700px",
       data: {
         teamMembers: this.teamMembers,
-        students: this.students,
+        students$: this.students$,
         appointment: appointment,
         appointmentTypes: this.appointmentTypes
       }

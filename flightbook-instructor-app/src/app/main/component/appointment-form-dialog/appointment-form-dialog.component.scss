@@ -80,6 +80,25 @@ mat-dialog-actions {
   }
 }
 
+// An existing subscription: the subscriber is fixed (remove + re-add to change),
+// so it is plain text, aligned with the 40px field box of the select rows.
+.fb-subscription-name {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  min-height: 40px;
+  margin-top: 5px;
+  padding: 0 16px;
+  border: 1px solid var(--fb-border-subtle);
+  border-radius: var(--fb-radius-sm);
+  background: var(--fb-surface-lowest);
+  color: var(--fb-ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .fb-subscription-add,
 .fb-subscription-remove {
   display: flex;
@@ -110,6 +129,16 @@ mat-dialog-actions {
 
   &:hover {
     background: var(--fb-primary-hover);
+  }
+
+  // Disabled until the student list has loaded.
+  &:disabled {
+    background: var(--fb-disabled-bg);
+    cursor: default;
+
+    .mat-icon {
+      color: var(--fb-disabled-fg);
+    }
   }
 
   .mat-icon {

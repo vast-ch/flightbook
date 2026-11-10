@@ -18,6 +18,10 @@ export class AppointmentException {
         throw new BadRequestException("Invalid unsubscribe: user must be subscribed to the appointment")
     }
 
+    public static invalidSubscription() {
+        throw new BadRequestException("Invalid subscription: every subscription must reference a user email")
+    }
+
     public static deadlinePassedException() {
         throw new BadRequestException("Deadline passed")
     }
