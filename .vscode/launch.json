@@ -80,14 +80,36 @@
     },
     {
       "type": "node",
+      "request": "launch",
+      "name": "Debug Nest Framework watch (API)",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "start:dev"],
+      "cwd": "${workspaceFolder}/flightbook-api",
+      "autoAttachChildProcesses": true,
+      "sourceMaps": true,
+      "outFiles": ["${workspaceFolder}/flightbook-api/dist/**/*.js"],
+      "resolveSourceMapLocations": [
+        "${workspaceFolder}/flightbook-api/dist/**",
+        "!**/node_modules/**"
+      ],
+      "skipFiles": ["<node_internals>/**"],
+      "console": "integratedTerminal",
+      "restart": true
+    },
+    {
+      "type": "node",
       "request": "attach",
       "name": "Attach to npm run start:debug (API)",
       "port": 9229,
       "restart": true,
       "sourceMaps": true,
       "cwd": "${workspaceFolder}/flightbook-api",
-      "skipFiles": ["<node_internals>/**"],
-      "autoAttachChildProcesses": true
+      "outFiles": ["${workspaceFolder}/flightbook-api/dist/**/*.js"],
+      "resolveSourceMapLocations": [
+        "${workspaceFolder}/flightbook-api/dist/**",
+        "!**/node_modules/**"
+      ],
+      "skipFiles": ["<node_internals>/**"]
     }
   ]
 }
