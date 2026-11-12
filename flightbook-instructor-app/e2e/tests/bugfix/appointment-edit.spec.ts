@@ -148,6 +148,30 @@ test('archived subscribers → shown in the dialog and kept on edit', async ({ p
   await expect.poll(dbState).toEqual({ state: 'CONFIRMED', subscriptions: 17 });
 });
 
+test('adding a student → only students not yet subscribed can be chosen', async ({ page }) => {
+  // 15 of the 17 students are subscribed; student16 and student17 are not.
+  psql(`delete from data.subscription s using data.app_user u
+        where s.user_id = u.id and s.appointment_id = ${appointmentId} and u.email in ('${ARCHIVED.join("','")}')`);
+  const [student16, student17] = NAMES.slice(-2);
+
+  const students = page.waitForResponse((r) => /\/instructor\/schools\/\d+\/students\?/.test(r.url()));
+  await page.goto('/appointments');
+  await students;
+  await waitForAppointments(page);
+  await openEditDialog(page);
+
+  // first new row: the two students who are not subscribed
+  await addStudentButton(page).click();
+  await dialog(page).getByRole('combobox', { name: 'Schüler*in' }).last().click();
+  await expect(page.getByRole('option')).toHaveText([student16, student17]);
+  await page.getByRole('option', { name: student16 }).click();
+
+  // second new row: the student just picked is gone as well
+  await addStudentButton(page).click();
+  await dialog(page).getByRole('combobox', { name: 'Schüler*in' }).last().click();
+  await expect(page.getByRole('option')).toHaveText([student17]);
+});
+
 test('API rejects a subscription without user and changes nothing', async ({ request }) => {
   const valid = SEED.students.slice(0, 16).map((s) => ({ user: { email: s.email } }));
   const response = await request.put(`${API_URL}/instructor/schools/${schoolId()}/appointments/${appointmentId}`, {

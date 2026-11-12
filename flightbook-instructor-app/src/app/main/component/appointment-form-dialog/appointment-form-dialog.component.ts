@@ -127,9 +127,10 @@ export class AppointmentFormDialogComponent implements OnInit, AfterViewChecked 
   /** Emails already in the list (existing and newly picked), hidden from the other selects. */
   selected() {
     this.selectedStudents.clear();
-    this.subscriptions.value.forEach((row: { user: { email: string } }) => {
-      if (row.user?.email) {
-        this.selectedStudents.add(row.user.email);
+    // The `user` control holds the subscriber's email (a string), not a user object.
+    this.subscriptions.value.forEach((row: { user: string }) => {
+      if (row.user) {
+        this.selectedStudents.add(row.user);
       }
     });
   }
