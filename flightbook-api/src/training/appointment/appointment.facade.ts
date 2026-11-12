@@ -94,6 +94,17 @@ export class AppointmentFacade {
 
         const previousState = appointment.state;
 
+        // Subscribers and waiting list before the change, to inform afterwards the
+        // students who were added or moved up.
+        const previousSubscriberEmails = new Set(appointment.subscriptions.map((subscription: Subscription) => subscription.user.email));
+        const students = await this.studentRepository.getStudentsBySchoolIdAndUserEmails(schoolId, [
+            ...appointment.subscriptions.map((subscription: Subscription) => subscription.user.email),
+            ...appointmentDto.subscriptions.map((subscriptionDto: SubscriptionDto) => subscriptionDto.user.email),
+        ]);
+        const previousWaitingListPositions = this.waitingListPositions(
+            this.calculateWaitingList(appointment.subscriptions, appointment.maxPeople, students).entries
+        );
+
         appointment.description = appointmentDto.description;
         appointment.maxPeople = appointmentDto.maxPeople;
         appointment.meetingPoint = appointmentDto.meetingPoint;
@@ -158,6 +169,19 @@ export class AppointmentFacade {
             this.notificationsService.sendAppointmentStateChanged(appointmentResp);
         }
 
+        const { entries } = this.calculateWaitingList(appointmentResp.subscriptions, appointmentResp.maxPeople, students);
+        this.notifyWaitingListChanges(plainToInstance(SchoolDto, appointmentResp.school), appointmentResp, previousWaitingListPositions, entries);
+
+        // Students the instructor added who got a place are informed of their subscription
+        // (those on the waiting list are informed once they move up).
+        const addedStudentsWithPlace = entries
+            .filter((entry, index) => !entry.waitingList && entry.student && !previousSubscriberEmails.has(appointmentResp.subscriptions[index].user.email))
+            .map((entry) => entry.student);
+        if (addedStudentsWithPlace.length > 0) {
+            this.emailService.sendAppointmentSubscription(addedStudentsWithPlace, appointmentResp);
+            this.notificationsService.sendAppointmentSubscription(addedStudentsWithPlace, appointmentResp);
+        }
+
         // Sync to Google Calendar
         try {
             await this.createOrUpdateAppointmentInGoogleCalendar(appointmentResp);
@@ -216,12 +240,9 @@ export class AppointmentFacade {
                 school.id,
                 appointment.subscriptions.map((subscription: Subscription) => subscription.user.email)
             );
-            const waitingListPositions = new Map<string, number>();
-            this.calculateWaitingList(appointment.subscriptions, appointment.maxPeople, students).entries.forEach((entry) => {
-                if (entry.waitingList) {
-                    waitingListPositions.set(entry.email, entry.position);
-                }
-            });
+            const previousWaitingListPositions = this.waitingListPositions(
+                this.calculateWaitingList(appointment.subscriptions, appointment.maxPeople, students).entries
+            );
 
             const subscriptionToDelete = appointment.removeUserSubscription(userId);
             if (!subscriptionToDelete) {
@@ -230,22 +251,12 @@ export class AppointmentFacade {
 
             await this.subscriptionRepository.remove(subscriptionToDelete);
 
-            const { entries } = this.calculateWaitingList(appointment.subscriptions, appointment.maxPeople, students);
-            appointment.subscriptions.forEach((subscription: Subscription, index: number) => {
-                const entry = entries[index];
-                if (entry.waitingList) {
-                    const previousPosition = waitingListPositions.get(subscription.user.email);
-                    if (previousPosition && entry.position < previousPosition) {
-                        this.emailService.sendInformWaitingStudent(school, appointment, subscription, entry.position, false);
-                        this.notificationsService.sendInformWaitingStudent(appointment, subscription, entry.position, false);
-                    }
-                } else {
-                    if (waitingListPositions.has(subscription.user.email)) {
-                        this.emailService.sendInformWaitingStudent(school, appointment, subscription, 0, true);
-                        this.notificationsService.sendInformWaitingStudent(appointment, subscription, 0, true);
-                    }
-                }
-            });
+            this.notifyWaitingListChanges(
+                school,
+                appointment,
+                previousWaitingListPositions,
+                this.calculateWaitingList(appointment.subscriptions, appointment.maxPeople, students).entries
+            );
             this.emailService.sendUnsubscribeEmail(school, appointment, subscriptionToDelete);
         }
         return AppointmentMapper.toAppointmentDto(appointment);
@@ -343,19 +354,27 @@ export class AppointmentFacade {
      * Walks the subscriptions in order and decides who has a place and who is on the
      * waiting list. Every subscription counts — a student archived after subscribing
      * keeps their place; a subscriber without student record takes one place.
+     *
+     * Strictly first come, first served: once someone does not fit, everyone after
+     * them waits too (no overtaking). So a cancellation can only move people up and
+     * never takes a place away — even if that leaves a seat free (e.g. a tandem
+     * student needing 2 places when only 1 is left).
+     *
      * The returned entries are index-aligned with `subscriptions`.
      */
     private calculateWaitingList(subscriptions: { user?: { email?: string } }[], maxPeople: number, students: Student[]) {
         let countSubscription = 0;
         let countWaitingList = 0;
         let waitingListPosition = 0;
+        let full = false;
 
         const entries = subscriptions.map((subscription) => {
             const email = subscription.user?.email;
             const student = students.find((s: Student) => s.user.email === email);
             const usedPlaces = student?.getUsedPlaces() ?? 1;
 
-            if (maxPeople && (countSubscription + usedPlaces) > maxPeople) {
+            if (maxPeople && (full || (countSubscription + usedPlaces) > maxPeople)) {
+                full = true;
                 waitingListPosition++;
                 countWaitingList += usedPlaces;
                 return { email, student, waitingList: true, position: waitingListPosition };
@@ -365,6 +384,44 @@ export class AppointmentFacade {
         });
 
         return { entries, countSubscription, countWaitingList };
+    }
+
+    /** email → waiting-list position of everyone on the waiting list. */
+    private waitingListPositions(entries: { email?: string; waitingList: boolean; position: number }[]): Map<string, number> {
+        const positions = new Map<string, number>();
+        entries.forEach((entry) => {
+            if (entry.waitingList && entry.email) {
+                positions.set(entry.email, entry.position);
+            }
+        });
+        return positions;
+    }
+
+    /**
+     * Informs students whose waiting-list situation improved: moved to a lower
+     * position, or got a place. Students who were not subscribed before are skipped.
+     * `entries` are index-aligned with `appointment.subscriptions`.
+     */
+    private notifyWaitingListChanges(
+        school: SchoolDto,
+        appointment: Appointment,
+        previousPositions: Map<string, number>,
+        entries: { waitingList: boolean; position: number }[]
+    ) {
+        appointment.subscriptions.forEach((subscription: Subscription, index: number) => {
+            const entry = entries[index];
+            const previousPosition = previousPositions.get(subscription.user.email);
+            if (!previousPosition) {
+                return;
+            }
+            if (!entry.waitingList) {
+                this.emailService.sendInformWaitingStudent(school, appointment, subscription, 0, true);
+                this.notificationsService.sendInformWaitingStudent(appointment, subscription, 0, true);
+            } else if (entry.position < previousPosition) {
+                this.emailService.sendInformWaitingStudent(school, appointment, subscription, entry.position, false);
+                this.notificationsService.sendInformWaitingStudent(appointment, subscription, entry.position, false);
+            }
+        });
     }
 
     // Overload signatures
