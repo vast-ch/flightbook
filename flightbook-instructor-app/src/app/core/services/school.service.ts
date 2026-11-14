@@ -115,6 +115,11 @@ export class SchoolService {
     return this.http.put<Appointment>(`${environment.baseUrl}/instructor/schools/${id}/appointments/${appointment.id}`, appointment);
   }
 
+  /** `message` is an optional text for the subscribers, who are informed of the deletion. */
+  deleteAppointment(id: number, appointmentId: number, message?: string): Observable<void> {
+    return this.http.delete<void>(`${environment.baseUrl}/instructor/schools/${id}/appointments/${appointmentId}`, { body: { message } });
+  }
+
   getAppointmentSubscriptions(id: number, appointmentId: number): Observable<Subscription[]> {
     return this.http.get<Subscription[]>(`${environment.baseUrl}/instructor/schools/${id}/appointments/${appointmentId}/subscriptions`);
   }

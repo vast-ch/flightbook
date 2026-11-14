@@ -415,6 +415,7 @@
         "createAccount": "Registrieren",
         "addControlSheet": "Ausbildungskontrollblatt hinzufügen",
         "cancel": "Abbrechen",
+        "delete": "Löschen",
         "send": "Senden",
         "yes": "Ja",
         "no": "Nein",
@@ -460,7 +461,23 @@
         "waitingList": "Warteliste",
         "noSubscription": "Zurzeit hat es keine Anmeldungen",
         "type": "Terminart",
-        "allInstructors": "Alle"
+        "allInstructors": "Alle",
+        "delete": {
+            "title": "{{type}} vom {{date}} um {{time}} löschen?",
+            "titleNoType": "Termin vom {{date}} um {{time}} löschen?",
+            "participants": "Angemeldet: {{students}}, Warteliste: {{waiting}}, Gäste: {{guests}}.",
+            "notifyStudents": "Alle angemeldeten Schüler*innen (inkl. Warteliste) werden per E-Mail und Push-Benachrichtigung informiert.",
+            "notifyStudentsNotGuests": "Alle angemeldeten Schüler*innen (inkl. Warteliste) werden per E-Mail und Push-Benachrichtigung informiert; Gäste werden nicht benachrichtigt.",
+            "notifyGuestsOnly": "Gäste werden nicht benachrichtigt.",
+            "notifyNobodySubscribed": "Es ist niemand angemeldet, daher wird niemand benachrichtigt.",
+            "notifyNobodyPast": "Der Termin liegt in der Vergangenheit, daher wird niemand benachrichtigt.",
+            "irreversible": "Das Löschen kann nicht rückgängig gemacht werden.",
+            "messageLabel": "Nachricht an die Angemeldeten (optional)",
+            "keep": "Termin behalten",
+            "confirm": "Termin löschen",
+            "confirmNotify": "Löschen und {{count}} benachrichtigen",
+            "deleted": "Termin gelöscht"
+        }
     },
     "appointmentExport": {
         "title": "Schulungstage Exportieren",

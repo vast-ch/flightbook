@@ -1,4 +1,4 @@
-import { AfterViewChecked, ChangeDetectorRef, Component, DestroyRef, ElementRef, Inject, OnInit, QueryList, ViewChildren } from '@angular/core';
+import { AfterViewChecked, ChangeDetectorRef, Component, DestroyRef, ElementRef, Inject, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormArray, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { ThemePalette } from '@angular/material/core';
@@ -13,6 +13,7 @@ import { User } from 'src/app/shared/domain/user';
 import { AppointmentsComponent } from '../../pages/appointments/appointments.component';
 import { GuestSubscription } from 'src/app/shared/domain/guest-subscription';
 import moment from 'moment';
+import { TranslateService } from '@ngx-translate/core';
 import { combineLatest, Observable, skip, startWith } from 'rxjs';
 
 @Component({
@@ -36,6 +37,19 @@ export class AppointmentFormDialogComponent implements OnInit, AfterViewChecked 
    *  may still be loading or not contain the subscriber (e.g. archived student). */
   private existingSubscribers = new Map<string, User>();
 
+  /** The footer is swapped for the delete confirmation while this is set. */
+  confirmingDelete = false;
+  deleteMessage = '';
+  // As saved, not as currently edited in the form: delete acts on the stored appointment.
+  subscribedCount = 0;
+  waitingCount = 0;
+  guestCount = 0;
+  /** Subscribers the API will notify: every subscription (waiting list included) of an upcoming appointment. */
+  notifyCount = 0;
+  private isUpcoming = false;
+
+  @ViewChild('keepButton') keepButton?: ElementRef<HTMLButtonElement>;
+
   @ViewChildren('subscriptionFormList') subscriptionFormList?: QueryList<ElementRef>
   @ViewChildren('guestSubscriptionFormList') guestSubscriptionFormList?: QueryList<ElementRef>
 
@@ -46,10 +60,18 @@ export class AppointmentFormDialogComponent implements OnInit, AfterViewChecked 
     public dialogRef: MatDialogRef<AppointmentsComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private cdRef: ChangeDetectorRef,
+    private translate: TranslateService,
     destroyRef: DestroyRef
   ) {
     this.appointment = data.appointment;
     this.appointmentTypes = data.appointmentTypes;
+
+    this.waitingCount = this.appointment.subscriptions.filter((subscription: Subscription) => subscription.waitingList).length;
+    this.subscribedCount = this.appointment.subscriptions.length - this.waitingCount;
+    this.guestCount = this.appointment.guestSubscriptions.length;
+    // Same rule as the API: deleting an appointment that already took place notifies nobody.
+    this.isUpcoming = !!this.appointment.scheduling && new Date(this.appointment.scheduling).getTime() > Date.now();
+    this.notifyCount = this.isUpcoming ? this.appointment.subscriptions.length : 0;
 
     (data.students$ as Observable<Student[] | null>).pipe(takeUntilDestroyed(destroyRef)).subscribe((students: Student[] | null) => {
       this.students = students ?? [];
@@ -138,6 +160,56 @@ export class AppointmentFormDialogComponent implements OnInit, AfterViewChecked 
   existingSubscriberName(email: string): string {
     const user = this.existingSubscribers.get(email);
     return `${user?.firstname ?? ''} ${user?.lastname ?? ''}`.trim() || email;
+  }
+
+  /** Only a saved appointment can be deleted. */
+  get canDelete(): boolean {
+    return !!this.appointment.id;
+  }
+
+  get hasParticipants(): boolean {
+    return this.appointment.subscriptions.length + this.guestCount > 0;
+  }
+
+  get deleteTitle(): string {
+    const scheduling = moment.utc(this.appointment.scheduling);
+    // Without a type the sentence needs its own wording ("the appointment"), not a stand-in name.
+    const typeName = this.appointment.type?.name;
+    return this.translate.instant(typeName ? 'appointment.delete.title' : 'appointment.delete.titleNoType', {
+      type: typeName,
+      date: scheduling.format('DD.MM.YYYY'),
+      time: scheduling.format('HH:mm')
+    });
+  }
+
+  /** Who hears about the deletion. Guests have no account, so they never do. */
+  get deleteConsequenceKey(): string {
+    if (this.notifyCount > 0) {
+      return this.guestCount > 0 ? 'appointment.delete.notifyStudentsNotGuests' : 'appointment.delete.notifyStudents';
+    }
+    if (!this.hasParticipants) {
+      return 'appointment.delete.notifyNobodySubscribed';
+    }
+    return this.isUpcoming ? 'appointment.delete.notifyGuestsOnly' : 'appointment.delete.notifyNobodyPast';
+  }
+
+  askDelete(): void {
+    this.deleteMessage = '';
+    this.confirmingDelete = true;
+    // Focus lands on the safe choice once the panel has rendered.
+    setTimeout(() => this.keepButton?.nativeElement.focus(), 0);
+  }
+
+  cancelDelete(): void {
+    this.confirmingDelete = false;
+  }
+
+  onDelete(): void {
+    this.dialogRef.close({
+      event: "delete",
+      appointment: this.appointment,
+      message: this.deleteMessage.trim() || undefined
+    });
   }
 
   onCancel(): void {

@@ -232,6 +232,17 @@ export class AppointmentsComponent implements OnInit, OnDestroy, AfterViewInit {
           this.loadAppointments(schoolId, undefined, undefined, true);
           this.refreshTabCounts();
         })
+      } else if (response?.event === "delete" && this.school?.id && response.appointment?.id) {
+        const schoolId = this.school.id;
+        this.schoolService.deleteAppointment(schoolId, response.appointment.id, response.message).pipe(takeUntil(this.unsubscribe$)).subscribe(() => {
+          this.loadAppointments(schoolId, undefined, undefined, true);
+          this.refreshTabCounts();
+          this.snackBar.open(this.translate.instant('appointment.delete.deleted'), this.translate.instant('buttons.done'), {
+            horizontalPosition: 'center',
+            verticalPosition: 'top',
+            duration: 2000
+          });
+        })
       }
     });
   }
