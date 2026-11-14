@@ -198,34 +198,24 @@ export class AppComponent implements OnDestroy, OnInit {
                 // Show the notification payload if the app is open on the device.
                 const alert = await this.alertController.create({
                     header: notification.title,
-                    message: notification.body.replace('\r\n', '<br/>'),
+                    message: (notification.body ?? '').replace(/\r?\n/g, '<br/>'),
                     backdropDismiss: false,
                     buttons: [
                         {
-                            text: this.translate.instant('buttons.done')
+                            text: this.translate.instant('buttons.done'),
+                            handler: () => {
+                                // The user is looking at the list the deleted appointment is still in.
+                                const data = notification.data;
+                                if (data?.type == 'APPOINTMENT_DELETED' && this.router.url.split('?')[0] == `/more/school/${data.schoolId}`) {
+                                    this.openAppointmentList(data.schoolId);
+                                }
+                            }
                         },
                         {
                             text: this.translate.instant('buttons.show'),
                             handler: () => {
-                                const type = notification.data.type
-                                if (type == "APPOINTMENT") {
-                                    const schoolId = notification.data.schoolId
-                                    const appointmentId = notification.data.appointmentId
-                                    this.router.navigate(
-                                        ['/more/school/', schoolId],
-                                        { queryParams: { appointmentId: appointmentId } }
-                                    );
-                                } else if (type == "FLIGHT_VALIDATION_REJECTED") {
-                                    const flightId = notification.data.flightId
-                                    this.router.navigate(
-                                        ['/flights/', flightId]
-                                    );
-                                } else if (type == 'FLIGHT_PAYMENT_REJECTED' || type == 'FLIGHT_PAYMENT_ACCEPTED') {
-                                    const flightId = notification.data.flightId
-                                    this.router.navigate(
-                                        ['/flights/', flightId]
-                                    );
-                                }
+                                // The alert above already was the message.
+                                this.openNotificationTarget(notification.data, false);
                             }
                         }
                     ]
@@ -238,27 +228,51 @@ export class AppComponent implements OnDestroy, OnInit {
             'pushNotificationActionPerformed',
             (notification: ActionPerformed) => {
                 // Action when user tap on a notification.
-                const type = notification.notification.data.type
-                if (type == "APPOINTMENT") {
-                    const schoolId = notification.notification.data.schoolId
-                    const appointmentId = notification.notification.data.appointmentId
-                    this.router.navigate(
-                        ['/more/school/', schoolId],
-                        { queryParams: { appointmentId: appointmentId } }
-                    );
-                } else if (type == "FLIGHT_VALIDATION_REJECTED") {
-                    const flightId = notification.notification.data.flightId
-                    this.router.navigate(
-                        ['/flights/', flightId]
-                    );
-                } else if (type == "FLIGHT_PAYMENT_REJECTED" || type == "FLIGHT_PAYMENT_ACCEPTED") {
-                    const flightId = notification.notification.data.flightId
-                    this.router.navigate(
-                        ['/flights/', flightId]
-                    );
-                }
+                this.openNotificationTarget(notification.notification.data, true);
             }
         );
+    }
+
+    /**
+     * Opens the page a push notification is about.
+     * @param tapped true when the user tapped it in the tray and has not read
+     * its text inside the app yet.
+     */
+    private async openNotificationTarget(data: any, tapped: boolean) {
+        const type = data?.type;
+        if (type == 'APPOINTMENT') {
+            this.router.navigate(
+                ['/more/school/', data.schoolId],
+                { queryParams: { appointmentId: data.appointmentId } }
+            );
+        } else if (type == 'APPOINTMENT_DELETED') {
+            // There is no appointment left to open: the school's list it is.
+            await this.openAppointmentList(data.schoolId);
+            if (tapped) {
+                await this.presentAppointmentDeletedAlert(data);
+            }
+        } else if (type == 'FLIGHT_VALIDATION_REJECTED' || type == 'FLIGHT_PAYMENT_REJECTED' || type == 'FLIGHT_PAYMENT_ACCEPTED') {
+            this.router.navigate(['/flights/', data.flightId]);
+        }
+    }
+
+    /** `refresh` makes the list reload even when it is already open or still alive in the stack. */
+    private openAppointmentList(schoolId: string) {
+        return this.router.navigate(['/more/school/', schoolId], { queryParams: { refresh: Date.now() } });
+    }
+
+    private async presentAppointmentDeletedAlert(data: any) {
+        const alert = await this.alertController.create({
+            header: data.title || this.translate.instant('appointment.deletedTitle'),
+            message: (data.body || this.translate.instant('appointment.deletedMessage')).replace(/\r?\n/g, '<br/>'),
+            backdropDismiss: false,
+            buttons: [
+                {
+                    text: this.translate.instant('buttons.done')
+                }
+            ]
+        });
+        await alert.present();
     }
 
     ngOnDestroy() {

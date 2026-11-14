@@ -5,6 +5,7 @@ import { FlightDto } from '../../flight/interface/flight-dto';
 import { StudentFacade } from '../../training/student/student.facade';
 import { SchoolGuard } from '../../auth/guard/school.guard';
 import { AppointmentDto } from '../appointment/interface/appointment-dto';
+import { AppointmentDeleteDto } from '../appointment/interface/appointment-delete-dto';
 import { TeamMemberFacade } from '../team-member/team-member.facade';
 import { EnrollmentFacade } from '../../training/enrollment/enrollment.facade';
 import { AppointmentFacade } from '../appointment/appointment.facade';
@@ -87,6 +88,13 @@ export class InstructorController {
     @Put('/schools/:id/appointments/:appointment_id')
     putAppointment(@Param('id') id: number, @Param('appointment_id') appointmentId: number, @Body() appointmentDto: AppointmentDto): Promise<AppointmentDto> {
         return this.appointmentFacade.updateAppointment(appointmentId, id, appointmentDto);
+    }
+
+    @UseGuards(CompositeAuthGuard, SchoolGuard)
+    @Delete('/schools/:id/appointments/:appointment_id')
+    @HttpCode(204)
+    async deleteAppointment(@Param('id') id: number, @Param('appointment_id') appointmentId: number, @Body() appointmentDeleteDto?: AppointmentDeleteDto): Promise<void> {
+        await this.appointmentFacade.deleteAppointment(appointmentId, id, appointmentDeleteDto);
     }
 
     @UseGuards(CompositeAuthGuard, SchoolGuard)

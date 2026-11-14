@@ -17,6 +17,10 @@
             "subject": "{school}: Registration for: {date}",
             "contentCanParticipate": "<p>Someone has unsubscribed from the appointment on {date}. You can now participate.</p><p>Appointment information</p><ul><li>Date: {date}</li>{type}<li>Meeting point: {meetingPoint}</li><li>Description: {description}</li><li>Max participants: {maxPeople}</li></ul>",
             "contentMovedUp": "<p>Someone has unsubscribed from the appointment on {date}. You have moved up to position {position} on the waiting list.</p><p>Appointment information</p><ul><li>Date: {date}</li>{type}<li>Meeting point: {meetingPoint}</li><li>Description: {description}</li><li>Max participants: {maxPeople}</li></ul>"
+        },
+        "deleted": {
+            "subject": "{school}: Appointment on {date} deleted",
+            "content": "<p>{school} has deleted the appointment on {date}. Your registration is therefore no longer valid.</p>{message}<p>Appointment information</p><ul><li>Date: {date}</li>{type}<li>Meeting point: {meetingPoint}</li></ul>"
         }
     },
     "enrollment": {

@@ -1,9 +1,13 @@
-import { BadRequestException, UnprocessableEntityException } from "@nestjs/common";
+import { BadRequestException, NotFoundException, UnprocessableEntityException } from "@nestjs/common";
 
 export class AppointmentException {
 
     public static invalidAppointment() {
         throw new UnprocessableEntityException("Invalid appointment: scheduling date and state must be provided")
+    }
+
+    public static notFound() {
+        throw new NotFoundException("Appointment not found")
     }
 
     public static invalidAppointmentType() {

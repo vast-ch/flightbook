@@ -143,6 +143,17 @@ export class AppointmentListPage implements OnInit, OnDestroy {
     ) {
         this.schoolId = +this.activeRoute.snapshot.paramMap.get('id');
         this.appointmentId = +this.activeRoute.snapshot.queryParamMap.get('appointmentId');
+
+        // A push saying an appointment was deleted navigates here with a new
+        // `refresh` value. The page may already be open, or alive in the stack
+        // with its rows, and ionViewDidEnter reloads neither.
+        let refresh = this.activeRoute.snapshot.queryParamMap.get('refresh');
+        this.activeRoute.queryParamMap.pipe(takeUntil(this.unsubscribe$)).subscribe(params => {
+            if (params.get('refresh') !== refresh) {
+                refresh = params.get('refresh');
+                this.initialDataLoad();
+            }
+        });
         addIcons({
             filterOutline,
             ellipsisVerticalOutline,
