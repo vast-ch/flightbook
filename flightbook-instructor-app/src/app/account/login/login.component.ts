@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, Input, Output, EventEmitter, SimpleChanges } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, Output, EventEmitter, SimpleChanges, HostBinding } from '@angular/core';
 import { Subject } from 'rxjs';
 import { Router } from '@angular/router';
 import { takeUntil } from 'rxjs/operators';
@@ -16,7 +16,9 @@ import { MatSnackBar } from '@angular/material/snack-bar';
   standalone: false
 })
 export class LoginComponent implements OnInit, OnDestroy {
-  @Input() loginPageRedirect: boolean = true;
+  /** Only true on the /login route; embedded in the enrollment and school-register steppers it
+   *  is false, and the page chrome (logo, background, padding) is left out. */
+  @Input() @HostBinding('class.fb-login--page') loginPageRedirect: boolean = true;
   @Input() showLanguage: boolean = true;
   @Input() email: string | undefined;
 
@@ -26,6 +28,8 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   form: UntypedFormGroup;
   loginInvalid = false;
+  showPassword = false;
+  readonly languages = ['de', 'fr'];
 
   constructor(
     private fb: UntypedFormBuilder,
@@ -84,6 +88,14 @@ export class LoginComponent implements OnInit, OnDestroy {
         }
       })
     }
+  }
+
+  get currentLang(): string {
+    return this.translate.currentLang || this.translate.defaultLang;
+  }
+
+  togglePassword() {
+    this.showPassword = !this.showPassword;
   }
 
   setLanguage(lang: string) {

@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { Student } from 'src/app/shared/domain/student';
 import { Enrollment } from 'src/app/shared/domain/enrollment';
 import { environment } from 'src/environments/environment';
@@ -89,6 +89,24 @@ export class SchoolService {
     return this.http.get<PagerEntity<Appointment[]>>(`${environment.baseUrl}/instructor/schools/${id}/appointments`, { params });
   }
 
+  // Deliberately independent of the shared mutable `this.filter`/`this.limit`, so this can run
+  // concurrently with the main list fetch (e.g. refreshing tab counts) without racing it.
+  // `order` is intentionally omitted - findAndCount's total is unaffected by sort direction.
+  getAppointmentCount(id: number, { from, to, instructorId }: { from?: Date; to?: Date; instructorId?: number } = {}): Observable<number> {
+    let params = new HttpParams().set('limit', '1');
+    if (from) {
+      params = params.set('from', moment(from).format('YYYY-MM-DD'));
+    }
+    if (to) {
+      params = params.set('to', moment(to).format('YYYY-MM-DD'));
+    }
+    if (instructorId) {
+      params = params.set('instructorId', instructorId.toString());
+    }
+    return this.http.get<PagerEntity<Appointment[]>>(`${environment.baseUrl}/instructor/schools/${id}/appointments`, { params })
+      .pipe(map(pagerEntity => pagerEntity.totalItems || 0));
+  }
+
   postAppointment(id: number, appointment: Appointment): Observable<Appointment> {
     return this.http.post<Appointment>(`${environment.baseUrl}/instructor/schools/${id}/appointments`, appointment);
   }
@@ -140,13 +158,13 @@ export class SchoolService {
     return this.http.get<TandemPilot[]>(`${environment.baseUrl}/schools/${id}/tandem-pilots`, { params });
   }
 
-  getPassengerConfirmationsBySchoolIdAndTandemPilotId({ limit = undefined, offset = undefined}: { limit?: number, offset?: number} = {}, id: number, tandemPilotId: number): Observable<PagerEntity<PassengerConfirmation[]>> {
-    let params: HttpParams = this.createFilterParams(limit, offset);
+  getPassengerConfirmationsBySchoolIdAndTandemPilotId({ limit = undefined, offset = undefined }: { limit?: number, offset?: number } = {}, id: number, tandemPilotId: number): Observable<PagerEntity<PassengerConfirmation[]>> {
+    const params: HttpParams = this.createTandemPagingParams(limit, offset);
     return this.http.get<PagerEntity<PassengerConfirmation[]>>(`${environment.baseUrl}/schools/${id}/tandem-pilots/${tandemPilotId}/passenger-confirmations`, { params });
   }
 
-  getTandemPilotFlightsBySchoolIdAndTandemPilotId({ limit = undefined, offset = undefined}: { limit?: number, offset?: number} = {}, id: number, tandemPilotId: number): Observable<PagerEntity<Flight[]>> {
-    let params: HttpParams = this.createFilterParams(limit, offset);
+  getTandemPilotFlightsBySchoolIdAndTandemPilotId({ limit = undefined, offset = undefined }: { limit?: number, offset?: number } = {}, id: number, tandemPilotId: number): Observable<PagerEntity<Flight[]>> {
+    const params: HttpParams = this.createTandemPagingParams(limit, offset);
     return this.http.get<PagerEntity<Flight[]>>(`${environment.baseUrl}/schools/${id}/tandem-pilots/${tandemPilotId}/flights`, { params });
   }
 
@@ -165,6 +183,19 @@ export class SchoolService {
     return this.http.get<PagerEntity<PassengerConfirmation[]>>(`${environment.baseUrl}/schools/${schoolId}/tandem-pilots/${tandemPilotId}/passenger-confirmations`);
   }
 
+  // Deliberately independent of the shared mutable `this.filter`, which Appointments leaves set:
+  // it would silently narrow the tandem tables.
+  private createTandemPagingParams(limit: number | undefined, offset: number | undefined): HttpParams {
+    let params = new HttpParams();
+    if (limit) {
+      params = params.append('limit', limit.toString());
+    }
+    if (offset) {
+      params = params.append('offset', offset.toString());
+    }
+    return params;
+  }
+
   private createFilterParams(limit: Number | undefined, offset: Number | undefined): HttpParams {
     let params = new HttpParams();
     if (this.filter.from && this.filter.from !== null) {
@@ -179,6 +210,10 @@ export class SchoolService {
 
     if (this.filter.instructorId) {
       params = params.append('instructorId', this.filter.instructorId?.toString() || '');
+    }
+
+    if (this.filter.order) {
+      params = params.append('order', this.filter.order);
     }
 
     if (limit) {

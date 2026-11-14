@@ -1,7 +1,10 @@
-<div class="star-rating-container star-rating-animation" fxLayout="row" fxLayoutAlign="start center" >
-  @for (star of stars; track star) {
-    <div [ngClass]="[star.class]" (click)="selectStar(star.id)">
-      <mat-icon>{{star.icon}}</mat-icon>
-    </div>
+<div class="star-rating-container">
+  @for (star of stars; track star.id) {
+    <button type="button" class="star-button" [class.star-button--filled]="star.filled" [class.star-button--big]="big"
+      [attr.aria-pressed]="star.filled"
+      [attr.aria-label]="label ? ('controlSheet.rating.starLabelWithContext' | translate: {label: label, n: star.id}) : ('controlSheet.rating.starLabel' | translate: {n: star.id})"
+      (click)="selectStar(star.id)">
+      <mat-icon>{{ star.filled ? 'star' : 'star_border' }}</mat-icon>
+    </button>
   }
 </div>

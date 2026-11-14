@@ -16,6 +16,9 @@ import { KeycloakService } from "../src/auth/service/keycloak.service";
 import { MockKeycloakService } from "./mock-keycloak.service";
 import { GoogleCalendarService } from "../src/shared/services/google-calendar.service";
 import { MockGoogleCalendarService } from "./mock-google-calendar.service";
+import { EmailService } from "../src/email/email.service";
+import { AppointmentModule } from "../src/training/appointment/appointment.module";
+import { NotificationsService } from "../src/shared/services/notifications.service";
 import { SchoolRepository } from "../src/training/school/school.repository";
 import { TeamMemberRepository } from "../src/training/team-member/team-member.repository";
 import { EnrollmentRepository } from "../src/training/enrollment/enrollment.repository";
@@ -104,6 +107,10 @@ const init = async () => {
     const guestSubscriptionRepository = moduleFixture.get<GuestSubscriptionRepository>(GuestSubscriptionRepository);
     const passengerConfirmationRepository = moduleFixture.get<PassengerConfirmationRepository>(PassengerConfirmationRepository);
     const tandemPilotRepository = moduleFixture.get<TandemPilotRepository>(TandemPilotRepository);
+    // Services whose calls specs may spy on (spec files cannot resolve them by class token themselves).
+    // EmailService is provided per module (no singleton): take the instance the appointment facade uses.
+    const appointmentEmailService = moduleFixture.select(AppointmentModule).get<EmailService>(EmailService, { strict: true });
+    const notificationsService = moduleFixture.get<NotificationsService>(NotificationsService, { strict: false });
 
     // Store globally for all tests to use
     (global as any).testApp = app;
@@ -127,6 +134,8 @@ const init = async () => {
     (global as any).testGuestSubscriptionRepository = guestSubscriptionRepository;
     (global as any).testPassengerConfirmationRepository = passengerConfirmationRepository;
     (global as any).testTandemPilotRepository = tandemPilotRepository;
+    (global as any).testAppointmentEmailService = appointmentEmailService;
+    (global as any).testNotificationsService = notificationsService;
 
     await userRepository.save(Testdata.getDefaultUser());
 };

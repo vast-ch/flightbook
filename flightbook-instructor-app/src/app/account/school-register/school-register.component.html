@@ -1,50 +1,93 @@
-<mat-card>
-  <mat-card-title>{{ 'school.register'| translate }}</mat-card-title>
-  <mat-card-content>
-    <mat-stepper #stepper>
-      <mat-step>
-        <ng-template matStepLabel>{{ 'account.title'| translate }}</ng-template>
-        <div class="language-list">
-          <p>
-            <a (click)="setLanguage('fr')" class="language fr">{{ 'language.fr' | translate }}</a>
-            <a (click)="setLanguage('de')" class="language de">{{ 'language.de' | translate }}</a>
-          </p>
+<div class="fb-register-page">
+  <div class="fb-register__top">
+    <img src="assets/icon/logo.png" alt="" class="fb-register__logo" />
+    <span class="fb-register__wordmark">Flightbook</span>
+    <div class="fb-register__languages">
+      @for (lang of languages; track lang) {
+        <button type="button" class="fb-register__language" [class.fb-register__language--active]="currentLang === lang"
+          [attr.aria-pressed]="currentLang === lang" [attr.aria-label]="'language.' + lang | translate"
+          (click)="setLanguage(lang)">{{ lang | uppercase }}</button>
+      }
+    </div>
+  </div>
+
+  <section class="fb-register__card">
+    <div class="fb-register__head">
+      <span class="fb-register__eyebrow">{{ 'school.registerEyebrow' | translate }}</span>
+      <h1 class="fb-register__title">{{ 'school.register' | translate }}</h1>
+    </div>
+
+    <ol class="fb-steps">
+      @for (s of steps; track s.n; let last = $last) {
+        <li class="fb-steps__item" [class.fb-steps__item--line]="!last">
+          <button type="button" class="fb-steps__button" [disabled]="!canGoTo(s.n)"
+            [attr.aria-current]="step === s.n ? 'step' : null" (click)="goTo(s.n)">
+            <span class="fb-steps__dot" [class.fb-steps__dot--current]="step === s.n" [class.fb-steps__dot--done]="isDone(s.n)">
+              @if (isDone(s.n)) {
+                <mat-icon aria-hidden="true">check</mat-icon>
+              } @else {
+                {{ s.n }}
+              }
+            </span>
+            <span class="fb-steps__label" [class.fb-steps__label--current]="step === s.n" [class.fb-steps__label--done]="isDone(s.n)">{{ s.label | translate }}</span>
+          </button>
+          @if (!last) {
+            <span class="fb-steps__line" [class.fb-steps__line--done]="isDone(s.n)" aria-hidden="true"></span>
+          }
+        </li>
+      }
+    </ol>
+
+    @if (step === 1) {
+      <div class="fb-register__choice">
+        <span class="fb-register__question" id="fb-has-account">{{ 'account.has' | translate }}</span>
+        <div class="fb-choice" role="group" aria-labelledby="fb-has-account">
+          <button type="button" class="fb-choice__option" [class.fb-choice__option--active]="hasAccount === true"
+            [attr.aria-pressed]="hasAccount === true" (click)="hasFbAccount(true)">
+            <mat-icon aria-hidden="true">login</mat-icon>
+            {{ 'account.hasYes' | translate }}
+          </button>
+          <button type="button" class="fb-choice__option" [class.fb-choice__option--active]="hasAccount === false"
+            [attr.aria-pressed]="hasAccount === false" (click)="hasFbAccount(false)">
+            <mat-icon aria-hidden="true">person_add</mat-icon>
+            {{ 'account.hasNo' | translate }}
+          </button>
         </div>
-        <p>{{ 'account.has'| translate }}</p>
-        <mat-button-toggle-group name="hasAccount" aria-label="Has an account">
-          <mat-button-toggle (click)="hasFbAccount(true)" value="true">{{ 'buttons.yes'| translate }}</mat-button-toggle>
-          <mat-button-toggle (click)="hasFbAccount(false)" value="false">{{ 'buttons.no'| translate }}</mat-button-toggle>
-        </mat-button-toggle-group>
-        @if (hasAccount != undefined) {
-          <div class="acountForm">
-            @if (hasAccount) {
-              <fb-login [loginPageRedirect]="false" [showLanguage]="false" (loginEvent)="loginEvent($event, stepper)">
-              </fb-login>
-            } @else {
-              <fb-user-register (loginEvent)="loginEvent($event, stepper)"></fb-user-register>
-            }
-          </div>
-        }
-      </mat-step>
-      <mat-step>
-        <ng-template matStepLabel>{{ 'school.school'| translate }}</ng-template>
-        <ng-template matStepContent>
-          <fb-school-register-form [school]="school" (saved)="schoolSaved($event, stepper)"></fb-school-register-form>
-        </ng-template>
-      </mat-step>
-      <mat-step>
-        <ng-template matStepLabel>{{ 'school.confirmation'| translate }}</ng-template>
-        <mat-card class="mat-card-stepper">
-          <mat-card-content>
-            <p>{{ 'school.success'| translate: {school: school.name} }}</p>
-            <p [innerHTML]="'school.manage'| translate: {link: link} "></p>
-            <mat-icon class="check-icon">check_circle</mat-icon>
-            <p><a color="primary" mat-raised-button target="_blank" href="https://instructor.flightbook.ch">
-              {{ 'school.access'| translate }}
-            </a></p>
-          </mat-card-content>
-        </mat-card>
-      </mat-step>
-    </mat-stepper>
-  </mat-card-content>
-</mat-card>
+      </div>
+
+      @if (hasAccount === undefined) {
+        <p class="fb-register__hint">
+          <mat-icon aria-hidden="true">info</mat-icon>
+          {{ 'account.choiceHint' | translate }}
+        </p>
+      } @else if (hasAccount) {
+        <fb-login [loginPageRedirect]="false" [showLanguage]="false" (loginEvent)="loginEvent($event)"></fb-login>
+      } @else {
+        <fb-user-register (loginEvent)="loginEvent($event)"></fb-user-register>
+      }
+    }
+
+    @if (step === 2) {
+      <fb-school-register-form [school]="school" (saved)="schoolSaved($event)" (back)="goTo(1)"></fb-school-register-form>
+    }
+
+    @if (step === 3) {
+      <div class="fb-register__done">
+        <span class="fb-register__done-icon"><mat-icon aria-hidden="true">check_circle</mat-icon></span>
+        <h2 class="fb-register__done-title">{{ 'school.success' | translate: { school: school.name } }}</h2>
+        <p class="fb-register__done-text" [innerHTML]="'school.manage' | translate: { link: link }"></p>
+        <a mat-raised-button color="primary" class="fb-register__access" target="_blank" [href]="link">
+          {{ 'school.access' | translate }}
+          <mat-icon aria-hidden="true" iconPositionEnd>open_in_new</mat-icon>
+        </a>
+      </div>
+    }
+  </section>
+
+  @if (step === 1) {
+    <p class="fb-register__login">
+      {{ 'school.alreadyRegistered' | translate }}
+      <a routerLink="/login">{{ 'buttons.login' | translate }}</a>
+    </p>
+  }
+</div>

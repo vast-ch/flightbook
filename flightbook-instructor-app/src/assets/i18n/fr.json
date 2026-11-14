@@ -6,7 +6,8 @@
         "appointments": "Rendez-vous",
         "tandemPilots": "Pilote biplace",
         "team": "Équipe",
-        "configuration": "Configuration"
+        "configuration": "Configuration",
+        "openMenu": "Ouvrir le menu"
     },
     "language": {
         "fr": "Français",
@@ -23,12 +24,19 @@
         "other": "Autre"
     },
     "login": {
+        "role": "Instructeur",
+        "newSchool": "Nouvelle école ?",
+        "showPassword": "Afficher le mot de passe",
+        "hidePassword": "Masquer le mot de passe",
         "title": "Log In",
         "email": "E-Mail",
         "password": "Mot de passe",
         "passwordlost": "Mot de passe oublié ?"
     },
     "account": {
+        "hasYes": "Oui, me connecter",
+        "hasNo": "Non, créer un compte",
+        "choiceHint": "Avec un compte existant, tu te connectes. Sinon, tu crées ici un nouveau compte pour l'école.",
         "title": "Compte",
         "register": "Inscription",
         "firstname": "Prénom",
@@ -41,10 +49,12 @@
         "has": "As-tu déjà un compte Flightbook?"
     },
     "school": {
+        "registerEyebrow": "Nouvelle école",
+        "alreadyRegistered": "École déjà inscrite ?",
         "school": "Ecole",
         "register": "Créer une école",
         "confirmation": "Confirmation",
-        "name": "Nom",
+        "name": "Nom de l'école",
         "address": "Adresse",
         "address2": "Adresse 2",
         "zip": "CP",
@@ -56,31 +66,68 @@
         "manage": "Tu peux gérer l'école à l'adresse suivante: <a target='_blank' href='{{link}}'>{{link}}</a>",
         "access": "Accéder"
     },
-    "enrollment": {
-        "title": "Inscription",
-        "accept": "Accepter",
-        "shareFlightbook": "Partager le carnet de vol",
-        "accessFlightbook": "souhaite avoir accès à ton carnet de vol.",
-        "hasAccess": "a désormais accès à ton carnet de vol",
-        "addTeam": "souhaite t'avoir comme membre de l'équipe.",
-        "inTeam": "Tu fais désormais partie de l'équipe de",
-        "acceptQuestion": "Es-tu d'accord ?",
-        "confirmation": "Confirmation",
-        "wrongToken": "Ce token n'existe pas ou n'est pas valide",
-        "payment": "Paiement",
-        "paymentInformation": "Le carnet de vol coûte 12.- par an <br>Pour que le carnet de vol puisse être partagé avec une école, tu dois régler ce paiement.",
-        "paymentInformationTrial": "Les 60 premiers jours coûtent CHF 2.50, ensuite le carnet de vol coûte CHF 12.– par an.<br>Pour que le carnet de vol puisse être partagé avec une école, tu dois souscrire cet abonnement.",
-        "tandemPaymentInformation": "Vous pouvez enregistrer jusqu’à 25 vols gratuitement. <br>Pour une utilisation illimitée, la cotisation annuelle s’élève à CHF 12.–. <br>Le paiement n’est actuellement pas requis.",
-        "paymentResilation": "Tu peux résilier à tout moment, la résiliation prend effet à la fin de l'année payée. Tu seras informé(e) par e-mail 30 jours avant chaque renouvellement.",
-        "paymentResilationTrial": "Tu peux résilier à tout moment, la résiliation prend effet à la fin de la période en cours (période d'essai ou année payée). Si tu résilies pendant les 60 jours, aucun autre frais ne sera facturé. Tu seras informé(e) par e-mail 30 jours avant chaque renouvellement.",
-        "paymentButton": "Payer",
-        "accessTandemFlights": "souhaite avoir accès aux vols biplaces qui sont liés à l'école.",
-        "hasTandemAccess": "a désormais accès aux vols biplaces"
-    },
+        "enrollment": {
+            "title": "Inscription",
+            "accept": "Accepter",
+            "shareFlightbook": "Partager le carnet de vol",
+            "accessFlightbook": "souhaite avoir accès à ton carnet de vol.",
+            "hasAccess": "a désormais accès à ton carnet de vol",
+            "addTeam": "souhaite t'avoir comme membre de l'équipe.",
+            "acceptQuestion": "Es-tu d'accord ?",
+            "confirmation": "Confirmation",
+            "payment": "Paiement",
+            "paymentResilation": "Tu peux résilier à tout moment, la résiliation prend effet à la fin de l'année payée. Tu seras informé(e) par e-mail 30 jours avant chaque renouvellement.",
+            "paymentResilationTrial": "Tu peux résilier à tout moment, la résiliation prend effet à la fin de la période en cours (période d'essai ou année payée). Si tu résilies pendant les 60 jours, aucun autre frais ne sera facturé. Tu seras informé(e) par e-mail 30 jours avant chaque renouvellement.",
+            "paymentButton": "Payer",
+            "accessTandemFlights": "souhaite avoir accès aux vols biplaces qui sont liés à l'école.",
+            "hasTandemAccess": "a désormais accès aux vols biplaces",
+            "invitedBy": "{{school}} t'invite",
+            "role": {
+                "student": "Élève",
+                "team": "Équipe",
+                "tandem": "Pilote biplace"
+            },
+            "invalidTitle": "Invitation non valide",
+            "invalidText": "Ce token n'existe pas ou n'est pas valide. Demande à ton école de t'envoyer une nouvelle invitation.",
+            "loginIntro": "Un compte Flightbook existe déjà pour cet e-mail. Connecte-toi pour continuer.",
+            "createIntro": "Crée ton compte Flightbook pour accepter l'invitation.",
+            "price": {
+                "trial": "CHF 2.50",
+                "trialSub": "pour les 60 premiers jours, ensuite CHF 12.– par an",
+                "trialBadge": "Période d'essai",
+                "year": "CHF 12.–",
+                "yearSub": "par an",
+                "yearBadge": "Abonnement annuel",
+                "tandem": "25 vols",
+                "tandemSub": "gratuits",
+                "tandemBadge": "Optionnel"
+            },
+            "point": {
+                "student": "Pour que le carnet de vol puisse être partagé avec une école, tu dois régler ce paiement.",
+                "studentTrial": "Pour que le carnet de vol puisse être partagé avec une école, tu dois souscrire cet abonnement.",
+                "tandemFree": "Tu peux enregistrer jusqu'à 25 vols et 10 confirmations de passagers gratuitement.",
+                "tandemPrice": "Pour une utilisation illimitée, la cotisation annuelle s'élève à CHF 12.–.",
+                "tandemNoPayment": "Le paiement n'est actuellement pas requis."
+            },
+            "scope": {
+                "student": "L'école voit tes vols, ton niveau de formation et peut valider tes vols.",
+                "team": "Tu as accès à l'Instructor-App de l'école et peux gérer les élèves et les rendez-vous.",
+                "tandem": "L'école voit uniquement les vols biplaces qui sont liés à elle."
+            },
+            "inTeamOf": "Tu fais désormais partie de l'équipe de {{school}}.",
+            "loginHint": "Connecte-toi dans l'{{app}} pour commencer.",
+            "app": {
+                "mobile": "application Flightbook",
+                "instructor": "Instructor-App"
+            }
+        },
     "error": {
         "title": "Erreur"
     },
     "student": {
+        "theoryExam": "Examen théorique",
+        "theoryExamPassed": "Réussi",
+        "theoryExamOpen": "Pas encore réussi",
         "information": "Informations",
         "addStudent": "Ajouter un élève",
         "archiveStudentMessage": "Veux-tu vraiment archiver $REPLACE_NAME?",
@@ -93,6 +140,7 @@
         "average": "Temps moyen",
         "list": "Liste de participants",
         "noStudentSelected": "Aucun élève n'a été sélectionné.",
+        "noStudents": "Aucun élève.",
         "flights": "Vols",
         "flight": {
             "number": "N°",
@@ -107,6 +155,7 @@
             "description": "Description",
             "diff": "Diff.",
             "instructor": "Instructeur",
+            "editor": "Responsable",
             "alone": "Seul",
             "maneuver": "Manoeuvre",
             "validationState": {
@@ -122,10 +171,19 @@
                 "comment": "Commentaire",
                 "PAID": "Payé",
                 "REJECTED": "Refusé",
-                "PENDING": "En attente"
+                "PENDING": "En attente",
+                "markPaid": "Marquer comme payé",
+                "markRejected": "Refuser le paiement"
             },
             "validationActions": "Actions",
             "validateAll": "Valide tous les vols avec le statut \"En attente\"",
+            "validateAllAction": "Tout valider",
+            "validate": "Valider le vol",
+            "reject": "Refuser le vol",
+            "rejectReason": "Motif du refus",
+            "rejectPlaceholder": "Pourquoi ce vol est-il refusé ? Visible par l'élève.",
+            "rejectHint": "Affiché comme infobulle sur le statut refusé.",
+            "rejectConfirm": "Refuser le vol",
             "noData": "Pas de données"
         },
         "phone": "Tél",
@@ -134,6 +192,13 @@
         "archived": "Archivé",
         "tandem": "Biplace",
         "isAppointmentActive": "Rendez-vous toujours visible?",
+        "roleLabel": "Élève",
+        "examReady": "Prêt pour l'examen",
+        "printFlightbook": "Imprimer le carnet de vol",
+        "archiveStudent": "Archiver l'élève",
+        "backToList": "Retour à la liste",
+        "toCheck": "{{n}} à vérifier",
+        "flightsCount": "{{n}} vols",
         "sort": {
             "sortBy": "Trier par",
             "firstname": "Prénom",
@@ -150,7 +215,11 @@
         "archived": "Archivé",
         "noTandemPilotSelected": "Aucun pilote biplace n'a été sélectionné.",
         "passengerConfirmations": "Confirmations des passagers",
-        "pilotName": "Nom du pilote"
+        "pilotName": "Nom du pilote",
+        "roleLabel": "Pilote biplace",
+        "noTandemPilots": "Aucun pilote biplace.",
+        "archiveTandemPilot": "Archiver le pilote biplace",
+        "passengers": "Passagers"
     },
     "passengerConfirmation" : {
         "date": "Date",
@@ -175,11 +244,14 @@
         "subscriptionComment": "Commentaire à l'inscription"
     },
     "studentNote": {
+        "noNotes": "Aucune note pour le moment",
         "date": "Date",
         "title": "Notes",
         "addNote": "Ajouter une note",
         "noteTitle": "Titre (optionnel)",
-        "comment": "Commentaire"
+        "comment": "Commentaire",
+        "edit": "Modifier la note",
+        "remove": "Supprimer la note"
     },
     "export": {
         "pilote": "Pilote",
@@ -216,7 +288,10 @@
         "exam": {
             "title": "Examens",
             "theory": "Théorie réussie le",
-            "practice": "Pratique réussie le"
+            "practice": "Pratique réussie le",
+            "notSet": "Non défini",
+            "setDate": "Définir la date",
+            "change": "Modifier"
         },
         "trainingHill": {
             "title": "Pente école",
@@ -284,7 +359,12 @@
             "title": "Niveau",
             "start": "Décollage",
             "maneuver": "Manoeuvre",
-            "landing": "Atterrissage"
+            "landing": "Atterrissage",
+            "summary": "{{count}}/{{total}} évalué(s)"
+        },
+        "rating": {
+            "starLabel": "Note {{n}} sur 3",
+            "starLabelWithContext": "{{label}} : Note {{n}} sur 3"
         }
     },
     "emergencyContact": {
@@ -293,7 +373,8 @@
         "lastname": "Nom",
         "phone": "Téléphone",
         "email": "E-Mail",
-        "additionalInformation": "Information complémentaires"
+        "additionalInformation": "Information complémentaires",
+        "providedByStudent": "Indiqué par l'élève"
     },
     "formMessage": {
         "emailExist": "Cette adresse e-mail est déjà utilisée!",
@@ -315,13 +396,18 @@
         "phoneInvalidFormat": "Le numéro de téléphone doit avoir le format suivant: {{format}}"
     },
     "message": {
+        "loading": "Chargement des données…",
         "error": "Une erreur est survenue. Veuillez réessayer plus tard ou envoyer un email a : yannick.lagger@flightbook.ch",
         "403": "Vous n'êtes pas autorisé(e) à effectuer cette requête",
         "noFlight": "Cet élève n’a aucun vol",
         "pdfDownloaded": "Le PDF a été téléchargé",
+        "exportReady": "L'export est prêt. Voulez-vous l'ouvrir ?",
         "changeSaved": "Modifications sauvegardées"
     },
     "buttons": {
+        "loginAndContinue": "Se connecter et continuer",
+        "createAccountAndContinue": "Créer un compte et continuer",
+        "back": "Retour",
         "login": "Se connecter",
         "save": "Sauvegarder",
         "done": "Ok",
@@ -334,9 +420,14 @@
         "no": "Non",
         "change_password": "Changer le mot de passe",
         "export": "Exporter",
+        "open": "Ouvrir",
         "skip": "Passer"
     },
     "appointment": {
+        "noAppointments": "Aucun rendez-vous",
+        "editAppointment": "Modifier le rendez-vous",
+        "showRegistrations": "Afficher les inscriptions",
+        "printRegistrations": "Imprimer la liste des inscriptions",
         "appointment": "Rendez-vous",
         "calendar": "Calendrier",
         "list": "Liste",
@@ -358,9 +449,12 @@
             "CONFIRMED": "Confirmé",
             "CANCELED": "Annulé"
         },
-        "passed": "Rendez-vous passé",
+        "upcoming": "À venir",
+        "passed": "Passés",
+        "advancedFilters": "Plus de filtres",
         "subscribeStudent": "Ajouter participants",
         "guestSubscribeStudent": "Ajouter participants externes",
+        "removeSubscription": "Retirer l'inscription",
         "guestStudent": "Élève externes",
         "student": "Élève",
         "waitingList": "Liste d'attente",
@@ -385,12 +479,23 @@
     "team": {
         "title": "Équipe",
         "addMember": "Ajouter un membre",
-        "removeMessage": "Veux-tu vraiment supprimer $REPLACE_NAME de ton équipe?"
+        "removeMessage": "Veux-tu vraiment supprimer $REPLACE_NAME de ton équipe?",
+        "role": {
+            "owner": "Propriétaire",
+            "instructor": "Instructeur"
+        },
+        "pagerLabel": "{{from}}–{{to}} sur {{total}} membres",
+        "noMembers": "0 membre",
+        "removeMember": "Retirer {{name}}",
+        "cannotRemoveSelf": "Tu ne peux pas te retirer toi-même",
+        "cannotRemoveOwner": "Les propriétaires ne peuvent pas être retirés",
+        "previousPage": "Page précédente",
+        "nextPage": "Page suivante"
     },
     "setting": {
         "title": "Configurations",
         "option": "Option",
-        "value": "Aktiviert",
+        "value": "Valeur",
         "types": {
             "validateFlights": "Valider les vols",
             "commentsOnSubscription": "Commentaire à l'inscription",
@@ -404,6 +509,7 @@
             "changeCalendar": "Changer de calendrier",
             "selectCalendar": "Sélectionner un calendrier",
             "primary": "Principal",
+            "noCalendars": "Aucun calendrier modifiable trouvé.",
             "save": "Enregistrer",
             "cancel": "Annuler"
         }
@@ -412,6 +518,12 @@
         "title": "Champs personnalisés tandem",
         "addField": "Ajouter un champ",
         "editField": "Modifier le champ",
+        "noData": "Aucun champ personnalisé.",
+        "disableField": "Désactiver {{label}}",
+        "editNamed": "Modifier {{label}}",
+        "dragToReorder": "Glisser pour réordonner",
+        "addOption": "Ajouter une option",
+        "removeOption": "Retirer l'option {{n}}",
         "label": "Libellé",
         "labelRequired": "Le libellé est requis",
         "fieldType": "Type",
@@ -433,8 +545,13 @@
         }
     },
     "appointmentType": {
-        "tite": "Type de rdv",
+        "title": "Type de rdv",
         "addType": "Ajouter",
+        "editType": "Modifier le type de rdv",
+        "noData": "Aucun type de rdv.",
+        "archiveType": "Archiver {{name}}",
+        "colorOf": "Couleur de {{name}}",
+        "editNamed": "Modifier {{name}}",
         "name": "Nom",
         "archive": "Archiver",
         "edit": "Modifier",
@@ -453,7 +570,11 @@
     "noSchool": {
         "title": "Aucune école liée à ton compte",
         "message": "Actuellement, tu ne travailles pour aucune école. Tu peux soit créer une école, soit passer à l'application Flightbook.",
-        "flightbookApp": "Flightbook-App"
+        "flightbookApp": "Flightbook-App",
+        "registerHint": "Inscrire et gérer une nouvelle école",
+        "appHint": "Passer à ton carnet de vol personnel",
+        "wrongAccount": "Mauvais compte ?",
+        "otherAccount": "Se connecter avec un autre compte"
     },
     "password": {
         "oldPassword": "Ancien mot de passe",

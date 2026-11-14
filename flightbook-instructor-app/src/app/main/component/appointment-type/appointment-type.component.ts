@@ -1,11 +1,9 @@
-import { Component, EventEmitter, OnDestroy, OnInit, Output, Signal } from '@angular/core';
-import { ThemePalette } from '@angular/material/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSlideToggleChange } from '@angular/material/slide-toggle';
 import { TranslateService } from '@ngx-translate/core';
-import { firstValueFrom, Subject, takeUntil } from 'rxjs';
+import { finalize, firstValueFrom, Subject, Subscription, takeUntil } from 'rxjs';
 import { AccountService } from 'src/app/core/services/account.service';
-import { DeviceSizeService } from 'src/app/core/services/device-size.service';
 import { SchoolService } from 'src/app/core/services/school.service';
 import { AppointmentType } from 'src/app/shared/domain/appointment-type-dto';
 import { School } from 'src/app/shared/domain/school';
@@ -20,16 +18,14 @@ import { TeamMember } from 'src/app/shared/domain/team-member';
 })
 export class AppointmentTypeComponent implements OnInit, OnDestroy {
 
-  @Output() backButtonClick = new EventEmitter();
-
-  color: ThemePalette = 'primary';
   school?: School;
   appointmentTypes: AppointmentType[];
   displayedColumns: string[] = ['name', 'color', 'archived', 'edit'];
-  teamMembers: TeamMember[];
-  get isMobile(): Signal<boolean> {
-    return this.deviceSize.isMobile;
-  }
+  // Starts true: on a page reload the school only arrives after the first render.
+  typesLoading = true;
+  private openingForm = false;
+  // Held so a slow response for a previous school cannot land after a switch.
+  private typesSubscription: Subscription | undefined;
 
   unsubscribe$ = new Subject<void>();
 
@@ -37,24 +33,21 @@ export class AppointmentTypeComponent implements OnInit, OnDestroy {
     private translate: TranslateService,
     private schoolService: SchoolService,
     private accountService: AccountService,
-    private dialog: MatDialog,
-    private deviceSize: DeviceSizeService
+    private dialog: MatDialog
   ) {
     this.appointmentTypes = [];
-    this.teamMembers = [];
   }
 
   ngOnInit(): void {
     this.school = this.accountService.currentSelectedSchool;
     if (this.school) {
       this.syncAppoiontmentTypeList();
-      this.syncTeamMemberList();
     }
 
     this.accountService.changeSelectedSchool$.pipe(takeUntil(this.unsubscribe$)).subscribe((school: School) => {
       this.school = school;
+      this.appointmentTypes = [];
       this.syncAppoiontmentTypeList();
-      this.syncTeamMemberList();
     });
   }
 
@@ -65,21 +58,35 @@ export class AppointmentTypeComponent implements OnInit, OnDestroy {
 
   syncAppoiontmentTypeList() {
     if (this.school?.id) {
-      this.schoolService.getAppointmentTypesBySchoolId(this.school.id).pipe(takeUntil(this.unsubscribe$)).subscribe((appointmentTypes: AppointmentType[]) => {
+      // Unsubscribing runs the previous request's finalize, so the flag is set after it.
+      this.typesSubscription?.unsubscribe();
+      this.typesLoading = true;
+
+      this.typesSubscription = this.schoolService.getAppointmentTypesBySchoolId(this.school.id).pipe(takeUntil(this.unsubscribe$), finalize(() => this.typesLoading = false)).subscribe((appointmentTypes: AppointmentType[]) => {
         this.appointmentTypes = appointmentTypes;
       })
     }
   }
 
-  syncTeamMemberList() {
-    if (this.school?.id) {
-      this.schoolService.getTeamMembers(this.school.id).pipe(takeUntil(this.unsubscribe$)).subscribe((teamMembers: TeamMember[]) => {
-        this.teamMembers = teamMembers.sort(((member1, member2) => (member1?.user?.firstname && member2?.user?.firstname && member1?.user?.firstname > member2?.user?.firstname ? 1 : -1)));
-      })
+  /** Fetched per open: this card lives beside Team, so a kept list would go stale. */
+  openAppointmentTypeForm(type?: AppointmentType) {
+    const school = this.school;
+    if (!school?.id || this.openingForm) {
+      return;
     }
+
+    this.openingForm = true;
+    this.schoolService.getTeamMembers(school.id)
+      .pipe(finalize(() => this.openingForm = false), takeUntil(this.unsubscribe$))
+      .subscribe((teamMembers: TeamMember[]) => {
+        if (school === this.school) {
+          const sortedMembers = teamMembers.sort(((member1, member2) => (member1?.user?.firstname && member2?.user?.firstname && member1?.user?.firstname > member2?.user?.firstname ? 1 : -1)));
+          this.openTypeDialog(sortedMembers, type);
+        }
+      });
   }
 
-  openAppointmentTypeForm(type?: AppointmentType) {
+  private openTypeDialog(teamMembers: TeamMember[], type?: AppointmentType) {
     let isNew = false;
     if (!type) {
       type = new AppointmentType();
@@ -88,14 +95,15 @@ export class AppointmentTypeComponent implements OnInit, OnDestroy {
     }
     const dialogRef = this.dialog.open(AppointmentTypeDialogComponent, {
       data: {
-        title: this.translate.instant('appointmentType.addType'),
+        title: this.translate.instant(isNew ? 'appointmentType.addType' : 'appointmentType.editType'),
         type: type,
-        teamMembers: this.teamMembers,
+        teamMembers: teamMembers,
       },
-      width: "500px"
+      width: "500px",
+      panelClass: "fb-email-dialog-panel"
     });
 
-    dialogRef.afterClosed().subscribe(response => {
+    dialogRef.afterClosed().pipe(takeUntil(this.unsubscribe$)).subscribe(response => {
       if (response?.event === "save") {
         if (isNew) {
           this.addAppointmentType(response.value);
@@ -133,9 +141,5 @@ export class AppointmentTypeComponent implements OnInit, OnDestroy {
   async changeColor(color: string, type: AppointmentType) {
     type.color = color;
     this.updateAppointmentType(type);
-  }
-
-  backButton() {
-    this.backButtonClick.emit();
   }
 }

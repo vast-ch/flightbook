@@ -1,6 +1,6 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal, WritableSignal } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { firstValueFrom, Observable, Subject } from 'rxjs';
+import { firstValueFrom, map, Observable, Subject } from 'rxjs';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import { User } from '../../shared/domain/user';
 import { environment } from 'src/environments/environment';
@@ -17,6 +17,7 @@ export class AccountService {
   private jwtHelper: JwtHelperService;
   changeSelectedSchool$: Subject<School> = new Subject<School>();
   currentSelectedSchool?: School;
+  currentUser$: WritableSignal<User | undefined> = signal(undefined);
 
   constructor(private http: HttpClient) {
     this.jwtHelper = new JwtHelperService();
@@ -41,11 +42,17 @@ export class AccountService {
 
   logout(): Observable<any> {
     const refreshToken = localStorage.getItem('refresh_token');
+    this.currentUser$.set(undefined);
     return this.http.post<any>(`${environment.baseUrl}/auth/logout`, { "refresh_token": refreshToken });
   }
 
   currentUser(): Observable<any> {
-    return this.http.get<User>(`${environment.baseUrl}/users`);
+    return this.http.get<User>(`${environment.baseUrl}/users`).pipe(
+      map((response: User) => {
+        this.currentUser$.set(response);
+        return response;
+      })
+    );
   }
 
   updateUser(user: User): Observable<User> {

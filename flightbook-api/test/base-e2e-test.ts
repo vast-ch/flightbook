@@ -96,6 +96,15 @@ export class BaseE2ETest {
     return (global as any).testTandemPilotRepository;
   }
 
+  /** The EmailService instance of AppointmentModule (EmailService is provided per module). */
+  public get appointmentEmailService(): any {
+    return (global as any).testAppointmentEmailService;
+  }
+
+  public get notificationsService(): any {
+    return (global as any).testNotificationsService;
+  }
+
   public getDefaultUser(): Promise<User> {
     return this.getUserByEmail(Testdata.EMAIL);
   }

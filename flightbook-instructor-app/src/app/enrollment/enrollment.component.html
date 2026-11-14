@@ -1,127 +1,170 @@
+<div class="fb-enroll-page">
+  <div class="fb-enroll__top">
+    <img src="assets/icon/logo.png" alt="" class="fb-enroll__logo" />
+    <span class="fb-enroll__wordmark">Flightbook</span>
+    <div class="fb-enroll__languages">
+      @for (lang of languages; track lang) {
+        <button type="button" class="fb-enroll__language" [class.fb-enroll__language--active]="currentLang === lang"
+          [attr.aria-pressed]="currentLang === lang" [attr.aria-label]="'language.' + lang | translate"
+          (click)="setLanguage(lang)">{{ lang | uppercase }}</button>
+      }
+    </div>
+  </div>
 
-@if (loading) {
-  <div class="overlay"></div>
-  <mat-spinner></mat-spinner>
-}
-
-@if (init) {
-  @if (enrollment) {
-    <mat-card>
-      <mat-card-title>{{ 'enrollment.title'| translate }}</mat-card-title>
-      <mat-card-content>
-        <mat-stepper #stepper>
-          @if (enrollment.isUser) {
-            <mat-step>
-              <ng-template matStepLabel>{{ 'login.title'| translate }}</ng-template>
-              <fb-login [loginPageRedirect]="false" [email]="enrollment.email"
-              (loginEvent)="loginEvent($event, stepper)"></fb-login>
-            </mat-step>
-          } @else {
-            <mat-step>
-              <ng-template matStepLabel>{{ 'account.register'| translate }}</ng-template>
-              <fb-user-register [email]="enrollment.email" (loginEvent)="loginEvent($event, stepper)"></fb-user-register>
-            </mat-step>
-          }
-          @if (enrollment.type == 'STUDENT') {
-            <mat-step>
-              <ng-template matStepLabel>{{ 'enrollment.payment'| translate }}</ng-template>
-              @if (trialEnabled) {
-                <p [innerHtml]="'enrollment.paymentInformationTrial'| translate"></p>
-                <p class="paymentResilation">{{ 'enrollment.paymentResilationTrial'| translate }}</p>
-              } @else {
-                <p [innerHtml]="'enrollment.paymentInformation'| translate"></p>
-                <p class="paymentResilation">{{ 'enrollment.paymentResilation'| translate }}</p>
-              }
-              <button mat-raised-button color="primary" (click)="getStripeSession()">{{ 'enrollment.paymentButton'| translate }}</button>
-            </mat-step>
-          }
-          @if (enrollment.type == 'TANDEM_PILOT') {
-            <mat-step [optional]="true">
-              <ng-template matStepLabel>{{ 'enrollment.payment'| translate }}</ng-template>
-              <p [innerHtml]="'enrollment.tandemPaymentInformation'| translate"></p>
-              <p class="paymentResilation">({{ 'enrollment.paymentResilation'| translate }})</p>
-              <button mat-raised-button color="primary" (click)="getStripeSession()">{{ 'enrollment.paymentButton'| translate }}</button>
-              <button mat-raised-button (click)="stepper.next()">{{ 'buttons.skip'| translate }}</button>
-            </mat-step>
-          }
-          <mat-step>
-            <ng-template matStepLabel>{{ 'enrollment.accept'| translate }}</ng-template>
-            @if (enrollment.type == 'STUDENT') {
-              <mat-card class="mat-card-stepper">
-                <mat-card-title>{{ 'enrollment.shareFlightbook'| translate }}</mat-card-title>
-                <mat-card-content>
-                  <p>{{ enrollment.school?.name }} {{ 'enrollment.accessFlightbook'| translate }}</p>
-                  <p>{{ 'enrollment.acceptQuestion'| translate }}</p>
-                  <button mat-raised-button color="primary" (click)="validate(stepper)">{{ 'enrollment.accept'| translate }}</button>
-                </mat-card-content>
-              </mat-card>
-            }
-            @if (enrollment.type == 'TEAM_MEMBER') {
-              <mat-card class="mat-card-stepper">
-                <mat-card-title>Team</mat-card-title>
-                <mat-card-content>
-                  <p>{{ enrollment.school?.name }} {{ 'enrollment.addTeam'| translate }}</p>
-                  <p>{{ 'enrollment.acceptQuestion'| translate }}</p>
-                  <button mat-raised-button color="primary" (click)="validate(stepper)">{{ 'enrollment.accept'| translate }}</button>
-                </mat-card-content>
-              </mat-card>
-            }
-            @if (enrollment.type == 'TANDEM_PILOT') {
-              <mat-card class="mat-card-stepper">
-                <mat-card-title>{{ 'enrollment.shareFlightbook'| translate }}</mat-card-title>
-                <mat-card-content>
-                  <p>{{ enrollment.school?.name }} {{ 'enrollment.accessTandemFlights'| translate }}</p>
-                  <p>{{ 'enrollment.acceptQuestion'| translate }}</p>
-                  <button mat-raised-button color="primary" (click)="validate(stepper)">{{ 'enrollment.accept'| translate }}</button>
-                </mat-card-content>
-              </mat-card>
-            }
-          </mat-step>
-          <mat-step>
-            <ng-template matStepLabel>{{ 'enrollment.confirmation'| translate }}</ng-template>
-            <mat-card class="mat-card-stepper">
-              <mat-card-content>
-                @if (enrollment.type == 'STUDENT') {
-                  <div>
-                    <p>{{ enrollment.school?.name }} {{ 'enrollment.hasAccess'| translate }}</p>
-                    <mat-icon class="check-icon">check_circle</mat-icon>
-                    <p><a color="primary" mat-raised-button target="_blank" href="https://m.flightbook.ch">
-                      {{ 'login.title'| translate }}
-                    </a></p>
-                  </div>
-                }
-                @if (enrollment.type == 'TEAM_MEMBER') {
-                  <div>
-                    <p>{{ 'enrollment.inTeam'| translate }} {{ enrollment.school?.name }}.</p>
-                    <mat-icon class="check-icon">check_circle</mat-icon>
-                    <p><a color="primary" mat-raised-button target="_blank" href="https://instructor.flightbook.ch">
-                      {{ 'login.title'| translate }}
-                    </a></p>
-                  </div>
-                }
-                @if (enrollment.type == 'TANDEM_PILOT') {
-                  <div>
-                    <p>{{ enrollment.school?.name }} {{ 'enrollment.hasTandemAccess'| translate }}</p>
-                    <mat-icon class="check-icon">check_circle</mat-icon>
-                    <p><a color="primary" mat-raised-button target="_blank" href="https://m.flightbook.ch">
-                      {{ 'login.title'| translate }}
-                    </a></p>
-                  </div>
-                }
-              </mat-card-content>
-            </mat-card>
-          </mat-step>
-        </mat-stepper>
-      </mat-card-content>
-    </mat-card>
-  } @else {
-    <mat-card class="mat-card-stepper">
-      <mat-card-title>{{ 'error.title'| translate }}</mat-card-title>
-      <mat-card-content>
-        <p>{{ 'enrollment.wrongToken'| translate }}</p>
-        <mat-icon class="error-icon">error</mat-icon>
-      </mat-card-content>
-    </mat-card>
+  @if (init && !enrollment) {
+    <section class="fb-enroll__card fb-enroll__result">
+      <span class="fb-enroll__result-icon fb-enroll__result-icon--error"><mat-icon aria-hidden="true">link_off</mat-icon></span>
+      <h1 class="fb-enroll__result-title">{{ 'enrollment.invalidTitle' | translate }}</h1>
+      <p class="fb-enroll__result-text">{{ 'enrollment.invalidText' | translate }}</p>
+    </section>
   }
-}
 
+  @if (enrollment || !init) {
+    <section class="fb-enroll__card" [attr.aria-busy]="loading">
+      @if (loading) {
+        <div class="fb-enroll__loading"><mat-spinner diameter="40"></mat-spinner></div>
+      }
+
+      @if (enrollment) {
+        <div class="fb-enroll__head">
+          <span class="fb-enroll__role-icon"><mat-icon aria-hidden="true">{{ roleIcon }}</mat-icon></span>
+          <div class="fb-enroll__head-text">
+            <span class="fb-enroll__eyebrow">{{ 'enrollment.title' | translate }} · {{ roleKey | translate }}</span>
+            <h1 class="fb-enroll__title">{{ 'enrollment.invitedBy' | translate: { school: enrollment.school?.name } }}</h1>
+          </div>
+        </div>
+
+        <ol class="fb-steps">
+          @for (s of steps; track s.key; let i = $index, last = $last) {
+            <li class="fb-steps__item" [class.fb-steps__item--line]="!last" [class.fb-steps__item--current]="step === i" [attr.aria-current]="step === i ? 'step' : null">
+              <span class="fb-steps__dot" [class.fb-steps__dot--current]="step === i" [class.fb-steps__dot--done]="isDone(i)">
+                @if (isDone(i)) {
+                  <mat-icon aria-hidden="true">check</mat-icon>
+                } @else {
+                  {{ i + 1 }}
+                }
+              </span>
+              <span class="fb-steps__label" [class.fb-steps__label--current]="step === i" [class.fb-steps__label--done]="isDone(i)">{{ s.label | translate }}</span>
+              @if (!last) {
+                <span class="fb-steps__line" [class.fb-steps__line--done]="isDone(i)" aria-hidden="true"></span>
+              }
+            </li>
+          }
+        </ol>
+
+        @switch (currentStep) {
+          @case ('account') {
+            @if (enrollment.isUser) {
+              <fb-login [loginPageRedirect]="false" [email]="enrollment.email" (loginEvent)="loginEvent($event)">
+                <div class="fb-enroll__intro">
+                  <mat-icon aria-hidden="true">person_check</mat-icon>
+                  <span>{{ 'enrollment.loginIntro' | translate }}</span>
+                </div>
+              </fb-login>
+            } @else {
+              <fb-user-register [email]="enrollment.email" (loginEvent)="loginEvent($event)">
+                <div class="fb-enroll__intro">
+                  <mat-icon aria-hidden="true">person_add</mat-icon>
+                  <span>{{ 'enrollment.createIntro' | translate }}</span>
+                </div>
+              </fb-user-register>
+            }
+          }
+
+          @case ('payment') {
+            <div class="fb-enroll__body">
+              <div class="fb-price">
+                <div class="fb-price__head">
+                  @if (enrollment.type === EnrollmentType.TANDEM_PILOT) {
+                    <span class="fb-price__main">{{ 'enrollment.price.tandem' | translate }}</span>
+                    <span class="fb-price__sub">{{ 'enrollment.price.tandemSub' | translate }}</span>
+                    <span class="fb-price__badge fb-price__badge--optional">{{ 'enrollment.price.tandemBadge' | translate }}</span>
+                  } @else if (trialEnabled) {
+                    <span class="fb-price__main">{{ 'enrollment.price.trial' | translate }}</span>
+                    <span class="fb-price__sub">{{ 'enrollment.price.trialSub' | translate }}</span>
+                    <span class="fb-price__badge">{{ 'enrollment.price.trialBadge' | translate }}</span>
+                  } @else {
+                    <span class="fb-price__main">{{ 'enrollment.price.year' | translate }}</span>
+                    <span class="fb-price__sub">{{ 'enrollment.price.yearSub' | translate }}</span>
+                    <span class="fb-price__badge">{{ 'enrollment.price.yearBadge' | translate }}</span>
+                  }
+                </div>
+                <ul class="fb-price__points">
+                  @if (enrollment.type === EnrollmentType.TANDEM_PILOT) {
+                    <li><mat-icon aria-hidden="true">check</mat-icon>{{ 'enrollment.point.tandemFree' | translate }}</li>
+                    <li><mat-icon aria-hidden="true">check</mat-icon>{{ 'enrollment.point.tandemPrice' | translate }}</li>
+                    <li><mat-icon aria-hidden="true">check</mat-icon>{{ 'enrollment.point.tandemNoPayment' | translate }}</li>
+                  } @else {
+                    <li><mat-icon aria-hidden="true">check</mat-icon>{{ (trialEnabled ? 'enrollment.point.studentTrial' : 'enrollment.point.student') | translate }}</li>
+                  }
+                </ul>
+              </div>
+              <p class="fb-enroll__note">{{ (enrollment.type === EnrollmentType.STUDENT && trialEnabled ? 'enrollment.paymentResilationTrial' : 'enrollment.paymentResilation') | translate }}</p>
+              <div class="fb-enroll__actions">
+                @if (enrollment.type === EnrollmentType.TANDEM_PILOT) {
+                  <button type="button" class="fb-secondary-button" (click)="goTo('accept')">{{ 'buttons.skip' | translate }}</button>
+                }
+                <button type="button" mat-raised-button color="primary" class="fb-primary-button" (click)="getStripeSession()">
+                  <mat-icon aria-hidden="true">credit_card</mat-icon>
+                  {{ 'enrollment.paymentButton' | translate }}
+                </button>
+              </div>
+            </div>
+          }
+
+          @case ('accept') {
+            <div class="fb-enroll__body">
+              <div class="fb-accept">
+                <h2 class="fb-accept__title">{{ (isTeam ? 'enrollment.role.team' : 'enrollment.shareFlightbook') | translate }}</h2>
+                <p class="fb-accept__text">
+                  <strong>{{ enrollment.school?.name }}</strong>
+                  @switch (enrollment.type) {
+                    @case (EnrollmentType.TEAM_MEMBER) { {{ 'enrollment.addTeam' | translate }} }
+                    @case (EnrollmentType.TANDEM_PILOT) { {{ 'enrollment.accessTandemFlights' | translate }} }
+                    @default { {{ 'enrollment.accessFlightbook' | translate }} }
+                  }
+                </p>
+              </div>
+              <div class="fb-scope">
+                @switch (enrollment.type) {
+                  @case (EnrollmentType.TEAM_MEMBER) {
+                    <mat-icon aria-hidden="true">badge</mat-icon><span>{{ 'enrollment.scope.team' | translate }}</span>
+                  }
+                  @case (EnrollmentType.TANDEM_PILOT) {
+                    <mat-icon aria-hidden="true">paragliding</mat-icon><span>{{ 'enrollment.scope.tandem' | translate }}</span>
+                  }
+                  @default {
+                    <mat-icon aria-hidden="true">menu_book</mat-icon><span>{{ 'enrollment.scope.student' | translate }}</span>
+                  }
+                }
+              </div>
+              <span class="fb-accept__question">{{ 'enrollment.acceptQuestion' | translate }}</span>
+              <button type="button" mat-raised-button color="primary" class="fb-primary-button" (click)="validate()">
+                <mat-icon aria-hidden="true">check</mat-icon>
+                {{ 'enrollment.accept' | translate }}
+              </button>
+            </div>
+          }
+
+          @case ('done') {
+            <div class="fb-enroll__result">
+              <span class="fb-enroll__result-icon"><mat-icon aria-hidden="true">check_circle</mat-icon></span>
+              <h2 class="fb-enroll__result-title">
+                @switch (enrollment.type) {
+                  @case (EnrollmentType.TEAM_MEMBER) { {{ 'enrollment.inTeamOf' | translate: { school: enrollment.school?.name } }} }
+                  @case (EnrollmentType.TANDEM_PILOT) { {{ enrollment.school?.name }} {{ 'enrollment.hasTandemAccess' | translate }} }
+                  @default { {{ enrollment.school?.name }} {{ 'enrollment.hasAccess' | translate }} }
+                }
+              </h2>
+              <p class="fb-enroll__result-text">{{ 'enrollment.loginHint' | translate: { app: ((isTeam ? 'enrollment.app.instructor' : 'enrollment.app.mobile') | translate) } }}</p>
+              <a mat-raised-button color="primary" class="fb-primary-button fb-enroll__app-link" target="_blank" [href]="appUrl">
+                {{ 'login.title' | translate }}
+                <mat-icon aria-hidden="true" iconPositionEnd>open_in_new</mat-icon>
+              </a>
+            </div>
+          }
+        }
+      }
+    </section>
+  }
+</div>

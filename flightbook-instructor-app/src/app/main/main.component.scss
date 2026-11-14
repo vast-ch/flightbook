@@ -1,9 +1,225 @@
+@use '@angular/material' as mat;
+
+// App shell header - see CONTRACT.md "SCOPE EXPANSION (round 2)".
+// The `.mat-toolbar.mat-primary` rule in `_m2-compat.scss` no longer applies here because
+// `color="primary"` was removed from the `<mat-toolbar>` in main.component.html - the M3
+// theme's default toolbar surface (`--mat-sys-surface`, white) plus this file supply the
+// mockup's white header instead.
+mat-toolbar.fb-toolbar {
+  padding: 0 20px;
+  height: 64px;
+  gap: 14px;
+  border-bottom: 1px solid var(--fb-border-subtle);
+}
+
+.fb-toolbar__menu-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 36px;
+  height: 36px;
+  margin-left: -6px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--fb-radius-md);
+  background: transparent;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--fb-bg);
+  }
+}
+
+.fb-toolbar__menu-icon {
+  font-size: 22px;
+  width: 22px;
+  height: 22px;
+  line-height: 22px;
+  color: var(--fb-text-2);
+}
+
+.fb-toolbar__brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  flex: none;
+}
+
+.fb-toolbar__logo {
+  display: block;
+  flex: none;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--fb-radius-md);
+}
+
+.fb-toolbar__wordmark {
+  flex: none;
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  color: var(--fb-ink);
+}
+
+.fb-toolbar__nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: none;
+  margin-left: 14px;
+}
+
+.fb-toolbar__nav-link {
+  display: inline-flex;
+  text-decoration: none;
+  align-items: center;
+  height: 34px;
+  padding: 0 13px;
+  flex: none;
+  white-space: nowrap;
+  border-radius: var(--fb-radius-pill);
+  background: transparent;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--fb-text-2);
+  cursor: pointer;
+
+  &:hover {
+    background: var(--fb-bg);
+  }
+
+  &.fb-toolbar__nav-link--active {
+    background: var(--fb-nav-active-bg);
+    font-weight: 600;
+    color: var(--fb-primary);
+  }
+}
+
+.fb-toolbar__school {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  // Shrinks instead of pushing the toolbar, and so the whole page, past the screen edge.
+  flex: 0 1 auto;
+  min-width: 0;
+  height: 36px;
+  padding: 0 12px;
+  border: 1px solid var(--fb-border-subtle);
+  border-radius: var(--fb-radius-md);
+  background: var(--fb-surface);
+  font-family: inherit;
+  font-size: var(--fb-text-base);
+  font-weight: 500;
+  color: var(--fb-text-2);
+  cursor: pointer;
+
+  &:hover {
+    background: var(--fb-fill-subtle);
+  }
+}
+
+@media screen and (min-width: 481px) {
+  .fb-toolbar__school--phone-only {
+    display: none;
+  }
+}
+
+.fb-toolbar__school--static {
+  box-sizing: border-box;
+  cursor: default;
+
+  &:hover {
+    background: var(--fb-surface);
+  }
+}
+
+.fb-toolbar__school-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+  max-width: 220px;
+}
+
+.fb-toolbar__menu-current {
+  display: none;
+}
+
+.fb-toolbar__school-icon {
+  flex: none;
+  font-size: 17px;
+  width: 17px;
+  height: 17px;
+  line-height: 17px;
+  color: var(--fb-text-4);
+}
+
+.fb-toolbar__school-caret {
+  flex: none;
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+  line-height: 16px;
+  color: var(--fb-text-4);
+}
+
+.fb-toolbar__icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid var(--fb-border-subtle);
+  border-radius: var(--fb-radius-md);
+  background: var(--fb-surface);
+  cursor: pointer;
+
+  &:hover {
+    background: var(--fb-fill-subtle);
+  }
+}
+
+.fb-toolbar__icon-btn-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  line-height: 18px;
+  color: var(--fb-text-2);
+}
+
+.fb-toolbar__account {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid var(--fb-border-subtle);
+  border-radius: 50%;
+  background: transparent;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--fb-text-3);
+  cursor: pointer;
+
+  &:hover {
+    background: var(--fb-bg);
+  }
+}
+
 .menu-spacer {
     flex: 1 1 auto;
 }
 
 .toolbar-link {
-    margin-left: 20px;
+    margin-left: 0;
     display: block;
 }
 
@@ -12,23 +228,114 @@
 }
 
 .mat-sidenav {
-    width: 225px;
+  width: 264px;
+  max-width: 80%;
+  border-right: 1px solid var(--fb-border-subtle);
+  @include mat.sidenav-overrides((container-shape: 0));
+}
+
+.fb-drawer__header {
+  display: flex;
+  align-items: center;
+  padding: 15px 20px;
+  border-bottom: 1px solid var(--fb-border-subtle);
+}
+
+.fb-drawer__title {
+  flex: 1;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--fb-text-3);
+}
+
+.fb-drawer__close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--fb-bg);
+  }
+
+  .mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: var(--fb-text-3);
+  }
+}
+
+.fb-drawer__link {
+  display: block;
+  padding: 15px 20px;
+  border-bottom: 1px solid var(--fb-surface-variant);
+  border-left: 3px solid transparent;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--fb-text-2);
+  text-decoration: none;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--fb-bg);
+  }
+
+  &.fb-drawer__link--active {
+    border-left-color: var(--fb-focus-ring);
+    background: var(--fb-nav-active-bg);
+    font-weight: 600;
+    color: var(--fb-primary);
+  }
+}
+
+.fb-drawer__close,
+.fb-drawer__link {
+  &:focus-visible {
+    outline: 2px solid var(--fb-focus-ring);
+    outline-offset: -2px;
+  }
 }
 
 .menu-sidenav-container {
     height: 100%;
 }
 
-.side-nav-menu a {
-    border-bottom: solid 1px rgba(0, 0, 0, 0.12);
+// The toolbar has its own breakpoints: at 1000px the full nav and a 220px school name no longer fit.
+@media screen and (max-width: 1000px) {
+  .responsive-menu {
+    display: block;
+  }
+
+  .toolbar-link {
+    display: none;
+  }
 }
 
-@media screen and (max-width: 570px) {
-    .responsive-menu {
-        display: block;
-    }
+@media screen and (max-width: 480px) {
+  .fb-toolbar__wordmark,
+  .fb-toolbar__school-name {
+    display: none;
+  }
 
-    .toolbar-link {
-        display: none;
-    }
- }
+  .fb-toolbar__school {
+    padding: 0 8px;
+  }
+
+  // Single school: phones keep the icon-only menu trigger (its menu shows the name), not the label.
+  .fb-toolbar__school--static {
+    display: none;
+  }
+
+  .fb-toolbar__menu-current {
+    display: flex;
+  }
+}

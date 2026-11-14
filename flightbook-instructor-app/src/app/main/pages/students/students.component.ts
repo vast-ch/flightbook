@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewChild, effect } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, QueryList, ViewChild, ViewChildren, effect } from '@angular/core';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { AccountService } from 'src/app/core/services/account.service';
@@ -11,8 +11,7 @@ import { EmailDialogComponent } from '../../component/email-dialog/email-dialog.
 import { TranslateService } from '@ngx-translate/core';
 import { DeviceSizeService } from 'src/app/core/services/device-size.service';
 import { MatSidenav } from '@angular/material/sidenav';
-import { Subject, takeUntil } from 'rxjs';
-import { MatTabChangeEvent, MatTabGroup } from '@angular/material/tabs';
+import { finalize, Subject, Subscription, takeUntil } from 'rxjs';
 
 @Component({
     selector: 'fb-students',
@@ -25,12 +24,17 @@ export class StudentsComponent implements OnInit, OnDestroy {
   selectedStudent: Student | undefined;
   studentList: Student[];
   @ViewChild(MatSidenav) sidenav: MatSidenav | undefined;
-  @ViewChild(MatTabGroup) tabGroup: MatTabGroup | undefined;
+  @ViewChildren('tabButton') tabButtons: QueryList<ElementRef<HTMLButtonElement>> | undefined;
   unsubscribe$ = new Subject<void>();
 
   students: Student[];
   archivedStudents: Student[];
   sortBy: string = 'firstname';
+  selectedTabIndex = 0;
+  loading = false;
+  /** Placeholder rows for the list skeleton; the widths vary so it reads as names, not a grid. */
+  readonly skeletonRows = ['62%', '48%', '70%', '55%', '45%', '66%'];
+  private listSubscription: Subscription | undefined;
 
   constructor(
     private translate: TranslateService,
@@ -60,7 +64,7 @@ export class StudentsComponent implements OnInit, OnDestroy {
       this.school = school;
       this.selectedStudent = undefined;
       this.studentList = [];
-      if (this.tabGroup?.selectedIndex == 0) {
+      if (this.selectedTabIndex === 0) {
         this.syncStudentList(false);
       } else {
         this.syncStudentList(true);
@@ -73,9 +77,50 @@ export class StudentsComponent implements OnInit, OnDestroy {
     this.unsubscribe$.complete();
   }
 
+  /** Single source of truth for which list the template iterates over - the Active/Archived
+   *  tablist above shares one tabpanel (.fb-student-list) rather than each tab owning its
+   *  own body. */
+  get displayedStudents(): Student[] {
+    return this.selectedTabIndex === 0 ? this.students : this.archivedStudents;
+  }
+
+  get activeCount(): number {
+    return this.students.length;
+  }
+
+  get archivedCount(): number {
+    return this.archivedStudents.length;
+  }
+
+  initials(student: Student): string {
+    const first = student.user?.firstname?.charAt(0) || '';
+    const last = student.user?.lastname?.charAt(0) || '';
+    return (first + last).toUpperCase();
+  }
+
+  isExamReady(student: Student): boolean {
+    const statistic = student.statistic;
+    return !!(
+      statistic?.nbFlights && statistic.nbFlights >= 50 &&
+      statistic?.nbStartplaces && statistic.nbStartplaces >= 5 &&
+      statistic?.nbLandingplaces && statistic.nbLandingplaces >= 5 &&
+      statistic?.nbFlightsAlone && statistic.nbFlightsAlone >= 1 &&
+      student.controlSheet?.passTheoryExam
+    );
+  }
+
   syncStudentList(archived: boolean, onlyChangeStatistics: boolean = false) {
     if (this.school?.id) {
-      this.schoolService.getStudentsBySchoolId(this.school.id, archived).pipe(takeUntil(this.unsubscribe$)).subscribe((students: Student[]) => {
+      // A newer request wins: a fast tab or school switch must not let an older response overwrite the list.
+      this.listSubscription?.unsubscribe();
+      // The statistics refresh after validating keeps the list on screen instead of flashing the skeleton.
+      if (!onlyChangeStatistics) {
+        this.loading = true;
+      }
+      this.listSubscription = this.schoolService.getStudentsBySchoolId(this.school.id, archived).pipe(
+        takeUntil(this.unsubscribe$),
+        finalize(() => this.loading = false)
+      ).subscribe((students: Student[]) => {
         if (archived) {
           this.archivedStudents = students.sort(((obj1, obj2) => (obj1.user?.firstname && obj2.user?.firstname && obj1.user?.firstname > obj2.user?.firstname ? 1 : -1)));
           this.selectedStudent = this.archivedStudents[0];
@@ -102,7 +147,7 @@ export class StudentsComponent implements OnInit, OnDestroy {
       return;
     }
 
-    if (this.tabGroup?.selectedIndex == 0) {
+    if (this.selectedTabIndex === 0) {
       this.syncStudentList(false, true);
     } else {
       this.syncStudentList(true, true);
@@ -134,7 +179,8 @@ export class StudentsComponent implements OnInit, OnDestroy {
       data: {
         title: this.translate.instant('student.addStudent')
       },
-      width: "500px"
+      width: "500px",
+      panelClass: "fb-email-dialog-panel"
     });
 
     dialogRef.afterClosed().subscribe(response => {
@@ -167,13 +213,50 @@ export class StudentsComponent implements OnInit, OnDestroy {
     });
   }
 
-  tabChange(event: MatTabChangeEvent) {
-    if (event.index == 0) {
+  tabChange(index: number) {
+    if (index !== this.selectedTabIndex) {
+      // The detail pane shows its skeleton until the other list arrives, not the previous tab's student.
+      this.selectedStudent = undefined;
+    }
+    this.selectedTabIndex = index;
+    if (index === 0) {
       this.syncStudentList(false);
     } else {
       this.syncStudentList(true);
-    } 
- }
+    }
+  }
+
+  /** WAI-ARIA APG tabs pattern: Left/Right (with wrap-around) and Home/End move focus and
+   *  select the tab, keeping the tablist a single Tab stop (roving tabindex in the template). */
+  onTabKeydown(event: KeyboardEvent): void {
+    const buttons = this.tabButtons?.toArray();
+    if (!buttons || buttons.length === 0) {
+      return;
+    }
+
+    const count = buttons.length;
+    let newIndex: number;
+    switch (event.key) {
+      case 'ArrowLeft':
+        newIndex = (this.selectedTabIndex - 1 + count) % count;
+        break;
+      case 'ArrowRight':
+        newIndex = (this.selectedTabIndex + 1) % count;
+        break;
+      case 'Home':
+        newIndex = 0;
+        break;
+      case 'End':
+        newIndex = count - 1;
+        break;
+      default:
+        return;
+    }
+
+    event.preventDefault();
+    this.tabChange(newIndex);
+    buttons[newIndex].nativeElement.focus();
+  }
 
   selectSort(sortBy: string) {
     this.sortBy = sortBy;

@@ -1,6 +1,6 @@
 <h1 mat-dialog-title>{{ 'appointment.appointment'| translate }}</h1>
 <mat-dialog-content [formGroup]="form">
-  <mat-form-field appearance="fill">
+  <mat-form-field appearance="outline">
     <mat-label>{{ 'appointment.state'| translate }}</mat-label>
     <mat-select cdkFocusInitial required formControlName="state">
       @for (state of states; track state) {
@@ -11,7 +11,7 @@
     </mat-select>
   </mat-form-field>
   @if (data.appointmentTypes.length > 0) {
-    <mat-form-field appearance="fill">
+    <mat-form-field appearance="outline">
       <mat-label>{{ 'appointment.type'| translate }}</mat-label>
       <mat-select formControlName="type" (selectionChange)="changeType($event)">
         @for (appointmentType of data.appointmentTypes; track appointmentType) {
@@ -22,39 +22,37 @@
       </mat-select>
     </mat-form-field>
   }
-  <div style="display: flex; gap: 16px;">
-    <mat-form-field style="flex: 2;">
+  <div class="fb-form-row">
+    <mat-form-field appearance="outline" style="flex: 2;">
       <mat-label>{{ 'appointment.dateTime'| translate }}</mat-label>
       <input matInput [matDatepicker]="picker"
-        placeholder="{{ 'appointment.dateTime'| translate }}"
         formControlName="date">
       <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
       <mat-datepicker #picker></mat-datepicker>
     </mat-form-field>
-    <mat-form-field style="flex: 1;">
+    <mat-form-field appearance="outline" style="flex: 1;">
       <mat-label>{{ 'appointment.time'| translate }}</mat-label>
       <input matInput type="time" formControlName="time">
     </mat-form-field>
   </div>
-  <div style="display: flex; gap: 16px;">
-    <mat-form-field style="flex: 2;">
+  <div class="fb-form-row">
+    <mat-form-field appearance="outline" style="flex: 2;">
       <mat-label>{{ 'appointment.deadline'| translate }}</mat-label>
       <input matInput [matDatepicker]="deadlinePicker"
-        placeholder="{{ 'appointment.deadline'| translate }}"
         formControlName="deadline">
       <mat-datepicker-toggle matSuffix [for]="deadlinePicker"></mat-datepicker-toggle>
       <mat-datepicker #deadlinePicker></mat-datepicker>
     </mat-form-field>
-    <mat-form-field style="flex: 1;">
+    <mat-form-field appearance="outline" style="flex: 1;">
       <mat-label>{{ 'appointment.time'| translate }}</mat-label>
       <input matInput type="time" formControlName="deadlineTime">
     </mat-form-field>
   </div>
-  <mat-form-field>
+  <mat-form-field appearance="outline">
     <mat-label>{{ 'appointment.meetingPoint'| translate }}</mat-label>
-    <input matInput placeholder="{{ 'appointment.meetingPoint'| translate }}" formControlName="meetingPoint">
+    <input matInput formControlName="meetingPoint">
   </mat-form-field>
-  <mat-form-field appearance="fill">
+  <mat-form-field appearance="outline">
     <mat-label>{{ 'appointment.instructor'| translate }}</mat-label>
     <mat-select formControlName="instructor">
       <mat-option [value]=""></mat-option>
@@ -65,69 +63,77 @@
       }
     </mat-select>
   </mat-form-field>
-  <mat-form-field appearance="fill">
+  <mat-form-field appearance="outline">
     <mat-label>{{ 'appointment.takeOffCoordinator'| translate }}</mat-label>
     <!-- <mat-select formControlName="takeOffCoordinator">
     <mat-option *ngFor="let teamMember of data.teamMembers" [value]="teamMember.user.email">
       {{teamMember.user.firstname}} {{teamMember.user.lastname}}
     </mat-option>
   </mat-select> -->
-  <input matInput placeholder="{{ 'appointment.takeOffCoordinator'| translate }}" type="text"
+  <input matInput type="text"
     formControlName="takeOffCoordinatorText">
 </mat-form-field>
-<mat-form-field>
+<mat-form-field appearance="outline">
   <mat-label>{{ 'appointment.maxPeople'| translate }}</mat-label>
-  <input matInput placeholder="{{ 'appointment.maxPeople'| translate }}" type="number"
+  <input matInput type="number"
     formControlName="maxPeople">
 </mat-form-field>
-<mat-form-field>
+<mat-form-field appearance="outline">
   <mat-label>{{ 'appointment.description'| translate }}</mat-label>
-  <textarea matInput placeholder="{{ 'appointment.description'| translate }}"
+  <textarea matInput
   formControlName="description"></textarea>
 </mat-form-field>
-<div class="subscription-form" formArrayName="subscriptions">
-  <button mat-mini-fab color="primary" (click)="addSubscription()">
-    <mat-icon>add</mat-icon>
-  </button>
-  <mat-label class="subscribe-student">{{ 'appointment.subscribeStudent'| translate }}</mat-label>
+<div class="fb-subscription-section" formArrayName="subscriptions">
+  <div class="fb-subscription-header">
+    <button type="button" class="fb-subscription-add" [attr.aria-label]="'appointment.subscribeStudent' | translate" [matTooltip]="'appointment.subscribeStudent' | translate" [disabled]="!studentsLoaded" (click)="addSubscription()">
+      <mat-icon aria-hidden="true">add</mat-icon>
+    </button>
+    <span class="fb-subscription-title">{{ 'appointment.subscribeStudent'| translate }}</span>
+  </div>
   @for (subscription of subscriptions.controls; track subscription; let i = $index) {
-    <div class="subscription-list" [formGroupName]="i" #subscriptionFormList>
-      <button mat-icon-button color="warn" (click)="removeSubscription(i, selectStudent.value)">
-        <mat-icon>remove</mat-icon>
+    <div class="fb-subscription-row" [formGroupName]="i" #subscriptionFormList>
+      <button type="button" class="fb-subscription-remove" [attr.aria-label]="'appointment.removeSubscription' | translate" [matTooltip]="'appointment.removeSubscription' | translate" (click)="removeSubscription(i)">
+        <mat-icon aria-hidden="true">remove</mat-icon>
       </button>
-      <mat-form-field class="subscription-form-field">
-        <mat-label>{{ 'appointment.student'| translate }}</mat-label>
-        <mat-select #selectStudent formControlName="user" (selectionChange)="selected()">
-          @for (student of students; track student) {
-            @if (subscription.value.user === student.user?.email || !isSelected(student.user?.email)) {
-              <mat-option [value]="student.user?.email">
-                {{student.user?.firstname}} {{student.user?.lastname}}
-              </mat-option>
+      @if (subscription.value.existing) {
+        <span class="fb-subscription-name">{{ existingSubscriberName(subscription.value.user) }}</span>
+      } @else {
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+          <mat-label>{{ 'appointment.student'| translate }}</mat-label>
+          <mat-select formControlName="user" (selectionChange)="selected()">
+            @for (student of students; track student) {
+              @if (subscription.value.user === student.user?.email || !isSelected(student.user?.email)) {
+                <mat-option [value]="student.user?.email">
+                  {{student.user?.firstname}} {{student.user?.lastname}}
+                </mat-option>
+              }
             }
-          }
-        </mat-select>
-      </mat-form-field>
+          </mat-select>
+        </mat-form-field>
+      }
     </div>
   }
 </div>
-<div class="guestSubscription-form" formArrayName="guestSubscriptions">
-  <button mat-mini-fab color="primary" (click)="addGuestSubscription()">
-    <mat-icon>add</mat-icon>
-  </button>
-  <mat-label class="subscribe-student">{{ 'appointment.guestSubscribeStudent'| translate }}</mat-label>
+<div class="fb-subscription-section" formArrayName="guestSubscriptions">
+  <div class="fb-subscription-header">
+    <button type="button" class="fb-subscription-add" [attr.aria-label]="'appointment.guestSubscribeStudent' | translate" [matTooltip]="'appointment.guestSubscribeStudent' | translate" (click)="addGuestSubscription()">
+      <mat-icon aria-hidden="true">add</mat-icon>
+    </button>
+    <span class="fb-subscription-title">{{ 'appointment.guestSubscribeStudent'| translate }}</span>
+  </div>
   @for (guestSubscriptions of guestSubscriptions.controls; track guestSubscriptions; let i = $index) {
-    <div class="subscription-list" [formGroupName]="i" #guestSubscriptionFormList>
-      <button mat-icon-button color="warn" (click)="removeGuestSubscription(i)">
-        <mat-icon>remove</mat-icon>
+    <div class="fb-subscription-row" [formGroupName]="i" #guestSubscriptionFormList>
+      <button type="button" class="fb-subscription-remove" [attr.aria-label]="'appointment.removeSubscription' | translate" [matTooltip]="'appointment.removeSubscription' | translate" (click)="removeGuestSubscription(i)">
+        <mat-icon aria-hidden="true">remove</mat-icon>
       </button>
-      <mat-form-field class="guestSubscription-form-field">
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
         <mat-label>{{ 'account.firstname'| translate }}</mat-label>
-        <input matInput placeholder="{{ 'account.firstname'| translate }}" type="text"
+        <input matInput type="text"
           formControlName="firstname">
       </mat-form-field>
-      <mat-form-field class="guestSubscription-form-field">
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
         <mat-label>{{ 'account.lastname'| translate }}</mat-label>
-        <input matInput placeholder="{{ 'account.lastname'| translate }}" type="text"
+        <input matInput type="text"
           formControlName="lastname">
       </mat-form-field>
     </div>
