@@ -17,6 +17,10 @@
             "subject": "{school}: Anmeldung: {date}",
             "contentCanParticipate": "<p>Jemand hat sich für den Termin vom {date} abgemeldet. Sie können jetzt teilnehmen.</p><p>Informationen zum Termin</p><ul> <li>Datum: {date}</li>{type}<li>Treffpunkt: {meetingPoint}</li><li>Beschreibung: {description}</li><li>Max Teilnehmer: {maxPeople}</li></ul>",
             "contentMovedUp": "<p>Jemand hat sich für den Termin vom {date} abgemeldet. Sie sind auf Platz {position} der Warteliste vorgerückt.</p><p>Informationen zum Termin</p><ul> <li>Datum: {date}</li>{type}<li>Treffpunkt: {meetingPoint}</li><li>Beschreibung: {description}</li><li>Max Teilnehmer: {maxPeople}</li></ul>"
+        },
+        "deleted": {
+            "subject": "{school}: Termin vom {date} wurde gelöscht",
+            "content": "<p>{school} hat den Termin vom {date} gelöscht. Deine Anmeldung ist damit hinfällig.</p>{message}<p>Informationen zum Termin</p><ul> <li>Datum: {date}</li>{type}<li>Treffpunkt: {meetingPoint}</li></ul>"
         }
     },
     "enrollment": {

@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { AppointmentDto } from "./interface/appointment-dto";
+import { AppointmentDeleteDto } from "./interface/appointment-delete-dto";
 import { plainToInstance } from "class-transformer";
 import { Appointment } from "./appointment.entity";
 import { AppointmentRepository } from "./appointment.repository";
@@ -190,6 +191,40 @@ export class AppointmentFacade {
         }
 
         return await this.generateWaitingList(AppointmentMapper.toAppointmentDto(appointmentResp), schoolId);
+    }
+
+    async deleteAppointment(id: number, schoolId: number, appointmentDeleteDto?: AppointmentDeleteDto): Promise<void> {
+        const appointment: Appointment = await this.appointmentRepository.getAppointmentById(id);
+
+        // The school guard only proves the caller belongs to the school in the URL.
+        if (appointment.school.id != schoolId) {
+            throw AppointmentException.notFound();
+        }
+
+        // Kept aside: removing the entities below strips their ids.
+        const appointmentId = appointment.id;
+        const subscriptions: Subscription[] = [...appointment.subscriptions];
+        const isUpcoming = new Date(appointment.scheduling).getTime() > Date.now();
+
+        // Subscriptions reference the appointment (RESTRICT), so they go first; all or nothing.
+        await this.appointmentRepository.manager.transaction(async (entityManager) => {
+            await entityManager.delete(Subscription, { appointment: { id: appointmentId } });
+            await entityManager.delete(GuestSubscription, { appointment: { id: appointmentId } });
+            await entityManager.delete(Appointment, { id: appointmentId });
+        });
+
+        try {
+            await this.deleteAppointmentInGoogleCalendar(appointment);
+        } catch (error) {
+            Logger.error('Failed to delete appointment in Google Calendar', error);
+        }
+
+        // Nobody needs to hear that an appointment which already took place was cleaned up.
+        if (isUpcoming && subscriptions.length > 0) {
+            const message = appointmentDeleteDto?.message?.trim() || undefined;
+            this.emailService.sendAppointmentDeleted(appointment, subscriptions, message);
+            this.notificationsService.sendAppointmentDeleted(appointment, subscriptions, message);
+        }
     }
 
     async addSubscriptionToAppointment(appointmentId: number, userId: number, comment?: string): Promise<AppointmentDto> {
@@ -452,17 +487,29 @@ export class AppointmentFacade {
         return appointmentDtoOrList;
     }
 
-    private async createOrUpdateAppointmentInGoogleCalendar(appointment: Appointment): Promise<void> {
-        if (!appointment.school.configuration?.googleCalendar) {
+    private async deleteAppointmentInGoogleCalendar(appointment: Appointment): Promise<void> {
+        if (!appointment.school.configuration?.googleCalendar || !appointment.googleCalendarEventId) {
             return;
         }
 
-        // Check if token needs refresh
+        await this.refreshGoogleCalendarTokenIfExpired(appointment);
+        await this.googleCalendarService.deleteEvent(appointment, appointment.school);
+    }
+
+    private async refreshGoogleCalendarTokenIfExpired(appointment: Appointment): Promise<void> {
         if (this.googleCalendarService.isTokenExpired(appointment.school.configuration.googleCalendar.tokenExpiry)) {
             await this.schoolFacade.refreshGoogleCalendarToken(appointment.school.id);
             // Reload school after token refresh
             appointment.school = await this.schoolRepository.getSchoolById(appointment.school.id);
         }
+    }
+
+    private async createOrUpdateAppointmentInGoogleCalendar(appointment: Appointment): Promise<void> {
+        if (!appointment.school.configuration?.googleCalendar) {
+            return;
+        }
+
+        await this.refreshGoogleCalendarTokenIfExpired(appointment);
 
         // If appointment already has a Google Calendar event ID, update it; otherwise create new
         if (appointment.googleCalendarEventId) {

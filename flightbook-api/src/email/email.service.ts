@@ -216,6 +216,60 @@ export class EmailService {
         this.sendEmail(email);
     }
 
+    /** Tells the subscribers (waiting list included) that the appointment no longer exists. */
+    sendAppointmentDeleted(appointment: Appointment, subscriptions: Subscription[], message?: string) {
+        const email = new EmailBodyDto();
+        email.replyTo = appointment.instructor ? appointment.instructor.email : appointment.school.email;
+        email.bccAddress = "";
+        subscriptions.forEach((subscription: Subscription) => {
+            if (subscription.user.isAppointmentEmailNotificationEnabled()) {
+                email.bccAddress += subscription.user.email + ";"
+            }
+        });
+
+        if (email.bccAddress.length <= 0) {
+            return;
+        }
+
+        const i18n = I18nContext.current();
+        const lang = appointment.school.language;
+        const date = moment(appointment.scheduling).utc().format('DD.MM.YYYY HH:mm');
+
+        email.subject = i18n.t('email.appointment.deleted.subject', {
+            lang: lang,
+            args: {
+                school: appointment.school.name,
+                date: date
+            }
+        });
+        const type = i18n.t('email.appointment.type', { lang: lang });
+        // The message is free text typed by the instructor and lands in an HTML mail.
+        const messageHtml = message
+            ? `<p>${this.escapeHtml(message).replace(new RegExp("\r?\n", "g"), "</br>")}</p>`
+            : "";
+        email.content = i18n.t('email.appointment.deleted.content', {
+            lang: lang,
+            args: {
+                school: appointment.school.name,
+                date: date,
+                type: appointment.type ? `<li>${type}: ${appointment.type.name}</li>` : "",
+                meetingPoint: appointment.meetingPoint || "-",
+                message: messageHtml
+            }
+        });
+
+        this.sendEmail(email);
+    }
+
+    private escapeHtml(text: string): string {
+        return text
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#39;");
+    }
+
     sendUnsubscribeEmail(school: SchoolDto, appointment: Appointment, subscription: Subscription) {
         if (!appointment.instructor) {
             return;

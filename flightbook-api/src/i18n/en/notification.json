@@ -16,6 +16,10 @@
             "title": "{school}: Registration for: {date}",
             "bodyCanParticipate": "Someone has unsubscribed from the appointment on {date}. You can now participate.",
             "bodyMovedUp": "Someone has unsubscribed from the appointment on {date}. You have moved up to position {position} on the waiting list."
+        },
+        "deleted": {
+            "title": "Appointment deleted",
+            "body": "{school} has deleted the appointment on {date}."
         }
     },
     "flightValidation": {
