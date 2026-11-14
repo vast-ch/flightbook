@@ -393,6 +393,8 @@
         "commentHint": "Mostra il tuo commento",
         "waitingList": "Lista d'attesa",
         "noAppointment": "Al momento non ci sono date per questa scuola",
+        "deletedTitle": "Appuntamento eliminato",
+        "deletedMessage": "La scuola ha eliminato un appuntamento a cui eri iscritto.",
         "type": "Tipo",
         "upcoming": "In arrivo",
         "past": "Passati",

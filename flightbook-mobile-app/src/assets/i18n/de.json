@@ -393,6 +393,8 @@
         "commentHint": "Deinen Kommentar anzeigen",
         "waitingList": "Warte liste",
         "noAppointment": "Zurzeit gibt es keine Termine für diese Flugschule",
+        "deletedTitle": "Termin gelöscht",
+        "deletedMessage": "Die Flugschule hat einen Termin gelöscht, für den du angemeldet warst.",
         "type": "Terminart",
         "upcoming": "Kommende",
         "past": "Vergangene",
