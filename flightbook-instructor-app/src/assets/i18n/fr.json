@@ -415,6 +415,7 @@
         "createAccount": "Créer un compte!",
         "addControlSheet": "Ajouter une fiche de contrôle",
         "cancel": "Annuler",
+        "delete": "Supprimer",
         "send": "Envoyer",
         "yes": "Oui",
         "no": "Non",
@@ -460,7 +461,23 @@
         "waitingList": "Liste d'attente",
         "noSubscription": "Il n'y a actuellement pas d'inscriptions",
         "type": "Type",
-        "allInstructors": "Tous"
+        "allInstructors": "Tous",
+        "delete": {
+            "title": "Supprimer {{type}} du {{date}} à {{time}} ?",
+            "titleNoType": "Supprimer le rendez-vous du {{date}} à {{time}} ?",
+            "participants": "Inscrits : {{students}}, liste d'attente : {{waiting}}, invités : {{guests}}.",
+            "notifyStudents": "Tous les élèves inscrits (liste d'attente comprise) seront informés par e-mail et notification push.",
+            "notifyStudentsNotGuests": "Tous les élèves inscrits (liste d'attente comprise) seront informés par e-mail et notification push ; les invités ne seront pas avertis.",
+            "notifyGuestsOnly": "Les invités ne seront pas avertis.",
+            "notifyNobodySubscribed": "Personne n'est inscrit, personne ne sera donc averti.",
+            "notifyNobodyPast": "Le rendez-vous est déjà passé, personne ne sera donc averti.",
+            "irreversible": "La suppression est définitive.",
+            "messageLabel": "Message aux inscrits (facultatif)",
+            "keep": "Conserver le rendez-vous",
+            "confirm": "Supprimer le rendez-vous",
+            "confirmNotify": "Supprimer et avertir {{count}}",
+            "deleted": "Rendez-vous supprimé"
+        }
     },
     "appointmentExport": {
         "title": "Export des journées de formation",

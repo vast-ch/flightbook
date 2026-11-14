@@ -141,7 +141,49 @@
 </div>
 </mat-dialog-content>
 
-<mat-dialog-actions align="end">
-  <button mat-raised-button (click)="onCancel()">{{ 'buttons.cancel'| translate }}</button>
-  <button mat-raised-button color="primary" (click)="onSave()" [disabled]="form.invalid">{{ 'buttons.save'| translate }}</button>
-</mat-dialog-actions>
+@if (!confirmingDelete) {
+  <mat-dialog-actions align="end">
+    @if (canDelete) {
+      <button type="button" class="fb-delete-button" (click)="askDelete()">
+        <mat-icon aria-hidden="true">delete</mat-icon>
+        {{ 'buttons.delete'| translate }}
+      </button>
+    }
+    <span class="fb-actions-spacer"></span>
+    <button mat-raised-button (click)="onCancel()">{{ 'buttons.cancel'| translate }}</button>
+    <button mat-raised-button color="primary" (click)="onSave()" [disabled]="form.invalid">{{ 'buttons.save'| translate }}</button>
+  </mat-dialog-actions>
+} @else {
+  <div class="fb-delete-confirm" role="alertdialog" aria-labelledby="fb-delete-title" aria-describedby="fb-delete-summary">
+    <div class="fb-delete-confirm__head">
+      <mat-icon aria-hidden="true">warning</mat-icon>
+      <div class="fb-delete-confirm__text">
+        <div id="fb-delete-title" class="fb-delete-confirm__title">{{ deleteTitle }}</div>
+        <div id="fb-delete-summary" class="fb-delete-confirm__summary">
+          @if (hasParticipants) {
+            {{ 'appointment.delete.participants'| translate: { students: subscribedCount, waiting: waitingCount, guests: guestCount } }}
+          }
+          {{ deleteConsequenceKey | translate }}
+          {{ 'appointment.delete.irreversible'| translate }}
+        </div>
+      </div>
+    </div>
+    @if (notifyCount > 0) {
+      <label class="fb-delete-confirm__message">
+        <span>{{ 'appointment.delete.messageLabel'| translate }}</span>
+        <textarea #deleteMessageInput rows="2" maxlength="1000"
+          (input)="deleteMessage = deleteMessageInput.value"></textarea>
+      </label>
+    }
+    <div class="fb-delete-confirm__actions">
+      <button #keepButton type="button" class="fb-delete-confirm__keep" (click)="cancelDelete()">{{ 'appointment.delete.keep'| translate }}</button>
+      <button type="button" class="fb-delete-confirm__delete" (click)="onDelete()">
+        @if (notifyCount > 0) {
+          {{ 'appointment.delete.confirmNotify'| translate: { count: notifyCount } }}
+        } @else {
+          {{ 'appointment.delete.confirm'| translate }}
+        }
+      </button>
+    </div>
+  </div>
+}
