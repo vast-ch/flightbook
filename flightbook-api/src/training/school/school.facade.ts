@@ -34,7 +34,8 @@ export class SchoolFacade {
             active: true,
             validateFlights: true,
             userCanEditControlSheet: true,
-            commentsOnSubscription: true
+            commentsOnSubscription: true,
+            trialEnabled: false
         };
         school.configuration.tandemModule = {
             active: false

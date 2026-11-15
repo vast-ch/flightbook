@@ -1,9 +1,13 @@
-import { BadRequestException, UnprocessableEntityException } from "@nestjs/common";
+import { BadRequestException, NotFoundException, UnprocessableEntityException } from "@nestjs/common";
 
 export class AppointmentException {
 
     public static invalidAppointment() {
         throw new UnprocessableEntityException("Invalid appointment: scheduling date and state must be provided")
+    }
+
+    public static notFound() {
+        throw new NotFoundException("Appointment not found")
     }
 
     public static invalidAppointmentType() {
@@ -16,6 +20,10 @@ export class AppointmentException {
 
     public static invalidUnsubscribe() {
         throw new BadRequestException("Invalid unsubscribe: user must be subscribed to the appointment")
+    }
+
+    public static invalidSubscription() {
+        throw new BadRequestException("Invalid subscription: every subscription must reference a user email")
     }
 
     public static deadlinePassedException() {

@@ -10,7 +10,8 @@ import { UserReadDto } from './interface/user-read-dto';
 import { UserPasswordWriteDto } from './interface/user-password-write-dto';
 import { InvalidPasswordException } from './exception/invalid-password-exception';
 import { InvalidOldPasswordException } from './exception/invalid-oldpassword-exception';
-import { PaymentFacade } from '../payment/payment-facade';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { USER_EMAIL_CHANGED, UserEmailChangedEvent } from './event/user-email-changed.event';
 import { EmailService } from '../email/email.service';
 import * as crypto from 'crypto';
 import { UserException } from './exception/user.exception';
@@ -23,7 +24,7 @@ export class UserFacade {
     constructor(
         private userRepository: UserRepository,
         private authService: AuthService,
-        private paymentFacade: PaymentFacade,
+        private eventEmitter: EventEmitter2,
         private emailService: EmailService,
         private keycloakService: KeycloakService
     ) {}
@@ -115,7 +116,7 @@ export class UserFacade {
         const userResp: User = await this.userRepository.saveUser(user);
 
         if (oldEmail !== userResp.email) {
-            this.paymentFacade.updatePaymentUser(userResp, oldEmail);
+            this.eventEmitter.emit(USER_EMAIL_CHANGED, new UserEmailChangedEvent(userResp, oldEmail));
         }
         return plainToClass(UserReadDto, userResp);
     }

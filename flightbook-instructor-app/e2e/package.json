@@ -1,0 +1,15 @@
+{
+  "name": "flightbook-instructor-e2e",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "stack:up": "./stack/up.sh",
+    "stack:down": "./stack/down.sh",
+    "build:app": "cd .. && npx ng build --configuration development",
+    "test": "playwright test",
+    "report": "playwright show-report out/report"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.56.0"
+  }
+}

@@ -15,6 +15,7 @@ export class SchoolRegisterFormComponent implements OnInit, OnDestroy {
 
   @Input() school: School | undefined;
   @Output() saved = new EventEmitter<boolean>();
+  @Output() back = new EventEmitter<void>();
 
   registerInvalid = false;
   form: UntypedFormGroup;

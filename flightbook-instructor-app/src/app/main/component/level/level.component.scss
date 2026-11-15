@@ -1,17 +1,2 @@
-ul {
-    display: inline-block;
-}
-
-ul li {
-    list-style-type: none;
-    float: left;
-    width: 365px;
-}
-
-.definition {
-    margin-left: 20px;
-}
-
-app-start-rating {
-    display: inline-block;
-}
+/* Structural styles for this component live in src/styles/_student-page.scss,
+   scoped under .fb-student-page (see the CONTRACT's styling policy, tier 2). */

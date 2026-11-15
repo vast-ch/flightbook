@@ -16,6 +16,10 @@
             "title": "{school}: Inscription",
             "bodyCanParticipate": "Quelqu'un s'est désinscrit pour le rendez-vous du {date}. Vous pouvez maintenant participer.",
             "bodyMovedUp": "Quelqu'un s'est désinscrit pour le rendez-vous du {date}. Vous êtes passé à la position {position} sur la liste d'attente."
+        },
+        "deleted": {
+            "title": "Rendez-vous supprimé",
+            "body": "{school} a supprimé le rendez-vous du {date}."
         }
     },
     "flightValidation": {

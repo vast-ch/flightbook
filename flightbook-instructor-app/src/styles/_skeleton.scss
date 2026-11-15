@@ -1,0 +1,91 @@
+// Loading placeholders shaped like the content they stand in for (redesign/INIT.md §5.1).
+// The page decides the layout; this only draws the shimmering bars. Skeleton markup is
+// aria-hidden, the busy region carries aria-busy and a visually hidden "loading" text.
+.fb-skeleton {
+  display: block;
+  flex: none;
+  height: 12px;
+  border-radius: var(--fb-radius-sm);
+  background: linear-gradient(90deg, var(--fb-track-bg) 0%, var(--fb-fill-subtle) 50%, var(--fb-track-bg) 100%);
+  background-size: 200% 100%;
+  animation: fb-skeleton-shimmer 1.4s ease-in-out infinite;
+
+  &--text {
+    height: 10px;
+  }
+
+  &--title {
+    height: 18px;
+  }
+
+  &--value {
+    height: 22px;
+  }
+
+  &--circle {
+    border-radius: 50%;
+  }
+
+  // Stands in for the 28px initials avatar of list and team rows.
+  &--avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+  }
+
+  // Stands in for a slide toggle.
+  &--toggle {
+    width: 36px;
+    height: 20px;
+    border-radius: var(--fb-radius-pill);
+  }
+}
+
+// A placeholder table or list row: bars side by side, same padding and divider as a real row.
+.fb-skeleton-row {
+  display: flex;
+  align-items: center;
+  gap: var(--fb-space-9);
+  padding: var(--fb-space-6-plus) var(--fb-space-8);
+  border-bottom: 1px solid var(--fb-surface-variant);
+
+  &:last-child {
+    border-bottom: 0;
+  }
+}
+
+.fb-skeleton-row__wide {
+  flex: 1;
+  min-width: 40px;
+  max-width: 280px;
+}
+
+// Visually hidden text for screen readers, e.g. the "loading" announcement of a busy region.
+.fb-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@keyframes fb-skeleton-shimmer {
+  from {
+    background-position: 100% 0;
+  }
+
+  to {
+    background-position: -100% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fb-skeleton {
+    animation: none;
+    background: var(--fb-track-bg);
+  }
+}

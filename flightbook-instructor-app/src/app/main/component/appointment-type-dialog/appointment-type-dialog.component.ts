@@ -1,5 +1,5 @@
-import { Component, Inject, Input, OnInit } from '@angular/core';
-import { FormControl, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
+import { Component, Inject } from '@angular/core';
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { AppointmentType } from 'src/app/shared/domain/appointment-type-dto';
 import { User } from 'src/app/shared/domain/user';
@@ -10,7 +10,7 @@ import { User } from 'src/app/shared/domain/user';
     styleUrls: ['./appointment-type-dialog.component.scss'],
     standalone: false
 })
-export class AppointmentTypeDialogComponent implements OnInit {
+export class AppointmentTypeDialogComponent {
 
   form: UntypedFormGroup;
   title: string;
@@ -38,8 +38,6 @@ export class AppointmentTypeDialogComponent implements OnInit {
         deadlineHours: [hours > 0 ? hours : null, Validators.nullValidator],
       });
     }
-
-  ngOnInit(): void {}
 
   onCancel() {
     this.dialogRef.close({ event: "cancel" });

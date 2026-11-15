@@ -1,56 +1,572 @@
-mat-card {
-    max-width: 1100px;
-    margin: 2em auto;
-    text-align: center;
+@use '@angular/material' as mat;
+
+// Invitation flow from the Claude Design mockup (Enrollment.dc.html). Same page frame, language
+// switch and step bar as the school registration (per-page copy, redesign/INIT.md §5.1).
+:host {
+  display: block;
+  min-height: 100vh;
+  background: var(--fb-bg);
+  font-family: Sora, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  color: var(--fb-ink);
 }
 
-.mat-card-stepper {
-    max-width: 432px;
-    margin: 2em auto;
-    text-align: center;
+.fb-enroll-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 40px 20px 32px;
 }
 
-mat-spinner {
-    margin:10% auto;
+// ---------------------------------------------------------------------------------
+// Top row
+// ---------------------------------------------------------------------------------
+.fb-enroll__top {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--fb-space-5);
 }
 
-::ng-deep .mat-horizontal-stepper-header{
-    pointer-events: none !important;
+.fb-enroll__logo {
+  display: block;
+  flex: none;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--fb-radius-md);
 }
 
-.check-icon {
-    margin-top: 20px;
-    margin-bottom: 20px !important;
-    transform: scale(3);
-    color: #48c600;
+.fb-enroll__wordmark {
+  flex: 1;
+  min-width: 0;
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.02em;
 }
 
-.error-icon {
-    margin-top: 20px;
-    margin-bottom: 20px !important;
-    transform: scale(3);
-    color: #ff4961;
+.fb-enroll__languages {
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--fb-border-subtle);
+  border-radius: var(--fb-radius-md);
+  background: var(--fb-surface);
 }
 
-mat-spinner {
+.fb-enroll__language {
+  height: 28px;
+  padding: 0 11px;
+  border: 0;
+  border-radius: var(--fb-radius-sm);
+  background: transparent;
+  font: inherit;
+  font-size: var(--fb-text-sm);
+  font-weight: 600;
+  color: var(--fb-text-2);
+  cursor: pointer;
+
+  &:hover:not(.fb-enroll__language--active) {
+    background: var(--fb-bg);
+  }
+
+  &--active {
+    background: var(--fb-primary);
+    color: var(--fb-on-primary);
+  }
+}
+
+// ---------------------------------------------------------------------------------
+// Card and head
+// ---------------------------------------------------------------------------------
+.fb-enroll__card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 120px;
+  background: var(--fb-surface);
+  border: 1px solid var(--fb-border-subtle);
+  border-radius: var(--fb-radius-lg);
+  overflow: hidden;
+}
+
+.fb-enroll__loading {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, var(--fb-surface) 75%, transparent);
+}
+
+.fb-enroll__head {
+  display: flex;
+  align-items: center;
+  gap: var(--fb-space-6);
+  padding: 22px var(--fb-space-9) var(--fb-space-8);
+  border-bottom: 1px solid var(--fb-surface-variant);
+}
+
+.fb-enroll__role-icon {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 11px;
+  background: var(--fb-nav-active-bg);
+
+  .mat-icon {
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+    color: var(--fb-primary);
+  }
+}
+
+.fb-enroll__head-text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--fb-space-2);
+  min-width: 0;
+}
+
+.fb-enroll__eyebrow {
+  font-size: var(--fb-text-xs);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--fb-text-3);
+}
+
+.fb-enroll__title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  text-wrap: pretty;
+}
+
+// ---------------------------------------------------------------------------------
+// Step bar (display only: the flow cannot go back)
+// ---------------------------------------------------------------------------------
+.fb-steps {
+  display: flex;
+  align-items: center;
+  gap: var(--fb-space-4);
+  margin: 0;
+  padding: var(--fb-space-7) var(--fb-space-9);
+  list-style: none;
+  background: var(--fb-fill-subtle);
+  border-bottom: 1px solid var(--fb-surface-variant);
+}
+
+.fb-steps__item {
+  display: flex;
+  align-items: center;
+  flex: none;
+  gap: var(--fb-space-3);
+  min-width: 0;
+
+  &--line {
+    flex: 1;
+  }
+
+  // Never narrower than its dot and label: the other steps' lines give way instead.
+  &--current {
+    min-width: auto;
+  }
+}
+
+.fb-steps__dot {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  box-sizing: border-box;
+  border: 1px solid var(--fb-dot-border);
+  border-radius: 50%;
+  background: var(--fb-surface);
+  font-size: var(--fb-text-sm);
+  font-weight: 600;
+  color: var(--fb-text-3);
+
+  &--current {
+    border: 0;
+    background: var(--fb-primary);
+    color: var(--fb-on-primary);
+  }
+
+  &--done {
+    border: 0;
+    background: var(--fb-nav-active-bg);
+    color: var(--fb-primary);
+  }
+
+  .mat-icon {
+    font-size: 15px;
+    width: 15px;
+    height: 15px;
+  }
+}
+
+.fb-steps__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: var(--fb-text-base);
+  font-weight: 500;
+  white-space: nowrap;
+  color: var(--fb-text-3);
+
+  // The current label never shortens; the others and the lines give way.
+  &--current {
+    flex: none;
+    overflow: visible;
+    font-weight: 600;
+    color: var(--fb-ink);
+  }
+
+  &--done {
+    color: var(--fb-text-2);
+  }
+}
+
+.fb-steps__line {
+  display: block;
+  flex: 1;
+  min-width: 10px;
+  height: 1px;
+  background: var(--fb-border-subtle);
+
+  &--done {
+    background: var(--fb-input-active-border);
+  }
+}
+
+// ---------------------------------------------------------------------------------
+// Account step: the login/register forms fill the card, with this intro on top
+// ---------------------------------------------------------------------------------
+fb-login {
+  max-width: none;
+}
+
+.fb-enroll__intro {
+  display: flex;
+  align-items: center;
+  gap: var(--fb-space-4);
+  padding: 11px 13px;
+  border-radius: var(--fb-radius-md);
+  background: var(--fb-bg);
+  font-size: var(--fb-text-base);
+  line-height: 1.45;
+  color: var(--fb-text-2);
+  text-wrap: pretty;
+
+  .mat-icon {
+    flex: none;
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: var(--fb-primary);
+  }
+}
+
+// ---------------------------------------------------------------------------------
+// Payment and accept steps
+// ---------------------------------------------------------------------------------
+.fb-enroll__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--fb-space-8);
+  padding: 22px var(--fb-space-9) var(--fb-space-9);
+}
+
+.fb-price {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--fb-border-subtle);
+  border-radius: 11px;
+  overflow: hidden;
+}
+
+.fb-price__head {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: var(--fb-space-4);
+  padding: var(--fb-space-7) var(--fb-space-8);
+  background: var(--fb-fill-subtle);
+  border-bottom: 1px solid var(--fb-surface-variant);
+}
+
+.fb-price__main {
+  font-size: var(--fb-text-4xl);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+// Grows but never shrinks: when the row is full the badge wraps below instead of covering it.
+.fb-price__sub {
+  flex: 1 0 auto;
+  font-size: var(--fb-text-base);
+  color: var(--fb-text-3);
+}
+
+.fb-price__badge {
+  padding: 3px 9px;
+  border-radius: var(--fb-radius-pill);
+  background: var(--fb-nav-active-bg);
+  font-size: var(--fb-text-xs);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--fb-primary-hover);
+
+  &--optional {
+    background: var(--fb-success-hover-bg);
+    color: var(--fb-success-fg);
+  }
+}
+
+.fb-price__points {
+  display: flex;
+  flex-direction: column;
+  gap: var(--fb-space-4);
+  margin: 0;
+  padding: var(--fb-space-7) var(--fb-space-8);
+  list-style: none;
+
+  li {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--fb-space-4);
+    font-size: var(--fb-text-base-plus);
+    line-height: 1.5;
+    color: var(--fb-text-2);
+    text-wrap: pretty;
+  }
+
+  .mat-icon {
+    flex: none;
+    margin-top: 1px;
+    font-size: 17px;
+    width: 17px;
+    height: 17px;
+    color: var(--fb-success-fg);
+  }
+}
+
+.fb-enroll__note {
+  margin: 0;
+  font-size: var(--fb-text-sm);
+  line-height: 1.55;
+  color: var(--fb-text-3);
+  text-wrap: pretty;
+}
+
+.fb-enroll__actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--fb-space-4);
+
+  // Basis 200px: on phones it drops below "Überspringen" at full width.
+  .fb-primary-button {
+    flex: 1 1 200px;
+  }
+}
+
+.fb-accept {
+  display: flex;
+  flex-direction: column;
+  gap: var(--fb-space-3);
+}
+
+.fb-accept__title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.fb-accept__text {
+  margin: 0;
+  font-size: var(--fb-text-base-plus);
+  line-height: 1.55;
+  color: var(--fb-text-2);
+  text-wrap: pretty;
+
+  strong {
+    font-weight: 600;
+    color: var(--fb-ink);
+  }
+}
+
+.fb-scope {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--fb-space-5);
+  padding: var(--fb-space-6) var(--fb-space-7);
+  border: 1px solid var(--fb-border-subtle);
+  border-radius: 11px;
+  background: var(--fb-fill-subtle);
+  font-size: var(--fb-text-base);
+  line-height: 1.5;
+  color: var(--fb-text-2);
+  text-wrap: pretty;
+
+  .mat-icon {
+    flex: none;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    color: var(--fb-primary);
+  }
+}
+
+.fb-accept__question {
+  font-size: var(--fb-text-base-plus);
+  font-weight: 500;
+}
+
+// ---------------------------------------------------------------------------------
+// Buttons
+// ---------------------------------------------------------------------------------
+.fb-primary-button {
+  flex: none;
+  height: 44px;
+
+  @include mat.button-overrides(
+    (
+      protected-label-text-size: var(--fb-text-lg),
+      protected-label-text-weight: 600,
+    )
+  );
+
+  &:hover {
+    --mat-button-protected-container-color: var(--fb-primary-active);
+  }
+
+  .mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.fb-secondary-button {
+  flex: none;
+  height: 44px;
+  padding: 0 var(--fb-space-7);
+  border: 1px solid var(--fb-border-subtle);
+  border-radius: var(--fb-radius-md);
+  background: var(--fb-surface);
+  font: inherit;
+  font-size: var(--fb-text-md);
+  font-weight: 600;
+  color: var(--fb-text-2);
+  cursor: pointer;
+
+  &:hover {
+    background: var(--fb-bg);
+  }
+}
+
+.fb-enroll__language,
+.fb-secondary-button {
+  &:focus-visible {
+    outline: 2px solid var(--fb-focus-ring);
+    outline-offset: 2px;
+  }
+}
+
+// ---------------------------------------------------------------------------------
+// Result screens: done and invalid token
+// ---------------------------------------------------------------------------------
+.fb-enroll__result {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--fb-space-6);
+  padding: 36px var(--fb-space-9) 32px;
+  text-align: center;
+}
+
+.fb-enroll__result-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--fb-success-hover-bg);
+
+  .mat-icon {
+    font-size: 30px;
+    width: 30px;
+    height: 30px;
+    color: var(--fb-success-fg);
+  }
+
+  &--error {
+    background: var(--fb-danger-bg);
+
+    .mat-icon {
+      color: var(--fb-danger);
+    }
+  }
+}
+
+.fb-enroll__result-title {
+  max-width: 400px;
+  margin: 0;
+  font-size: var(--fb-text-2xl);
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  text-wrap: pretty;
+}
+
+.fb-enroll__result-text {
+  max-width: 380px;
+  margin: 0;
+  font-size: var(--fb-text-base-plus);
+  line-height: 1.55;
+  color: var(--fb-text-3);
+  text-wrap: pretty;
+}
+
+.fb-enroll__app-link {
+  flex: none;
+  margin-top: var(--fb-space-2);
+  padding: 0 22px;
+}
+
+// Phones: only the current step keeps a visible label; the others stay readable for screen readers.
+@media (max-width: 480px) {
+  .fb-steps,
+  .fb-steps__item {
+    gap: var(--fb-space-2);
+  }
+
+  .fb-steps__line {
+    min-width: 6px;
+  }
+
+  .fb-steps__label:not(.fb-steps__label--current) {
     position: absolute;
-    top: 20%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 3;
-}
-
-.overlay {
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    position: absolute;
-    z-index: 2;
-    backdrop-filter: blur(1px);
-    background-color: rgb(1 1 1 / 60%);
-}
-
-.paymentResilation{
-    font-size: 11px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
 }

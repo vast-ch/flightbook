@@ -17,6 +17,10 @@
             "subject": "{school}: Inscription: {date}",
             "contentCanParticipate": "<p>Quelqu'un s'est désinscrit pour le rendez-vous du {date}. Vous pouvez maintenant participer.</p><p>Informations</p><ul> <li>Date: {date}</li>{type}<li>Point de rencontre: {meetingPoint}</li><li>Description: {description}</li><li>Max participants: {maxPeople}</li></ul>",
             "contentMovedUp": "<p>Quelqu'un s'est désinscrit pour le rendez-vous du {date}. Vous êtes passé à la position {position} sur la liste d'attente.</p><p>Informations</p><ul> <li>Date: {date}</li>{type}<li>Point de rencontre: {meetingPoint}</li><li>Description: {description}</li><li>Max participants: {maxPeople}</li></ul>"
+        },
+        "deleted": {
+            "subject": "{school}: Rendez-vous du {date} supprimé",
+            "content": "<p>{school} a supprimé le rendez-vous du {date}. Ton inscription n'est donc plus valable.</p>{message}<p>Informations</p><ul> <li>Date: {date}</li>{type}<li>Point de rencontre: {meetingPoint}</li></ul>"
         }
     },
     "enrollment": {

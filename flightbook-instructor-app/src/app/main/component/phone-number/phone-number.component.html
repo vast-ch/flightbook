@@ -1,5 +1,5 @@
 <div [formGroup]="phoneForm" class="phone-number-container">
-  <mat-form-field>
+  <mat-form-field appearance="outline" subscriptSizing="dynamic">
     <mat-label>{{ 'account.prefix' | translate }}</mat-label>
     <mat-select formControlName="prefix">
       @for (prefix of prefixes; track prefix.prefix) {
@@ -8,7 +8,7 @@
     </mat-select>
   </mat-form-field>
 
-  <mat-form-field>
+  <mat-form-field appearance="outline" subscriptSizing="dynamic">
     <mat-label>{{ 'account.phone' | translate }}</mat-label>
     <input matInput 
            formControlName="phone" 

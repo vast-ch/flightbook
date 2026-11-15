@@ -313,6 +313,7 @@ exports[`Instructor Flight Validation (e2e) /instructor/schools/:school_id/stude
       "configuration": {
         "schoolModule": {
           "active": true,
+          "trialEnabled": true,
           "userCanEditControlSheet": true,
           "validateFlights": true,
         },

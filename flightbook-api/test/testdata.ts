@@ -222,6 +222,7 @@ export class Testdata {
         school.configuration = {
             schoolModule: {
                 active: true,
+                trialEnabled: true,
                 validateFlights: true,
                 userCanEditControlSheet: true,
             },

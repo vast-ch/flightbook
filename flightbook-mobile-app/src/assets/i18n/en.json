@@ -393,6 +393,8 @@
         "commentHint": "Show your comment",
         "waitingList": "Waiting list",
         "noAppointment": "There are currently no dates for this flight school",
+        "deletedTitle": "Appointment deleted",
+        "deletedMessage": "The flight school has deleted an appointment you were registered for.",
         "type": "Type",
         "upcoming": "Upcoming",
         "past": "Past",

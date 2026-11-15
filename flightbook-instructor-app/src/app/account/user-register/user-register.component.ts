@@ -19,6 +19,7 @@ export class UserRegisterComponent implements OnInit, OnDestroy {
 
   form: UntypedFormGroup;
   registerInvalid = false;
+  showPassword = false;
 
   constructor(
     private fb: UntypedFormBuilder,

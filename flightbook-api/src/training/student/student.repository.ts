@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { Student } from './student.entity';
 
 @Injectable()
@@ -88,6 +88,29 @@ export class StudentRepository extends Repository<Student> {
             }
         };
         return this.repository.find(options);
+    }
+
+    /** Students of the school with these user emails — archived or not, with or
+     *  without appointment access. Used for waiting-list calculation: a
+     *  subscription keeps its place whatever happened to the student afterwards. */
+    async getStudentsBySchoolIdAndUserEmails(schoolId: number, emails: string[]): Promise<Student[]> {
+        if (emails.length === 0) {
+            return [];
+        }
+        return this.repository.find({
+            relations: {
+                user: true,
+                school: true
+            },
+            where: {
+                school: {
+                    id: schoolId
+                },
+                user: {
+                    email: In(emails)
+                }
+            }
+        });
     }
 
     async getAppointmentActiveStudentsBySchoolId(schoolId: number): Promise<Student[]> {

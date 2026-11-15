@@ -51,9 +51,15 @@ npm run stack:down
   put it in `localStorage.access_token`, so Keycloak is never needed. The real
   login screen is only screenshotted, not exercised.
 - **Seed data** lives in `tests/seed-data.js`, shared by the seeder and the
-  assertions.
+  assertions. Places, gliders and flights go through the API; the school side
+  (school, instructor, student + control sheet, appointments with a
+  subscription, tandem pilot + passenger confirmations, emergency contact) has
+  no student-facing create endpoints, so `stack/seed.mjs` inserts it as SQL.
+  Appointments are relative to the database's "today".
 - **Stability:** fixed clock (2026-10-22), `en` locale, Europe/Zurich, Ionic
-  animations off, one worker.
+  animations off, one worker, no network beyond localhost (map tiles get a
+  blank image). `screenshot.css` hides focus indicators while capturing:
+  where Ionic puts focus in an opened overlay is a race.
 - **Baselines** (`__screenshots__/`) are not committed: they depend on the
   machine's Chrome and fonts, and `compare.sh` regenerates them from the base
   ref every time.
@@ -61,7 +67,6 @@ npm run stack:down
 ## Known
 
 - The control sheet logs `Cannot read properties of null (reading
-  'altitudeFlight')` for a user without a control sheet — a pre-existing app
-  bug, allow-listed in `routes.spec.ts`.
-- Not covered yet: school / appointment / tandem screens (need school data in
-  the seed), native Capacitor plugins.
+  'altitudeFlight')` for a user *without* a control sheet — a pre-existing app
+  bug. The seeded user has one, so the suite doesn't hit it.
+- Not covered: native Capacitor plugins, the instructor-side views.

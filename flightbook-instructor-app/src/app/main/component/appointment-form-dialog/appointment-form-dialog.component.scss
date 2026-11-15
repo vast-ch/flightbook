@@ -1,24 +1,305 @@
+@use '@angular/material' as mat;
+
+// Dialog-scoped styling - documented exception to the shared-partial rule (CONTRACT tier 2):
+// the CDK overlay renders outside .fb-appointment-page, into .cdk-overlay-container appended
+// to <body>, so page-scoped rules can never reach it. Component styles travel with the
+// template wherever it mounts, so this works the same way email-dialog.component.scss does.
+//
+// No wrapper class needed here: this is a component stylesheet (default
+// ViewEncapsulation.Emulated), so Angular already scopes these rules to this component's
+// template - the class-wrapping technique is only needed for the global partials
+// (_appointment-page.scss / _student-page.scss).
+[mat-dialog-title] {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--fb-ink);
+}
+
 mat-form-field {
-    width: 100%;
+  width: 100%;
+  // Label-clipping fix, verbatim from email-dialog.component.scss: an outlined/filled
+  // field's floated label sits above the field's top edge, and Material zeroes the dialog
+  // content's top padding when it follows a mat-dialog-title, leaving no clearance for it.
+  padding-top: 5px;
+
+  @include mat.form-field-overrides(
+    (
+      container-height: 40px,
+      container-vertical-padding: 8px,
+      // Outlined fields default to corner-extra-small (4px, verified in
+      // _m3-form-field.scss); the mockup's bordered box wants 9px.
+      outlined-container-shape: 9px,
+    )
+  );
 }
 
-.subscribe-student {
-    margin-left: 15px;
+.fb-form-row {
+  display: flex;
+  gap: 14px;
 }
 
-.subscription-list {
-    margin-left: 30px;
+mat-dialog-actions {
+  background: var(--fb-fill-subtle);
+  border-top: 1px solid var(--fb-surface-variant);
 }
 
-.subscription-form-field {
-    width: fit-content;
+// Pushes Delete to the left edge; Cancel / Save keep their place on the right.
+.fb-actions-spacer {
+  flex: 1;
 }
 
-.guestSubscription-form-field {
-    width: 40%;
-    margin-right: 5px;
+.fb-delete-button,
+.fb-delete-confirm__keep,
+.fb-delete-confirm__delete {
+  height: 36px;
+  padding: 0 15px;
+  border-radius: var(--fb-radius-md);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 2px solid var(--fb-focus-ring);
+    outline-offset: 2px;
+  }
 }
 
-.guestSubscription-form {
-    margin-top: 10px;
+.fb-delete-button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 12px;
+  border: 1px solid var(--fb-danger-border);
+  background: var(--fb-surface);
+  color: var(--fb-danger);
+
+  &:hover {
+    background: var(--fb-danger-bg);
+  }
+
+  .mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+}
+
+// Replaces the footer while the instructor confirms: same slot, so the form above stays put.
+.fb-delete-confirm {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px 24px 18px;
+  background: var(--fb-danger-bg);
+  border-top: 1px solid var(--fb-danger-border);
+}
+
+.fb-delete-confirm__head {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+
+  .mat-icon {
+    flex: none;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    color: var(--fb-danger);
+  }
+}
+
+.fb-delete-confirm__text {
+  flex: 1;
+  min-width: 0;
+}
+
+.fb-delete-confirm__title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--fb-ink);
+}
+
+.fb-delete-confirm__summary {
+  margin-top: 4px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--fb-on-danger-bg);
+}
+
+.fb-delete-confirm__message {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  span {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--fb-on-danger-bg);
+  }
+
+  textarea {
+    box-sizing: border-box;
+    padding: 9px 11px;
+    border: 1px solid var(--fb-danger-border);
+    border-radius: var(--fb-radius-md);
+    background: var(--fb-surface);
+    font: inherit;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--fb-ink);
+    resize: vertical;
+
+    &:focus-visible {
+      outline: 2px solid var(--fb-focus-ring);
+      outline-offset: 1px;
+    }
+  }
+}
+
+.fb-delete-confirm__actions {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.fb-delete-confirm__keep {
+  border: 1px solid var(--fb-border-subtle);
+  background: var(--fb-surface);
+  color: var(--fb-text-2);
+
+  &:hover {
+    background: var(--fb-fill-subtle);
+  }
+}
+
+.fb-delete-confirm__delete {
+  border: 0;
+  background: var(--fb-danger);
+  color: var(--fb-on-danger);
+
+  &:hover {
+    background: var(--fb-danger-active);
+  }
+}
+
+.fb-subscription-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 4px;
+  border-top: 1px solid var(--fb-surface-variant);
+
+  // Keeps the last row and the next section's rule apart: subscripts are collapsed here.
+  & + & {
+    margin-top: 14px;
+  }
+}
+
+.fb-subscription-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.fb-subscription-title {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--fb-ink);
+}
+
+.fb-subscription-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+
+  mat-form-field {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+// An existing subscription: the subscriber is fixed (remove + re-add to change),
+// so it is plain text, aligned with the 40px field box of the select rows.
+.fb-subscription-name {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  min-height: 40px;
+  margin-top: 5px;
+  padding: 0 16px;
+  border: 1px solid var(--fb-border-subtle);
+  border-radius: var(--fb-radius-md);
+  background: var(--fb-surface-lowest);
+  color: var(--fb-ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fb-subscription-add,
+.fb-subscription-remove {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border-radius: 50%;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 2px solid var(--fb-focus-ring);
+    outline-offset: 2px;
+  }
+
+  .mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.fb-subscription-add {
+  border: 0;
+  background: var(--fb-primary);
+
+  &:hover {
+    background: var(--fb-primary-hover);
+  }
+
+  // Disabled until the student list has loaded.
+  &:disabled {
+    background: var(--fb-disabled-bg);
+    cursor: default;
+
+    .mat-icon {
+      color: var(--fb-disabled-fg);
+    }
+  }
+
+  .mat-icon {
+    color: var(--mat-sys-on-primary);
+  }
+}
+
+.fb-subscription-remove {
+  // Centres on the 40px field box, which sits below the field's 5px padding-top.
+  margin-top: 9px;
+  border: 1px solid var(--fb-danger-border);
+  background: var(--fb-surface);
+
+  &:hover {
+    background: var(--fb-danger-bg);
+  }
+
+  .mat-icon {
+    color: var(--fb-danger);
+  }
 }

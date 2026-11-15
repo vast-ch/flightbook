@@ -3,6 +3,10 @@ import fs from 'node:fs';
 import { API_URL } from './seed-data.js';
 
 const TOKEN_FILE = new URL('../.auth/token.txt', import.meta.url);
+const BLANK_PNG = Buffer.from(
+  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=',
+  'base64',
+);
 
 export function token(): string {
   if (!fs.existsSync(TOKEN_FILE)) throw new Error('No e2e token — run `npm run stack:up` first.');
@@ -39,6 +43,14 @@ export const test = base.extend<Fixtures>({
   },
 
   page: async ({ page, loggedIn }, use) => {
+    // Nothing leaves the machine: map tiles (OpenStreetMap) and any other
+    // external request would make screenshots slow, flaky and dependent on
+    // someone else's server. Images get a transparent pixel, the rest fails.
+    await page.route(/^https?:\/\/(?!localhost[:/]|127\.0\.0\.1[:/])/, (route) =>
+      route.request().resourceType() === 'image'
+        ? route.fulfill({ contentType: 'image/png', body: BLANK_PNG })
+        : route.abort('blockedbyclient'),
+    );
     // A fixed clock keeps "today" (date pickers, default flight date) stable
     // between the baseline run and the run under test.
     await page.clock.setFixedTime(new Date('2026-10-22T10:00:00+02:00'));
@@ -56,12 +68,14 @@ export const test = base.extend<Fixtures>({
 
 /** Navigates and waits until the app has rendered and stopped fetching. */
 export async function open(page: Page, path: string) {
-  await page.goto(path, { waitUntil: 'networkidle' });
+  await page.goto(path, { waitUntil: 'load' });
   await settle(page);
 }
 
 export async function settle(page: Page) {
-  await page.waitForLoadState('networkidle');
+  // Capped: a cold first load once kept the network busy past the whole test
+  // timeout. Anything that matters is asserted on afterwards anyway.
+  await page.waitForLoadState('networkidle', { timeout: 10_000 }).catch(() => {});
   // Ionic hydrates components and fonts land a beat after networkidle.
   await page.evaluate(() => document.fonts.ready);
   await page.waitForTimeout(400);

@@ -1,5 +1,6 @@
 import { HttpService } from '@nestjs/axios';
 import { Injectable, Logger } from '@nestjs/common';
+import { OnEvent } from '@nestjs/event-emitter';
 import { firstValueFrom } from 'rxjs';
 import { PaymentStatusDto } from './interface/payment-status-dto';
 import Stripe from 'stripe';
@@ -9,6 +10,8 @@ import { PaymentException } from './exception/payment.exception';
 import { EmailService } from '../email/email.service';
 import { PaymentState } from './paymentState';
 import { User } from '../user/domain/user.entity';
+import { USER_EMAIL_CHANGED, UserEmailChangedEvent } from '../user/event/user-email-changed.event';
+import { EnrollmentFacade } from '../training/enrollment/enrollment.facade';
 
 @Injectable()
 export class PaymentFacade {
@@ -18,7 +21,8 @@ export class PaymentFacade {
     constructor(
         private readonly httpService: HttpService,
         private readonly userRepository: UserRepository,
-        private readonly emailService: EmailService
+        private readonly emailService: EmailService,
+        private readonly enrollmentFacade: EnrollmentFacade
     ) {
         this.stripe = new Stripe(env.STRIPE_SECRET_KEY, {
             apiVersion: '2025-08-27.basil',
@@ -26,17 +30,25 @@ export class PaymentFacade {
         this.endpointSecret = env.STRIPE_ENDPOINT_SECRET;
     }
 
-    async getStripeSession(userId: number, callbackUrl: string, lang: string): Promise<any> {
+    async getStripeSession(userId: number, callbackUrl: string, lang: string, enrollmentToken?: string): Promise<any> {
+        // If enrollmentToken is provided, get the school and set trialDays
+        let trialDays = 0;
+        if (enrollmentToken) {
+            trialDays = (await this.enrollmentFacade.isTrialEnabled(enrollmentToken))
+                   ? Number(env.STRIPE_TRIAL_DAYS ?? 60)
+                   : 0;
+        }
+
         const user = await this.userRepository.getUserById(userId);
 
         // Map your application's language code to a valid Stripe locale
         const validLocales = [
             'de', 'en', 'fr', 'it'
         ];
-        
+
         // Default to 'en' if the provided language isn't supported by Stripe
         let stripeLocale = 'en';
-        
+
         // If the provided lang is valid for Stripe, use it
         if (validLocales.includes(lang)) {
             stripeLocale = lang;
@@ -47,22 +59,32 @@ export class PaymentFacade {
             email: user.email,
             limit: 1
         });
+        const existingCustomer = existingCustomers.data[0];
 
         const sessionParam: Stripe.Checkout.SessionCreateParams = {
             locale: stripeLocale as Stripe.Checkout.SessionCreateParams.Locale,
             payment_method_types: ['card'],
-            line_items: [{
-                price: env.STRIPE_PRICE,
-                quantity: 1,
-            }],
+            line_items: [
+                {
+                    price: env.STRIPE_PRICE,
+                    quantity: 1,
+                },
+                // Add trial fee line item only if trialDays > 0
+                ...(trialDays > 0
+                    ? [{ price: env.STRIPE_TRIAL_FEE_PRICE, quantity: 1 }]
+                    : []),
+            ],
             mode: 'subscription',
+            // Conditionally add subscription_data only if trialDays > 0
+            ...(trialDays > 0 && { subscription_data: { trial_period_days: trialDays } }),
             success_url: `${callbackUrl}/success`,
             cancel_url: `${callbackUrl}/cancel`,
             client_reference_id: userId.toString(),
-            allow_promotion_codes: true,
+            // A discount code would be consumed by the trial fee invoice instead of the yearly price
+            allow_promotion_codes: trialDays === 0,
             // Conditionally set either customer or customer_email
-            ...(existingCustomers.data.length > 0 
-                ? { customer: existingCustomers.data[0].id }
+            ...(existingCustomer
+                ? { customer: existingCustomer.id }
                 : { customer_email: user.email }
             )
         };
@@ -76,12 +98,12 @@ export class PaymentFacade {
             return null;
         }
 
-        const stripeCustomerList = await this.stripe.customers.list({email: user.email});
+        const stripeCustomerList = await this.stripe.customers.list({ email: user.email });
         return stripeCustomerList.data[0] ?? null;
     }
 
     private async findStripeSubscriptionForCustomer(customerId: string): Promise<Stripe.Subscription | null> {
-        const stripeSubscriptionList = await this.stripe.subscriptions.list({customer: customerId});
+        const stripeSubscriptionList = await this.stripe.subscriptions.list({ customer: customerId });
         return stripeSubscriptionList.data[0] ?? null;
     }
 
@@ -164,6 +186,11 @@ export class PaymentFacade {
 
     }
 
+    @OnEvent(USER_EMAIL_CHANGED)
+    async handleUserEmailChanged(event: UserEmailChangedEvent) {
+        await this.updatePaymentUser(event.user, event.oldEmail);
+    }
+
     async updatePaymentUser(user: User, oldEmail: string) {
         try {
             // TODO Check store (Stripe, IOs, Android) -> not yet necessary
@@ -171,12 +198,12 @@ export class PaymentFacade {
                 email: oldEmail,
             });
 
-            customers.data.forEach((customer: Stripe.Customer) => {
+            await Promise.all(customers.data.map((customer: Stripe.Customer) =>
                 this.stripe.customers.update(
                     customer.id,
-                    {email: user.email}
-                );
-            });
+                    { email: user.email }
+                )
+            ));
         } catch (e: any) {
             Logger.error(`Error update payment email for user id ${user.id} with old email ${oldEmail} and new email ${user.email}`);
             this.emailService.sendErrorMessageToAdmin('Error update payment email', `Error update payment email for user id ${user.id} with old email ${oldEmail} and new email ${user.email}`);

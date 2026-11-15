@@ -9,6 +9,7 @@ exports[`Schools (e2e) /schools (POST) 1`] = `
     "schoolModule": {
       "active": true,
       "commentsOnSubscription": true,
+      "trialEnabled": false,
       "userCanEditControlSheet": true,
       "validateFlights": true,
     },
@@ -33,6 +34,7 @@ exports[`Schools (e2e) /schools (POST) 2`] = `
     "schoolModule": {
       "active": true,
       "commentsOnSubscription": true,
+      "trialEnabled": false,
       "userCanEditControlSheet": true,
       "validateFlights": true,
     },
@@ -76,6 +78,7 @@ exports[`Schools (e2e) /schools/configuration (PUT) 1`] = `
   "configuration": {
     "schoolModule": {
       "active": false,
+      "trialEnabled": true,
       "userCanEditControlSheet": false,
       "validateFlights": false,
     },
@@ -129,6 +132,7 @@ exports[`Schools (e2e) /schools/configuration (PUT) 2`] = `
   "configuration": {
     "schoolModule": {
       "active": false,
+      "trialEnabled": true,
       "userCanEditControlSheet": false,
       "validateFlights": false,
     },
@@ -526,6 +530,7 @@ exports[`Schools tandem pilots (e2e) /schools/:id/tandem-pilots/:tandemPilotId/f
       "configuration": {
         "schoolModule": {
           "active": true,
+          "trialEnabled": true,
           "userCanEditControlSheet": true,
           "validateFlights": true,
         },
@@ -600,6 +605,7 @@ exports[`Schools tandem pilots (e2e) /schools/:id/tandem-pilots/:tandemPilotId/p
       "configuration": {
         "schoolModule": {
           "active": true,
+          "trialEnabled": true,
           "userCanEditControlSheet": true,
           "validateFlights": true,
         },
@@ -657,6 +663,7 @@ exports[`Student schools (e2e) /student/schools (GET) 1`] = `
     "configuration": {
       "schoolModule": {
         "active": true,
+        "trialEnabled": true,
         "userCanEditControlSheet": true,
         "validateFlights": true,
       },
@@ -712,6 +719,7 @@ exports[`instructor schools (e2e) /instructor/schools (GET) 1`] = `
     "configuration": {
       "schoolModule": {
         "active": true,
+        "trialEnabled": true,
         "userCanEditControlSheet": true,
         "validateFlights": true,
       },
@@ -762,6 +770,7 @@ exports[`instructor schools (e2e) /instructor/schools (GET) 1`] = `
     "configuration": {
       "schoolModule": {
         "active": true,
+        "trialEnabled": true,
         "userCanEditControlSheet": true,
         "validateFlights": true,
       },

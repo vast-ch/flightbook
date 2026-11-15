@@ -112,6 +112,11 @@ export class SchoolModuleDto {
   @IsOptional()
   @IsBoolean()
   commentsOnSubscription?: boolean;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsBoolean()
+  trialEnabled?: boolean;
 }
 
 @Expose()

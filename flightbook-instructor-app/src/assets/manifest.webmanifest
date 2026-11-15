@@ -1,7 +1,7 @@
 {
   "name": "Flightbook Instructor",
   "short_name": "Instructor",
-  "theme_color": "#3880ff",
+  "theme_color": "#0b76c2",
   "background_color": "#43B1FD",
   "display": "standalone",
   "scope": "/",

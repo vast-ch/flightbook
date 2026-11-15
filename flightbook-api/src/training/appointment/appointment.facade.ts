@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { AppointmentDto } from "./interface/appointment-dto";
+import { AppointmentDeleteDto } from "./interface/appointment-delete-dto";
 import { plainToInstance } from "class-transformer";
 import { Appointment } from "./appointment.entity";
 import { AppointmentRepository } from "./appointment.repository";
@@ -51,6 +52,7 @@ export class AppointmentFacade {
     ) { }
 
     async createAppointment(schoolId: number, appointmentDto: AppointmentDto): Promise<AppointmentDto> {
+        this.subscriptionsValidityCheck(appointmentDto);
         let appointment: Appointment = plainToInstance(Appointment, appointmentDto);
         await this.appointmentValidityCheck(appointmentDto, schoolId, appointment);
 
@@ -85,10 +87,24 @@ export class AppointmentFacade {
     }
 
     async updateAppointment(id: number, schoolId: number, appointmentDto: AppointmentDto): Promise<AppointmentDto> {
+        // Validate before touching anything: a subscription without a user would
+        // otherwise be treated as "removed" and deleted before the update fails.
+        this.subscriptionsValidityCheck(appointmentDto);
         let appointment: Appointment = await this.appointmentRepository.getAppointmentById(id);
         await this.appointmentValidityCheck(appointmentDto, schoolId, appointment);
 
         const previousState = appointment.state;
+
+        // Subscribers and waiting list before the change, to inform afterwards the
+        // students who were added or moved up.
+        const previousSubscriberEmails = new Set(appointment.subscriptions.map((subscription: Subscription) => subscription.user.email));
+        const students = await this.studentRepository.getStudentsBySchoolIdAndUserEmails(schoolId, [
+            ...appointment.subscriptions.map((subscription: Subscription) => subscription.user.email),
+            ...appointmentDto.subscriptions.map((subscriptionDto: SubscriptionDto) => subscriptionDto.user.email),
+        ]);
+        const previousWaitingListPositions = this.waitingListPositions(
+            this.calculateWaitingList(appointment.subscriptions, appointment.maxPeople, students).entries
+        );
 
         appointment.description = appointmentDto.description;
         appointment.maxPeople = appointmentDto.maxPeople;
@@ -106,7 +122,6 @@ export class AppointmentFacade {
 
         subscriptionsToRemove.forEach((subscription: Subscription) => {
             appointment.removeUserSubscription(subscription.user.id);
-            this.subscriptionRepository.remove(subscription);
         });
 
         // add new subscriptions
@@ -118,15 +133,18 @@ export class AppointmentFacade {
         });
 
         // Update or clear removed guestsubscriptions
+        const guestSubscriptionsToRemove: GuestSubscription[] = [];
         appointment.guestSubscriptions.forEach((guestSubscription: GuestSubscription) => {
             const guestSubscriptionDto = appointmentDto.guestSubscriptions.find((guestSubscriptionDto: GuestSubscriptionDto) => guestSubscriptionDto.id === guestSubscription.id);
             if (guestSubscriptionDto) {
                 guestSubscription.firstname = guestSubscriptionDto.firstname;
                 guestSubscription.lastname = guestSubscriptionDto.lastname;
             } else {
-                appointment.removeGuestUserSubscription(guestSubscription.id);
-                this.guestSubscriptionRepository.remove(guestSubscription);
+                guestSubscriptionsToRemove.push(guestSubscription);
             }
+        });
+        guestSubscriptionsToRemove.forEach((guestSubscription: GuestSubscription) => {
+            appointment.removeGuestUserSubscription(guestSubscription.id);
         });
 
         // add new guest subscriptions
@@ -137,11 +155,33 @@ export class AppointmentFacade {
             }
         });
 
+        // Removals and the update succeed or fail together.
+        const appointmentResp: Appointment = await this.appointmentRepository.manager.transaction(async (entityManager) => {
+            if (subscriptionsToRemove.length > 0) {
+                await entityManager.remove(subscriptionsToRemove);
+            }
+            if (guestSubscriptionsToRemove.length > 0) {
+                await entityManager.remove(guestSubscriptionsToRemove);
+            }
+            return await entityManager.save(appointment);
+        });
+
         if (previousState != appointmentDto.state) {
-            this.notificationsService.sendAppointmentStateChanged(appointment);
+            this.notificationsService.sendAppointmentStateChanged(appointmentResp);
         }
 
-        const appointmentResp: Appointment = await this.appointmentRepository.save(appointment);
+        const { entries } = this.calculateWaitingList(appointmentResp.subscriptions, appointmentResp.maxPeople, students);
+        this.notifyWaitingListChanges(plainToInstance(SchoolDto, appointmentResp.school), appointmentResp, previousWaitingListPositions, entries);
+
+        // Students the instructor added who got a place are informed of their subscription
+        // (those on the waiting list are informed once they move up).
+        const addedStudentsWithPlace = entries
+            .filter((entry, index) => !entry.waitingList && entry.student && !previousSubscriberEmails.has(appointmentResp.subscriptions[index].user.email))
+            .map((entry) => entry.student);
+        if (addedStudentsWithPlace.length > 0) {
+            this.emailService.sendAppointmentSubscription(addedStudentsWithPlace, appointmentResp);
+            this.notificationsService.sendAppointmentSubscription(addedStudentsWithPlace, appointmentResp);
+        }
 
         // Sync to Google Calendar
         try {
@@ -151,6 +191,40 @@ export class AppointmentFacade {
         }
 
         return await this.generateWaitingList(AppointmentMapper.toAppointmentDto(appointmentResp), schoolId);
+    }
+
+    async deleteAppointment(id: number, schoolId: number, appointmentDeleteDto?: AppointmentDeleteDto): Promise<void> {
+        const appointment: Appointment = await this.appointmentRepository.getAppointmentById(id);
+
+        // The school guard only proves the caller belongs to the school in the URL.
+        if (appointment.school.id != schoolId) {
+            throw AppointmentException.notFound();
+        }
+
+        // Kept aside: removing the entities below strips their ids.
+        const appointmentId = appointment.id;
+        const subscriptions: Subscription[] = [...appointment.subscriptions];
+        const isUpcoming = new Date(appointment.scheduling).getTime() > Date.now();
+
+        // Subscriptions reference the appointment (RESTRICT), so they go first; all or nothing.
+        await this.appointmentRepository.manager.transaction(async (entityManager) => {
+            await entityManager.delete(Subscription, { appointment: { id: appointmentId } });
+            await entityManager.delete(GuestSubscription, { appointment: { id: appointmentId } });
+            await entityManager.delete(Appointment, { id: appointmentId });
+        });
+
+        try {
+            await this.deleteAppointmentInGoogleCalendar(appointment);
+        } catch (error) {
+            Logger.error('Failed to delete appointment in Google Calendar', error);
+        }
+
+        // Nobody needs to hear that an appointment which already took place was cleaned up.
+        if (isUpcoming && subscriptions.length > 0) {
+            const message = appointmentDeleteDto?.message?.trim() || undefined;
+            this.emailService.sendAppointmentDeleted(appointment, subscriptions, message);
+            this.notificationsService.sendAppointmentDeleted(appointment, subscriptions, message);
+        }
     }
 
     async addSubscriptionToAppointment(appointmentId: number, userId: number, comment?: string): Promise<AppointmentDto> {
@@ -197,20 +271,13 @@ export class AppointmentFacade {
 
         if (appointment.subscriptions) {
             // Only for EMC student subscription - After migrate Subscription user to student the student request can be removed
-            const students = await this.studentRepository.getAppointmentActiveStudentsBySchoolId(school.id);
-            const waitingListPositions = new Map<string, number>();
-            let countSubscription = 0;
-            let waitingListPosition = 0;
-
-            appointment.subscriptions.forEach((subscription: Subscription) => {
-                const foundStudent = students.find((student: Student) => student.user.email === subscription.user.email);
-                if (appointment.maxPeople && (countSubscription + foundStudent.getUsedPlaces()) > appointment.maxPeople) {
-                    waitingListPosition++;
-                    waitingListPositions.set(subscription.user.email, waitingListPosition);
-                } else {
-                    countSubscription += foundStudent.getUsedPlaces();
-                }
-            });
+            const students = await this.studentRepository.getStudentsBySchoolIdAndUserEmails(
+                school.id,
+                appointment.subscriptions.map((subscription: Subscription) => subscription.user.email)
+            );
+            const previousWaitingListPositions = this.waitingListPositions(
+                this.calculateWaitingList(appointment.subscriptions, appointment.maxPeople, students).entries
+            );
 
             const subscriptionToDelete = appointment.removeUserSubscription(userId);
             if (!subscriptionToDelete) {
@@ -219,27 +286,12 @@ export class AppointmentFacade {
 
             await this.subscriptionRepository.remove(subscriptionToDelete);
 
-            countSubscription = 0;
-            waitingListPosition = 0;
-
-            appointment.subscriptions.forEach((subscription: Subscription) => {
-                const foundStudent = students.find((student: Student) => student.user.email === subscription.user.email);
-
-                if (appointment.maxPeople && (countSubscription + foundStudent.getUsedPlaces()) > appointment.maxPeople) {
-                    waitingListPosition++;
-                    const previousPosition = waitingListPositions.get(subscription.user.email);
-                    if (previousPosition && waitingListPosition < previousPosition) {
-                        this.emailService.sendInformWaitingStudent(school, appointment, subscription, waitingListPosition, false);
-                        this.notificationsService.sendInformWaitingStudent(appointment, subscription, waitingListPosition, false);
-                    }
-                } else {
-                    countSubscription += foundStudent.getUsedPlaces();
-                    if (waitingListPositions.has(subscription.user.email)) {
-                        this.emailService.sendInformWaitingStudent(school, appointment, subscription, 0, true);
-                        this.notificationsService.sendInformWaitingStudent(appointment, subscription, 0, true);
-                    }
-                }
-            });
+            this.notifyWaitingListChanges(
+                school,
+                appointment,
+                previousWaitingListPositions,
+                this.calculateWaitingList(appointment.subscriptions, appointment.maxPeople, students).entries
+            );
             this.emailService.sendUnsubscribeEmail(school, appointment, subscriptionToDelete);
         }
         return AppointmentMapper.toAppointmentDto(appointment);
@@ -278,6 +330,13 @@ export class AppointmentFacade {
     async getAppointmentById(id: number): Promise<AppointmentDto> {
         const appointment = await this.appointmentRepository.getAppointmentById(id);
         return await this.generateWaitingList(AppointmentMapper.toAppointmentDto(appointment), appointment.school.id);
+    }
+
+    private subscriptionsValidityCheck(appointmentDto: AppointmentDto) {
+        const subscriptions = appointmentDto.subscriptions ?? [];
+        if (subscriptions.some((subscriptionDto: SubscriptionDto) => !subscriptionDto?.user?.email)) {
+            AppointmentException.invalidSubscription();
+        }
     }
 
     private async appointmentValidityCheck(appointmentDto: AppointmentDto, schoolId: number, appointment: Appointment) {
@@ -326,34 +385,100 @@ export class AppointmentFacade {
         }
     }
 
+    /**
+     * Walks the subscriptions in order and decides who has a place and who is on the
+     * waiting list. Every subscription counts — a student archived after subscribing
+     * keeps their place; a subscriber without student record takes one place.
+     *
+     * Strictly first come, first served: once someone does not fit, everyone after
+     * them waits too (no overtaking). So a cancellation can only move people up and
+     * never takes a place away — even if that leaves a seat free (e.g. a tandem
+     * student needing 2 places when only 1 is left).
+     *
+     * The returned entries are index-aligned with `subscriptions`.
+     */
+    private calculateWaitingList(subscriptions: { user?: { email?: string } }[], maxPeople: number, students: Student[]) {
+        let countSubscription = 0;
+        let countWaitingList = 0;
+        let waitingListPosition = 0;
+        let full = false;
+
+        const entries = subscriptions.map((subscription) => {
+            const email = subscription.user?.email;
+            const student = students.find((s: Student) => s.user.email === email);
+            const usedPlaces = student?.getUsedPlaces() ?? 1;
+
+            if (maxPeople && (full || (countSubscription + usedPlaces) > maxPeople)) {
+                full = true;
+                waitingListPosition++;
+                countWaitingList += usedPlaces;
+                return { email, student, waitingList: true, position: waitingListPosition };
+            }
+            countSubscription += usedPlaces;
+            return { email, student, waitingList: false, position: 0 };
+        });
+
+        return { entries, countSubscription, countWaitingList };
+    }
+
+    /** email → waiting-list position of everyone on the waiting list. */
+    private waitingListPositions(entries: { email?: string; waitingList: boolean; position: number }[]): Map<string, number> {
+        const positions = new Map<string, number>();
+        entries.forEach((entry) => {
+            if (entry.waitingList && entry.email) {
+                positions.set(entry.email, entry.position);
+            }
+        });
+        return positions;
+    }
+
+    /**
+     * Informs students whose waiting-list situation improved: moved to a lower
+     * position, or got a place. Students who were not subscribed before are skipped.
+     * `entries` are index-aligned with `appointment.subscriptions`.
+     */
+    private notifyWaitingListChanges(
+        school: SchoolDto,
+        appointment: Appointment,
+        previousPositions: Map<string, number>,
+        entries: { waitingList: boolean; position: number }[]
+    ) {
+        appointment.subscriptions.forEach((subscription: Subscription, index: number) => {
+            const entry = entries[index];
+            const previousPosition = previousPositions.get(subscription.user.email);
+            if (!previousPosition) {
+                return;
+            }
+            if (!entry.waitingList) {
+                this.emailService.sendInformWaitingStudent(school, appointment, subscription, 0, true);
+                this.notificationsService.sendInformWaitingStudent(appointment, subscription, 0, true);
+            } else if (entry.position < previousPosition) {
+                this.emailService.sendInformWaitingStudent(school, appointment, subscription, entry.position, false);
+                this.notificationsService.sendInformWaitingStudent(appointment, subscription, entry.position, false);
+            }
+        });
+    }
+
     // Overload signatures
     private async generateWaitingList(appointmentDto: AppointmentDto, schoolId: number): Promise<AppointmentDto>;
     private async generateWaitingList(appointmentDtoList: AppointmentDto[], schoolId: number): Promise<AppointmentDto[]>;
 
     private async generateWaitingList(appointmentDtoOrList: AppointmentDto | AppointmentDto[], schoolId: number): Promise<AppointmentDto | AppointmentDto[]> {
         const appointmentDtoList = Array.isArray(appointmentDtoOrList) ? appointmentDtoOrList : [appointmentDtoOrList];
-        // Only for EMC student subscription - After migrate Subscription user to student the student request can be removed
-        const students = await this.studentRepository.getAppointmentActiveStudentsBySchoolId(schoolId);
+        const emails = new Set<string>();
         appointmentDtoList.forEach((appointmentDto: AppointmentDto) => {
-            let countSubscription = 0;
-            let countWaitingList = 0;
-            appointmentDto.subscriptions?.forEach((subscriptionDto: SubscriptionDto) => {
-                const foundStudent = students.find((student: Student) => student.user.email === subscriptionDto.user.email);
-                if (!foundStudent)  {
-                    Logger.debug("Student not found - subscriptionDto", subscriptionDto);
-                    Logger.debug("Student not found - student list", students);
-                    return;
-                }
-                subscriptionDto.waitingList = true;
+            appointmentDto.subscriptions?.forEach((subscriptionDto: SubscriptionDto) => emails.add(subscriptionDto.user.email));
+        });
+        const students = await this.studentRepository.getStudentsBySchoolIdAndUserEmails(schoolId, [...emails]);
 
-                if (appointmentDto.maxPeople && (countSubscription + foundStudent.getUsedPlaces()) > appointmentDto.maxPeople) {
-                    countWaitingList += foundStudent.getUsedPlaces();
-                } else {
-                    countSubscription += foundStudent.getUsedPlaces();
-                    subscriptionDto.waitingList = false;
+        appointmentDtoList.forEach((appointmentDto: AppointmentDto) => {
+            const { entries, countSubscription, countWaitingList } = this.calculateWaitingList(appointmentDto.subscriptions ?? [], appointmentDto.maxPeople, students);
+            appointmentDto.subscriptions?.forEach((subscriptionDto: SubscriptionDto, index: number) => {
+                const entry = entries[index];
+                subscriptionDto.waitingList = entry.waitingList;
+                if (entry.student) {
+                    subscriptionDto.student = StudentMapper.toStudentDto(entry.student, null);
                 }
-
-                subscriptionDto.student = StudentMapper.toStudentDto(foundStudent, null);
             });
             appointmentDto.countSubscription = countSubscription;
             appointmentDto.countGuestSubscription = appointmentDto.guestSubscriptions.length;
@@ -362,17 +487,29 @@ export class AppointmentFacade {
         return appointmentDtoOrList;
     }
 
-    private async createOrUpdateAppointmentInGoogleCalendar(appointment: Appointment): Promise<void> {
-        if (!appointment.school.configuration?.googleCalendar) {
+    private async deleteAppointmentInGoogleCalendar(appointment: Appointment): Promise<void> {
+        if (!appointment.school.configuration?.googleCalendar || !appointment.googleCalendarEventId) {
             return;
         }
 
-        // Check if token needs refresh
+        await this.refreshGoogleCalendarTokenIfExpired(appointment);
+        await this.googleCalendarService.deleteEvent(appointment, appointment.school);
+    }
+
+    private async refreshGoogleCalendarTokenIfExpired(appointment: Appointment): Promise<void> {
         if (this.googleCalendarService.isTokenExpired(appointment.school.configuration.googleCalendar.tokenExpiry)) {
             await this.schoolFacade.refreshGoogleCalendarToken(appointment.school.id);
             // Reload school after token refresh
             appointment.school = await this.schoolRepository.getSchoolById(appointment.school.id);
         }
+    }
+
+    private async createOrUpdateAppointmentInGoogleCalendar(appointment: Appointment): Promise<void> {
+        if (!appointment.school.configuration?.googleCalendar) {
+            return;
+        }
+
+        await this.refreshGoogleCalendarTokenIfExpired(appointment);
 
         // If appointment already has a Google Calendar event ID, update it; otherwise create new
         if (appointment.googleCalendarEventId) {

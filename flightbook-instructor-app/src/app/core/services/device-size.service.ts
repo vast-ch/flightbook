@@ -20,7 +20,7 @@ export class DeviceSizeService {
   }
 
   private checkDeviceSize(width: number) {
-    const isMobile = width < 768;
+    const isMobile = width <= 768;
     this.isMobile.set(isMobile);
   }
 }

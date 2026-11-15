@@ -11,6 +11,7 @@ import { Flight } from '../../flight/domain/flight.entity';
 
 export enum NotificationType {
     APPOINTMENT = "APPOINTMENT",
+    APPOINTMENT_DELETED = "APPOINTMENT_DELETED",
     FLIGHT_VALIDATION_REJECTED = "FLIGHT_VALIDATION_REJECTED",
     FLIGHT_PAYMENT_REJECTED = "FLIGHT_PAYMENT_REJECTED"
   }
@@ -172,6 +173,64 @@ export class NotificationsService {
         this.userRepository.clearNotificationTokens(tokensToDelete);
     }
 
+
+    /** Tells the subscribers (waiting list included) that the appointment no longer exists. */
+    async sendAppointmentDeleted(appointment: Appointment, subscriptions: Subscription[], message?: string) {
+
+        const tokens = subscriptions.filter((subscription: Subscription) => subscription.user.notificationToken)
+            .map((subscription: Subscription) => subscription.user.notificationToken);
+
+        if (tokens.length == 0) {
+            Logger.debug("no notification to send for appointment deletion");
+            return
+        }
+
+        const i18n = I18nContext.current();
+
+        const title: string = i18n.t('notification.appointment.deleted.title', { lang: appointment.school.language });
+        let body: string = i18n.t('notification.appointment.deleted.body', {
+            lang: appointment.school.language,
+            args: {
+                school: appointment.school.name,
+                date: moment(appointment.scheduling).utc().format('DD.MM.YYYY HH:mm'),
+                meetingPoint: appointment.meetingPoint || "-"
+            }
+        });
+        if (message) {
+            body += `\r\n${message}`;
+        }
+
+        const multicastMessage: MulticastMessage = {
+            notification: {
+                title: title,
+                body: body
+            },
+            // No appointmentId: there is nothing left to open. Title and body are
+            // repeated because a notification tapped in the tray does not reliably
+            // hand them to the app, which shows them in an alert.
+            data: {
+                type: NotificationType.APPOINTMENT_DELETED,
+                schoolId: `${appointment.school.id}`,
+                title: title,
+                body: body
+            },
+            tokens: tokens
+        }
+        const tokensToDelete: string[] = [];
+        try {
+            const batchResponse: BatchResponse = await getMessaging().sendEachForMulticast(multicastMessage, process.env.ENV != "prod");
+            Logger.debug(batchResponse);
+            batchResponse.responses.forEach((response: SendResponse, index: number) => {
+                if (!response.success) {
+                    tokensToDelete.push(tokens[index]);
+                }
+            });
+        } catch (e: any) {
+            Logger.error("Firebase sendEachForMulticast error", e);
+        }
+
+        this.userRepository.clearNotificationTokens(tokensToDelete);
+    }
 
     async sendInformWaitingStudent(appointment: Appointment, subscription: Subscription, waitingListPosition: number, canParticipate: boolean) {
 

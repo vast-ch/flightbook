@@ -1,8 +1,5 @@
 export class GoogleCalendarConfig {
-  accessToken?: string;
-  refreshToken?: string;
   calendarId?: string;
-  tokenExpiry?: Date;
 }
 
 export interface CustomFieldDefinition {
@@ -29,6 +26,7 @@ export class SchoolModule {
   validateFlights?: boolean;
   userCanEditControlSheet?: boolean;
   commentsOnSubscription?: boolean;
+  trialEnabled?: boolean;
 }
 
 export class SchoolConfig {

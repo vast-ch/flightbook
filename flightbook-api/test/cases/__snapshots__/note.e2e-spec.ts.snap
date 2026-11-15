@@ -32,6 +32,7 @@ exports[`instructor note (e2e) /instructor/students/:id/notes (POST) 1`] = `
       "configuration": {
         "schoolModule": {
           "active": true,
+          "trialEnabled": true,
           "userCanEditControlSheet": true,
           "validateFlights": true,
         },
@@ -115,6 +116,7 @@ exports[`instructor note (e2e) /instructor/students/:id/notes (PUT) 1`] = `
       "configuration": {
         "schoolModule": {
           "active": true,
+          "trialEnabled": true,
           "userCanEditControlSheet": true,
           "validateFlights": true,
         },

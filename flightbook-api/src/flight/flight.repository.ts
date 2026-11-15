@@ -459,7 +459,7 @@ export class FlightRepository extends Repository<Flight> {
     async countNotValidatedFlights(token: any, isTandem: boolean): Promise<number> {
         return this.createQueryBuilder('flight')
             .leftJoin('flight.glider', 'glider')
-            .where('flight.validation_timestamp IS NULL')
+            .where('flight.validation_state IS NULL')
             .andWhere(`flight.user_id = ${token.userId}`)
             .andWhere(`glider.tandem = ${isTandem}`)
             .getCount();

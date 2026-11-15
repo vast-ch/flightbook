@@ -17,6 +17,10 @@
             "subject": "{school}: Registrazione per: {date}",
             "contentCanParticipate": "<p>Qualcuno ha cancellato la sua partecipazione per {date}. Ora puoi partecipare.</p>",
             "contentMovedUp": "<p>Qualcuno ha cancellato la sua partecipazione per {date}. Sei passato alla posizione {position} nella lista d'attesa.</p>"
+        },
+        "deleted": {
+            "subject": "{school}: Appuntamento del {date} eliminato",
+            "content": "<p>{school} ha eliminato l'appuntamento del {date}. La tua iscrizione non è quindi più valida.</p>{message}<p>Informazioni sull'appuntamento</p><ul><li>Data: {date}</li>{type}<li>Punto d'incontro: {meetingPoint}</li></ul>"
         }
     },
     "invoice": {

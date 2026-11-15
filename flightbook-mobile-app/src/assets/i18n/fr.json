@@ -393,6 +393,8 @@
         "commentHint": "Afficher votre commentaire",
         "waitingList": "Liste d'attente",
         "noAppointment": "Il n'y a actuellement aucune date pour cette école",
+        "deletedTitle": "Rendez-vous supprimé",
+        "deletedMessage": "L'école a supprimé un rendez-vous auquel tu étais inscrit.",
         "type": "Type",
         "upcoming": "À venir",
         "past": "Passés",

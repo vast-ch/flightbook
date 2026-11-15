@@ -1,5 +1,45 @@
+@use '@angular/material' as mat;
+
+// Same look as export-dialog.component (tandem export): the CDK overlay renders outside every
+// page root, so the styling lives with the component.
+[mat-dialog-title] {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--fb-ink);
+}
+
 mat-form-field {
-    width: 100%;
-    display: block;
-    margin-bottom: 16px;
+  display: block;
+  width: 100%;
+  // Material zeroes the dialog content's top padding after a title, so the floated label
+  // needs this clearance to render whole.
+  padding-top: 5px;
+
+  @include mat.form-field-overrides(
+    (
+      container-height: 40px,
+      container-vertical-padding: 8px,
+      outlined-container-shape: 9px,
+    )
+  );
+}
+
+.fb-form-row {
+  display: flex;
+  gap: 14px;
+
+  mat-form-field {
+    flex: 1;
+    min-width: 0;
+  }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 0;
+  }
+}
+
+mat-dialog-actions {
+  background: var(--fb-fill-subtle);
+  border-top: 1px solid var(--fb-surface-variant);
 }

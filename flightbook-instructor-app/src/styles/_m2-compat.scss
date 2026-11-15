@@ -1,0 +1,89 @@
+@use '@angular/material' as mat;
+@use './theme-colors' as theme-colors;
+
+// The M3 theme in styles.scss does not emit `.mat-primary` / `.mat-accent` / `.mat-warn`
+// (those are an M2-only concept - see `get-theme-version($theme) != 1` guards throughout
+// Angular Material's component theme partials). Without this shim every `color="primary"`
+// and `color="warn"` binding across the app (30 + 6 usages, plus 1 toolbar and 4 mat-icon)
+// silently renders unstyled. This file must ship in the same commit as the M3 theme swap.
+//
+// `mat.color-variants-backwards-compatibility` covers most components (icon-button, chips,
+// slide-toggle, tabs, form-field, select, radio, checkbox, progress-bar/spinner, stepper,
+// datepicker, badge, fab) but deliberately skips raised/flat/outlined/text buttons and the
+// toolbar - those are hand-written below.
+$compat-theme: mat.define-theme(
+  (
+    color: (
+      theme-type: light,
+      primary: theme-colors.$primary-palette,
+      tertiary: theme-colors.$tertiary-palette,
+      use-system-variables: true,
+    ),
+  )
+);
+
+html {
+  @include mat.color-variants-backwards-compatibility($compat-theme);
+
+  // Undo M3's pill-shaped buttons (`corner-full`) in favour of the design's 9px radius.
+  // Icon buttons/fabs stay round - they are excluded on purpose.
+  --mat-button-filled-container-shape: 9px;
+  --mat-button-outlined-container-shape: 9px;
+  --mat-button-protected-container-shape: 9px;
+  --mat-button-text-container-shape: 9px;
+  --mat-button-tonal-container-shape: 9px;
+}
+
+// Raised (protected), flat (filled) and outlined/text buttons: color-variants-backwards-
+// compatibility explicitly skips these for the `primary` variant, and only ever handles
+// `.mat-warn` -> `error` the same way, so both need hand-written rules.
+.mat-mdc-raised-button {
+  &.mat-primary {
+    --mat-button-protected-container-color: var(--mat-sys-primary);
+    --mat-button-protected-label-text-color: var(--mat-sys-on-primary);
+  }
+
+  &.mat-warn {
+    --mat-button-protected-container-color: var(--mat-sys-error);
+    --mat-button-protected-label-text-color: var(--mat-sys-on-error);
+  }
+}
+
+.mat-mdc-unelevated-button {
+  &.mat-primary {
+    --mat-button-filled-container-color: var(--mat-sys-primary);
+    --mat-button-filled-label-text-color: var(--mat-sys-on-primary);
+  }
+
+  &.mat-warn {
+    --mat-button-filled-container-color: var(--mat-sys-error);
+    --mat-button-filled-label-text-color: var(--mat-sys-on-error);
+  }
+}
+
+.mat-mdc-outlined-button {
+  &.mat-primary {
+    --mat-button-outlined-label-text-color: var(--mat-sys-primary);
+    --mat-button-outlined-outline-color: var(--mat-sys-primary);
+  }
+
+  &.mat-warn {
+    --mat-button-outlined-label-text-color: var(--mat-sys-error);
+    --mat-button-outlined-outline-color: var(--mat-sys-error);
+  }
+}
+
+.mat-mdc-button {
+  &.mat-primary {
+    --mat-button-text-label-text-color: var(--mat-sys-primary);
+  }
+
+  &.mat-warn {
+    --mat-button-text-label-text-color: var(--mat-sys-error);
+  }
+}
+
+.mat-toolbar.mat-primary {
+  --mat-toolbar-container-background-color: var(--mat-sys-primary);
+  --mat-toolbar-container-text-color: var(--mat-sys-on-primary);
+}

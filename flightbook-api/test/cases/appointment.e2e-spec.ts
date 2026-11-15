@@ -56,6 +56,34 @@ describe('student appointment (e2e)', () => {
       });
   });
 
+  it('/student/schools/:id/appointments/:appointmentId (GET) does not expose Google Calendar tokens', async () => {
+    // given
+    const { studentUser, testSchool, appointments } = await testInstance.createSchoolDataWithAppointment();
+    testSchool.configuration = {
+      ...testSchool.configuration,
+      googleCalendar: {
+        accessToken: 'test-access-token',
+        refreshToken: 'test-refresh-token',
+        calendarId: 'primary',
+        tokenExpiry: new Date(Date.now() + 3600000)
+      }
+    };
+    await testInstance.schoolRepository.save(testSchool);
+
+    const keycloakToken = JwtTestHelper.createKeycloakToken({ sub: studentUser.id, email: studentUser.email });
+
+    //when
+    return request(testInstance.app.getHttpServer())
+      .get(`/student/schools/${testSchool.id}/appointments/${appointments[0].id}`)
+      .set('Authorization', `Bearer ${keycloakToken}`)
+      .expect(200)
+      .then(async (response) => {
+        expect(response.text).not.toContain('test-access-token');
+        expect(response.text).not.toContain('test-refresh-token');
+        expect(response.body.school.configuration.googleCalendar).toEqual({ calendarId: 'primary' });
+      });
+  });
+
   it('/student/schools/:schoolId/appointments/:appointmentId/subscriptions (POST)', async () => {
     // given
     const { studentUser, student, testSchool, appointments } = await testInstance.createSchoolDataWithAppointment();

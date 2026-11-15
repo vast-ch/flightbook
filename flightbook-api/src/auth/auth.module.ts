@@ -13,7 +13,6 @@ import { AuthFacade } from './auth.facade';
 import { EmailService } from '../email/email.service';
 import { HttpModule } from '@nestjs/axios';
 import { UserFacade } from '../user/user.facade';
-import { PaymentFacade } from '../payment/payment-facade';
 import { KeycloakService } from './service/keycloak.service';
 import { KeycloakStrategy } from './strategy/keycloak.strategy';
 import { KeycloakConfig } from './config/keycloak.config';
@@ -47,7 +46,6 @@ import { KeycloakConfig } from './config/keycloak.config';
     AuthFacade, 
     EmailService, 
     UserFacade, 
-    PaymentFacade,
     KeycloakService,
     KeycloakConfig
   ],
