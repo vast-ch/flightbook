@@ -34,10 +34,9 @@ registerLocaleData(italianLocale);
 registerLocaleData(frenchLocale);
 
 function getIonicConfig() {
-  const isAndroid = isPlatform('android');
   return {
     innerHTMLTemplatesEnabled: true,
-    swipeBackEnabled: true  // Only enable on Android
+    swipeBackEnabled: true
   };
 }
 

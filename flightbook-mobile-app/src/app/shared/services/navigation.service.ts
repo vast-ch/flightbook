@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Router, RoutesRecognized } from '@angular/router';
 import { NavController, Platform } from '@ionic/angular';
+import { App } from '@capacitor/app';
+import { Capacitor } from '@capacitor/core';
 
 /**
  * Above Ionic's own hardware-back handler (registered at priority 0 by
@@ -9,6 +11,15 @@ import { NavController, Platform } from '@ionic/angular';
  * button and closes itself instead of triggering a navigation underneath it.
  */
 const BACK_BUTTON_PRIORITY = 10;
+
+/**
+ * Last in line, below Ionic's own router-outlet handler (0): only reached once
+ * nothing - overlay, menu, our fallbacks, Ionic's stack - could use the back
+ * event, i.e. on Home at its root. @capacitor/app's OnBackPressedCallback is
+ * always enabled and never leaves the app by itself, so without this the event
+ * dies and Android's back gesture does nothing on the start screen.
+ */
+const EXIT_BACK_BUTTON_PRIORITY = -1;
 
 /**
  * `<ion-tabs>` (tabs.page.html) renders its own nested `<ion-router-outlet
@@ -43,8 +54,8 @@ const BACK_BUTTON_PRIORITY = 10;
  * the start destination (Home) rather than do nothing, plus `settings`
  * falling back to `more` since it's still a fresh top-level segment. 'home'
  * is deliberately absent: as the start destination, back from there should
- * fall through to the platform default (app minimize/exit), not loop back
- * onto itself.
+ * fall through to the EXIT_BACK_BUTTON_PRIORITY handler (app minimize), not
+ * loop back onto itself.
  */
 const ROOT_SEGMENT_FALLBACKS: Record<string, string> = {
   settings: 'more',
@@ -90,9 +101,20 @@ export class NavigationService {
         return;
       }
       // A real tab root (home, flights, statistics, more) or anything not
-      // listed above - defer to Ionic's own default (priority 0) handler.
+      // listed above - defer to Ionic's own (priority 0) handler, and past
+      // it to the exit handler below.
       processNextHandler();
     });
+
+    // Android only: iOS has no system back gesture and must never leave the
+    // app itself. minimizeApp() rather than exitApp() matches Android 12+,
+    // which backgrounds the root activity instead of finishing it - so the
+    // pilot comes back to Home without a cold boot.
+    if (Capacitor.getPlatform() === 'android') {
+      this.platform.backButton.subscribeWithPriority(EXIT_BACK_BUTTON_PRIORITY, () => {
+        App.minimizeApp();
+      });
+    }
   }
 
   private rootFallback(): string | null {
