@@ -11,6 +11,12 @@
     },
     "Keyboard": {
       "resizeOnFullScreen": true
+    },
+    "SystemBars": {
+      "style": "LIGHT"
+    },
+    "StatusBar": {
+      "style": "LIGHT"
     }
   },
 	"ios": {

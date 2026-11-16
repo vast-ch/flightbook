@@ -16,7 +16,6 @@ import {
 } from '@capacitor/push-notifications';
 import { Capacitor } from '@capacitor/core';
 import { SplashScreen } from '@capacitor/splash-screen';
-import { StatusBar } from '@capacitor/status-bar';
 import { Router } from '@angular/router';
 import { RegisterPage } from './account/register/register.page';
 import { PaymentStatus } from './account/shared/paymentStatus.model';
@@ -76,17 +75,14 @@ export class AppComponent implements OnDestroy, OnInit {
     }
 
     async ngOnInit(): Promise<void> {
+        // No StatusBar.setOverlaysWebView({ overlay: false }) here: the page
+        // headers pad themselves with env(safe-area-inset-top) and expect to
+        // draw under the status bar. Android 15+ forces that anyway; forcing it
+        // off on older versions left a band in the native window background
+        // (dark grey in dark mode) above the white headers. The bar icons are
+        // pinned dark by `"style": "LIGHT"` in capacitor.config.json, because
+        // the plugins' DEFAULT follows the OS theme and this app is light-only.
         this.hideNativeSplash();
-
-        // Fix EdgeToEdge header issue: ensure StatusBar overlaysWebView is false and set style
-        try {
-            if (Capacitor.isNativePlatform() && Capacitor.getPlatform() == "android") {
-                await StatusBar.setOverlaysWebView({ overlay: false });
-            }
-        } catch (e) {
-            // StatusBar not available or not supported
-            console.warn('StatusBar plugin not available:', e);
-        }
     }
 
     subscribeToEmmiter(componentRef: any) {

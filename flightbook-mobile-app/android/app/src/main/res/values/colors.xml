@@ -4,4 +4,7 @@
     <color name="colorPrimary">#0054e9</color>
     <color name="colorPrimaryDark">#4d8dff</color>
     <color name="colorAccent">#3880ff</color>
+    <!-- The web fb-surface colour: page headers and tab bar. Shows behind the system
+         bars wherever the WebView does not draw under them. -->
+    <color name="windowBackground">#ffffff</color>
 </resources>
