@@ -75,6 +75,7 @@ export const footerData = {
     {
       title: 'Legal',
       links: [
+        { text: 'Nutzungsbedingungen', href: '/terms' },
         { text: 'Datenschutz', href: '/privacy-policy' },
       ],
     },
@@ -88,6 +89,7 @@ export const footerDataFr = {
     {
       title: 'Légal',
       links: [
+        { text: "Conditions d'utilisation", href: '/fr/terms' },
         { text: 'Confidentialité', href: '/fr/privacy-policy' },
       ],
     },
