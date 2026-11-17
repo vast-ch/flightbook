@@ -1,0 +1,21 @@
+---
+import Layout from '~/layouts/PageLayout.astro';
+import TermsContent from '~/components/common/TermsContent.astro';
+
+const metadata = {
+  title: 'Terms of Service - Flightbook',
+  description: 'Flightbook Terms of Service - Rules for using Flightbook and Flightbook Premium',
+  robots: {
+    index: true,
+    follow: true,
+  },
+  languageAlternates: [
+    { hrefLang: 'en', href: 'https://flightbook.ch/terms' },
+    { hrefLang: 'x-default', href: 'https://flightbook.ch/terms' },
+  ],
+};
+---
+
+<Layout metadata={metadata}>
+  <TermsContent />
+</Layout>
