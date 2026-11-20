@@ -1,6 +1,6 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, concatMap, map, tap } from 'rxjs';
+import { Observable, map, tap } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { Place } from './place.model';
 import { Pager } from 'src/app/shared/domain/pager.model';
@@ -26,6 +26,13 @@ export class PlaceStore {
     error: null
   });
   
+  /**
+   * Bumped whenever a place is created, edited or deleted. The writes do not
+   * touch the cached rows: PlaceListPage compares this against the revision its
+   * rows were loaded at and reloads on enter, the way the flight list does.
+   */
+  public revision = signal(0);
+
   // Default limit for pagination
   public defaultLimit = 25;
   
@@ -110,27 +117,17 @@ export class PlaceStore {
     
     return this.http.post<Place>(`${environment.baseUrl}/places`, place).pipe(
       tap({
-        next: (response: Place) => {
-          // Mark the post operation as complete
+        next: () => {
+          this.state.update(state => ({ ...state, loading: false, error: null }));
+          this.bumpRevision();
+        },
+        error: (error) => {
           this.state.update(state => ({
             ...state,
             loading: false,
-            error: null
-          }));
-        },
-        error: (error) => {
-          this.state.update(state => ({ 
-            ...state, 
-            loading: false, 
-            error: error.message || 'An error occurred while saving the place' 
+            error: error.message || 'An error occurred while saving the place'
           }));
         }
-      }),
-      // After posting the place, get the updated place list
-      concatMap((response: Place) => {
-        return this.getPlaces({ limit: this.defaultLimit, clearStore: true }).pipe(
-          map(() => response)
-        );
       })
     );
   }
@@ -140,24 +137,9 @@ export class PlaceStore {
     
     return this.http.put<Place>(`${environment.baseUrl}/places/${place.id}`, place).pipe(
       tap({
-        next: (response: Place) => {
-          this.state.update(state => {
-            const updatedPlaces = [...state.places];
-            const index = updatedPlaces.findIndex((listPlace: Place) => listPlace.id === response.id);
-            
-            if (index !== -1) {
-              updatedPlaces[index] = response;
-              // Sort by name
-              updatedPlaces.sort((a, b) => a.name.toUpperCase() > b.name.toUpperCase() ? 1 : -1);
-            }
-            
-            return {
-              ...state,
-              places: updatedPlaces,
-              loading: false,
-              error: null
-            };
-          });
+        next: () => {
+          this.state.update(state => ({ ...state, loading: false, error: null }));
+          this.bumpRevision();
         },
         error: (error) => {
           this.state.update(state => ({ 
@@ -176,21 +158,8 @@ export class PlaceStore {
     return this.http.delete<Place>(`${environment.baseUrl}/places/${place.id}`).pipe(
       tap({
         next: () => {
-          this.state.update(state => {
-            const updatedPlaces = [...state.places];
-            const index = updatedPlaces.findIndex((listPlace: Place) => listPlace.id === place.id);
-            
-            if (index !== -1) {
-              updatedPlaces.splice(index, 1);
-            }
-            
-            return {
-              ...state,
-              places: updatedPlaces,
-              loading: false,
-              error: null
-            };
-          });
+          this.state.update(state => ({ ...state, loading: false, error: null }));
+          this.bumpRevision();
         },
         error: (error) => {
           this.state.update(state => ({ 
@@ -203,6 +172,11 @@ export class PlaceStore {
     );
   }
   
+  /** A place was created, edited or deleted. */
+  private bumpRevision(): void {
+    this.revision.update(value => value + 1);
+  }
+
   searchOpenstreetmapPlace(name: string): Observable<FeatureCollection> {
     return this.http.get<FeatureCollection>(`${environment.baseUrl}/places/openstreetmap/${name}`);
   }

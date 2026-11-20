@@ -198,20 +198,18 @@ export class FlightStore {
           loading: false,
           error: null
         }));
+        // No refetch here: the bump marks the list stale, and FlightListPage
+        // reloads it on enter - every caller navigates there next. Refetching
+        // here too loaded page one twice per save (and once per file in the
+        // bulk IGC import).
         this.bumpDataRevision();
-      }),
-      // After posting the flight, get the updated flight list
-      concatMap((response: Flight) => {
-        return this.getFlights({ limit: this.defaultLimit, clearStore: true }).pipe(
-          map(() => response)
-        );
       }),
       tap({
         error: (error) => {
-          this.state.update(state => ({ 
-            ...state, 
-            loading: false, 
-            error: error.message || 'An error occurred while saving the flight' 
+          this.state.update(state => ({
+            ...state,
+            loading: false,
+            error: error.message || 'An error occurred while saving the flight'
           }));
         }
       })
@@ -223,24 +221,12 @@ export class FlightStore {
     
     return this.http.put<Flight>(`${environment.baseUrl}/flights/${flight.id}`, flight).pipe(
       tap({
-        next: (response: Flight) => {
-          this.state.update(state => {
-            const updatedFlights = [...state.flights];
-            const index = updatedFlights.findIndex((listFlight: Flight) => listFlight.id === response.id);
-            
-            if (index !== -1) {
-              // Preserve the flight number
-              response.number = updatedFlights[index].number;
-              updatedFlights[index] = response;
-            }
-            
-            return {
-              ...state,
-              flights: updatedFlights,
-              loading: false,
-              error: null
-            };
-          });
+        next: () => {
+          // The cached rows are not patched: a saved flight always returns to
+          // /flights, and the bump makes FlightListPage reload from the API -
+          // which is the only source of the right sort order, filter
+          // membership and flight number anyway.
+          this.state.update(state => ({ ...state, loading: false, error: null }));
           this.bumpDataRevision();
         },
         error: (error) => {

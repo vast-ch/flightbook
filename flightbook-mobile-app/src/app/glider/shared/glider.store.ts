@@ -1,6 +1,6 @@
 import { Injectable, Signal, computed, inject, signal } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, concatMap, map, tap } from 'rxjs';
+import { Observable, map, tap } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { Glider } from './glider.model';
 import { Pager } from 'src/app/shared/domain/pager.model';
@@ -35,6 +35,13 @@ export class GliderStore {
    */
   public filter = signal<GliderFilter>(new GliderFilter());
   
+  /**
+   * Bumped whenever a glider is created, edited or deleted. The writes do not
+   * touch the cached rows: GliderListPage compares this against the revision
+   * its rows were loaded at and reloads on enter, the way the flight list does.
+   */
+  public revision = signal(0);
+
   // Default limit for pagination
   public defaultLimit = 40;
 
@@ -136,21 +143,11 @@ export class GliderStore {
     this.state.update(state => ({ ...state, loading: true }));
     
     return this.http.post<Glider>(`${environment.baseUrl}/gliders`, glider).pipe(
-      tap((response: Glider) => {
-        // Mark the post operation as complete
-        this.state.update(state => ({
-          ...state,
-          loading: false,
-          error: null
-        }));
-      }),
-      // After posting the glider, get the updated glider list
-      concatMap((response: Glider) => {
-        return this.getGliders({ limit: this.defaultLimit, clearStore: true }).pipe(
-          map(() => response)
-        );
-      }),
       tap({
+        next: () => {
+          this.state.update(state => ({ ...state, loading: false, error: null }));
+          this.bumpRevision();
+        },
         error: (error) => {
           this.state.update(state => ({ 
             ...state, 
@@ -167,29 +164,9 @@ export class GliderStore {
     
     return this.http.put<Glider>(`${environment.baseUrl}/gliders/${glider.id}`, glider).pipe(
       tap({
-        next: (response: Glider) => {
-          this.state.update(state => {
-            const updatedGliders = [...state.gliders];
-            const index = updatedGliders.findIndex((listGlider: Glider) => listGlider.id === response.id);
-            
-            if (index !== -1) {
-              updatedGliders[index] = glider;
-              // Sort by brand and name
-              updatedGliders.sort((a, b) => {
-                if (a.brand.toUpperCase() === b.brand.toUpperCase()) {
-                  return a.name.toUpperCase() > b.name.toUpperCase() ? 1 : -1;
-                }
-                return a.brand.toUpperCase() > b.brand.toUpperCase() ? 1 : -1;
-              });
-            }
-            
-            return {
-              ...state,
-              gliders: updatedGliders,
-              loading: false,
-              error: null
-            };
-          });
+        next: () => {
+          this.state.update(state => ({ ...state, loading: false, error: null }));
+          this.bumpRevision();
         },
         error: (error) => {
           this.state.update(state => ({ 
@@ -206,21 +183,11 @@ export class GliderStore {
     this.state.update(state => ({ ...state, loading: true }));
     
     return this.http.delete<any>(`${environment.baseUrl}/gliders/${glider.id}`).pipe(
-      tap((response: any) => {
-        // Mark the delete operation as complete
-        this.state.update(state => ({
-          ...state,
-          loading: false,
-          error: null
-        }));
-      }),
-      // After deleting the glider, get the updated glider list
-      concatMap((response: any) => {
-        return this.getGliders({ limit: this.defaultLimit, clearStore: true }).pipe(
-          map(() => response)
-        );
-      }),
       tap({
+        next: () => {
+          this.state.update(state => ({ ...state, loading: false, error: null }));
+          this.bumpRevision();
+        },
         error: (error) => {
           this.state.update(state => ({ 
             ...state, 
@@ -232,6 +199,11 @@ export class GliderStore {
     );
   }
   
+  /** A glider was created, edited or deleted. */
+  private bumpRevision(): void {
+    this.revision.update(value => value + 1);
+  }
+
   clearGliders(): void {
     this.state.update(state => ({ ...state, gliders: [] }));
   }
