@@ -361,9 +361,16 @@ export class AppointmentFormDialogComponent implements OnInit, AfterViewChecked 
     }
 
     const type = this.appointmentTypes.find((appointmentType: AppointmentType) => appointmentType.id == event.value);
-    this.form.get("meetingPoint")?.setValue(type?.meetingPoint);
-    this.form.get("maxPeople")?.setValue(type?.maxPeople);
-    this.form.get("instructor")?.setValue(type?.instructor?.email);
+    // An empty default on the type must not wipe what is already in the form.
+    if (type?.meetingPoint) {
+      this.form.get("meetingPoint")?.setValue(type.meetingPoint);
+    }
+    if (type?.maxPeople != null) {
+      this.form.get("maxPeople")?.setValue(type.maxPeople);
+    }
+    if (type?.instructor?.email) {
+      this.form.get("instructor")?.setValue(type.instructor.email);
+    }
     if (type?.time) {
       const time = moment.utc(type.time, 'HH:mm');
       this.form.get("time")?.setValue(time.format('HH:mm'));
