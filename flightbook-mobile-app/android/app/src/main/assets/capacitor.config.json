@@ -10,6 +10,7 @@
 			"splashFullScreen": true
 		},
 		"Keyboard": {
+			"resize": "none",
 			"resizeOnFullScreen": true
 		},
 		"SystemBars": {

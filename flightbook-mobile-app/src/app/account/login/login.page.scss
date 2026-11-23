@@ -6,8 +6,9 @@
 .login {
     display: flex;
     flex-direction: column;
-    // Fills the viewport so the footer can sit at the bottom, but still scrolls
-    // when the keyboard shrinks the visual viewport.
+    // Fills the viewport so the footer can sit at the bottom. The keyboard does
+    // not resize the webview (Keyboard.resize "none" in capacitor.config.json),
+    // so this never re-centres; ion-content's keyboard padding provides scroll.
     min-height: 100%;
     box-sizing: border-box;
 }
