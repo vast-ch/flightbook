@@ -1,6 +1,6 @@
 import { Injectable, signal, WritableSignal } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { firstValueFrom, map, Observable, Subject } from 'rxjs';
+import { firstValueFrom, map, Observable, shareReplay, Subject } from 'rxjs';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import { User } from '../../shared/domain/user';
 import { environment } from 'src/environments/environment';
@@ -18,6 +18,7 @@ export class AccountService {
   changeSelectedSchool$: Subject<School> = new Subject<School>();
   currentSelectedSchool?: School;
   currentUser$: WritableSignal<User | undefined> = signal(undefined);
+  private schools$?: Observable<School[]>;
 
   constructor(private http: HttpClient) {
     this.jwtHelper = new JwtHelperService();
@@ -43,6 +44,7 @@ export class AccountService {
   logout(): Observable<any> {
     const refreshToken = localStorage.getItem('refresh_token');
     this.currentUser$.set(undefined);
+    this.clearSchoolsCache();
     return this.http.post<any>(`${environment.baseUrl}/auth/logout`, { "refresh_token": refreshToken });
   }
 
@@ -67,7 +69,17 @@ export class AccountService {
     return this.http.get<any>(`${environment.baseUrl}/auth/reset-password/${email}`);
   }
 
-  getSchoolsByUserId(): Observable<School[]> {
+  /** The user's schools, fetched once and shared (start-page guard and main shell both need them). */
+  getSchools(): Observable<School[]> {
+    this.schools$ ??= this.getSchoolsByUserId().pipe(shareReplay(1));
+    return this.schools$;
+  }
+
+  clearSchoolsCache() {
+    this.schools$ = undefined;
+  }
+
+  private getSchoolsByUserId(): Observable<School[]> {
     return this.http.get<School[]>(`${environment.baseUrl}/instructor/schools`);
   }
 

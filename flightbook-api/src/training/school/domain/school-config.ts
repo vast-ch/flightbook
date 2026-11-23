@@ -119,6 +119,12 @@ export class SchoolModuleDto {
   trialEnabled?: boolean;
 }
 
+export enum StartPage {
+  STUDENTS = 'students',
+  APPOINTMENTS = 'appointments',
+  TANDEM_PILOTS = 'tandem-pilots'
+}
+
 @Expose()
 export class SchoolConfig {
 
@@ -140,4 +146,10 @@ export class SchoolConfig {
   @ValidateNested()
   @Type(() => GoogleCalendarConfig)
   googleCalendar?: GoogleCalendarConfig;
+
+  @Expose()
+  @ApiPropertyOptional({ enum: StartPage })
+  @IsOptional()
+  @IsEnum(StartPage)
+  startPage?: StartPage;
 }

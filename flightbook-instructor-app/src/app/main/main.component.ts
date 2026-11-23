@@ -32,7 +32,7 @@ export class MainComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.accountService.getSchoolsByUserId().pipe(takeUntil(this.unsubscribe$)).subscribe((schools: School[]) => {
+    this.accountService.getSchools().pipe(takeUntil(this.unsubscribe$)).subscribe((schools: School[]) => {
       this.schools = schools;
       if (this.schools.length == 0){
         this.router.navigate(['no-school']);

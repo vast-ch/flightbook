@@ -5,7 +5,7 @@ import { AccountService } from 'src/app/core/services/account.service';
 import { SchoolService } from 'src/app/core/services/school.service';
 import { School } from 'src/app/shared/domain/school';
 import { firstValueFrom, Subject, takeUntil } from 'rxjs';
-import { SchoolConfig, SchoolModule } from 'src/app/shared/domain/school-config';
+import { availableStartPages, resolveStartPage, SchoolConfig, SchoolModule, StartPage } from 'src/app/shared/domain/school-config';
 
 @Component({
   selector: 'fb-school-setting',
@@ -26,6 +26,20 @@ export class SchoolSettingComponent implements OnInit, OnDestroy {
   private calendarRequest = 0;
   private destroyed = false;
   unsubscribe$ = new Subject<void>();
+
+  readonly startPageLabels: Record<StartPage, string> = {
+    'students': 'menu.students',
+    'appointments': 'menu.appointments',
+    'tandem-pilots': 'menu.tandemPilots',
+  };
+
+  get startPageOptions(): StartPage[] {
+    return availableStartPages(this.school?.configuration);
+  }
+
+  get selectedStartPage(): StartPage {
+    return resolveStartPage(this.school?.configuration);
+  }
 
   constructor(
     private schoolService: SchoolService,
@@ -66,6 +80,14 @@ export class SchoolSettingComponent implements OnInit, OnDestroy {
       this.ensureSchoolModule(this.school).commentsOnSubscription = event.checked;
       this.updateConfiguration();
     }
+  }
+
+  async changeStartPage(startPage: StartPage) {
+    const school = this.school;
+    if (!school?.id) return;
+
+    (school.configuration ??= new SchoolConfig()).startPage = startPage;
+    await firstValueFrom(this.schoolService.updateSchoolConfiguration(school.id, { startPage }));
   }
 
   async updateConfiguration() {

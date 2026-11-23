@@ -516,7 +516,8 @@
         "types": {
             "validateFlights": "Flüge validieren",
             "commentsOnSubscription": "Kommentar bei Anmeldung",
-            "googleCalendar": "Google Kalender"
+            "googleCalendar": "Google Kalender",
+            "startPage": "Startseite"
         },
         "googleCalendar": {
             "connect": "Verbinden",

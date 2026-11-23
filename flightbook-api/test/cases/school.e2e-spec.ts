@@ -146,6 +146,33 @@ describe('Schools (e2e)', () => {
       });
   });
 
+  it('/schools/configuration (PUT) start page', async () => {
+    // given
+    const school = Testdata.createSchool("School 1");
+    await testInstance.schoolRepository.save(school);
+    const teamMember = Testdata.createTeamMember(school, await testInstance.getDefaultUser(), true);
+    await testInstance.teamMemberRepository.save(teamMember);
+    const keycloakToken = JwtTestHelper.createKeycloakToken();
+    const originalSchoolModule = school.configuration!.schoolModule;
+    const originalTandemModule = school.configuration!.tandemModule;
+
+    //when
+    await request(testInstance.app.getHttpServer())
+      .put(`/schools/${school.id}/configuration`)
+      .set('Authorization', `Bearer ${keycloakToken}`)
+      .send({ startPage: 'appointments' })
+      .expect(200)
+      .then((response) => {
+        expect(response.body.configuration.startPage).toEqual('appointments');
+      });
+
+    // then
+    const dbSchool = await testInstance.schoolRepository.findOneBy({ id: school.id });
+    expect(dbSchool!.configuration!.startPage).toEqual('appointments');
+    expect(dbSchool!.configuration!.schoolModule).toEqual(originalSchoolModule);
+    expect(dbSchool!.configuration!.tandemModule).toEqual(originalTandemModule);
+  });
+
   it('/schools/configuration (PUT) with custom fields - all field types', async () => {
     // given
     const school = Testdata.createSchool("School 1");
