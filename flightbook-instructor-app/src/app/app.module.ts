@@ -14,7 +14,7 @@ import { DatePipe } from '@angular/common';
 import { MAT_ICON_DEFAULT_OPTIONS } from '@angular/material/icon';
 
 export function createTranslateLoader(http: HttpClient) {
-  return new TranslateHttpLoader(http, './assets/i18n/', '.json');
+  return new TranslateHttpLoader(http, './assets/i18n/', '.json?v=' + Date.now());
 }
 
 @NgModule({ 
