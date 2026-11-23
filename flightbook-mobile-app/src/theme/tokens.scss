@@ -1404,3 +1404,49 @@ ion-modal.dateModal.filterDateModal {
   color: var(--fb-text-body);
   text-wrap: pretty;
 }
+
+/*
+ * Scroll room under the keyboard. Keyboard.resize is "none" (see
+ * capacitor.config.json), so the keyboard overlays the webview instead of
+ * shrinking it. Ionic's scroll assist only pads ion-content (--keyboard-offset)
+ * when the focused input itself had to be scrolled above the keyboard; focus a
+ * field that is already visible (flight form: km) and the content keeps its
+ * normal height, so whatever sits under the keyboard (comment) is unreachable.
+ * AppComponent sets --fb-keyboard-height from the native keyboard events.
+ *
+ * This is Ionic 9's own .inner-scroll padding-bottom with --keyboard-offset
+ * swapped for the larger of it and the real keyboard height, so the two never
+ * stack. Re-check it against ion-content's CSS after an Ionic upgrade.
+ * (Not ::part(scroll)::after - pseudo-elements on ::part() are not reliable in
+ * WebKit, which is the platform that needs this.)
+ */
+ion-content::part(scroll) {
+  padding-bottom: calc(
+    var(--padding-bottom)
+    + max(var(--keyboard-offset, 0px), var(--fb-keyboard-height, 0px))
+    + var(--offset-bottom)
+    + var(--internal-content-safe-area-padding-bottom, 0px)
+  );
+}
+
+/*
+ * Footers (the forms' Save button) ride on top of the keyboard. With resize
+ * "none" they would otherwise stay at the bottom of the webview, under it.
+ * Only the footer moves - a transform, not a layout change - so the content
+ * does not reflow the way it did with resize "native" (the jumps on login).
+ * Ionic hides ion-tab-bar on the same keyboardWillShow, so the footer starts
+ * from the very bottom and the full keyboard height is the right distance.
+ * The footer now covers the last stretch of ion-content above the keyboard;
+ * the padding rule above (keyboard height) already leaves room for it, since
+ * ion-content ends at the footer's untransformed top.
+ */
+ion-footer {
+  transform: translate3d(0, calc(-1 * var(--fb-keyboard-height, 0px)), 0);
+  // Roughly the iOS keyboard animation, so the two travel together.
+  transition: transform 250ms cubic-bezier(0.17, 0.59, 0.4, 0.77);
+}
+
+// Above the keyboard the home-indicator inset is the keyboard's problem.
+.fb-keyboard-open .form-footer--standalone {
+  padding-bottom: 12px;
+}

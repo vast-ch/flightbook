@@ -5,6 +5,7 @@ import { HTTP_INTERCEPTORS, HttpClient, provideHttpClient, withInterceptorsFromD
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 
+import { keyboardOverlaysWebview, scrollAssistKeyboardHeight } from './shared/util/keyboard';
 import { IonicRouteStrategy, provideIonicAngular, IonApp, IonRouterOutlet, isPlatform } from '@ionic/angular';
 
 import { AppComponent } from './app.component';
@@ -36,7 +37,11 @@ registerLocaleData(frenchLocale);
 function getIonicConfig() {
   return {
     innerHTMLTemplatesEnabled: true,
-    swipeBackEnabled: true
+    swipeBackEnabled: true,
+    // See shared/util/keyboard.ts: Ionic's default (290) misses the Save
+    // footer lifted onto the keyboard, so fields just above it went under.
+    // iOS only - Android resizes the webview and keeps Ionic's default.
+    ...(keyboardOverlaysWebview() ? { keyboardHeight: scrollAssistKeyboardHeight() } : {})
   };
 }
 
