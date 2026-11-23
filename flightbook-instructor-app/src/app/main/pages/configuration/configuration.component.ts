@@ -31,7 +31,7 @@ export class ConfigurationComponent implements OnInit, OnDestroy {
       // If school parameter is provided, switch to that school
       if (params['google_calendar'] && params['school']) {
         const schoolId = parseInt(params['school'], 10);
-        this.accountService.getSchoolsByUserId().pipe(takeUntil(this.unsubscribe$)).subscribe((schools: School[]) => {
+        this.accountService.getSchools().pipe(takeUntil(this.unsubscribe$)).subscribe((schools: School[]) => {
           const school = schools.find(s => s.id === schoolId);
           if (school) {
             this.accountService.setCurrentSchool(school);

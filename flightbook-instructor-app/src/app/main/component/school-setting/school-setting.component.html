@@ -31,6 +31,25 @@
     </div>
   </div>
 
+  @if (!school || startPageOptions.length > 1) {
+    <div class="fb-option-row">
+      <span class="fb-option-row__label">{{ 'setting.types.startPage' | translate }}</span>
+      <div class="fb-option-row__value">
+        @if (school) {
+          <mat-form-field appearance="outline" subscriptSizing="dynamic" class="fb-calendar__field">
+            <mat-select [aria-label]="'setting.types.startPage' | translate" [value]="selectedStartPage" (selectionChange)="changeStartPage($event.value)">
+              @for (page of startPageOptions; track page) {
+                <mat-option [value]="page">{{ startPageLabels[page] | translate }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        } @else {
+          <span class="fb-skeleton fb-skeleton--toggle" aria-hidden="true"></span>
+        }
+      </div>
+    </div>
+  }
+
   <div class="fb-option-row fb-option-row--top">
     <span class="fb-option-row__label">{{ 'setting.types.googleCalendar' | translate }}</span>
     <div class="fb-option-row__value">

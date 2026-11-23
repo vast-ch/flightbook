@@ -113,5 +113,9 @@ export class School {
 
       this.configuration.tandemModule = mergedTandemModule;
     }
+
+    if (update.startPage !== undefined) {
+      this.configuration.startPage = update.startPage;
+    }
   }
 }
