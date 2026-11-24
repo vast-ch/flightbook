@@ -1,4 +1,4 @@
-import { Component, OnDestroy, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, signal } from '@angular/core';
 import { ModalController, IonContent, IonInput, IonSelect, IonSelectOption, IonButton } from '@ionic/angular';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -21,7 +21,10 @@ import { chevronForward } from 'ionicons/icons';
         IonSelect,
         IonSelectOption,
         IonButton
-    ]
+    ],
+    // TODO: This component has been partially migrated to be zoneless-compatible.
+    // After testing, this should be updated to ChangeDetectionStrategy.OnPush.
+    changeDetection: ChangeDetectionStrategy.Default,
 })
 export class GliderFilterComponent implements OnDestroy {
     private unsubscribe$ = new Subject<void>();

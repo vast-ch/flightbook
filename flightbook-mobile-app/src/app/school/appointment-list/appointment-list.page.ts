@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewChild, computed, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, ViewChild, computed, signal } from '@angular/core';
 import moment from 'moment-timezone';
 import { ActivatedRoute } from '@angular/router';
 import { AlertController, LoadingController, ModalController, NavController, IonIcon, IonContent, IonList, IonItem, IonToggle, IonLabel, IonInfiniteScroll, IonInfiniteScrollContent, IonPopover } from '@ionic/angular';
@@ -45,7 +45,10 @@ const CLOSING_SOON_HOURS = 24;
         IonPopover,
         FormsModule,
         AppointmentFilterChipsComponent
-    ]
+    ],
+    // TODO: This component has been partially migrated to be zoneless-compatible.
+    // After testing, this should be updated to ChangeDetectionStrategy.OnPush.
+    changeDetection: ChangeDetectionStrategy.Default,
 })
 export class AppointmentListPage implements OnInit, OnDestroy {
     @ViewChild(IonInfiniteScroll) infiniteScroll: IonInfiniteScroll;

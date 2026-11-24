@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, effect, inject } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, effect, inject, signal } from '@angular/core';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { AlertController, LoadingController, NavController, IonContent, IonButton, IonIcon, IonInput, IonTextarea, IonToggle } from '@ionic/angular';
 import HttpStatusCode from '../../shared/util/HttpStatusCode';
@@ -40,15 +40,24 @@ const LANGUAGES = ['fr', 'de', 'en', 'it'];
         IonTextarea,
         IonToggle,
         PhoneNumberComponent
-    ]
+    ],
+    // TODO: This component has been partially migrated to be zoneless-compatible.
+    // After testing, this should be updated to ChangeDetectionStrategy.OnPush.
+    changeDetection: ChangeDetectionStrategy.Default,
 })
 export class AccountDataPage implements OnInit, OnDestroy {
     unsubscribe$ = new Subject<void>();
 
+    /**
+     * user, emergencyContact and pwd are ngModel-bound models replaced after
+     * async work (the seeding effect, HTTP answers): each replacement ends in
+     * markForCheck().
+     */
     user: User;
     /** The API is a list, the UI a singleton; the id keeps POST an upsert. */
     emergencyContact = new EmergencyContact();
-    paymentStatus: PaymentStatus;
+    paymentStatus = signal<PaymentStatus | undefined>(undefined);
+    private cdr = inject(ChangeDetectorRef);
     isNative: boolean;
     version = inject(VersionService).version;
 
@@ -90,10 +99,11 @@ export class AccountDataPage implements OnInit, OnDestroy {
             }
             this.seeded = true;
             this.user = this.withConfig(structuredClone(user));
+            this.cdr.markForCheck();
         });
 
         this.paymentService.getPaymentStatus().pipe(takeUntil(this.unsubscribe$)).subscribe((paymentStatus: PaymentStatus) => {
-            this.paymentStatus = paymentStatus;
+            this.paymentStatus.set(paymentStatus);
         });
 
         if (this.route.snapshot.paramMap.get('payment') === 'success') {
@@ -125,7 +135,7 @@ export class AccountDataPage implements OnInit, OnDestroy {
 
     /** EXEMPTED is entitled but not paying, so it reads as Free here. */
     get isPremium(): boolean {
-        return !!this.paymentStatus?.active && this.paymentStatus?.state !== 'EXEMPTED';
+        return !!this.paymentStatus()?.active && this.paymentStatus()?.state !== 'EXEMPTED';
     }
 
     /** Stripe checkout is web-only; native builds have no purchase path. */
@@ -165,6 +175,7 @@ export class AccountDataPage implements OnInit, OnDestroy {
             next: (contacts: EmergencyContact[]) => {
                 if (contacts?.length > 0) {
                     this.emergencyContact = contacts[0];
+                    this.cdr.markForCheck();
                 }
             }
         });
@@ -204,6 +215,7 @@ export class AccountDataPage implements OnInit, OnDestroy {
                 this.emergencyContact = await firstValueFrom(
                     this.schoolService.postEmergencyContact(this.emergencyContact)
                 );
+                this.cdr.markForCheck();
             } catch (error) {
                 contactError = error;
             }
@@ -271,6 +283,7 @@ export class AccountDataPage implements OnInit, OnDestroy {
             next: async () => {
                 await loading.dismiss();
                 this.pwd = { oldPassword: '', newPassword: '', newPassword2: '' };
+                this.cdr.markForCheck();
                 await this.alert(this.translate.instant('login.password'), this.translate.instant('message.passwordchanged'));
             },
             error: async (error: any) => {
@@ -333,7 +346,7 @@ export class AccountDataPage implements OnInit, OnDestroy {
 
                         this.accountService.cancelPaymentSubscription().pipe(takeUntil(this.unsubscribe$)).subscribe({
                             next: () => {
-                                this.paymentService.setPaymentStatus({ ...this.paymentStatus, state: 'CANCELED' });
+                                this.paymentService.setPaymentStatus({ ...this.paymentStatus(), state: 'CANCELED' });
                                 loading.dismiss();
                             },
                             error: () => {

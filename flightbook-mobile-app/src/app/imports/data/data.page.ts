@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, signal } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
 import { AlertController, LoadingController, IonContent, IonFooter, IonSelect, IonSelectOption, IonButton, IonIcon } from '@ionic/angular';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
@@ -25,18 +25,21 @@ import { chevronBack, chevronForward, cloudUploadOutline } from "ionicons/icons"
         IonSelectOption,
         IonButton,
         IonIcon
-    ]
+    ],
+    // TODO: This component has been partially migrated to be zoneless-compatible.
+    // After testing, this should be updated to ChangeDetectionStrategy.OnPush.
+    changeDetection: ChangeDetectionStrategy.Default,
 })
 export class DataPage implements OnInit, OnDestroy {
     unsubscribe$ = new Subject<void>();
 
     isIos = false;
-    file: File | undefined;
-    result: any | undefined;
-    showButton = true;
+    file = signal<File | undefined>(undefined);
+    result = signal<any | undefined>(undefined);
+    showButton = signal(true);
 
-    importTypes: ImportType[] = [];
-    currentType: ImportType;
+    importTypes = signal<ImportType[]>([]);
+    currentType = signal<ImportType | undefined>(undefined);
 
     constructor(
         private loadingCtrl: LoadingController,
@@ -69,8 +72,8 @@ export class DataPage implements OnInit, OnDestroy {
         await loading.present();
         this.importService.getImportTypes().pipe(takeUntil(this.unsubscribe$)).subscribe({
             next: (res: ImportType[]) => {
-                this.importTypes = res;
-                this.currentType = this.importTypes[0];
+                this.importTypes.set(res);
+                this.currentType.set(res[0]);
             },
             async complete() {
                 loading.dismiss();
@@ -79,24 +82,24 @@ export class DataPage implements OnInit, OnDestroy {
     }
 
     changeImportType(event: CustomEvent) {
-        this.currentType = this.importTypes.find(element => element.type === event.detail.value);
+        this.currentType.set(this.importTypes().find(element => element.type === event.detail.value));
         // The file was validated against the old type, and the card presents it
         // under the new one's label - so it cannot carry over.
-        this.file = undefined;
+        this.file.set(undefined);
     }
 
     async onFilesSelect(event: any) {
         const file = event.target.files[0];
-        if (!file.name.toLowerCase().endsWith(`.${this.currentType.fileType}`)) {
+        if (!file.name.toLowerCase().endsWith(`.${this.currentType().fileType}`)) {
             const alert = await this.alertController.create({
                 header: this.translate.instant('message.infotitle'),
-                message: this.translate.instant('message.wrongFileType', { fileType: this.currentType.fileType.toUpperCase() }),
+                message: this.translate.instant('message.wrongFileType', { fileType: this.currentType().fileType.toUpperCase() }),
                 buttons: [this.translate.instant('buttons.done')]
             });
             await alert.present();
             return;
         }
-        this.file = event.target.files[0];
+        this.file.set(event.target.files[0]);
     }
 
     async onIosFilesSelect() {
@@ -105,10 +108,10 @@ export class DataPage implements OnInit, OnDestroy {
             readData: true
         });
 
-        if (!(result.files[0] as PickedFile).name.toLowerCase().endsWith(`.${this.currentType.fileType}`)) {
+        if (!(result.files[0] as PickedFile).name.toLowerCase().endsWith(`.${this.currentType().fileType}`)) {
             const alert = await this.alertController.create({
                 header: this.translate.instant('message.infotitle'),
-                message: this.translate.instant('message.wrongFileType', { fileType: this.currentType.fileType.toUpperCase() }),
+                message: this.translate.instant('message.wrongFileType', { fileType: this.currentType().fileType.toUpperCase() }),
                 buttons: [this.translate.instant('buttons.done')]
             });
             await alert.present();
@@ -127,7 +130,7 @@ export class DataPage implements OnInit, OnDestroy {
         const blob = new Blob([arrayBuffer], { type: result.files[0].mimeType });
 
         // Create a File object from the Blob
-        this.file = new File([blob], result.files[0].name);
+        this.file.set(new File([blob], result.files[0].name));
     }
 
     async save() {
@@ -137,12 +140,12 @@ export class DataPage implements OnInit, OnDestroy {
         await loading.present();
 
         const formData = new FormData();
-        formData.append('file', this.file);
+        formData.append('file', this.file());
 
-        this.showButton = false;
+        this.showButton.set(false);
         try {
-            const result = await firstValueFrom(this.importService.importData(formData, this.currentType.type));
-            this.result = result;
+            const result = await firstValueFrom(this.importService.importData(formData, this.currentType().type));
+            this.result.set(result);
             this.flightStore.clearFlights();
             this.gliderStore.clearGliders();
             this.placeStore.clearPlaces();
@@ -164,7 +167,7 @@ export class DataPage implements OnInit, OnDestroy {
                 ]
             });
             await alert.present();
-            this.showButton = true;
+            this.showButton.set(true);
         }
         await loading.dismiss();
     }

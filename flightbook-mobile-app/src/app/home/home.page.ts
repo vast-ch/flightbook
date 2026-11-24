@@ -1,4 +1,4 @@
-import { Component, OnDestroy, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { IonContent, IonSkeletonText, IonIcon } from '@ionic/angular';
@@ -26,7 +26,10 @@ import { splitDistance, splitDuration, toHoursMinutes } from 'src/app/shared/uti
         IonContent,
         IonSkeletonText,
         IonIcon
-    ]
+    ],
+    // TODO: This component has been partially migrated to be zoneless-compatible.
+    // After testing, this should be updated to ChangeDetectionStrategy.OnPush.
+    changeDetection: ChangeDetectionStrategy.Default,
 })
 export class HomePage implements OnDestroy {
     private unsubscribe$ = new Subject<void>();

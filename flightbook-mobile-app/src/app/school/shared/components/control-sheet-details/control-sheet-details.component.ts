@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, Input, OnDestroy, OnInit, ViewEncapsulation, inject } from '@angular/core';
+import { ChangeDetectionStrategy, AfterViewInit, Component, ElementRef, Input, OnDestroy, OnInit, ViewEncapsulation, inject } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { ModalController, IonContent, IonButton, createGesture, Gesture, GestureDetail } from '@ionic/angular';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
@@ -29,7 +29,10 @@ const DISMISS_VELOCITY = 0.4;
         StarRatingComponent,
         IonContent,
         IonButton
-    ]
+    ],
+    // TODO: This component has been partially migrated to be zoneless-compatible.
+    // After testing, this should be updated to ChangeDetectionStrategy.OnPush.
+    changeDetection: ChangeDetectionStrategy.Default,
 })
 export class ControlSheetDetailsComponent implements OnInit, AfterViewInit, OnDestroy {
 

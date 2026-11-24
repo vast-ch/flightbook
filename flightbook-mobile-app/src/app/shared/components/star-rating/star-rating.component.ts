@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { NgClass } from '@angular/common';
 import { IonIcon } from "@ionic/angular";
 import { addIcons } from "ionicons";
@@ -8,7 +8,10 @@ import { star } from "ionicons/icons";
     selector: 'fb-star-rating',
     templateUrl: './star-rating.component.html',
     styleUrls: ['./star-rating.component.scss'],
-    imports: [NgClass, IonIcon]
+    imports: [NgClass, IonIcon],
+    // TODO: This component has been partially migrated to be zoneless-compatible.
+    // After testing, this should be updated to ChangeDetectionStrategy.OnPush.
+    changeDetection: ChangeDetectionStrategy.Default,
 })
 export class StarRatingComponent implements OnInit, OnChanges {
     @Input()

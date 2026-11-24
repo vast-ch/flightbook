@@ -17,11 +17,11 @@
       <div class="form-divider">{{ 'flight.orByHand' | translate }}</div>
     }
 
-    <flight-form [flight]=flight [gliders]=gliders [schools]=schools [tandemSchools]="tandemSchools()" [igcFile]=igcFile (saveFlight)="saveFlight($event)"></flight-form>
+    <flight-form [flight]=flight [gliders]="gliders()" [schools]="schools()" [tandemSchools]="tandemSchools()" [igcFile]="igcFile()" (saveFlight)="saveFlight($event)"></flight-form>
 
     <div class="secondary-actions">
       <ion-button expand="block" fill="outline" (click)="copy()">{{ 'buttons.copy' | translate }}</ion-button>
-      @if (flight?.igc && igcFile) {
+      @if (flight?.igc && igcFile()) {
         <ion-button expand="block" fill="outline" (click)="downloadIgc()">
           <ion-icon slot="start" name="download-outline" aria-hidden="true"></ion-icon>
           {{ 'buttons.downloadIgc' | translate }}

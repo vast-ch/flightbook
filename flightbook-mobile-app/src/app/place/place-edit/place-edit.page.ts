@@ -1,4 +1,4 @@
-import { Component, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
@@ -24,13 +24,17 @@ import { PlaceFormComponent } from '../../form/place-form/place-form';
         IonFooter,
         IonButton,
         IonIcon
-    ]
+    ],
+    // TODO: This component has been partially migrated to be zoneless-compatible.
+    // After testing, this should be updated to ChangeDetectionStrategy.OnPush.
+    changeDetection: ChangeDetectionStrategy.Default,
 })
 export class PlaceEditPage implements OnDestroy {
     unsubscribe$ = new Subject<void>();
     private readonly placeId: number;
     place: Place;
-    deleteDisabled: boolean;
+    /** Enabled once the flight count comes back as 0 - an HTTP answer. */
+    deleteDisabled = signal(true);
 
     constructor(
         private activeRoute: ActivatedRoute,
@@ -41,7 +45,6 @@ export class PlaceEditPage implements OnDestroy {
         private loadingCtrl: LoadingController,
         private alertController: AlertController
     ) {
-        this.deleteDisabled = true;
         this.placeId = +this.activeRoute.snapshot.paramMap.get('id');
         this.place = this.placeStore.places().find(place => place.id === this.placeId);
         this.place = structuredClone(this.place);
@@ -50,7 +53,7 @@ export class PlaceEditPage implements OnDestroy {
         }
         this.flightStore.nbFlightsByPlaceId(this.placeId).pipe(takeUntil(this.unsubscribe$)).subscribe((resp: any) => {
             if (resp.nbFlights == 0) {
-                this.deleteDisabled = false;
+                this.deleteDisabled.set(false);
             }
         });
         addIcons({ 'chevron-back': chevronBack });

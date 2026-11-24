@@ -1,4 +1,4 @@
-import { Component, ElementRef, Injector, Input, ViewChild, afterNextRender, computed, effect, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, Injector, Input, ViewChild, afterNextRender, computed, effect, inject, signal } from '@angular/core';
 import { LanguageService } from 'src/app/shared/services/language.service';
 import { HeatmapDay } from '../../shared/statistic.store';
 
@@ -17,7 +17,10 @@ export interface HeatmapCell {
 @Component({
     selector: 'fb-activity-heatmap',
     templateUrl: './activity-heatmap.component.html',
-    styleUrls: ['./activity-heatmap.component.scss']
+    styleUrls: ['./activity-heatmap.component.scss'],
+    // TODO: This component has been partially migrated to be zoneless-compatible.
+    // After testing, this should be updated to ChangeDetectionStrategy.OnPush.
+    changeDetection: ChangeDetectionStrategy.Default,
 })
 export class ActivityHeatmapComponent {
 

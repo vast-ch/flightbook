@@ -1,4 +1,4 @@
-import { Component, Input, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, computed, inject, signal } from '@angular/core';
 import { Chart, ChartConfiguration, ChartData, ChartType, Plugin } from 'chart.js';
 import { NgChartsModule } from 'ng2-charts';
 import { FlightStatistic } from '../../../flight/shared/flightStatistic.model';
@@ -100,7 +100,10 @@ export interface MonthColumn {
     selector: 'fb-activity-chart',
     templateUrl: './activity-chart.component.html',
     styleUrls: ['./activity-chart.component.scss'],
-    imports: [NgChartsModule]
+    imports: [NgChartsModule],
+    // TODO: This component has been partially migrated to be zoneless-compatible.
+    // After testing, this should be updated to ChangeDetectionStrategy.OnPush.
+    changeDetection: ChangeDetectionStrategy.Default,
 })
 export class ActivityChartComponent {
 

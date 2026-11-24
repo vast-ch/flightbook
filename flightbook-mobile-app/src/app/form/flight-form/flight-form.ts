@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, OnChanges, SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output, OnChanges, SimpleChanges } from '@angular/core';
 import { AlertController, IonInput, IonTextarea, IonModal, IonContent, IonDatetime, IonToggle, IonIcon, IonSelectOption, IonSelect } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { chevronForward } from 'ionicons/icons';
@@ -37,7 +37,10 @@ import { School, CustomFieldDefinition } from 'src/app/school/shared/school.mode
         IonIcon,
         IonSelect,
         IonSelectOption
-    ]
+    ],
+    // TODO: This component has been partially migrated to be zoneless-compatible.
+    // After testing, this should be updated to ChangeDetectionStrategy.OnPush.
+    changeDetection: ChangeDetectionStrategy.Default,
 })
 export class FlightFormComponent implements OnInit, OnChanges {
 

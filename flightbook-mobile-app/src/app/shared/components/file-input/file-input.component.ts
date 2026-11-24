@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
 import { AlertController, IonIcon } from '@ionic/angular';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
@@ -11,7 +11,10 @@ import { cloudUploadOutline } from "ionicons/icons";
     selector: 'fb-file-input',
     templateUrl: 'file-input.component.html',
     styleUrls: ['file-input.component.scss'],
-    imports: [IonIcon, TranslateModule]
+    imports: [IonIcon, TranslateModule],
+    // TODO: This component has been partially migrated to be zoneless-compatible.
+    // After testing, this should be updated to ChangeDetectionStrategy.OnPush.
+    changeDetection: ChangeDetectionStrategy.Default,
 })
 export class FileInputComponent implements OnInit {
 

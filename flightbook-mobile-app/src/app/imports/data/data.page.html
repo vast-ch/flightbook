@@ -16,30 +16,30 @@
         <span class="fb-row__label">{{ 'import.format' | translate }}</span>
         <span class="fb-row__value">
           <ion-select interface="popover" toggleIcon="chevron-forward"
-                      value="{{ importTypes[0]?.type }}" (ionChange)="changeImportType($event)"
+                      value="{{ importTypes()[0]?.type }}" (ionChange)="changeImportType($event)"
                       [attr.aria-label]="'import.format' | translate">
-            @for (type of importTypes; track type) {
+            @for (type of importTypes(); track type) {
               <ion-select-option value="{{ type.type }}">{{ type.name }}</ion-select-option>
             }
           </ion-select>
         </span>
       </div>
     </div>
-    @if (currentType?.description) {
-      <p class="import-hint">{{ currentType.description }}</p>
+    @if (currentType()?.description) {
+      <p class="import-hint">{{ currentType().description }}</p>
     }
 
     <!-- File. Guarded on currentType so the label never names an empty type. -->
-    @if (currentType) {
+    @if (currentType()) {
       @if (isIos) {
         <button type="button" class="import-card" (click)="onIosFilesSelect()">
           <ion-icon name="cloud-upload-outline" class="import-card__icon" aria-hidden="true"></ion-icon>
           <span class="import-card__text">
             <span class="import-card__title">
-              {{ 'import.chooseFile' | translate:{ fileType: currentType.fileType.toUpperCase() } }}
+              {{ 'import.chooseFile' | translate:{ fileType: currentType().fileType.toUpperCase() } }}
             </span>
-            @if (file) {
-              <span class="import-card__file">{{ file.name }}</span>
+            @if (file()) {
+              <span class="import-card__file">{{ file().name }}</span>
             }
           </span>
         </button>
@@ -49,10 +49,10 @@
           <ion-icon name="cloud-upload-outline" class="import-card__icon" aria-hidden="true"></ion-icon>
           <span class="import-card__text">
             <span class="import-card__title">
-              {{ 'import.chooseFile' | translate:{ fileType: currentType.fileType.toUpperCase() } }}
+              {{ 'import.chooseFile' | translate:{ fileType: currentType().fileType.toUpperCase() } }}
             </span>
-            @if (file) {
-              <span class="import-card__file">{{ file.name }}</span>
+            @if (file()) {
+              <span class="import-card__file">{{ file().name }}</span>
             }
           </span>
         </button>
@@ -60,7 +60,7 @@
     }
 
     <!-- Result -->
-    @if (result) {
+    @if (result(); as result) {
       <div class="import-result">
         <div class="fb-section-label">{{ 'import.result' | translate }}</div>
 
@@ -110,7 +110,7 @@
   </div>
 </ion-content>
 
-@if (showButton && file) {
+@if (showButton() && file()) {
   <ion-footer class="form-footer">
     <ion-button expand="block" (click)="save()">{{ 'buttons.save' | translate }}</ion-button>
   </ion-footer>

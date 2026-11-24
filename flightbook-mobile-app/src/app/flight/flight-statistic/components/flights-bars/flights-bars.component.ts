@@ -1,4 +1,4 @@
-import { Component, Input, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, computed, inject, signal } from '@angular/core';
 import { LanguageService } from 'src/app/shared/services/language.service';
 import { Bar } from '../../shared/statistic.store';
 
@@ -12,7 +12,10 @@ import { Bar } from '../../shared/statistic.store';
     selector: 'fb-flights-bars',
     standalone: true,
     templateUrl: './flights-bars.component.html',
-    styleUrls: ['./flights-bars.component.scss']
+    styleUrls: ['./flights-bars.component.scss'],
+    // TODO: This component has been partially migrated to be zoneless-compatible.
+    // After testing, this should be updated to ChangeDetectionStrategy.OnPush.
+    changeDetection: ChangeDetectionStrategy.Default,
 })
 export class FlightsBarsComponent {
 

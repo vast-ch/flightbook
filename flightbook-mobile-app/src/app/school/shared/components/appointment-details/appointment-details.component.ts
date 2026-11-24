@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, ChangeDetectorRef, inject } from '@angular/core';
 import { AlertController, ModalController, IonIcon, IonContent, IonButton } from '@ionic/angular';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { firstValueFrom } from 'rxjs';
@@ -28,7 +28,10 @@ const HOURS_BEFORE_DAYS = 48;
         IonIcon,
         IonContent,
         IonButton
-    ]
+    ],
+    // TODO: This component has been partially migrated to be zoneless-compatible.
+    // After testing, this should be updated to ChangeDetectionStrategy.OnPush.
+    changeDetection: ChangeDetectionStrategy.Default,
 })
 export class AppointmentDetailsComponent implements OnInit {
 
@@ -36,6 +39,8 @@ export class AppointmentDetailsComponent implements OnInit {
     currentUser: User;
     school: School;
     isSubscribed = false;
+    /** The subscribe/unsubscribe alerts' handlers run outside any Angular event. */
+    private cdr = inject(ChangeDetectorRef);
     subscribed: Subscription[] = [];
     waitingList: Subscription[] = [];
     hasChanges = false;
@@ -215,12 +220,14 @@ export class AppointmentDetailsComponent implements OnInit {
                                 this.informWaitingList();
                             }
                             this.isSubscribed = true;
+                            this.cdr.markForCheck();
                         }
                     },
                     {
                         text: this.translate.instant('buttons.no'),
                         handler: () => {
                             this.isSubscribed = false;
+                            this.cdr.markForCheck();
                         }
                     }
                 ]
@@ -248,12 +255,14 @@ export class AppointmentDetailsComponent implements OnInit {
                             this.ngOnInit();
                             this.isSubscribed = false;
                             this.markChanged();
+                            this.cdr.markForCheck();
                         }
                     },
                     {
                         text: this.translate.instant('buttons.no'),
                         handler: () => {
                             this.isSubscribed = true;
+                            this.cdr.markForCheck();
                         }
                     }
                 ]

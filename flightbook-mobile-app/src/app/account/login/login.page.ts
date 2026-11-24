@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { NavController, AlertController, LoadingController, IonContent, IonInput, IonButton, IonIcon } from '@ionic/angular';
 import { UpperCasePipe } from '@angular/common';
@@ -28,7 +28,10 @@ import { ActivatedRoute, Router } from '@angular/router';
         IonInput,
         IonButton,
         IonIcon
-    ]
+    ],
+    // TODO: This component has been partially migrated to be zoneless-compatible.
+    // After testing, this should be updated to ChangeDetectionStrategy.OnPush.
+    changeDetection: ChangeDetectionStrategy.Default,
 })
 export class LoginPage implements OnInit, OnDestroy {
     unsubscribe$ = new Subject<void>();

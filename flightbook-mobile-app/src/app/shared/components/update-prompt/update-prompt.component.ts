@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { AlertController, IonButton, IonContent, IonFooter, IonIcon, ModalController } from '@ionic/angular';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { UpdateStatus, VersionCheckResponse } from '../../services/version-check.service';
@@ -16,7 +16,10 @@ import { NativeMarket } from "@capacitor-community/native-market";
     IonContent,
     IonFooter,
     TranslateModule
-  ]
+  ],
+  // TODO: This component has been partially migrated to be zoneless-compatible.
+  // After testing, this should be updated to ChangeDetectionStrategy.OnPush.
+  changeDetection: ChangeDetectionStrategy.Default,
 })
 export class UpdatePromptComponent {
   @Input() updateInfo: VersionCheckResponse;

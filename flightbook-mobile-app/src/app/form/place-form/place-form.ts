@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, Output, EventEmitter } from '@angular/core';
 import { AlertController, IonInput, IonSelect, IonSelectOption, IonTextarea } from '@ionic/angular';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { Place } from 'src/app/place/shared/place.model';
@@ -10,7 +10,10 @@ import { PlaceMapComponent } from '../../shared/components/place-map/place-map.c
     selector: 'place-form',
     templateUrl: 'place-form.html',
     styleUrls: ['place-form.scss'],
-    imports: [FormsModule, PlaceMapComponent, TranslateModule, IonInput, IonSelect, IonSelectOption, IonTextarea]
+    imports: [FormsModule, PlaceMapComponent, TranslateModule, IonInput, IonSelect, IonSelectOption, IonTextarea],
+    // TODO: This component has been partially migrated to be zoneless-compatible.
+    // After testing, this should be updated to ChangeDetectionStrategy.OnPush.
+    changeDetection: ChangeDetectionStrategy.Default,
 })
 export class PlaceFormComponent {
 

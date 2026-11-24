@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, OnDestroy } from '@angular/core';
 import { LoadingController, AlertController, IonContent, IonFooter, IonIcon, IonInput, IonButton } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { arrowBack, eyeOutline, eyeOffOutline } from 'ionicons/icons';
@@ -25,7 +25,10 @@ import { PhoneNumberComponent } from 'src/app/shared/components/phone-number/pho
         IonInput,
         IonButton,
         PhoneNumberComponent
-    ]
+    ],
+    // TODO: This component has been partially migrated to be zoneless-compatible.
+    // After testing, this should be updated to ChangeDetectionStrategy.OnPush.
+    changeDetection: ChangeDetectionStrategy.Default,
 })
 export class RegisterPage implements OnInit, OnDestroy {
     unsubscribe$ = new Subject<void>();

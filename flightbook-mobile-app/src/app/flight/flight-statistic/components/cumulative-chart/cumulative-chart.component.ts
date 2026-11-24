@@ -1,4 +1,4 @@
-import { Component, Input, computed, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, computed, signal } from '@angular/core';
 import { ChartConfiguration, ChartData } from 'chart.js';
 import { NgChartsModule } from 'ng2-charts';
 import { CumulativePoint } from '../../shared/statistic.store';
@@ -14,7 +14,10 @@ import { themeColor, withAlpha } from 'src/app/shared/util/theme-color';
     selector: 'fb-cumulative-chart',
     templateUrl: './cumulative-chart.component.html',
     styleUrls: ['./cumulative-chart.component.scss'],
-    imports: [NgChartsModule]
+    imports: [NgChartsModule],
+    // TODO: This component has been partially migrated to be zoneless-compatible.
+    // After testing, this should be updated to ChangeDetectionStrategy.OnPush.
+    changeDetection: ChangeDetectionStrategy.Default,
 })
 export class CumulativeChartComponent {
 

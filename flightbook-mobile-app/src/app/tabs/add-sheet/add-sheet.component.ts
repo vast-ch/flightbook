@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { AlertController, ModalController, IonIcon } from '@ionic/angular';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
@@ -20,7 +20,10 @@ const FREE_FLIGHT_LIMIT = 25;
     selector: 'app-add-sheet',
     templateUrl: './add-sheet.component.html',
     styleUrls: ['./add-sheet.component.scss'],
-    imports: [TranslateModule, IonIcon]
+    imports: [TranslateModule, IonIcon],
+    // TODO: This component has been partially migrated to be zoneless-compatible.
+    // After testing, this should be updated to ChangeDetectionStrategy.OnPush.
+    changeDetection: ChangeDetectionStrategy.Default,
 })
 export class AddSheetComponent {
     private modalCtrl = inject(ModalController);

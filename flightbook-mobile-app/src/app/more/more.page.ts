@@ -1,4 +1,4 @@
-import { Component, OnDestroy, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AlertController, IonContent, IonIcon, IonInput, IonReorder, IonReorderGroup, IonToggle, ReorderEndCustomEvent, ToggleCustomEvent } from '@ionic/angular';
@@ -41,7 +41,10 @@ const SCHOOL_WORD = /^(flugschule|flight\s+school|paragliding\s+school|school|[Ã
         IonReorder,
         IonReorderGroup,
         IonToggle
-    ]
+    ],
+    // TODO: This component has been partially migrated to be zoneless-compatible.
+    // After testing, this should be updated to ChangeDetectionStrategy.OnPush.
+    changeDetection: ChangeDetectionStrategy.Default,
 })
 export class MorePage implements OnDestroy {
     private unsubscribe$ = new Subject<void>();

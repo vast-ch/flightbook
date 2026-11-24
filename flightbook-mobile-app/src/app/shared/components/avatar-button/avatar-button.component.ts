@@ -1,4 +1,4 @@
-import { Component, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { AccountService } from 'src/app/account/shared/account.service';
@@ -15,7 +15,10 @@ import { AccountService } from 'src/app/account/shared/account.service';
     standalone: true,
     imports: [TranslateModule],
     templateUrl: './avatar-button.component.html',
-    styles: [':host { display: contents; }']
+    styles: [':host { display: contents; }'],
+    // TODO: This component has been partially migrated to be zoneless-compatible.
+    // After testing, this should be updated to ChangeDetectionStrategy.OnPush.
+    changeDetection: ChangeDetectionStrategy.Default,
 })
 export class AvatarButtonComponent {
     private accountService = inject(AccountService);

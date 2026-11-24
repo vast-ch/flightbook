@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Output, computed, inject } from '@angular/core';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { IonIcon } from '@ionic/angular';
 import { addIcons } from 'ionicons';
@@ -20,9 +20,12 @@ type Chip = { label: string; clear: () => void };
     selector: 'fb-filter-chips',
     standalone: true,
     imports: [TranslateModule, IonIcon],
-    templateUrl: './filter-chips.component.html'
+    templateUrl: './filter-chips.component.html',
     // .filter-summary* moved to tokens.scss when the glider list grew the same
     // row: two components draw it now, and neither owns the pattern.
+    // TODO: This component has been partially migrated to be zoneless-compatible.
+    // After testing, this should be updated to ChangeDetectionStrategy.OnPush.
+    changeDetection: ChangeDetectionStrategy.Default,
 })
 export class FilterChipsComponent {
     private flightStore = inject(FlightStore);

@@ -1,4 +1,4 @@
-import { Component, Input, computed, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, computed, signal } from '@angular/core';
 import { SeasonRow } from '../../shared/statistic.store';
 
 /**
@@ -11,7 +11,10 @@ import { SeasonRow } from '../../shared/statistic.store';
     selector: 'fb-season-grid',
     standalone: true,
     templateUrl: './season-grid.component.html',
-    styleUrls: ['./season-grid.component.scss']
+    styleUrls: ['./season-grid.component.scss'],
+    // TODO: This component has been partially migrated to be zoneless-compatible.
+    // After testing, this should be updated to ChangeDetectionStrategy.OnPush.
+    changeDetection: ChangeDetectionStrategy.Default,
 })
 export class SeasonGridComponent {
 

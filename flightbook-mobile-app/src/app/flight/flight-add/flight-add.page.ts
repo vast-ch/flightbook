@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, OnDestroy, ChangeDetectorRef, inject, signal } from '@angular/core';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { Router } from '@angular/router';
@@ -34,14 +34,22 @@ import { NavigationService } from 'src/app/shared/services/navigation.service';
         IonFooter,
         IonButton,
         IonIcon
-    ]
+    ],
+    // TODO: This component has been partially migrated to be zoneless-compatible.
+    // After testing, this should be updated to ChangeDetectionStrategy.OnPush.
+    changeDetection: ChangeDetectionStrategy.Default,
 })
 export class FlightAddPage implements OnInit, OnDestroy {
     unsubscribe$ = new Subject<void>();
+    /**
+     * A mutable model shared with flight-form, filled in by HTTP answers and
+     * the IGC parse: each such write ends in markForCheck().
+     */
     flight: Flight;
-    gliders: Glider[] = [];
-    igcFile: string;
-    schools: School[];
+    gliders = signal<Glider[]>([]);
+    igcFile = signal<string | undefined>(undefined);
+    schools = signal<School[] | undefined>(undefined);
+    private cdr = inject(ChangeDetectorRef);
     tandemSchools = this.tandemSchoolService.schools;
 
     constructor(
@@ -71,7 +79,7 @@ export class FlightAddPage implements OnInit, OnDestroy {
 
     ngOnInit() {
         this.schoolService.getSchools().then((schools: School[]) => {
-            this.schools = schools;
+            this.schools.set(schools);
         });
 
         this.tandemSchoolService.getSchools();
@@ -87,6 +95,7 @@ export class FlightAddPage implements OnInit, OnDestroy {
                     if (res.length > 0) {
                         this.flight.glider = res[0].glider;
                         this.ensureSelectedGliderIncluded();
+                        this.cdr.markForCheck();
                     }
                 });
         }
@@ -95,7 +104,7 @@ export class FlightAddPage implements OnInit, OnDestroy {
         // restoring it in the handler left the glider list filtered whenever the
         // request failed.
         this.gliderStore.getGliders({ store: false, archived: "0" }).pipe(takeUntil(this.unsubscribe$)).subscribe((resp: Glider[]) => {
-            this.gliders = resp;
+            this.gliders.set(resp);
             this.ensureSelectedGliderIncluded();
             this.noGliderCheck();
         });
@@ -166,8 +175,10 @@ export class FlightAddPage implements OnInit, OnDestroy {
 
         await loading.present();
 
-        this.igcFile = await this.igcService.getIgcFileContentAndPrefillFlight(this.flight, this.flight.igcFile);
+        this.igcFile.set(await this.igcService.getIgcFileContentAndPrefillFlight(this.flight, this.flight.igcFile));
         this.ensureSelectedGliderIncluded();
+        // The parse wrote date, time, km, places and glider into this.flight.
+        this.cdr.markForCheck();
 
         await loading.dismiss();
     }
@@ -181,13 +192,13 @@ export class FlightAddPage implements OnInit, OnDestroy {
      * ngOnInit with the default, unset Glider() and nothing to add yet.
      */
     private ensureSelectedGliderIncluded() {
-        if (this.flight.glider?.id && !this.gliders.find(glider => glider.id === this.flight.glider.id)) {
-            this.gliders.push(this.flight.glider);
+        if (this.flight.glider?.id && !this.gliders().find(glider => glider.id === this.flight.glider.id)) {
+            this.gliders.update(gliders => [...gliders, this.flight.glider]);
         }
     }
 
     private async noGliderCheck() {
-        if (this.gliders.length === 0) {
+        if (this.gliders().length === 0) {
             const alert = await this.alertController.create({
                 header: this.translate.instant('message.noglidertitle'),
                 message: this.translate.instant('message.noglider'),

@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, computed, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, computed, signal, ChangeDetectorRef, inject } from '@angular/core';
 import { ControlSheet } from 'src/app/shared/domain/control-sheet';
 import { SchoolService } from '../shared/school.service';
 import { Subject, takeUntil } from 'rxjs';
@@ -33,11 +33,20 @@ type SkillRow = { key: string, value: number };
         IonContent,
         IonIcon,
         IonModal
-    ]
+    ],
+    // TODO: This component has been partially migrated to be zoneless-compatible.
+    // After testing, this should be updated to ChangeDetectionStrategy.OnPush.
+    changeDetection: ChangeDetectionStrategy.Default,
 })
 export class ControlSheetPage implements OnInit, OnDestroy {
     unsubscribe$ = new Subject<void>();
+    /**
+     * The sheet and everything derived from it (rows, progress, exam dates) are
+     * plain fields rewritten together after the load and after a rating saved
+     * from the skill modal: both paths end in markForCheck().
+     */
     controlSheet: ControlSheet | undefined;
+    private cdr = inject(ChangeDetectorRef);
 
     orderedAltitudeFlight: SkillRow[] = [];
     orderedTheory: SkillRow[] = [];
@@ -201,6 +210,7 @@ export class ControlSheetPage implements OnInit, OnDestroy {
                     ? new Date(this.controlSheet.passPracticeExam).toISOString()
                     : new Date().toISOString();
                 this.orderControlSheet(controlSheet);
+                this.cdr.markForCheck();
                 await loading.dismiss();
             },
             error: async () => {
@@ -271,6 +281,8 @@ export class ControlSheetPage implements OnInit, OnDestroy {
             rows[index] = { key, value };
         }
         this.refreshProgress();
+        // Called by the skill modal through `persist`, not by this template.
+        this.cdr.markForCheck();
 
         await this.postControlSheet();
     }

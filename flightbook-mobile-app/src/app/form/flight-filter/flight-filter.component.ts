@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, computed, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, computed, signal } from '@angular/core';
 import { ModalController, IonContent, IonIcon, IonInput, IonButton, IonModal, IonDatetime, IonSelect, IonSelectOption } from '@ionic/angular';
 import { Subject, Subscription, of } from 'rxjs';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
@@ -35,10 +35,13 @@ type PeriodKey = 'all' | 'last12' | string;
         IonDatetime,
         IonSelect,
         IonSelectOption
-    ]
+    ],
+    // TODO: This component has been partially migrated to be zoneless-compatible.
+    // After testing, this should be updated to ChangeDetectionStrategy.OnPush.
+    changeDetection: ChangeDetectionStrategy.Default,
 })
 export class FlightFilterComponent implements OnInit, OnDestroy {
-    public gliders: Glider[] = [];
+    public gliders = signal<Glider[]>([]);
     private unsubscribe$ = new Subject<void>();
     public language: string;
 
@@ -107,7 +110,7 @@ export class FlightFilterComponent implements OnInit, OnDestroy {
         this.gliderStore.getGliders({ store: false, applyFilter: false })
             .pipe(takeUntil(this.unsubscribe$))
             .subscribe({
-                next: (gliders: Glider[]) => { this.gliders = gliders; },
+                next: (gliders: Glider[]) => this.gliders.set(gliders),
                 // The rest of the sheet still works; only the choices are missing.
                 error: () => { }
             });
@@ -188,7 +191,7 @@ export class FlightFilterComponent implements OnInit, OnDestroy {
      * value and the filter holds a whole Glider - an empty one standing for "any".
      */
     setGliderById(id: string) {
-        const glider = id ? this.gliders.find(candidate => String(candidate.id) === id) : null;
+        const glider = id ? this.gliders().find(candidate => String(candidate.id) === id) : null;
         this.flightStore.updateFilter({ glider: glider ?? new Glider() });
     }
 

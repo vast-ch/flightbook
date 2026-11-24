@@ -49,7 +49,7 @@
           line for every glider owned, and a pilot with a dozen of them pushed
           everything below off the sheet.
         -->
-        @if (gliders.length > 0) {
+        @if (gliders().length > 0) {
             <div class="fb-section-label filter-label">{{ 'groupname.glider' | translate }}</div>
             <div class="filter-select">
                 <ion-select [ngModel]="selectedGliderId()" (ngModelChange)="setGliderById($event)"
@@ -59,7 +59,7 @@
                             cancelText="{{ 'buttons.clear' | translate }}"
                             (ionCancel)="setGliderById('')">
                     <ion-select-option value="">{{ 'glider.all' | translate }}</ion-select-option>
-                    @for (glider of gliders; track glider.id) {
+                    @for (glider of gliders(); track glider.id) {
                         <ion-select-option [value]="glider.id.toString()">
                             {{ glider.brand }} {{ glider.name }}
                         </ion-select-option>

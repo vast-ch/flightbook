@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { ModalController, IonContent, IonButton, IonModal, IonDatetime } from '@ionic/angular';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { AppointmentFilter } from '../../appointment-filter.model';
@@ -21,7 +21,10 @@ const STATES: string[] = ['', ...Object.values(State)];
         IonButton,
         IonModal,
         IonDatetime
-    ]
+    ],
+    // TODO: This component has been partially migrated to be zoneless-compatible.
+    // After testing, this should be updated to ChangeDetectionStrategy.OnPush.
+    changeDetection: ChangeDetectionStrategy.Default,
 })
 export class AppointmentFilterComponent {
     public readonly states = STATES;

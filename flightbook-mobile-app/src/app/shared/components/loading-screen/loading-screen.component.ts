@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
 import { TranslateModule } from '@ngx-translate/core';
 import { VersionService } from 'src/app/shared/services/version.service';
 
@@ -28,7 +28,10 @@ const STALLED_AFTER = 8000;
     selector: 'fb-loading-screen',
     templateUrl: './loading-screen.component.html',
     styleUrls: ['./loading-screen.component.scss'],
-    imports: [TranslateModule]
+    imports: [TranslateModule],
+    // TODO: This component has been partially migrated to be zoneless-compatible.
+    // After testing, this should be updated to ChangeDetectionStrategy.OnPush.
+    changeDetection: ChangeDetectionStrategy.Default,
 })
 export class LoadingScreenComponent implements OnInit, OnDestroy {
     private lineIndex = signal(0);

@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, Output, EventEmitter, OnInit, inject } from '@angular/core';
 import { AlertController, IonItem, IonInput, IonToggle, IonTextarea, IonModal, IonContent, IonDatetime, IonList, IonItemSliding, IonItemOptions, IonItemOption, IonIcon, ModalController } from '@ionic/angular';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { Glider, GliderCheck } from 'src/app/glider/shared/glider.model';
@@ -12,7 +12,10 @@ import { CheckComponent } from './check/check.component';
     selector: 'glider-form',
     templateUrl: 'glider-form.html',
     styleUrls: ['glider-form.scss'],
-    imports: [FormsModule, DatePipe, TranslateModule, IonItem, IonInput, IonToggle, IonTextarea, IonModal, IonContent, IonDatetime, IonList, IonItemSliding, IonItemOptions, IonItemOption, IonIcon]
+    imports: [FormsModule, DatePipe, TranslateModule, IonItem, IonInput, IonToggle, IonTextarea, IonModal, IonContent, IonDatetime, IonList, IonItemSliding, IonItemOptions, IonItemOption, IonIcon],
+    // TODO: This component has been partially migrated to be zoneless-compatible.
+    // After testing, this should be updated to ChangeDetectionStrategy.OnPush.
+    changeDetection: ChangeDetectionStrategy.Default,
 })
 export class GliderFormComponent implements OnInit {
     @Input()
@@ -21,6 +24,7 @@ export class GliderFormComponent implements OnInit {
     saveGlider = new EventEmitter<Glider>();
     language: string;
     displayArchived = false;
+    private cdr = inject(ChangeDetectorRef);
 
     constructor(
         private alertController: AlertController,
@@ -103,6 +107,9 @@ export class GliderFormComponent implements OnInit {
         }
 
         this.glider.checks.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+        // Written after onWillDismiss, outside any Angular event: the check list
+        // would not show the new or edited check until the next tap.
+        this.cdr.markForCheck();
         await modal.dismiss();
     }
 }

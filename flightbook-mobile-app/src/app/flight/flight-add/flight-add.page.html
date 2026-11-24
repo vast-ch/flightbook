@@ -10,7 +10,7 @@
     <fb-file-input (onFilesSelectEvent)="onFilesSelectEvent($event)"></fb-file-input>
     <div class="form-divider">{{ 'flight.orByHand' | translate }}</div>
 
-    <flight-form [flight]=flight [gliders]=gliders [schools]=schools [tandemSchools]="tandemSchools()" [igcFile]=igcFile (saveFlight)="saveFlight($event)"></flight-form>
+    <flight-form [flight]=flight [gliders]="gliders()" [schools]="schools()" [tandemSchools]="tandemSchools()" [igcFile]="igcFile()" (saveFlight)="saveFlight($event)"></flight-form>
   </div>
 </ion-content>
 

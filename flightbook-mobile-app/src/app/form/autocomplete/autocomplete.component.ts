@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter, ElementRef, OnChanges, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, Input, Output, EventEmitter, ElementRef, OnChanges, OnDestroy, signal } from '@angular/core';
 import { Subject, of } from 'rxjs';
 import { catchError, debounceTime, switchMap, takeUntil } from 'rxjs/operators';
 import { Place } from 'src/app/place/shared/place.model';
@@ -18,7 +18,10 @@ import { TranslateModule } from '@ngx-translate/core';
     imports: [
         IonIcon,
         TranslateModule
-    ]
+    ],
+    // TODO: This component has been partially migrated to be zoneless-compatible.
+    // After testing, this should be updated to ChangeDetectionStrategy.OnPush.
+    changeDetection: ChangeDetectionStrategy.Default,
 })
 export class AutocompleteComponent implements OnInit, OnChanges, OnDestroy {
     private unsubscribe$ = new Subject<void>();
@@ -29,15 +32,14 @@ export class AutocompleteComponent implements OnInit, OnChanges, OnDestroy {
     @Output()
     setInputValue = new EventEmitter<Place>();
 
-    show: boolean;
-    listElement: Place[];
+    show = signal(false);
+    listElement = signal<Place[]>([]);
 
     constructor(
         private placeStore: PlaceStore,
         private eRef: ElementRef
     ) {
         this.search = null;
-        this.show = false;
         addIcons({ close });
 
         // Wired in the constructor, not ngOnInit: the first ngOnChanges runs
@@ -52,10 +54,10 @@ export class AutocompleteComponent implements OnInit, OnChanges, OnDestroy {
             takeUntil(this.unsubscribe$)
         ).subscribe((res: Place[]) => {
             if (res && res.length > 0) {
-                this.show = true;
-                this.listElement = res;
+                this.listElement.set(res);
+                this.show.set(true);
             } else {
-                this.show = false;
+                this.show.set(false);
             }
         });
     }
@@ -64,7 +66,7 @@ export class AutocompleteComponent implements OnInit, OnChanges, OnDestroy {
 
     onClick(event: any) {
         if (!this.eRef.nativeElement.contains(event.target)) { // or some similar check
-            this.show = false;
+            this.show.set(false);
         }
     }
 
@@ -76,7 +78,7 @@ export class AutocompleteComponent implements OnInit, OnChanges, OnDestroy {
             // one in flight does not outlive the component.
             this.searchTerm$.next(this.search);
         } else {
-            this.show = false;
+            this.show.set(false);
         }
     }
 
@@ -91,12 +93,12 @@ export class AutocompleteComponent implements OnInit, OnChanges, OnDestroy {
     }
 
     setValue(value: any) {
-        this.show = false;
+        this.show.set(false);
         this.setInputValue.emit(value);
     }
 
     closeList() {
-        this.show = false;
+        this.show.set(false);
     }
 
     ngOnDestroy() {

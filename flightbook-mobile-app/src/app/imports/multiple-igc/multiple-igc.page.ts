@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, signal } from '@angular/core';
 import { LoadingController, IonContent, IonFooter, IonList, IonItem, IonSpinner, IonButton, IonIcon } from '@ionic/angular';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { Subject, from, firstValueFrom } from 'rxjs';
@@ -43,15 +43,27 @@ const IMPORT_CONCURRENCY = 2;
         IonSpinner,
         IonButton,
         IonIcon
-    ]
+    ],
+    // TODO: This component has been partially migrated to be zoneless-compatible.
+    // After testing, this should be updated to ChangeDetectionStrategy.OnPush.
+    changeDetection: ChangeDetectionStrategy.Default,
 })
 export class MultipleIgcPage implements OnInit {
 
     unsubscribe$ = new Subject<void>();
-    gliders: Glider[] = [];
+    gliders = signal<Glider[]>([]);
     state = State;
-    flightStateList: FlightStatus[] = [];
-    isSaved = false;
+    /**
+     * The rows' own objects are updated in place (state, and the flight the IGC
+     * parse fills in), so every such change ends in touch(): a new array is
+     * what tells Angular the list moved.
+     */
+    flightStateList = signal<FlightStatus[]>([]);
+    isSaved = signal(false);
+
+    private touch() {
+        this.flightStateList.update(list => [...list]);
+    }
 
     /** LanguageService, not translate.currentLang: always a locale Angular has data for. */
     get currentLang(): string {
@@ -85,7 +97,7 @@ export class MultipleIgcPage implements OnInit {
         this.gliderStore.getGliders({ store: false, applyFilter: false })
             .pipe(takeUntil(this.unsubscribe$))
             .subscribe({
-                next: (gliders: Glider[]) => { this.gliders = gliders; },
+                next: (gliders: Glider[]) => this.gliders.set(gliders),
                 error: () => { }
             });
     }
@@ -98,17 +110,18 @@ export class MultipleIgcPage implements OnInit {
                 state: State.LOADING
             };
 
-            this.flightStateList.push(flightState);
+            this.flightStateList.update(list => [...list, flightState]);
 
             flight.igcFile = file;
 
             await this.igcService.getIgcFileContentAndPrefillFlight(flight, flight.igcFile);
 
             if (!flight.glider.name) {
-                flight.glider = this.gliders[0];
+                flight.glider = this.gliders()[0];
             }
 
             flightState.state = State.LOADED;
+            this.touch();
         }
     }
 
@@ -121,7 +134,7 @@ export class MultipleIgcPage implements OnInit {
     }
 
     removeFlight(index: number) {
-        this.flightStateList.splice(index, 1);
+        this.flightStateList.update(list => list.filter((_, i) => i !== index));
     }
 
     async save() {
@@ -131,13 +144,13 @@ export class MultipleIgcPage implements OnInit {
         await loading.present();
 
         await firstValueFrom(
-            from(this.flightStateList).pipe(
+            from(this.flightStateList()).pipe(
                 mergeMap(flightState => this.saveOne(flightState), IMPORT_CONCURRENCY),
                 toArray()
             )
         );
 
-        this.isSaved = true;
+        this.isSaved.set(true);
         await loading.dismiss();
     }
 
@@ -153,6 +166,7 @@ export class MultipleIgcPage implements OnInit {
         } catch {
             flightState.state = State.ERROR;
         }
+        this.touch();
     }
 
     private async uploadIgc(flight: Flight) {
@@ -162,8 +176,8 @@ export class MultipleIgcPage implements OnInit {
     }
 
     clear() {
-        this.flightStateList = [];
-        this.isSaved = false;
+        this.flightStateList.set([]);
+        this.isSaved.set(false);
     }
 }
 

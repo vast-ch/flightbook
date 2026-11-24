@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common';
-import { Component, OnDestroy, OnInit, computed, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, computed, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ModalController, LoadingController, IonIcon, IonContent, IonInfiniteScroll, IonInfiniteScrollContent, AlertController, ActionSheetController } from '@ionic/angular';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
@@ -28,7 +28,10 @@ import { localDate } from 'src/app/shared/util/format';
     IonContent,
     IonInfiniteScroll,
     IonInfiniteScrollContent
-  ]
+  ],
+  // TODO: This component has been partially migrated to be zoneless-compatible.
+  // After testing, this should be updated to ChangeDetectionStrategy.OnPush.
+  changeDetection: ChangeDetectionStrategy.Default,
 })
 export class PassengerConfirmationListPage implements OnInit, OnDestroy {
 

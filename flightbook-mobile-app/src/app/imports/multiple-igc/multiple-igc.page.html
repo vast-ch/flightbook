@@ -13,17 +13,17 @@
                    (onFilesSelectEvent)="onFilesSelectEvent($event)"></fb-file-input>
   </div>
 
-  @if (flightStateList.length > 0) {
+  @if (flightStateList().length > 0) {
     <div class="fb-section-label igc-heading">
-      @if (flightStateList.length === 1) {
+      @if (flightStateList().length === 1) {
         {{ 'import.stagedOne' | translate }}
       } @else {
-        {{ 'import.staged' | translate:{ count: flightStateList.length } }}
+        {{ 'import.staged' | translate:{ count: flightStateList().length } }}
       }
     </div>
 
     <ion-list class="list-block">
-      @for (flightSate of flightStateList; track flightSate; let i = $index) {
+      @for (flightSate of flightStateList(); track flightSate; let i = $index) {
         <ion-item detail="false" lines="none" class="igc-row" [attr.data-index]="i">
           @if (flightSate.state == state.LOADING) {
             <div class="igc-row__loading">
@@ -50,7 +50,7 @@
                 </div>
 
                 <div class="igc-row__glider">
-                  <fb-glider-select [flight]=flightSate.flight [gliders]=gliders></fb-glider-select>
+                  <fb-glider-select [flight]=flightSate.flight [gliders]=gliders()></fb-glider-select>
                 </div>
               </div>
 
@@ -72,9 +72,9 @@
   }
 </ion-content>
 
-@if (flightStateList.length > 0) {
+@if (flightStateList().length > 0) {
   <ion-footer class="form-footer">
-    @if (isSaved) {
+    @if (isSaved()) {
       <ion-button expand="block" (click)="clear()">{{ 'buttons.clear' | translate }}</ion-button>
     } @else {
       <ion-button expand="block" (click)="save()">{{ 'buttons.save' | translate }}</ion-button>

@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, Input, NgZone, OnDestroy, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, AfterViewInit, ChangeDetectorRef, Component, ElementRef, Input, NgZone, OnDestroy, ViewChild } from '@angular/core';
 import Feature from 'ol/Feature';
 import IGC from 'ol/format/IGC';
 import Map from 'ol/Map';
@@ -54,7 +54,10 @@ const LANDING_COLOR = '#e0483a';
         IonRange,
         IonButton,
         IonIcon
-    ]
+    ],
+    // TODO: This component has been partially migrated to be zoneless-compatible.
+    // After testing, this should be updated to ChangeDetectionStrategy.OnPush.
+    changeDetection: ChangeDetectionStrategy.Default,
 })
 export class IgcMapComponent implements AfterViewInit, OnDestroy {
 
@@ -516,6 +519,9 @@ export class IgcMapComponent implements AfterViewInit, OnDestroy {
                 }),
             }),
         });
+        // mapReady flips here, after the awaited configuration request: the play
+        // button and slider are bound to it and would otherwise stay disabled.
+        this.cdr.markForCheck();
     }
 
     /**

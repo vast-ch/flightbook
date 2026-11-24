@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
 import { Flight } from 'src/app/flight/shared/flight.model';
 import { Glider } from 'src/app/glider/shared/glider.model';
 import { TranslateModule } from '@ngx-translate/core';
@@ -12,7 +12,10 @@ import { IonSelect, IonSelectOption } from "@ionic/angular";
         TranslateModule,
         IonSelect,
         IonSelectOption
-    ]
+    ],
+    // TODO: This component has been partially migrated to be zoneless-compatible.
+    // After testing, this should be updated to ChangeDetectionStrategy.OnPush.
+    changeDetection: ChangeDetectionStrategy.Default,
 })
 export class GliderSelectComponent implements OnInit {
 

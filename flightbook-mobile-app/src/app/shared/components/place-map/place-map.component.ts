@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, Input, NgZone, OnChanges, OnDestroy, SimpleChanges, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, AfterViewInit, ChangeDetectorRef, Component, ElementRef, Input, NgZone, OnChanges, OnDestroy, SimpleChanges, ViewChild } from '@angular/core';
 import { AlertController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
 import { Point as GeoPoint, Position } from 'geojson';
@@ -38,6 +38,9 @@ const DEFAULT_ZOOM = 6.7;
     templateUrl: './place-map.component.html',
     styleUrls: ['./place-map.component.scss'],
     standalone: true,
+    // TODO: This component has been partially migrated to be zoneless-compatible.
+    // After testing, this should be updated to ChangeDetectionStrategy.OnPush.
+    changeDetection: ChangeDetectionStrategy.Default,
 })
 export class PlaceMapComponent implements AfterViewInit, OnChanges, OnDestroy {
 
@@ -75,7 +78,8 @@ export class PlaceMapComponent implements AfterViewInit, OnChanges, OnDestroy {
         private alertController: AlertController,
         private translate: TranslateService,
         private configurationService: ConfigurationService,
-        private zone: NgZone
+        private zone: NgZone,
+        private cdr: ChangeDetectorRef
     ) {
         this.vectorSource.addFeature(this.marker);
 
@@ -178,6 +182,9 @@ export class PlaceMapComponent implements AfterViewInit, OnChanges, OnDestroy {
                     this.guessedCountry = metadata.country;
                 }
             });
+            // The fields live in the parent form; zone.run no longer renders
+            // anything without Zone.js, and markForCheck reaches the ancestors.
+            this.cdr.markForCheck();
         } catch {
             // Keep the coordinates; the pilot can still fill these in by hand.
         }
@@ -206,6 +213,9 @@ export class PlaceMapComponent implements AfterViewInit, OnChanges, OnDestroy {
         this.guessedAltitude = metadata.altitude;
         this.place.country = metadata.country;
         this.guessedCountry = metadata.country;
+        // Reached from an HTTP answer or the override alert's handler, neither of
+        // which tells Angular: the parent form shows these fields.
+        this.cdr.markForCheck();
     }
 
     private async initMap(position?: Position) {

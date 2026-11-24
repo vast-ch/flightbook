@@ -239,14 +239,14 @@
         <div class="fb-banner fb-banner--success account-banner">
           <div class="fb-banner__title">{{ 'account.premium' | translate }}</div>
           <div class="fb-banner__text">
-            @if (paymentStatus?.state === 'CANCELED') {
-              {{ 'payment.canceled' | translate: { date: paymentStatus.expires_date | date:'dd.MM.yyyy HH:mm':'UTC' } }}
+            @if (paymentStatus()?.state === 'CANCELED') {
+              {{ 'payment.canceled' | translate: { date: paymentStatus().expires_date | date:'dd.MM.yyyy HH:mm':'UTC' } }}
             } @else {
-              {{ 'payment.information' | translate: { date: paymentStatus.expires_date | date:'dd.MM.yyyy HH:mm':'UTC' } }}
+              {{ 'payment.information' | translate: { date: paymentStatus().expires_date | date:'dd.MM.yyyy HH:mm':'UTC' } }}
             }
           </div>
         </div>
-        @if (paymentStatus.active && paymentStatus?.state === 'ACTIVE') {
+        @if (paymentStatus().active && paymentStatus()?.state === 'ACTIVE') {
           <div class="account-actions">
             <ion-button expand="block" fill="outline" color="danger" (click)="cancelSubscription()">
               {{ 'buttons.cancelSubscription' | translate }}

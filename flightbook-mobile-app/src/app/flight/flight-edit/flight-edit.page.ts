@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { firstValueFrom, Subject } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { takeUntil } from 'rxjs/operators';
@@ -41,7 +41,10 @@ import { NavigationService } from 'src/app/shared/services/navigation.service';
         IonButton,
         IonFooter,
         IonIcon
-    ]
+    ],
+    // TODO: This component has been partially migrated to be zoneless-compatible.
+    // After testing, this should be updated to ChangeDetectionStrategy.OnPush.
+    changeDetection: ChangeDetectionStrategy.Default,
 })
 export class FlightEditPage implements OnInit, OnDestroy {
     unsubscribe$ = new Subject<void>();
@@ -50,10 +53,15 @@ export class FlightEditPage implements OnInit, OnDestroy {
     private decoder = new TextDecoder('utf-8');
     public FlightValidationState = FlightValidationState;
     public TandemSchoolPaymentState = TandemSchoolPaymentState;
+    /**
+     * A mutable model shared with flight-form and filled in after awaits (the
+     * load, the IGC parse): each such write ends in markForCheck().
+     */
     flight: Flight = new Flight();
-    gliders: Glider[] = [];
-    igcFile: string;
-    schools: School[];
+    gliders = signal<Glider[]>([]);
+    igcFile = signal<string | undefined>(undefined);
+    schools = signal<School[] | undefined>(undefined);
+    private cdr = inject(ChangeDetectorRef);
     tandemSchools = this.tandemSchoolService.schools;
 
     constructor(
@@ -121,11 +129,13 @@ export class FlightEditPage implements OnInit, OnDestroy {
             }
 
             // archived: "0" for this request only - see flight-add.
+            // The flight was loaded and prepared after an await.
+            this.cdr.markForCheck();
+
             this.gliderStore.getGliders({ store: false, archived: "0" }).pipe(takeUntil(this.unsubscribe$)).subscribe((resp: Glider[]) => {
-                this.gliders = resp;
-                if (!this.gliders.find(glider => glider.id === this.flight.glider.id)) {
-                    this.gliders.push(this.flight.glider);
-                }
+                this.gliders.set(resp.find(glider => glider.id === this.flight.glider.id)
+                    ? resp
+                    : [...resp, this.flight.glider]);
             });
             this.loadIgcData();
 
@@ -139,7 +149,7 @@ export class FlightEditPage implements OnInit, OnDestroy {
     ngOnInit() {
         this.dataLoading();
         this.schoolService.getSchools().then((schools: School[]) => {
-            this.schools = schools;
+            this.schools.set(schools);
         });
     }
 
@@ -198,7 +208,7 @@ export class FlightEditPage implements OnInit, OnDestroy {
 
     async downloadIgc() {
         const filename = `flight_${this.flight.date}_${this.flight.number}.igc`;
-        await this.igcDownloadService.download({ filename, content: this.igcFile });
+        await this.igcDownloadService.download({ filename, content: this.igcFile() });
     }
 
     async copy() {
@@ -259,7 +269,7 @@ export class FlightEditPage implements OnInit, OnDestroy {
     private async copyIgc(loading: any) {
         await loading.present();
         const destinationFileName = `${uuidv4()}-${this.flight.igc.filepath.substring(37)}`;
-        const file: File = new File([this.igcFile], destinationFileName);
+        const file: File = new File([this.igcFile()], destinationFileName);
         const formData = new FormData();
         formData.append('file', file, destinationFileName);
         try {
@@ -291,7 +301,9 @@ export class FlightEditPage implements OnInit, OnDestroy {
 
         await loading.present();
 
-        this.igcFile = await this.igcService.getIgcFileContentAndPrefillFlight(this.flight, this.flight.igcFile, override);
+        this.igcFile.set(await this.igcService.getIgcFileContentAndPrefillFlight(this.flight, this.flight.igcFile, override));
+        // The parse wrote into this.flight.
+        this.cdr.markForCheck();
 
         await loading.dismiss();
     }
@@ -323,7 +335,7 @@ export class FlightEditPage implements OnInit, OnDestroy {
         if (this.flight.igc && this.flight.igc.filepath) {
             this.fileUploadService.getFile(this.flight.igc.filepath).pipe(takeUntil(this.unsubscribe$)).subscribe(async blob => {
                 const blobText = await blob.text();
-                this.igcFile = this.decoder.decode(new Uint8Array(JSON.parse(blobText).data));
+                this.igcFile.set(this.decoder.decode(new Uint8Array(JSON.parse(blobText).data)));
             })
         }
     }

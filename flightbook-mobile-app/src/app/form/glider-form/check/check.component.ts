@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AlertController, IonContent, IonFooter, IonButton, IonTextarea, IonIcon, IonModal, IonDatetime, ModalController } from "@ionic/angular";
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
@@ -22,7 +22,10 @@ import { GliderCheck } from 'src/app/glider/shared/glider.model';
     IonFooter,
     DatePipe,
     FormsModule
-  ]
+  ],
+  // TODO: This component has been partially migrated to be zoneless-compatible.
+  // After testing, this should be updated to ChangeDetectionStrategy.OnPush.
+  changeDetection: ChangeDetectionStrategy.Default,
 })
 export class CheckComponent {
 

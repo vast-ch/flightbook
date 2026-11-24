@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, ElementRef, OnDestroy, ViewChild, signal } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, OnDestroy, ViewChild, signal } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { ActionSheetController, IonButton, IonContent, IonIcon, IonInput, IonToggle, ModalController, IonSelect, IonSelectOption } from '@ionic/angular';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
@@ -34,7 +34,10 @@ const LANGUAGES = SUPPORTED_LANGUAGES;
     IonToggle,
     IonSelect,
     IonSelectOption
-  ]
+  ],
+  // TODO: This component has been partially migrated to be zoneless-compatible.
+  // After testing, this should be updated to ChangeDetectionStrategy.OnPush.
+  changeDetection: ChangeDetectionStrategy.Default,
 })
 export class PassengerConfirmationFormComponent implements OnDestroy {
   unsubscribe$ = new Subject<void>();
@@ -137,7 +140,12 @@ export class PassengerConfirmationFormComponent implements OnDestroy {
     // Narrowed like every other switch in the app: an unshipped code sticks in
     // translate.currentLang while its bundle 404s, and every date binding given
     // that locale then throws NG0701 on each change-detection pass.
-    this.translate.use(resolveLanguage(lang));
+    // The handler runs from the action sheet, outside any Angular listener, and
+    // languageCode is a getter: re-check once the bundle has loaded.
+    this.translate.use(resolveLanguage(lang)).subscribe({
+      next: () => this.cdr.markForCheck(),
+      error: () => { /* the missing bundle is reported by the loader */ }
+    });
   }
 
   // ---- Signature ------------------------------------------------------
@@ -151,6 +159,10 @@ export class PassengerConfirmationFormComponent implements OnDestroy {
     this.signaturePad = new SignaturePad(canvas, {
       penColor: this.colorService.getIonTextColor()
     });
+    // Strokes arrive through signature_pad's own pointer listeners, which tell
+    // Angular nothing: without this, Save and the clear button would keep the
+    // "empty" state they had before the passenger signed.
+    this.signaturePad.addEventListener('endStroke', () => this.cdr.markForCheck());
 
     // The size has to be passed: fromDataURL defaults to
     // `canvas.width / devicePixelRatio`, and this bitmap is in CSS pixels, so

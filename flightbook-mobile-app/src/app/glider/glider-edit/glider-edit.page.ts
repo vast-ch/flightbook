@@ -1,4 +1,4 @@
-import { Component, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -25,13 +25,17 @@ import { GliderFormComponent } from '../../form/glider-form/glider-form';
         IonFooter,
         IonButton,
         IonIcon
-    ]
+    ],
+    // TODO: This component has been partially migrated to be zoneless-compatible.
+    // After testing, this should be updated to ChangeDetectionStrategy.OnPush.
+    changeDetection: ChangeDetectionStrategy.Default,
 })
 export class GliderEditPage implements OnDestroy {
     unsubscribe$ = new Subject<void>();
     private gliderId: number;
     glider: Glider;
-    deleteDisabled: boolean;
+    /** Enabled once the flight count comes back as 0 - an HTTP answer. */
+    deleteDisabled = signal(true);
 
     constructor(
         private activeRoute: ActivatedRoute,
@@ -42,7 +46,6 @@ export class GliderEditPage implements OnDestroy {
         private alertController: AlertController,
         private translate: TranslateService
     ) {
-        this.deleteDisabled = true;
         this.gliderId = +this.activeRoute.snapshot.paramMap.get('id');
         this.glider = this.gliderStore.gliders().find(glider => glider.id === this.gliderId);
         this.glider = structuredClone(this.glider);
@@ -51,7 +54,7 @@ export class GliderEditPage implements OnDestroy {
         }
         this.flightStore.nbFlightsByGliderId(this.gliderId).pipe(takeUntil(this.unsubscribe$)).subscribe((resp: any) => {
             if (resp.nbFlights == 0) {
-                this.deleteDisabled = false;
+                this.deleteDisabled.set(false);
             }
         });
         addIcons({ 'chevron-back': chevronBack });

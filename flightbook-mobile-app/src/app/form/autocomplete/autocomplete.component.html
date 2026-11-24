@@ -1,10 +1,10 @@
-@if (show) {
+@if (show()) {
   <!--
     Kept in normal flow: the enclosing form card uses overflow:hidden for its
     rounded corners, which would clip an absolutely-positioned dropdown.
   -->
   <div class="suggestions">
-    @for (element of listElement; track element.id) {
+    @for (element of listElement(); track element.id) {
       <button type="button" class="suggestion" (click)="setValue(element)">
         <span class="suggestion__name">
           @if (matchedPrefix(element.name)) {

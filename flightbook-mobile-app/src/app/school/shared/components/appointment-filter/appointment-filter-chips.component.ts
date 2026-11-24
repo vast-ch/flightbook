@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Output, computed, inject } from '@angular/core';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { IonIcon } from '@ionic/angular';
 import { addIcons } from 'ionicons';
@@ -22,7 +22,10 @@ type Chip = { label: string; clear: () => void };
     selector: 'fb-appointment-filter-chips',
     standalone: true,
     imports: [TranslateModule, IonIcon],
-    templateUrl: './appointment-filter-chips.component.html'
+    templateUrl: './appointment-filter-chips.component.html',
+    // TODO: This component has been partially migrated to be zoneless-compatible.
+    // After testing, this should be updated to ChangeDetectionStrategy.OnPush.
+    changeDetection: ChangeDetectionStrategy.Default,
 })
 export class AppointmentFilterChipsComponent {
     private schoolService = inject(SchoolService);

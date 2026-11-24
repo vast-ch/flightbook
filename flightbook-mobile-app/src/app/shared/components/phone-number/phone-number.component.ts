@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, forwardRef } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnDestroy, forwardRef, ChangeDetectorRef } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR, FormsModule, NG_VALIDATORS, Validator, AbstractControl, ValidationErrors } from '@angular/forms';
 import { IonInput, IonSelect, IonSelectOption, IonText } from '@ionic/angular';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
@@ -27,7 +27,10 @@ interface CountryPrefix {
       useExisting: forwardRef(() => PhoneNumberComponent),
       multi: true
     }
-  ]
+  ],
+  // TODO: This component has been partially migrated to be zoneless-compatible.
+  // After testing, this should be updated to ChangeDetectionStrategy.OnPush.
+  changeDetection: ChangeDetectionStrategy.Default,
 })
 export class PhoneNumberComponent implements ControlValueAccessor, Validator, OnDestroy {
   unsubscribe$ = new Subject<void>();
@@ -83,10 +86,11 @@ export class PhoneNumberComponent implements ControlValueAccessor, Validator, On
     this.onChange(this.value);
   }
 
-  constructor(private translate: TranslateService) {
+  constructor(private translate: TranslateService, private cdr: ChangeDetectorRef) {
     this.defineCountryPrefix();
     translate.onLangChange.pipe(takeUntil(this.unsubscribe$)).subscribe(() => {
-      this.defineCountryPrefix()
+      this.defineCountryPrefix();
+      this.cdr.markForCheck();
     });
   }
 
@@ -121,6 +125,9 @@ export class PhoneNumberComponent implements ControlValueAccessor, Validator, On
     if (value !== undefined && value !== null) {
       this.value = value;
     }
+    // Forms call this from a microtask (NgModel defers its writes), which
+    // schedules no render on its own without Zone.js.
+    this.cdr.markForCheck();
   }
 
   registerOnChange(fn: any): void {
@@ -133,6 +140,7 @@ export class PhoneNumberComponent implements ControlValueAccessor, Validator, On
 
   setDisabledState(isDisabled: boolean): void {
     this.disabled = isDisabled;
+    this.cdr.markForCheck();
   }
 
   updateValue(): void {
