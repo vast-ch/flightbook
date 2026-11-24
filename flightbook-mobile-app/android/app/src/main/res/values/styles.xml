@@ -9,10 +9,15 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-    <style name="AppTheme.NoActionBar" parent="Theme.AppCompat.DayNight.NoActionBar">
+    <!-- Light-only, like the web app: no values-night override. The window
+         background shows behind the status and navigation bars when Capacitor
+         pads the WebView instead of letting it draw under them (Android
+         System WebView < 140), and the bar icons are always dark. -->
+    <style name="AppTheme.NoActionBar" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="android:background">@null</item>
+        <item name="android:windowBackground">@color/windowBackground</item>
         <item name="android:statusBarColor">@color/colorPrimary</item>
     </style>
 

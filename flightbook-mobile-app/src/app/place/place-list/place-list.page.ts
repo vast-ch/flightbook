@@ -66,19 +66,32 @@ export class PlaceListPage implements OnDestroy {
     }
 
     ionViewDidEnter() {
-        if (this.places().length === 0) {
+        // The revision check, not just an empty list: the store no longer
+        // patches its rows on create/edit/delete, it only bumps the revision,
+        // so this is what brings the list up to date after a write.
+        if (this.places().length === 0 || this.listRevision !== this.placeStore.revision()) {
             this.initialDataLoad();
         }
     }
+
+    /** PlaceStore.revision the rows on screen were fetched at. */
+    private listRevision = -1;
 
     private async initialDataLoad() {
         const loading = await this.loadingCtrl.create({
             message: this.translate.instant('loading.loading')
         });
         await loading.present();
+        // Back to page one: a scroller that hit the end of the old rows would
+        // otherwise stay disabled under a list that may now be longer.
+        if (this.infiniteScroll) {
+            this.infiniteScroll.disabled = false;
+        }
+        const revision = this.placeStore.revision();
         this.placeStore.getPlaces({ limit: this.limit, clearStore: true })
             .pipe(takeUntil(this.unsubscribe$))
             .subscribe(async () => {
+                this.listRevision = revision;
                 await loading.dismiss();
             }, async () => {
                 await loading.dismiss();

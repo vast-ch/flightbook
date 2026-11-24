@@ -16,7 +16,8 @@ import {
 } from '@capacitor/push-notifications';
 import { Capacitor } from '@capacitor/core';
 import { SplashScreen } from '@capacitor/splash-screen';
-import { StatusBar } from '@capacitor/status-bar';
+import { Keyboard } from '@capacitor/keyboard';
+import { keyboardOverlaysWebview, rememberKeyboardHeight } from './shared/util/keyboard';
 import { Router } from '@angular/router';
 import { RegisterPage } from './account/register/register.page';
 import { PaymentStatus } from './account/shared/paymentStatus.model';
@@ -76,17 +77,41 @@ export class AppComponent implements OnDestroy, OnInit {
     }
 
     async ngOnInit(): Promise<void> {
+        // No StatusBar.setOverlaysWebView({ overlay: false }) here: the page
+        // headers pad themselves with env(safe-area-inset-top) and expect to
+        // draw under the status bar. Android 15+ forces that anyway; forcing it
+        // off on older versions left a band in the native window background
+        // (dark grey in dark mode) above the white headers. The bar icons are
+        // pinned dark by `"style": "LIGHT"` in capacitor.config.json, because
+        // the plugins' DEFAULT follows the OS theme and this app is light-only.
         this.hideNativeSplash();
+        this.trackKeyboardHeight();
+    }
 
-        // Fix EdgeToEdge header issue: ensure StatusBar overlaysWebView is false and set style
-        try {
-            if (Capacitor.isNativePlatform() && Capacitor.getPlatform() == "android") {
-                await StatusBar.setOverlaysWebView({ overlay: false });
-            }
-        } catch (e) {
-            // StatusBar not available or not supported
-            console.warn('StatusBar plugin not available:', e);
+    /**
+     * Publishes the native keyboard height as --fb-keyboard-height (plus an
+     * .fb-keyboard-open class), which tokens.scss uses to add scroll room at the
+     * bottom of every ion-content and to lift ion-footer above the keyboard.
+     * Needed because Keyboard.resize is "none": the keyboard covers the webview
+     * rather than shrinking it, and Ionic only pads the content when the focused
+     * input had to be scrolled - see the comment on the rule in tokens.scss.
+     */
+    private trackKeyboardHeight() {
+        // iOS only: Android resizes the webview for the keyboard, so the footer
+        // already sits on it and the content already has its scroll room.
+        if (!keyboardOverlaysWebview()) {
+            return;
         }
+        const root = document.documentElement;
+        Keyboard.addListener('keyboardWillShow', (info) => {
+            root.style.setProperty('--fb-keyboard-height', `${info.keyboardHeight}px`);
+            root.classList.add('fb-keyboard-open');
+            rememberKeyboardHeight(info.keyboardHeight);
+        });
+        Keyboard.addListener('keyboardWillHide', () => {
+            root.style.removeProperty('--fb-keyboard-height');
+            root.classList.remove('fb-keyboard-open');
+        });
     }
 
     subscribeToEmmiter(componentRef: any) {

@@ -15,6 +15,7 @@
 		504EC30D1FED79650016851F /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 504EC30B1FED79650016851F /* Main.storyboard */; };
 		504EC30F1FED79650016851F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 504EC30E1FED79650016851F /* Assets.xcassets */; };
 		504EC3121FED79650016851F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 504EC3101FED79650016851F /* LaunchScreen.storyboard */; };
+		AC724B8530ABB7CB00DEB3D4 /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = AC724B8430ABB7CB00DEB3D4 /* AppIcon.icon */; };
 		ACD3CDA52FB5FEA900C40E1D /* CapApp-SPM in Frameworks */ = {isa = PBXBuildFile; productRef = ACD3CDA42FB5FEA900C40E1D /* CapApp-SPM */; };
 		ACD3CDA92FB601DB00C40E1D /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = ACD3CDA82FB601DB00C40E1D /* FirebaseMessaging */; };
 /* End PBXBuildFile section */
@@ -31,6 +32,7 @@
 		504EC30E1FED79650016851F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		504EC3111FED79650016851F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		504EC3131FED79650016851F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		AC724B8430ABB7CB00DEB3D4 /* AppIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = AppIcon.icon; sourceTree = "<group>"; };
 		ACD3CDA62FB5FF1200C40E1D /* debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = debug.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -77,6 +79,7 @@
 				504EC3101FED79650016851F /* LaunchScreen.storyboard */,
 				504EC3131FED79650016851F /* Info.plist */,
 				2FAD9762203C412B000D30F8 /* config.xml */,
+				AC724B8430ABB7CB00DEB3D4 /* AppIcon.icon */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -149,6 +152,7 @@
 				50379B232058CBB4000EE86E /* capacitor.config.json in Resources */,
 				2670A00B26722EC20040124F /* public in Resources */,
 				504EC30D1FED79650016851F /* Main.storyboard in Resources */,
+				AC724B8530ABB7CB00DEB3D4 /* AppIcon.icon in Resources */,
 				2FAD9763203C412B000D30F8 /* config.xml in Resources */,
 				26C29782292FFEB700B7C528 /* GoogleService-Info.plist in Resources */,
 			);
@@ -318,7 +322,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.1.0;
+				MARKETING_VERSION = 3.2.0;
 				OTHER_SWIFT_FLAGS = "$(inherited) \"-D\" \"COCOAPODS\" \"-DDEBUG\"";
 				PRODUCT_BUNDLE_IDENTIFIER = ch.flightbook;
 				PRODUCT_NAME = Flightbook;
@@ -343,7 +347,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.1.0;
+				MARKETING_VERSION = 3.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = ch.flightbook;
 				PRODUCT_NAME = Flightbook;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "";

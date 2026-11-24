@@ -158,19 +158,12 @@ export class FlightEditPage implements OnInit, OnDestroy {
             await this.uploadIgc(flight, loading);
         }
 
+        // A changed date moves the flight in the list, but there is no refetch
+        // here: putFlight bumps the revision, and FlightListPage reloads on
+        // enter - which made a refetch here load the list twice.
         this.flightStore.putFlight(flight).pipe(takeUntil(this.unsubscribe$)).subscribe(async (res: Flight) => {
-
-            if (this.initialFlight?.date !== this.flight.date) {
-                this.flightStore.getFlights({ limit: this.flightStore.defaultLimit, clearStore: true })
-                    .pipe(takeUntil(this.unsubscribe$))
-                    .subscribe(async (res: Flight[]) => {
-                        await loading.dismiss();
-                        await this.navigationService.back('/flights');
-                    });
-            } else {
-                await loading.dismiss();
-                await this.navigationService.back('/flights');
-            }
+            await loading.dismiss();
+            await this.navigationService.back('/flights');
         },
             (async (resp: any) => {
                 await loading.dismiss();
