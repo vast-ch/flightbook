@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { NgModule, provideCheckNoChangesConfig } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { RouteReuseStrategy } from '@angular/router';
 import { HTTP_INTERCEPTORS, HttpClient, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
@@ -16,6 +16,7 @@ import { SharedModule } from './shared/shared.module';
 import { HttpAuthInterceptor } from './shared/interceptor/auth.interceptor';
 import { HttpErrorInterceptor } from './shared/interceptor/error.interceptor';
 import { PaymentService } from './shared/services/payment.service';
+import { environment } from '../environments/environment';
 import { registerLocaleData } from '@angular/common';
 import germanLocale from '@angular/common/locales/de';
 import italianLocale from '@angular/common/locales/it';
@@ -70,6 +71,9 @@ function getIonicConfig() {
         NavigationService,
         provideHttpClient(withInterceptorsFromDi()),
         provideIonicAngular(getIonicConfig()),
+        // e2e change-detection check only (environment.e2e.ts): log NG0100 for any
+        // binding that changed without Angular being notified. Dev mode only.
+        ...(environment.checkNoChanges ? [provideCheckNoChangesConfig({ exhaustive: true, interval: 500 })] : []),
     ]
 })
 export class AppModule {

@@ -28,12 +28,20 @@ export async function api<T = any>(method: string, path: string, body?: unknown)
 type Fixtures = {
   /** Set to false for screens that must be visited logged out. */
   loggedIn: boolean;
+  /**
+   * 'fixed' freezes Date.now() for stable screenshots. RxJS debounceTime waits
+   * for Date.now() to pass its deadline, so under a frozen clock a debounced
+   * stream never emits: specs exercising debounced UI use 'running', which
+   * starts at the same instant and then ticks normally.
+   */
+  clock: 'fixed' | 'running';
   /** Console errors and uncaught exceptions collected during the test. */
   consoleErrors: string[];
 };
 
 export const test = base.extend<Fixtures>({
   loggedIn: [true, { option: true }],
+  clock: ['fixed', { option: true }],
 
   consoleErrors: async ({ page }, use) => {
     const errors: string[] = [];
@@ -42,7 +50,7 @@ export const test = base.extend<Fixtures>({
     await use(errors);
   },
 
-  page: async ({ page, loggedIn }, use) => {
+  page: async ({ page, loggedIn, clock }, use) => {
     // Nothing leaves the machine: map tiles (OpenStreetMap) and any other
     // external request would make screenshots slow, flaky and dependent on
     // someone else's server. Images get a transparent pixel, the rest fails.
@@ -53,7 +61,9 @@ export const test = base.extend<Fixtures>({
     );
     // A fixed clock keeps "today" (date pickers, default flight date) stable
     // between the baseline run and the run under test.
-    await page.clock.setFixedTime(new Date('2026-10-22T10:00:00+02:00'));
+    const now = new Date('2026-10-22T10:00:00+02:00');
+    if (clock === 'fixed') await page.clock.setFixedTime(now);
+    else await page.clock.setSystemTime(now);
     await page.addInitScript(
       ([t, loggedIn]) => {
         localStorage.setItem('language', 'en');
@@ -79,6 +89,16 @@ export async function settle(page: Page) {
   // Ionic hydrates components and fonts land a beat after networkidle.
   await page.evaluate(() => document.fonts.ready);
   await page.waitForTimeout(400);
+}
+
+/**
+ * Screenshot against the baseline — skipped in the change-detection run
+ * (`npm run test:cd`), which serves a dev-mode build: that run is about NG0100
+ * console errors, and its unoptimised bundle is not what baselines are made of.
+ */
+export async function shot(page: Page, name: string) {
+  if (process.env.E2E_CD_CHECK) return;
+  await expect(page).toHaveScreenshot(name);
 }
 
 export { expect };

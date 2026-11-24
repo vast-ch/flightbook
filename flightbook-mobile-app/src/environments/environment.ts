@@ -6,7 +6,8 @@ import informations from '../../package.json';
 export const environment = {
   production: false,
   baseUrl : 'http://localhost:8282',
-  appVersion: informations.version
+  appVersion: informations.version,
+  checkNoChanges: false,
 };
 
 /*

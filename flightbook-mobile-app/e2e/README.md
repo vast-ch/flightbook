@@ -42,6 +42,25 @@ npm run stack:down
 
 `E2E_WWW=<dir>` serves a different build (e.g. one made from another branch).
 
+### Change-detection check (zoneless / OnPush)
+
+```sh
+npm run test:cd         # or: ./cd-check.sh [playwright args]
+```
+
+Builds the app with the `e2e` configuration — dev mode, `environment.e2e.ts`,
+which turns on `provideCheckNoChangesConfig({ exhaustive: true, interval })` —
+into `out/cd-build`, and runs the whole suite against it with screenshots
+skipped (`E2E_CD_CHECK=1`). A binding that changed without Angular being
+notified logs NG0100, and every test fails on console errors. The default run
+and `compare.sh` still test the production build.
+
+`tests/interactions.spec.ts` covers the async interactions a migration tends
+to break (filter count, date picker, statistics periods, IGC import via the
+xc-score worker, place autocomplete, swipe-delete, infinite scroll, language
+switch). It runs with `clock: 'running'`: under the default frozen clock RxJS
+`debounceTime` never fires.
+
 ## How it works
 
 - **Database:** `postgis/postgis:15-3.4`, the image flightbook-api's own e2e

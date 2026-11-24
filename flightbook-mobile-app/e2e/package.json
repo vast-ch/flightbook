@@ -8,6 +8,7 @@
     "test": "playwright test",
     "baseline": "playwright test --update-snapshots",
     "compare": "./compare.sh",
+    "test:cd": "./cd-check.sh",
     "report": "playwright show-report out/report"
   },
   "devDependencies": {

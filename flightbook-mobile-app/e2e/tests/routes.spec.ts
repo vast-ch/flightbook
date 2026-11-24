@@ -1,4 +1,4 @@
-import { test, expect, open, settle } from './fixtures';
+import { test, expect, open, settle, shot } from './fixtures';
 import { SEED } from './seed-data.js';
 
 type Route = {
@@ -83,7 +83,7 @@ for (const r of routes) {
       expect(new URL(page.url()).pathname, 'stayed on the screen (no redirect to login/list)').toMatch(lands);
       if (r.shows) await expect(page.getByText(r.shows, { exact: false }).first()).toBeVisible();
 
-      await expect(page).toHaveScreenshot(`${r.name}.png`);
+      await shot(page, `${r.name}.png`);
 
       // Ionic scrolls inside ion-content, so a full-page capture can't reach
       // what is below the fold — scroll it and take a second shot instead.
@@ -97,7 +97,7 @@ for (const r of routes) {
       if (scrolls) {
         await content.evaluate((el: any) => el.scrollToBottom(0));
         await settle(page);
-        await expect(page).toHaveScreenshot(`${r.name}--bottom.png`);
+        await shot(page, `${r.name}--bottom.png`);
         await content.evaluate((el: any) => el.scrollToTop(0));
         await settle(page);
       }
@@ -109,7 +109,7 @@ for (const r of routes) {
         await select.click();
         await page.locator('ion-alert, ion-popover, ion-action-sheet, ion-modal').last().waitFor();
         await settle(page);
-        await expect(page).toHaveScreenshot(`${r.name}--select-open.png`);
+        await shot(page, `${r.name}--select-open.png`);
       }
 
       const unexpected = consoleErrors.filter((e) => !(r.knownErrors ?? []).some((k) => k.test(e)));
