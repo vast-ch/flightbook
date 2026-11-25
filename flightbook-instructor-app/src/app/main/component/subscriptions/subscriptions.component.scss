@@ -21,15 +21,17 @@ h1::before {
     align-items: center;
 }
 
-.subscriptionItem {
-    height: auto;
-}
-
+// Plain markup rather than mat-list: a mat-list-item is a fixed one-line
+// height and clips its content, which cut long comments off.
 .subscription-row {
     display: flex;
     flex-direction: column;
     padding: 12px 0;
-    width: 100%;
+    min-width: 0;
+
+    & + & {
+        border-top: 1px solid rgba(0, 0, 0, 0.12);
+    }
 }
 
 .subscription-title {
@@ -47,6 +49,7 @@ h1::before {
 .subscription-comment {
     margin: 4px 0 0 0;
     white-space: pre-wrap;
+    overflow-wrap: anywhere;
     color: rgba(0, 0, 0, 0.6);
     font-size: 0.9em;
 }

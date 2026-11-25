@@ -6,9 +6,8 @@
       <span>{{ appointment.countSubscription }}/{{ appointment.maxPeople }} </span>
     }{{ 'appointment.registrations' | translate }}</h1>
     <div class="item-value subscriptions">
-      <mat-list>
-        @for (subscription of subscribed; track subscription; let last = $last) {
-          <mat-list-item class="subscriptionItem">
+      <div class="subscription-list">
+        @for (subscription of subscribed; track subscription) {
             <div class="subscription-row">
               <span class="subscription-title">
                 {{ subscription.user?.firstname }} {{ subscription.user?.lastname }}
@@ -20,20 +19,15 @@
                 <p class="subscription-comment">{{ subscription.comment }}</p>
               }
             </div>
-          </mat-list-item>
-          @if (!last) {
-            <mat-divider></mat-divider>
-          }
         }
-      </mat-list>
+      </div>
     </div>
   @if (waitingList.length > 0) {
     <div>
       <h1 mat-dialog-title class="waiting-list">{{ 'appointment.waitingList' | translate }}</h1>
       <div class="item-value subscriptions">
-        <mat-list>
-          @for (subscription of waitingList; track subscription; let last = $last) {
-            <mat-list-item class="subscriptionItem">
+        <div class="subscription-list">
+          @for (subscription of waitingList; track subscription) {
               <div class="subscription-row">
                 <span class="subscription-title">
                   {{ subscription.user?.firstname }} {{ subscription.user?.lastname }}
@@ -45,12 +39,8 @@
                   <p class="subscription-comment">{{ subscription.comment }}</p>
                 }
               </div>
-            </mat-list-item>
-            @if (!last) {
-              <mat-divider></mat-divider>
-            }
           }
-        </mat-list>
+        </div>
       </div>
   </div>
 }
