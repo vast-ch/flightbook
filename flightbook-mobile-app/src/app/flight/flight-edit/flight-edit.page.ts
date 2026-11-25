@@ -42,9 +42,7 @@ import { NavigationService } from 'src/app/shared/services/navigation.service';
         IonFooter,
         IonIcon
     ],
-    // TODO: This component has been partially migrated to be zoneless-compatible.
-    // After testing, this should be updated to ChangeDetectionStrategy.OnPush.
-    changeDetection: ChangeDetectionStrategy.Default,
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FlightEditPage implements OnInit, OnDestroy {
     unsubscribe$ = new Subject<void>();
@@ -55,7 +53,8 @@ export class FlightEditPage implements OnInit, OnDestroy {
     public TandemSchoolPaymentState = TandemSchoolPaymentState;
     /**
      * A mutable model shared with flight-form and filled in after awaits (the
-     * load, the IGC parse): each such write ends in markForCheck().
+     * load, the IGC parse): each such write ends in a new reference and
+     * markForCheck() - see republishFlight().
      */
     flight: Flight = new Flight();
     gliders = signal<Glider[]>([]);
@@ -156,6 +155,17 @@ export class FlightEditPage implements OnInit, OnDestroy {
     ngOnDestroy() {
         this.unsubscribe$.next();
         this.unsubscribe$.complete();
+    }
+
+    /**
+     * Republishes `flight` as a new object after it was written in place (an
+     * HTTP answer, the IGC parse). flight-form and its glider select are
+     * OnPush: an unchanged reference would leave them showing the old values,
+     * and markForCheck() only reaches this page and its ancestors.
+     */
+    private republishFlight() {
+        this.flight = Object.assign(new Flight(), this.flight);
+        this.cdr.markForCheck();
     }
 
     async saveFlight(flight: Flight) {
@@ -303,7 +313,7 @@ export class FlightEditPage implements OnInit, OnDestroy {
 
         this.igcFile.set(await this.igcService.getIgcFileContentAndPrefillFlight(this.flight, this.flight.igcFile, override));
         // The parse wrote into this.flight.
-        this.cdr.markForCheck();
+        this.republishFlight();
 
         await loading.dismiss();
     }

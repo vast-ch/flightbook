@@ -13,9 +13,7 @@ import { CheckComponent } from './check/check.component';
     templateUrl: 'glider-form.html',
     styleUrls: ['glider-form.scss'],
     imports: [FormsModule, DatePipe, TranslateModule, IonItem, IonInput, IonToggle, IonTextarea, IonModal, IonContent, IonDatetime, IonList, IonItemSliding, IonItemOptions, IonItemOption, IonIcon],
-    // TODO: This component has been partially migrated to be zoneless-compatible.
-    // After testing, this should be updated to ChangeDetectionStrategy.OnPush.
-    changeDetection: ChangeDetectionStrategy.Default,
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GliderFormComponent implements OnInit {
     @Input()

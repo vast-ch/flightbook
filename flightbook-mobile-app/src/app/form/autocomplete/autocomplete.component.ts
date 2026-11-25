@@ -19,9 +19,7 @@ import { TranslateModule } from '@ngx-translate/core';
         IonIcon,
         TranslateModule
     ],
-    // TODO: This component has been partially migrated to be zoneless-compatible.
-    // After testing, this should be updated to ChangeDetectionStrategy.OnPush.
-    changeDetection: ChangeDetectionStrategy.Default,
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AutocompleteComponent implements OnInit, OnChanges, OnDestroy {
     private unsubscribe$ = new Subject<void>();

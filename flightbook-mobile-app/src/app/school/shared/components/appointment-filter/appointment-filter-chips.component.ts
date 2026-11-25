@@ -23,9 +23,7 @@ type Chip = { label: string; clear: () => void };
     standalone: true,
     imports: [TranslateModule, IonIcon],
     templateUrl: './appointment-filter-chips.component.html',
-    // TODO: This component has been partially migrated to be zoneless-compatible.
-    // After testing, this should be updated to ChangeDetectionStrategy.OnPush.
-    changeDetection: ChangeDetectionStrategy.Default,
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppointmentFilterChipsComponent {
     private schoolService = inject(SchoolService);

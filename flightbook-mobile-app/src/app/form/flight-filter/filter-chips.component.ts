@@ -23,9 +23,7 @@ type Chip = { label: string; clear: () => void };
     templateUrl: './filter-chips.component.html',
     // .filter-summary* moved to tokens.scss when the glider list grew the same
     // row: two components draw it now, and neither owns the pattern.
-    // TODO: This component has been partially migrated to be zoneless-compatible.
-    // After testing, this should be updated to ChangeDetectionStrategy.OnPush.
-    changeDetection: ChangeDetectionStrategy.Default,
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FilterChipsComponent {
     private flightStore = inject(FlightStore);

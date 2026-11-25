@@ -38,9 +38,7 @@ const DEFAULT_ZOOM = 6.7;
     templateUrl: './place-map.component.html',
     styleUrls: ['./place-map.component.scss'],
     standalone: true,
-    // TODO: This component has been partially migrated to be zoneless-compatible.
-    // After testing, this should be updated to ChangeDetectionStrategy.OnPush.
-    changeDetection: ChangeDetectionStrategy.Default,
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PlaceMapComponent implements AfterViewInit, OnChanges, OnDestroy {
 

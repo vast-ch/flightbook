@@ -21,9 +21,7 @@ const FREE_FLIGHT_LIMIT = 25;
     templateUrl: './add-sheet.component.html',
     styleUrls: ['./add-sheet.component.scss'],
     imports: [TranslateModule, IonIcon],
-    // TODO: This component has been partially migrated to be zoneless-compatible.
-    // After testing, this should be updated to ChangeDetectionStrategy.OnPush.
-    changeDetection: ChangeDetectionStrategy.Default,
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AddSheetComponent {
     private modalCtrl = inject(ModalController);

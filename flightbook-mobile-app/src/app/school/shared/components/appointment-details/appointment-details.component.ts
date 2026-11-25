@@ -29,9 +29,7 @@ const HOURS_BEFORE_DAYS = 48;
         IonContent,
         IonButton
     ],
-    // TODO: This component has been partially migrated to be zoneless-compatible.
-    // After testing, this should be updated to ChangeDetectionStrategy.OnPush.
-    changeDetection: ChangeDetectionStrategy.Default,
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppointmentDetailsComponent implements OnInit {
 

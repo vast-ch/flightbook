@@ -11,9 +11,7 @@ import { PlaceMapComponent } from '../../shared/components/place-map/place-map.c
     templateUrl: 'place-form.html',
     styleUrls: ['place-form.scss'],
     imports: [FormsModule, PlaceMapComponent, TranslateModule, IonInput, IonSelect, IonSelectOption, IonTextarea],
-    // TODO: This component has been partially migrated to be zoneless-compatible.
-    // After testing, this should be updated to ChangeDetectionStrategy.OnPush.
-    changeDetection: ChangeDetectionStrategy.Default,
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PlaceFormComponent {
 

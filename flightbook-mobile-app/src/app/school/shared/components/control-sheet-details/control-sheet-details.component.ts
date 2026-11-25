@@ -30,9 +30,7 @@ const DISMISS_VELOCITY = 0.4;
         IonContent,
         IonButton
     ],
-    // TODO: This component has been partially migrated to be zoneless-compatible.
-    // After testing, this should be updated to ChangeDetectionStrategy.OnPush.
-    changeDetection: ChangeDetectionStrategy.Default,
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ControlSheetDetailsComponent implements OnInit, AfterViewInit, OnDestroy {
 

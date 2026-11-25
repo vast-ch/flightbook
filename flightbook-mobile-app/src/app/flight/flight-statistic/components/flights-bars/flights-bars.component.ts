@@ -13,9 +13,7 @@ import { Bar } from '../../shared/statistic.store';
     standalone: true,
     templateUrl: './flights-bars.component.html',
     styleUrls: ['./flights-bars.component.scss'],
-    // TODO: This component has been partially migrated to be zoneless-compatible.
-    // After testing, this should be updated to ChangeDetectionStrategy.OnPush.
-    changeDetection: ChangeDetectionStrategy.Default,
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FlightsBarsComponent {
 

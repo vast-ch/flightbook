@@ -12,9 +12,7 @@ import { SeasonRow } from '../../shared/statistic.store';
     standalone: true,
     templateUrl: './season-grid.component.html',
     styleUrls: ['./season-grid.component.scss'],
-    // TODO: This component has been partially migrated to be zoneless-compatible.
-    // After testing, this should be updated to ChangeDetectionStrategy.OnPush.
-    changeDetection: ChangeDetectionStrategy.Default,
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SeasonGridComponent {
 

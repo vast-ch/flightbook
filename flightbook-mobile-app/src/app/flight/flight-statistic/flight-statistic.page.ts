@@ -39,9 +39,7 @@ import { splitDistance, splitDuration, toHoursMinutes } from 'src/app/shared/uti
         IonSkeletonText,
         FilterChipsComponent
     ],
-    // TODO: This component has been partially migrated to be zoneless-compatible.
-    // After testing, this should be updated to ChangeDetectionStrategy.OnPush.
-    changeDetection: ChangeDetectionStrategy.Default,
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FlightStatisticPage implements OnDestroy {
     private unsubscribe$ = new Subject<void>();

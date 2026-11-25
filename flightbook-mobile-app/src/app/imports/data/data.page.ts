@@ -26,9 +26,7 @@ import { chevronBack, chevronForward, cloudUploadOutline } from "ionicons/icons"
         IonButton,
         IonIcon
     ],
-    // TODO: This component has been partially migrated to be zoneless-compatible.
-    // After testing, this should be updated to ChangeDetectionStrategy.OnPush.
-    changeDetection: ChangeDetectionStrategy.Default,
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DataPage implements OnInit, OnDestroy {
     unsubscribe$ = new Subject<void>();

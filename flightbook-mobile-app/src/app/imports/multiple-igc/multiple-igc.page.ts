@@ -44,9 +44,7 @@ const IMPORT_CONCURRENCY = 2;
         IonButton,
         IonIcon
     ],
-    // TODO: This component has been partially migrated to be zoneless-compatible.
-    // After testing, this should be updated to ChangeDetectionStrategy.OnPush.
-    changeDetection: ChangeDetectionStrategy.Default,
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MultipleIgcPage implements OnInit {
 

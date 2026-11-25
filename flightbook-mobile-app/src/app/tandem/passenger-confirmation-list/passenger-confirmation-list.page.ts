@@ -29,9 +29,7 @@ import { localDate } from 'src/app/shared/util/format';
     IonInfiniteScroll,
     IonInfiniteScrollContent
   ],
-  // TODO: This component has been partially migrated to be zoneless-compatible.
-  // After testing, this should be updated to ChangeDetectionStrategy.OnPush.
-  changeDetection: ChangeDetectionStrategy.Default,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PassengerConfirmationListPage implements OnInit, OnDestroy {
 

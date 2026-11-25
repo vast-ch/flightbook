@@ -79,6 +79,11 @@ export const test = base.extend<Fixtures>({
 /** Navigates and waits until the app has rendered and stopped fetching. */
 export async function open(page: Page, path: string) {
   await page.goto(path, { waitUntil: 'load' });
+  // The boot screen stays up at least 900 ms after the first page activates
+  // (AppComponent.MIN_BOOT_MS) - ~1.5 s after load. A light screen (register)
+  // can go network-idle sooner, and with animations disabled the boot screen is
+  // a "stable" frame toHaveScreenshot will happily compare.
+  await page.locator('fb-loading-screen').waitFor({ state: 'detached', timeout: 10_000 }).catch(() => {});
   await settle(page);
 }
 

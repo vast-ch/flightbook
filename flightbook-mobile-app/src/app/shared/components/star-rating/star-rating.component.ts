@@ -9,9 +9,7 @@ import { star } from "ionicons/icons";
     templateUrl: './star-rating.component.html',
     styleUrls: ['./star-rating.component.scss'],
     imports: [NgClass, IonIcon],
-    // TODO: This component has been partially migrated to be zoneless-compatible.
-    // After testing, this should be updated to ChangeDetectionStrategy.OnPush.
-    changeDetection: ChangeDetectionStrategy.Default,
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StarRatingComponent implements OnInit, OnChanges {
     @Input()

@@ -16,9 +16,7 @@ import { AccountService } from 'src/app/account/shared/account.service';
     imports: [TranslateModule],
     templateUrl: './avatar-button.component.html',
     styles: [':host { display: contents; }'],
-    // TODO: This component has been partially migrated to be zoneless-compatible.
-    // After testing, this should be updated to ChangeDetectionStrategy.OnPush.
-    changeDetection: ChangeDetectionStrategy.Default,
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AvatarButtonComponent {
     private accountService = inject(AccountService);

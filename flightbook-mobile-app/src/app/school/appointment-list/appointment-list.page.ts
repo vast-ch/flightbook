@@ -46,9 +46,7 @@ const CLOSING_SOON_HOURS = 24;
         FormsModule,
         AppointmentFilterChipsComponent
     ],
-    // TODO: This component has been partially migrated to be zoneless-compatible.
-    // After testing, this should be updated to ChangeDetectionStrategy.OnPush.
-    changeDetection: ChangeDetectionStrategy.Default,
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppointmentListPage implements OnInit, OnDestroy {
     @ViewChild(IonInfiniteScroll) infiniteScroll: IonInfiniteScroll;

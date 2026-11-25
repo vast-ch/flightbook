@@ -35,9 +35,7 @@ const LANGUAGES = SUPPORTED_LANGUAGES;
     IonSelect,
     IonSelectOption
   ],
-  // TODO: This component has been partially migrated to be zoneless-compatible.
-  // After testing, this should be updated to ChangeDetectionStrategy.OnPush.
-  changeDetection: ChangeDetectionStrategy.Default,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PassengerConfirmationFormComponent implements OnDestroy {
   unsubscribe$ = new Subject<void>();

@@ -35,15 +35,13 @@ import { NavigationService } from 'src/app/shared/services/navigation.service';
         IonButton,
         IonIcon
     ],
-    // TODO: This component has been partially migrated to be zoneless-compatible.
-    // After testing, this should be updated to ChangeDetectionStrategy.OnPush.
-    changeDetection: ChangeDetectionStrategy.Default,
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FlightAddPage implements OnInit, OnDestroy {
     unsubscribe$ = new Subject<void>();
     /**
      * A mutable model shared with flight-form, filled in by HTTP answers and
-     * the IGC parse: each such write ends in markForCheck().
+     * the IGC parse: each such write ends in republishFlight().
      */
     flight: Flight;
     gliders = signal<Glider[]>([]);
@@ -77,6 +75,17 @@ export class FlightAddPage implements OnInit, OnDestroy {
         this.navigationService.back('/flights');
     }
 
+    /**
+     * Republishes `flight` as a new object after it was written in place (an
+     * HTTP answer, the IGC parse). flight-form and its glider select are
+     * OnPush: an unchanged reference would leave them showing the old values,
+     * and markForCheck() only reaches this page and its ancestors.
+     */
+    private republishFlight() {
+        this.flight = Object.assign(new Flight(), this.flight);
+        this.cdr.markForCheck();
+    }
+
     ngOnInit() {
         this.schoolService.getSchools().then((schools: School[]) => {
             this.schools.set(schools);
@@ -95,7 +104,7 @@ export class FlightAddPage implements OnInit, OnDestroy {
                     if (res.length > 0) {
                         this.flight.glider = res[0].glider;
                         this.ensureSelectedGliderIncluded();
-                        this.cdr.markForCheck();
+                        this.republishFlight();
                     }
                 });
         }
@@ -178,7 +187,7 @@ export class FlightAddPage implements OnInit, OnDestroy {
         this.igcFile.set(await this.igcService.getIgcFileContentAndPrefillFlight(this.flight, this.flight.igcFile));
         this.ensureSelectedGliderIncluded();
         // The parse wrote date, time, km, places and glider into this.flight.
-        this.cdr.markForCheck();
+        this.republishFlight();
 
         await loading.dismiss();
     }

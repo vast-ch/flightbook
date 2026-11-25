@@ -12,9 +12,7 @@ import { cloudUploadOutline } from "ionicons/icons";
     templateUrl: 'file-input.component.html',
     styleUrls: ['file-input.component.scss'],
     imports: [IonIcon, TranslateModule],
-    // TODO: This component has been partially migrated to be zoneless-compatible.
-    // After testing, this should be updated to ChangeDetectionStrategy.OnPush.
-    changeDetection: ChangeDetectionStrategy.Default,
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FileInputComponent implements OnInit {
 

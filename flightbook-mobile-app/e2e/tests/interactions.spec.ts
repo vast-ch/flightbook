@@ -144,6 +144,20 @@ test.describe('IGC import', () => {
   });
 });
 
+test.describe('IGC prefill', () => {
+  // The add page writes the parse result into its flight in place; the OnPush
+  // form only shows it because the page then hands it a new object.
+  test('fills the flight form from a dropped file', async ({ page, consoleErrors }) => {
+    await open(page, '/flights/add');
+    await page.locator('fb-file-input input[type="file"]').setInputFiles(IGC_FILE);
+
+    await expect(page.locator('ion-input[name="km"] input')).toHaveValue('5.71');
+    await expect(page.locator('ion-input[name="start"] input')).toHaveValue('E2E IGC Launch');
+    await expect(page.locator('#flightDateInput .fb-row__value')).toHaveText('15.08.2026');
+    expect(consoleErrors).toEqual([]);
+  });
+});
+
 test.describe('place autocomplete', () => {
   test('suggests places as you type and fills the one picked', async ({ page, consoleErrors }) => {
     const fiesch = SEED.places[2].name;

@@ -55,9 +55,7 @@ const LANDING_COLOR = '#e0483a';
         IonButton,
         IonIcon
     ],
-    // TODO: This component has been partially migrated to be zoneless-compatible.
-    // After testing, this should be updated to ChangeDetectionStrategy.OnPush.
-    changeDetection: ChangeDetectionStrategy.Default,
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class IgcMapComponent implements AfterViewInit, OnDestroy {
 
