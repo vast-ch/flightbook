@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, AfterViewInit, ChangeDetectorRef, Component, ElementRef, Input, NgZone, OnDestroy, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, AfterViewInit, ChangeDetectorRef, Component, ElementRef, Input, OnDestroy, ViewChild } from '@angular/core';
 import Feature from 'ol/Feature';
 import IGC from 'ol/format/IGC';
 import Map from 'ol/Map';
@@ -145,7 +145,6 @@ export class IgcMapComponent implements AfterViewInit, OnDestroy {
 
     constructor(
         private configurationService: ConfigurationService,
-        private zone: NgZone,
         private cdr: ChangeDetectorRef
     ) {
         this.vectorSource.on('addfeature', this.onAddfeature);
@@ -279,11 +278,9 @@ export class IgcMapComponent implements AfterViewInit, OnDestroy {
         this.playStartedAt = performance.now();
         this.lastSyncAt = 0;
         this.playing = true;
-        // Outside Angular: a 60fps loop would otherwise run change detection on
-        // every frame for the whole replay. Bindings are synced on a throttle.
-        this.zone.runOutsideAngular(() => {
-            this.animationHandle = requestAnimationFrame(this.tick);
-        });
+        // The loop schedules no change detection of its own (zoneless): the
+        // marker moves every frame, the bindings are synced on a throttle.
+        this.animationHandle = requestAnimationFrame(this.tick);
     }
 
     private stop() {
@@ -320,7 +317,7 @@ export class IgcMapComponent implements AfterViewInit, OnDestroy {
     };
 
     private syncBindings() {
-        this.zone.run(() => this.cdr.detectChanges());
+        this.cdr.detectChanges();
     }
 
     /**

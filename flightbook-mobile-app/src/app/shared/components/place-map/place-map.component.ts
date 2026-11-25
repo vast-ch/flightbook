@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, AfterViewInit, ChangeDetectorRef, Component, ElementRef, Input, NgZone, OnChanges, OnDestroy, SimpleChanges, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, AfterViewInit, ChangeDetectorRef, Component, ElementRef, Input, OnChanges, OnDestroy, SimpleChanges, ViewChild } from '@angular/core';
 import { AlertController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
 import { Point as GeoPoint, Position } from 'geojson';
@@ -76,7 +76,6 @@ export class PlaceMapComponent implements AfterViewInit, OnChanges, OnDestroy {
         private alertController: AlertController,
         private translate: TranslateService,
         private configurationService: ConfigurationService,
-        private zone: NgZone,
         private cdr: ChangeDetectorRef
     ) {
         this.vectorSource.addFeature(this.marker);
@@ -166,22 +165,20 @@ export class PlaceMapComponent implements AfterViewInit, OnChanges, OnDestroy {
             if (this.destroyed || !this.coordinatesFromSearch) {
                 return;
             }
-            this.zone.run(() => {
-                // Fill an empty field, or refine an earlier guess of our own -
-                // but never replace a value the pilot entered. An existing
-                // place reaches here by being renamed, and its altitude may
-                // have been surveyed rather than looked up.
-                if (this.ownsAltitude()) {
-                    this.place.altitude = metadata.altitude;
-                    this.guessedAltitude = metadata.altitude;
-                }
-                if (this.ownsCountry()) {
-                    this.place.country = metadata.country;
-                    this.guessedCountry = metadata.country;
-                }
-            });
-            // The fields live in the parent form; zone.run no longer renders
-            // anything without Zone.js, and markForCheck reaches the ancestors.
+            // Fill an empty field, or refine an earlier guess of our own -
+            // but never replace a value the pilot entered. An existing
+            // place reaches here by being renamed, and its altitude may
+            // have been surveyed rather than looked up.
+            if (this.ownsAltitude()) {
+                this.place.altitude = metadata.altitude;
+                this.guessedAltitude = metadata.altitude;
+            }
+            if (this.ownsCountry()) {
+                this.place.country = metadata.country;
+                this.guessedCountry = metadata.country;
+            }
+            // The fields live in the parent form: markForCheck reaches the
+            // ancestors, which an HTTP answer alone would not.
             this.cdr.markForCheck();
         } catch {
             // Keep the coordinates; the pilot can still fill these in by hand.
@@ -294,7 +291,7 @@ export class PlaceMapComponent implements AfterViewInit, OnChanges, OnDestroy {
             await alert.onDidDismiss();
             await alert.dismiss();
         } else {
-            this.zone.run(() => this.writeMetadata(res));
+            this.writeMetadata(res);
         }
     });
 }
