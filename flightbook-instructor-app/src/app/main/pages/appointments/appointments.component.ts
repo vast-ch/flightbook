@@ -250,6 +250,7 @@ export class AppointmentsComponent implements OnInit, OnDestroy, AfterViewInit {
   subscriptionDetail(appointment: Appointment) {
     const dialogRef = this.dialog.open(SubscriptionsComponent, {
       width: "700px",
+      maxWidth: "95vw",
       data: {
         appointment: appointment
       }
