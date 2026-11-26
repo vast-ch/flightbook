@@ -34,6 +34,8 @@ type SkillRow = { key: string, value: number };
         IonIcon,
         IonModal
     ],
+    // Injected to sort translated options; was a provider of the old ControlSheetPageModule.
+    providers: [NxgTransalteSortPipe],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ControlSheetPage implements OnInit, OnDestroy {

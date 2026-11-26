@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, signal } from '@angular/core';
 
-import { AlertController, IonicSafeString } from '@ionic/angular';
+import { AlertController, IonicSafeString, IonApp, IonRouterOutlet } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
 import { takeUntil } from 'rxjs/operators';
 import { AccountService } from './account/shared/account.service';
@@ -25,14 +25,19 @@ import { PaymentService } from './shared/services/payment.service';
 import { firstValueFrom, Subject } from 'rxjs';
 import { addIcons } from "ionicons";
 import { cloudUpload, copy } from 'ionicons/icons';
+import { LoadingScreenComponent } from './shared/components/loading-screen/loading-screen.component';
 
 
 @Component({
     selector: 'app-root',
     templateUrl: 'app.component.html',
     styleUrls: ['app.component.scss'],
-    standalone: false,
     changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [
+        IonApp,
+        IonRouterOutlet,
+        LoadingScreenComponent,
+    ],
 })
 export class AppComponent implements OnDestroy, OnInit {
     unsubscribe$ = new Subject<void>();

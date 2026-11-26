@@ -3,7 +3,7 @@ import { TranslateService } from '@ngx-translate/core';
 
 /**
  * The languages the app ships strings for, and the only ones whose Angular
- * locale data is registered (de/fr/it in app.module.ts; en is built in).
+ * locale data is registered (de/fr/it in app.config.ts; en is built in).
  */
 export const SUPPORTED_LANGUAGES = ['de', 'fr', 'it', 'en'];
 

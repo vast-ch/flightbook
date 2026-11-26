@@ -1,5 +1,4 @@
-import { NgModule } from '@angular/core';
-import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
+import { Routes } from '@angular/router';
 import { AuthGuardService } from './account/shared/auth-guard.service';
 import { ForceUpdateGuard } from './shared/guards/force-update.guard';
 import { TabsPage } from './tabs/tabs.page';
@@ -10,7 +9,7 @@ import { TabsPage } from './tabs/tabs.page';
  * the push-notification deep links (/flights/:id, /more/school/:id) keep
  * working. Login and register sit outside the shell: no tab bar there.
  */
-const routes: Routes = [
+export const routes: Routes = [
   {
     path: '',
     redirectTo: 'home',
@@ -18,12 +17,12 @@ const routes: Routes = [
   },
   {
     path: 'login',
-    loadChildren: () => import('./account/login/login.module').then(m => m.LoginPageModule),
+    loadComponent: () => import('./account/login/login.page').then(m => m.LoginPage),
     canActivate: [ForceUpdateGuard]
   },
   {
     path: 'register',
-    loadChildren: () => import('./account/register/register.module').then(m => m.RegisterPageModule)
+    loadComponent: () => import('./account/register/register.page').then(m => m.RegisterPage)
   },
   {
     path: '',
@@ -31,7 +30,7 @@ const routes: Routes = [
     children: [
       {
         path: 'home',
-        loadChildren: () => import('./home/home.module').then(m => m.HomePageModule),
+        loadComponent: () => import('./home/home.page').then(m => m.HomePage),
         canActivate: [ForceUpdateGuard, AuthGuardService]
       },
       {
@@ -42,12 +41,12 @@ const routes: Routes = [
       },
       {
         path: 'flights',
-        loadChildren: () => import('./flight/flight-list/flight-list.module').then(m => m.FlightListPageModule),
+        loadComponent: () => import('./flight/flight-list/flight-list.page').then(m => m.FlightListPage),
         canActivate: [AuthGuardService]
       },
       {
         path: 'flights/add',
-        loadChildren: () => import('./flight/flight-add/flight-add.module').then(m => m.FlightAddPageModule),
+        loadComponent: () => import('./flight/flight-add/flight-add.page').then(m => m.FlightAddPage),
         canActivate: [AuthGuardService]
       },
       {
@@ -63,12 +62,12 @@ const routes: Routes = [
       },
       {
         path: 'statistics',
-        loadChildren: () => import('./flight/flight-statistic/flight-statistic.module').then(m => m.FlightStatisticPageModule),
+        loadComponent: () => import('./flight/flight-statistic/flight-statistic.page').then(m => m.FlightStatisticPage),
         canActivate: [AuthGuardService]
       },
       {
         path: 'flights/:id',
-        loadChildren: () => import('./flight/flight-edit/flight-edit.module').then(m => m.FlightEditPageModule),
+        loadComponent: () => import('./flight/flight-edit/flight-edit.page').then(m => m.FlightEditPage),
         canActivate: [AuthGuardService]
       },
       {
@@ -80,17 +79,17 @@ const routes: Routes = [
          * reveal More underneath it instead of finding an empty stack.
          */
         path: 'more/gliders',
-        loadChildren: () => import('./glider/glider-list/glider-list.module').then(m => m.GliderListPageModule),
+        loadComponent: () => import('./glider/glider-list/glider-list.page').then(m => m.GliderListPage),
         canActivate: [AuthGuardService]
       },
       {
         path: 'more/gliders/add',
-        loadChildren: () => import('./glider/glider-add/glider-add.module').then(m => m.GliderAddPageModule),
+        loadComponent: () => import('./glider/glider-add/glider-add.page').then(m => m.GliderAddPage),
         canActivate: [AuthGuardService]
       },
       {
         path: 'more/gliders/:id',
-        loadChildren: () => import('./glider/glider-edit/glider-edit.module').then(m => m.GliderEditPageModule),
+        loadComponent: () => import('./glider/glider-edit/glider-edit.page').then(m => m.GliderEditPage),
         canActivate: [AuthGuardService]
       },
       {
@@ -99,17 +98,17 @@ const routes: Routes = [
          * only ever reached from the More menu.
          */
         path: 'more/places',
-        loadChildren: () => import('./place/place-list/place-list.module').then(m => m.PlaceListPageModule),
+        loadComponent: () => import('./place/place-list/place-list.page').then(m => m.PlaceListPage),
         canActivate: [AuthGuardService]
       },
       {
         path: 'more/places/add',
-        loadChildren: () => import('./place/place-add/place-add.module').then(m => m.PlaceAddPageModule),
+        loadComponent: () => import('./place/place-add/place-add.page').then(m => m.PlaceAddPage),
         canActivate: [AuthGuardService]
       },
       {
         path: 'more/places/:id',
-        loadChildren: () => import('./place/place-edit/place-edit.module').then(m => m.PlaceEditPageModule),
+        loadComponent: () => import('./place/place-edit/place-edit.page').then(m => m.PlaceEditPage),
         canActivate: [AuthGuardService]
       },
       {
@@ -120,18 +119,18 @@ const routes: Routes = [
          * stack instead.
          */
         path: 'flights/imports/igc',
-        loadChildren: () => import('./imports/multiple-igc/multiple-igc.module').then(m => m.MultipleIgcPageModule),
+        loadComponent: () => import('./imports/multiple-igc/multiple-igc.page').then(m => m.MultipleIgcPage),
         canActivate: [AuthGuardService]
       },
       {
         // More-only, unlike imports/igc above - nested under `more` instead.
         path: 'more/imports/data',
-        loadChildren: () => import('./imports/data/data.module').then(m => m.DataPageModule),
+        loadComponent: () => import('./imports/data/data.page').then(m => m.DataPage),
         canActivate: [AuthGuardService]
       },
       {
         path: 'flight-edit',
-        loadChildren: () => import('./flight/flight-edit/flight-edit.module').then(m => m.FlightEditPageModule),
+        loadComponent: () => import('./flight/flight-edit/flight-edit.page').then(m => m.FlightEditPage),
         canActivate: [AuthGuardService]
       },
       {
@@ -144,7 +143,13 @@ const routes: Routes = [
          * break both.
          */
         path: 'settings',
-        loadChildren: () => import('./account/settings/settings.module').then(m => m.SettingsPageModule),
+        loadComponent: () => import('./account/settings/account-data.page').then(m => m.AccountDataPage),
+        canActivate: [AuthGuardService]
+      },
+      {
+        // Stripe's return: /settings/success and /settings/cancel (see above).
+        path: 'settings/:payment',
+        loadComponent: () => import('./account/settings/account-data.page').then(m => m.AccountDataPage),
         canActivate: [AuthGuardService]
       },
       {
@@ -154,34 +159,26 @@ const routes: Routes = [
          * ROOT_SEGMENT_FALLBACKS comment for the accepted trade-off.
          */
         path: 'more/school/:id',
-        loadChildren: () => import('./school/appointment-list/appointment-list.module').then(m => m.AppointmentListPageModule),
+        loadComponent: () => import('./school/appointment-list/appointment-list.page').then(m => m.AppointmentListPage),
         canActivate: [AuthGuardService]
       },
       {
         // Same trade-off as school/:id above - also reachable from Home.
         path: 'more/control-sheet',
-        loadChildren: () => import('./school/control-sheet/control-sheet.module').then(m => m.ControlSheetPageModule),
+        loadComponent: () => import('./school/control-sheet/control-sheet.page').then(m => m.ControlSheetPage),
         canActivate: [AuthGuardService]
       },
       {
         // Same trade-off as school/:id above - also reachable from the tab bar's global "+" add-sheet.
         path: 'more/passenger-confirmations',
-        loadChildren: () => import('./tandem/passenger-confirmation-list/passenger-confirmation-list.module').then(m => m.PassengerConfirmationListPageModule),
+        loadComponent: () => import('./tandem/passenger-confirmation-list/passenger-confirmation-list.page').then(m => m.PassengerConfirmationListPage),
         canActivate: [AuthGuardService]
       },
       {
         path: 'more',
-        loadChildren: () => import('./more/more.module').then(m => m.MorePageModule),
+        loadComponent: () => import('./more/more.page').then(m => m.MorePage),
         canActivate: [AuthGuardService]
       }
     ]
   }
 ];
-
-@NgModule({
-  imports: [
-    RouterModule.forRoot(routes, { preloadingStrategy: PreloadAllModules })
-  ],
-  exports: [RouterModule]
-})
-export class AppRoutingModule { }

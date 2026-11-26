@@ -1,6 +1,6 @@
 # CLAUDE.md — flightbook-mobile-app
 
-Angular 21 (standalone components, signals, Zone.js) + Ionic 9 + Capacitor. A paragliding
+Angular 21 (standalone components, signals, zoneless, OnPush) + Ionic 9 + Capacitor. A paragliding
 logbook. This file records what is specific to *this* app and what has actually
 caught people out; the global `~/.claude/CLAUDE.md` still applies for everything
 else.
@@ -44,6 +44,37 @@ file and the surrounding code.
 - Ionic's reset sets `body { word-wrap: break-word }`, which permits mid-word
   breaks. A required-field marker is a zero-width `.fb-row__req` span for that
   reason — see the comment on `.fb-row__label`.
+
+## Change detection (zoneless + OnPush)
+
+- No Zone.js (`provideZonelessChangeDetection()` in `app.config.ts`), and every
+  component is `ChangeDetectionStrategy.OnPush`. New components too.
+- A template only updates when Angular is told: a signal it reads changed, a
+  template event fired, an `@Input` got a new reference, or `markForCheck()`.
+  A plain field written after `await`, in a `subscribe`, an Ionic alert/action
+  sheet `handler`, `modal.onWillDismiss()`, a Worker or a third-party listener
+  silently never renders. Prefer a signal; use `markForCheck()` for
+  `ngModel`-bound model objects.
+- `markForCheck()` reaches the component and its **ancestors**, not children.
+  A parent that mutates an object an OnPush child takes as `@Input` must hand
+  over a new reference - see `republishFlight()` in flight-add/flight-edit.
+- `NgZone.run()` is a no-op now; it does not render anything.
+- A `ControlValueAccessor` must `markForCheck()` in `writeValue` /
+  `setDisabledState` (forms call them from a microtask) - see `phone-number`.
+- Guard: `e2e/` `npm run test:cd` runs a dev build with exhaustive
+  `checkNoChanges`; any unnotified binding fails as NG0100.
+
+## Bootstrap and routing (standalone, no NgModules)
+
+- `main.ts` → `bootstrapApplication(AppComponent, appConfig)`. App-wide
+  providers live in `app/app.config.ts`, routes in `app/app.routes.ts`; every
+  page is lazy via `loadComponent`. Don't add NgModules or `*.module.ts` files.
+- A provider a page needs goes in its `@Component({ providers })` or in
+  `app.config.ts`, not in a route module (see `NxgTransalteSortPipe` on
+  control-sheet).
+- ngx-translate 14 has no `provideTranslateService()`; it is set up once with
+  `importProvidersFrom(TranslateModule.forRoot(...))`. Pages import plain
+  `TranslateModule` for the pipe, never `forChild()`.
 
 ## State
 
@@ -105,6 +136,8 @@ and `docker` are replaced at build time.
   `place-map/place-marker.style.spec.ts`); the generated "should create" smoke
   specs were deleted because they tested nothing the e2e suite doesn't. Add unit
   specs for logic (formatting, parsing, store calculations), not for rendering.
+- **Change detection:** `cd e2e && npm run test:cd` - see the section above.
+  Run it for anything touching component state.
 - **e2e:** `e2e/` runs Playwright against the built app and a local API
   (Postgres in Docker, seeded user, no Keycloak). `e2e/compare.sh [ref]`
   screenshots every screen on a base ref and diffs the working tree against it,

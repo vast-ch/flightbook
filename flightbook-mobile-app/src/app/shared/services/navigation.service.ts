@@ -35,7 +35,7 @@ const EXIT_BACK_BUTTON_PRIORITY = -1;
  *
  * gliders, places, imports/data, school, control-sheet and
  * passenger-confirmations all avoid this by being registered under
- * `more/*` (see app-routing.module.ts), sharing More's own stack instead of
+ * `more/*` (see app.routes.ts), sharing More's own stack instead of
  * getting a fresh one - which is why they're no longer listed below. The
  * last three of those are also reachable from Home or the tab bar's global
  * "+" add-sheet, not just More; nesting them under `more` anyway is a
