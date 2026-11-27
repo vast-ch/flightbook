@@ -176,8 +176,10 @@ export class PaymentFacade {
                 paymentStatusDto.state = PaymentState.EXPIRED;
             }
         } catch (e: any) {
+            // Stripe unknown: grant access. An exempted user stays EXEMPTED -
+            // clients show them as Free, not as a subscriber with no dates.
             paymentStatusDto.active = true;
-            paymentStatusDto.state = PaymentState.NONE;
+            paymentStatusDto.state = user.paymentExempted ? PaymentState.EXEMPTED : PaymentState.NONE;
             Logger.error(`Error check payment status for user id ${id}`);
             //this.emailService.sendErrorMessageToAdmin('Error check payment status', `Error check payment status for user id ${id}`);
         }

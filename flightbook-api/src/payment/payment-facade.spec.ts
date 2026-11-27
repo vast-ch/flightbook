@@ -189,5 +189,25 @@ describe('Payment Facade', () => {
         expect(status.state).toBe(PaymentState.EXPIRED);
         expect(status.active).toBe(false);
     });
+
+    it('keeps EXEMPTED for an exempted user when the Stripe lookup fails', async () => {
+        userRepository.getUserById.mockResolvedValue(buildUser({ paymentExempted: true }));
+        (facade.stripe.customers.list as jest.Mock).mockRejectedValue(new Error('Stripe unreachable'));
+
+        const status = await facade.hasUserPayed(1);
+
+        expect(status.state).toBe(PaymentState.EXEMPTED);
+        expect(status.active).toBe(true);
+    });
+
+    it('grants access as NONE to a non-exempted user when the Stripe lookup fails', async () => {
+        userRepository.getUserById.mockResolvedValue(buildUser());
+        (facade.stripe.customers.list as jest.Mock).mockRejectedValue(new Error('Stripe unreachable'));
+
+        const status = await facade.hasUserPayed(1);
+
+        expect(status.state).toBe(PaymentState.NONE);
+        expect(status.active).toBe(true);
+    });
   });
 });
