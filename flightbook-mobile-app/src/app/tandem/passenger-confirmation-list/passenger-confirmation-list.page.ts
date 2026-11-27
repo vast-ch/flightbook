@@ -2,7 +2,7 @@ import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, computed, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ModalController, LoadingController, IonIcon, IonContent, IonInfiniteScroll, IonInfiniteScrollContent, AlertController, ActionSheetController } from '@ionic/angular';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { firstValueFrom, Subject, takeUntil } from 'rxjs';
 import { addIcons } from "ionicons";
 import { add, checkmark, chevronBack, shareOutline } from 'ionicons/icons';
@@ -22,7 +22,7 @@ import { localDate } from 'src/app/shared/util/format';
   templateUrl: './passenger-confirmation-list.page.html',
   styleUrls: ['./passenger-confirmation-list.page.scss'],
   imports: [
-    TranslateModule,
+    TranslatePipe,
     DatePipe,
     IonIcon,
     IonContent,

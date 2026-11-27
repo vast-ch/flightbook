@@ -4,7 +4,7 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { FlightFilterComponent } from 'src/app/form/flight-filter/flight-filter.component';
 import { FilterChipsComponent } from 'src/app/form/flight-filter/filter-chips.component';
-import { TranslateService, TranslateModule } from '@ngx-translate/core';
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 import { LogbookExportService } from 'src/app/shared/services/logbook-export.service';
 import { Flight } from '../shared/flight.model';
 import { FlightStatistic } from '../shared/flightStatistic.model';
@@ -35,7 +35,7 @@ import { toHoursMinutes } from 'src/app/shared/util/format';
         AvatarButtonComponent,
         FlagsModule,
         DatePipe,
-        TranslateModule,
+        TranslatePipe,
         IonContent,
         IonIcon,
         IonItem,

@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
 import { AlertController, IonIcon } from '@ionic/angular';
-import { TranslateService, TranslateModule } from '@ngx-translate/core';
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 import { v4 as uuidv4 } from 'uuid';
 import { FilePicker, PickedFile } from '@capawesome/capacitor-file-picker';
 import { addIcons } from "ionicons";
@@ -11,7 +11,7 @@ import { cloudUploadOutline } from "ionicons/icons";
     selector: 'fb-file-input',
     templateUrl: 'file-input.component.html',
     styleUrls: ['file-input.component.scss'],
-    imports: [IonIcon, TranslateModule],
+    imports: [IonIcon, TranslatePipe],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FileInputComponent implements OnInit {

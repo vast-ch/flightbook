@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { AlertController, LoadingController, IonContent, IonFooter, IonButton, IonIcon } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { close } from 'ionicons/icons';
-import { TranslateService, TranslateModule } from '@ngx-translate/core';
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 import HttpStatusCode from '../../shared/util/HttpStatusCode';
 import { FileUploadService } from 'src/app/flight/shared/fileupload.service';
 import { Place } from 'src/app/place/shared/place.model';
@@ -29,7 +29,7 @@ import { NavigationService } from 'src/app/shared/services/navigation.service';
     imports: [
         FileInputComponent,
         FlightFormComponent,
-        TranslateModule,
+        TranslatePipe,
         IonContent,
         IonFooter,
         IonButton,

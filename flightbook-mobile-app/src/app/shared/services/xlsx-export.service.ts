@@ -23,7 +23,7 @@ export class XlsxExportService {
   lang : string;
 
   constructor(private translate: TranslateService) {
-    this.lang = this.translate.currentLang;
+    this.lang = this.translate.getCurrentLang();
   }
 
   async loadXlsx() {

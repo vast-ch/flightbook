@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Output, computed, inject } from '@angular/core';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { IonIcon } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { close } from 'ionicons/icons';
@@ -21,7 +21,7 @@ type Chip = { label: string; clear: () => void };
 @Component({
     selector: 'fb-glider-filter-chips',
     standalone: true,
-    imports: [TranslateModule, IonIcon],
+    imports: [TranslatePipe, IonIcon],
     templateUrl: './glider-filter-chips.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })

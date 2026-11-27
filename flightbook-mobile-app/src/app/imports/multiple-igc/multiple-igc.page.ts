@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnInit, signal } from '@angular/core';
 import { LoadingController, IonContent, IonFooter, IonList, IonItem, IonSpinner, IonButton, IonIcon } from '@ionic/angular';
-import { TranslateService, TranslateModule } from '@ngx-translate/core';
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 import { Subject, from, firstValueFrom } from 'rxjs';
 import { takeUntil, mergeMap, toArray } from 'rxjs/operators';
 import { Place } from 'src/app/place/shared/place.model';
@@ -35,7 +35,7 @@ const IMPORT_CONCURRENCY = 2;
         FileInputComponent,
         GliderSelectComponent,
         DatePipe,
-        TranslateModule,
+        TranslatePipe,
         IonContent,
         IonFooter,
         IonList,

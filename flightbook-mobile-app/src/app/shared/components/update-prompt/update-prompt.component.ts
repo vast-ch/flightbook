@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { AlertController, IonButton, IonContent, IonFooter, IonIcon, ModalController } from '@ionic/angular';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { UpdateStatus, VersionCheckResponse } from '../../services/version-check.service';
 import { addIcons } from 'ionicons';
 import { alertCircle, informationCircle } from 'ionicons/icons';
@@ -15,7 +15,7 @@ import { NativeMarket } from "@capacitor-community/native-market";
     IonIcon,
     IonContent,
     IonFooter,
-    TranslateModule
+    TranslatePipe
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

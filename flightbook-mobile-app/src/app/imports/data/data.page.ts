@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, signal } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
 import { AlertController, LoadingController, IonContent, IonFooter, IonSelect, IonSelectOption, IonButton, IonIcon } from '@ionic/angular';
-import { TranslateService, TranslateModule } from '@ngx-translate/core';
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 import { Subject, firstValueFrom, takeUntil } from 'rxjs';
 import { FilePicker, PickedFile, PickFilesResult } from '@capawesome/capacitor-file-picker';
 import { FlightStore } from 'src/app/flight/shared/flight.store';
@@ -18,7 +18,7 @@ import { chevronBack, chevronForward, cloudUploadOutline } from "ionicons/icons"
     templateUrl: './data.page.html',
     styleUrls: ['./data.page.scss'],
     imports: [
-        TranslateModule,
+        TranslatePipe,
         IonContent,
         IonFooter,
         IonSelect,

@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, OnDestroy, signal } from '@angular/
 import { ModalController, IonContent, IonInput, IonSelect, IonSelectOption, IonButton } from '@ionic/angular';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { GliderStore } from '../shared/glider.store';
 import { Glider } from '../shared/glider.model';
 import { FormsModule } from '@angular/forms';
@@ -15,7 +15,7 @@ import { chevronForward } from 'ionicons/icons';
     styleUrls: ['./glider-filter.component.scss'],
     imports: [
         FormsModule,
-        TranslateModule,
+        TranslatePipe,
         IonContent,
         IonInput,
         IonSelect,

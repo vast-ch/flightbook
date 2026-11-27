@@ -6,7 +6,7 @@ import { PlaceStore } from 'src/app/place/shared/place.store';
 import { addIcons } from "ionicons";
 import { close } from "ionicons/icons";
 import { IonIcon } from "@ionic/angular";
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
     selector: 'autocomplete',
@@ -17,7 +17,7 @@ import { TranslateModule } from '@ngx-translate/core';
     },
     imports: [
         IonIcon,
-        TranslateModule
+        TranslatePipe
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })

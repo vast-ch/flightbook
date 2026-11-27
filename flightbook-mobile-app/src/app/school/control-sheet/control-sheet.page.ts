@@ -3,7 +3,7 @@ import { ControlSheet } from 'src/app/shared/domain/control-sheet';
 import { SchoolService } from '../shared/school.service';
 import { Subject, takeUntil } from 'rxjs';
 import { AlertController, LoadingController, ModalController, IonContent, IonIcon, IonModal, IonDatetime } from '@ionic/angular';
-import { TranslateService, TranslateModule } from '@ngx-translate/core';
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 import { ControlSheetDetailsComponent } from '../shared/components/control-sheet-details/control-sheet-details.component';
 import { NxgTransalteSortPipe } from 'src/app/shared/pipes/nxg-transalte-sort.pipe';
 import { DatePipe } from '@angular/common';
@@ -29,7 +29,7 @@ type SkillRow = { key: string, value: number };
         DatePipe,
         IonDatetime,
         StarRatingComponent,
-        TranslateModule,
+        TranslatePipe,
         IonContent,
         IonIcon,
         IonModal

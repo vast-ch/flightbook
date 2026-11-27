@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnInit, ChangeDetectorRef, inject } from '@angular/core';
 import { AlertController, ModalController, IonIcon, IonContent, IonButton } from '@ionic/angular';
-import { TranslateService, TranslateModule } from '@ngx-translate/core';
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 import { firstValueFrom } from 'rxjs';
 import { User } from 'src/app/account/shared/user.model';
 import { Appointment } from 'src/app/school/shared/appointment.model';
@@ -24,7 +24,7 @@ const HOURS_BEFORE_DAYS = 48;
     styleUrls: ['./appointment-details.component.scss'],
     imports: [
         DatePipe,
-        TranslateModule,
+        TranslatePipe,
         IonIcon,
         IonContent,
         IonButton

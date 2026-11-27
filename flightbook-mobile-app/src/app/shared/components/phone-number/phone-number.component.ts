@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, Input, OnDestroy, forwardRef, ChangeDetectorRef } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR, FormsModule, NG_VALIDATORS, Validator, AbstractControl, ValidationErrors } from '@angular/forms';
 import { IonInput, IonSelect, IonSelectOption, IonText } from '@ionic/angular';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { Subject, takeUntil } from 'rxjs';
 
 interface CountryPrefix {
@@ -15,7 +15,7 @@ interface CountryPrefix {
   selector: 'fb-phone-number',
   templateUrl: './phone-number.component.html',
   styleUrls: ['./phone-number.component.scss'],
-  imports: [IonInput, IonSelect, IonSelectOption, IonText, FormsModule, TranslateModule],
+  imports: [IonInput, IonSelect, IonSelectOption, IonText, FormsModule, TranslatePipe],
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,

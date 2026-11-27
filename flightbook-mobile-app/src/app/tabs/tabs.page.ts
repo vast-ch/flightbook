@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { ModalController, IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel } from '@ionic/angular';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { homeOutline, ellipsisHorizontal, add, statsChart } from 'ionicons/icons';
 import { AddSheetComponent } from './add-sheet/add-sheet.component';
@@ -10,7 +10,7 @@ import { AddSheetComponent } from './add-sheet/add-sheet.component';
     templateUrl: './tabs.page.html',
     styleUrls: ['./tabs.page.scss'],
     imports: [
-        TranslateModule,
+        TranslatePipe,
         IonTabs,
         IonTabBar,
         IonTabButton,

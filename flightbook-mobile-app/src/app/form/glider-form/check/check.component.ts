@@ -2,7 +2,7 @@ import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AlertController, IonContent, IonFooter, IonButton, IonTextarea, IonIcon, IonModal, IonDatetime, ModalController } from "@ionic/angular";
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { close, chevronForward } from 'ionicons/icons';
 import { GliderCheck } from 'src/app/glider/shared/glider.model';
@@ -14,7 +14,7 @@ import { GliderCheck } from 'src/app/glider/shared/glider.model';
   imports: [
     IonDatetime,
     IonModal,
-    TranslateModule,
+    TranslatePipe,
     IonIcon,
     IonTextarea,
     IonButton,
@@ -37,7 +37,7 @@ export class CheckComponent {
     private modalCtrl: ModalController,
     private alertController: AlertController
   ) {
-    this.language = this.translate.currentLang;
+    this.language = this.translate.getCurrentLang();
     addIcons({ close, 'chevron-forward': chevronForward });
   }
 

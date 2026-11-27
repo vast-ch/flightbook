@@ -72,9 +72,12 @@ file and the surrounding code.
 - A provider a page needs goes in its `@Component({ providers })` or in
   `app.config.ts`, not in a route module (see `NxgTransalteSortPipe` on
   control-sheet).
-- ngx-translate 14 has no `provideTranslateService()`; it is set up once with
-  `importProvidersFrom(TranslateModule.forRoot(...))`. Pages import plain
-  `TranslateModule` for the pipe, never `forChild()`.
+- ngx-translate 18: set up once in `app.config.ts` with
+  `provideTranslateService` + `provideTranslateHttpLoader`. There is no
+  `TranslateModule` any more - components import the standalone
+  `TranslatePipe`. `translate.currentLang` is a signal (`getCurrentLang()` for a
+  snapshot); the old default language is the "fallback" language
+  (`setFallbackLang`).
 
 ## State
 

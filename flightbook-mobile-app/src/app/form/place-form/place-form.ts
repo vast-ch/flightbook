@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, Input, Output, EventEmitter } from '@angular/core';
 import { AlertController, IonInput, IonSelect, IonSelectOption, IonTextarea } from '@ionic/angular';
-import { TranslateService, TranslateModule } from '@ngx-translate/core';
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 import { Place } from 'src/app/place/shared/place.model';
 import { Countries, Country } from 'src/app/place/shared/place.countries';
 import { FormsModule } from '@angular/forms';
@@ -10,7 +10,7 @@ import { PlaceMapComponent } from '../../shared/components/place-map/place-map.c
     selector: 'place-form',
     templateUrl: 'place-form.html',
     styleUrls: ['place-form.scss'],
-    imports: [FormsModule, PlaceMapComponent, TranslateModule, IonInput, IonSelect, IonSelectOption, IonTextarea],
+    imports: [FormsModule, PlaceMapComponent, TranslatePipe, IonInput, IonSelect, IonSelectOption, IonTextarea],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PlaceFormComponent {
@@ -29,7 +29,7 @@ export class PlaceFormComponent {
         private alertController: AlertController,
         private translate: TranslateService
     ) {
-        this.lang = this.translate.currentLang;
+        this.lang = this.translate.getCurrentLang();
         this.countries.sort((a, b) => a.name[this.lang].localeCompare(b.name[this.lang]));
         this.moveCountryToTop('de');
         this.moveCountryToTop('fr');

@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, OnDestroy, ViewChild, signal } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { ActionSheetController, IonButton, IonContent, IonIcon, IonInput, IonToggle, ModalController, IonSelect, IonSelectOption } from '@ionic/angular';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { DatePipe } from '@angular/common';
 import { addIcons } from 'ionicons';
 import { chevronForward, close } from 'ionicons/icons';
@@ -26,7 +26,7 @@ const LANGUAGES = SUPPORTED_LANGUAGES;
   imports: [
     FormsModule,
     DatePipe,
-    TranslateModule,
+    TranslatePipe,
     IonButton,
     IonIcon,
     IonContent,
@@ -112,7 +112,7 @@ export class PassengerConfirmationFormComponent implements OnDestroy {
   }
 
   get languageCode(): string {
-    return (this.translate.currentLang || this.translate.getDefaultLang() || '').toUpperCase();
+    return (this.translate.getCurrentLang() || this.translate.getFallbackLang() || '').toUpperCase();
   }
 
   /** Everything the passenger has to give before they can sign. */

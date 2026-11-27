@@ -239,10 +239,12 @@
         <div class="fb-banner fb-banner--success account-banner">
           <div class="fb-banner__title">{{ 'account.premium' | translate }}</div>
           <div class="fb-banner__text">
+            <!-- Payment-exempted users have no expires_date. ngx-translate 18 prints a
+                 null param as "null"; undefined keeps the old output. -->
             @if (paymentStatus()?.state === 'CANCELED') {
-              {{ 'payment.canceled' | translate: { date: paymentStatus().expires_date | date:'dd.MM.yyyy HH:mm':'UTC' } }}
+              {{ 'payment.canceled' | translate: { date: (paymentStatus().expires_date | date:'dd.MM.yyyy HH:mm':'UTC') ?? undefined } }}
             } @else {
-              {{ 'payment.information' | translate: { date: paymentStatus().expires_date | date:'dd.MM.yyyy HH:mm':'UTC' } }}
+              {{ 'payment.information' | translate: { date: (paymentStatus().expires_date | date:'dd.MM.yyyy HH:mm':'UTC') ?? undefined } }}
             }
           </div>
         </div>

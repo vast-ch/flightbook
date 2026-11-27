@@ -4,7 +4,7 @@ import { DatePipe } from '@angular/common';
 import { IonContent, IonSkeletonText, IonIcon } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { chevronForward, checkmark } from 'ionicons/icons';
-import { TranslateService, TranslateModule } from '@ngx-translate/core';
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { NewsStore } from '../news/shared/news.store';
@@ -21,7 +21,7 @@ import { splitDistance, splitDuration, toHoursMinutes } from 'src/app/shared/uti
     imports: [
         AvatarButtonComponent,
         DatePipe,
-        TranslateModule,
+        TranslatePipe,
         ActivityChartComponent,
         IonContent,
         IonSkeletonText,
@@ -99,8 +99,8 @@ export class HomePage implements OnDestroy {
         }
 
         const news = this.newsStore.news();
-        if (news.length === 0 || news[0].language !== this.translate.currentLang) {
-            this.newsStore.getNews(this.translate.currentLang).pipe(takeUntil(this.unsubscribe$)).subscribe();
+        if (news.length === 0 || news[0].language !== this.translate.getCurrentLang()) {
+            this.newsStore.getNews(this.translate.getCurrentLang()).pipe(takeUntil(this.unsubscribe$)).subscribe();
         }
     }
 

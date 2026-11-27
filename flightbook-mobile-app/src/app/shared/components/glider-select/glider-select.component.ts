@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
 import { Flight } from 'src/app/flight/shared/flight.model';
 import { Glider } from 'src/app/glider/shared/glider.model';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { IonSelect, IonSelectOption } from "@ionic/angular";
 
 @Component({
@@ -9,7 +9,7 @@ import { IonSelect, IonSelectOption } from "@ionic/angular";
     templateUrl: './glider-select.component.html',
     styleUrls: ['./glider-select.component.scss'],
     imports: [
-        TranslateModule,
+        TranslatePipe,
         IonSelect,
         IonSelectOption
     ],

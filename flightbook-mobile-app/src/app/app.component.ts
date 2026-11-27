@@ -64,7 +64,7 @@ export class AppComponent implements OnDestroy, OnInit {
         private paymentService: PaymentService,
         private sessionService: SessionService
     ) {
-        this.translate.setDefaultLang('en');
+        this.translate.setFallbackLang('en');
         // Narrowed to a language we ship: an unsupported code sticks in
         // translate.currentLang even though its bundle 404s, and every DatePipe
         // given that locale then throws NG0701 on each change-detection pass.

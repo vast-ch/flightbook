@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { AccountService } from 'src/app/account/shared/account.service';
 
 /**
@@ -13,7 +13,7 @@ import { AccountService } from 'src/app/account/shared/account.service';
 @Component({
     selector: 'fb-avatar-button',
     standalone: true,
-    imports: [TranslateModule],
+    imports: [TranslatePipe],
     templateUrl: './avatar-button.component.html',
     styles: [':host { display: contents; }'],
     changeDetection: ChangeDetectionStrategy.OnPush,

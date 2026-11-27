@@ -1,6 +1,5 @@
 import {
     ApplicationConfig,
-    importProvidersFrom,
     inject,
     provideAppInitializer,
     provideCheckNoChangesConfig,
@@ -10,11 +9,11 @@ import { DatePipe, registerLocaleData } from '@angular/common';
 import germanLocale from '@angular/common/locales/de';
 import italianLocale from '@angular/common/locales/it';
 import frenchLocale from '@angular/common/locales/fr';
-import { HTTP_INTERCEPTORS, HttpClient, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { PreloadAllModules, provideRouter, RouteReuseStrategy, withPreloading } from '@angular/router';
 import { IonicRouteStrategy, provideIonicAngular } from '@ionic/angular';
-import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
-import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+import { provideTranslateService } from '@ngx-translate/core';
+import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
 
 import { routes } from './app.routes';
 import { environment } from '../environments/environment';
@@ -26,10 +25,6 @@ import { NavigationService } from './shared/services/navigation.service';
 registerLocaleData(germanLocale);
 registerLocaleData(italianLocale);
 registerLocaleData(frenchLocale);
-
-export function createTranslateLoader(http: HttpClient) {
-    return new TranslateHttpLoader(http, './assets/i18n/', '.json');
-}
 
 function ionicConfig() {
     return {
@@ -51,12 +46,12 @@ export const appConfig: ApplicationConfig = {
         provideHttpClient(withInterceptorsFromDi()),
         { provide: HTTP_INTERCEPTORS, useClass: HttpAuthInterceptor, multi: true },
         { provide: HTTP_INTERCEPTORS, useClass: HttpErrorInterceptor, multi: true },
-        // ngx-translate 14 has no provideTranslateService().
-        importProvidersFrom(
-            TranslateModule.forRoot({
-                loader: { provide: TranslateLoader, useFactory: createTranslateLoader, deps: [HttpClient] },
-            }),
-        ),
+        // Bundles are fetched through HttpClient (useHttpBackend: false), so the
+        // interceptors see them, as with the old TranslateHttpLoader. The fallback
+        // and current language are set in AppComponent.
+        provideTranslateService({
+            loader: provideTranslateHttpLoader({ prefix: './assets/i18n/', suffix: '.json' }),
+        }),
         // PdfExportService formats dates with it.
         DatePipe,
         // NavigationService listens to router events from the first navigation

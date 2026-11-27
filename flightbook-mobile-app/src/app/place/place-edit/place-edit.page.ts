@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, OnDestroy, signal } from '@angular/
 import { ActivatedRoute } from '@angular/router';
 import { takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
-import { TranslateService, TranslateModule } from '@ngx-translate/core';
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 import { LoadingController, AlertController, IonContent, IonFooter, IonButton, IonIcon } from '@ionic/angular';
 import HttpStatusCode from '../../shared/util/HttpStatusCode';
 import { Place } from 'src/app/place/shared/place.model';
@@ -19,7 +19,7 @@ import { PlaceFormComponent } from '../../form/place-form/place-form';
     styleUrls: ['./place-edit.page.scss'],
     imports: [
         PlaceFormComponent,
-        TranslateModule,
+        TranslatePipe,
         IonContent,
         IonFooter,
         IonButton,

@@ -4,7 +4,7 @@ import { addIcons } from 'ionicons';
 import { chevronForward } from 'ionicons/icons';
 import { FlightValidationState } from 'src/app/flight/shared/flight-validation-state';
 import { TandemSchoolPaymentState } from 'src/app/flight/shared/tandem-school-payment-state';
-import { TranslateService, TranslateModule } from '@ngx-translate/core';
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 import moment from 'moment';
 import { NgForm, FormsModule } from '@angular/forms';
 import { Place } from 'src/app/place/shared/place.model';
@@ -27,7 +27,7 @@ import { School, CustomFieldDefinition } from 'src/app/school/shared/school.mode
         AutocompleteComponent,
         IgcMapComponent,
         DatePipe,
-        TranslateModule,
+        TranslatePipe,
         IonInput,
         IonTextarea,
         IonModal,
@@ -80,7 +80,7 @@ export class FlightFormComponent implements OnInit, OnChanges {
         private alertController: AlertController,
         private translate: TranslateService
     ) {
-        this.language = this.translate.currentLang;
+        this.language = this.translate.getCurrentLang();
         addIcons({ chevronForward });
     }
 

@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { ModalController, IonContent, IonButton, IonModal, IonDatetime } from '@ionic/angular';
-import { TranslateService, TranslateModule } from '@ngx-translate/core';
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 import { AppointmentFilter } from '../../appointment-filter.model';
 import { SchoolService } from '../../school.service';
 import { State } from '../../state';
@@ -16,7 +16,7 @@ const STATES: string[] = ['', ...Object.values(State)];
     styleUrls: ['./appointment-filter.component.scss'],
     imports: [
         DatePipe,
-        TranslateModule,
+        TranslatePipe,
         IonContent,
         IonButton,
         IonModal,
@@ -43,7 +43,7 @@ export class AppointmentFilterComponent {
         private translate: TranslateService,
         private modalCtrl: ModalController
     ) {
-        this.language = translate.currentLang;
+        this.language = translate.getCurrentLang();
     }
 
     changeDate(type: 'from' | 'to', event: CustomEvent) {

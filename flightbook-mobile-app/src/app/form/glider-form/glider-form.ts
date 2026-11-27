@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, Output, EventEmitter, OnInit, inject } from '@angular/core';
 import { AlertController, IonItem, IonInput, IonToggle, IonTextarea, IonModal, IonContent, IonDatetime, IonList, IonItemSliding, IonItemOptions, IonItemOption, IonIcon, ModalController } from '@ionic/angular';
-import { TranslateService, TranslateModule } from '@ngx-translate/core';
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 import { Glider, GliderCheck } from 'src/app/glider/shared/glider.model';
 import { FormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
@@ -12,7 +12,7 @@ import { CheckComponent } from './check/check.component';
     selector: 'glider-form',
     templateUrl: 'glider-form.html',
     styleUrls: ['glider-form.scss'],
-    imports: [FormsModule, DatePipe, TranslateModule, IonItem, IonInput, IonToggle, IonTextarea, IonModal, IonContent, IonDatetime, IonList, IonItemSliding, IonItemOptions, IonItemOption, IonIcon],
+    imports: [FormsModule, DatePipe, TranslatePipe, IonItem, IonInput, IonToggle, IonTextarea, IonModal, IonContent, IonDatetime, IonList, IonItemSliding, IonItemOptions, IonItemOption, IonIcon],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GliderFormComponent implements OnInit {
@@ -29,7 +29,7 @@ export class GliderFormComponent implements OnInit {
         private translate: TranslateService,
         private modalController: ModalController
     ) {
-        this.language = this.translate.currentLang;
+        this.language = this.translate.getCurrentLang();
         // chevron-forward is used by the check rows in this template; without
         // registering it here the icon only resolves if some earlier page
         // happened to register it, so a deep link to the form renders a gap.

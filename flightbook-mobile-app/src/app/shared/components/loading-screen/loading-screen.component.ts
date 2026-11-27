@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { VersionService } from 'src/app/shared/services/version.service';
 
 /** How many rotating status lines splash.lines carries, per locale. */
@@ -28,7 +28,7 @@ const STALLED_AFTER = 8000;
     selector: 'fb-loading-screen',
     templateUrl: './loading-screen.component.html',
     styleUrls: ['./loading-screen.component.scss'],
-    imports: [TranslateModule],
+    imports: [TranslatePipe],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LoadingScreenComponent implements OnInit, OnDestroy {

@@ -5,7 +5,7 @@ import { arrowBack, eyeOutline, eyeOffOutline } from 'ionicons/icons';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { Router } from '@angular/router';
-import { TranslateService, TranslateModule } from '@ngx-translate/core';
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 import HttpStatusCode from '../../shared/util/HttpStatusCode';
 import { User } from 'src/app/account/shared/user.model';
 import { AccountService } from '../shared/account.service';
@@ -18,7 +18,7 @@ import { PhoneNumberComponent } from 'src/app/shared/components/phone-number/pho
     styleUrls: ['./register.page.scss'],
     imports: [
         FormsModule,
-        TranslateModule,
+        TranslatePipe,
         IonContent,
         IonFooter,
         IonIcon,

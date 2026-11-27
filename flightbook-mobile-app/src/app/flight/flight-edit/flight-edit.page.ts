@@ -6,7 +6,7 @@ import { AlertController, LoadingController, IonContent, IonButton, IonFooter, I
 import { DatePipe } from '@angular/common';
 import { addIcons } from 'ionicons';
 import { chevronBack, downloadOutline } from 'ionicons/icons';
-import { TranslateService, TranslateModule } from '@ngx-translate/core';
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 import HttpStatusCode from '../../shared/util/HttpStatusCode';
 import { v4 as uuidv4 } from 'uuid';
 import { FileUploadService } from 'src/app/flight/shared/fileupload.service';
@@ -35,7 +35,7 @@ import { NavigationService } from 'src/app/shared/services/navigation.service';
     imports: [
         FileInputComponent,
         FlightFormComponent,
-        TranslateModule,
+        TranslatePipe,
         DatePipe,
         IonContent,
         IonButton,

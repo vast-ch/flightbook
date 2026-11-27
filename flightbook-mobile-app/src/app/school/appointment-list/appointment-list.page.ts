@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, ViewChild, compu
 import moment from 'moment-timezone';
 import { ActivatedRoute } from '@angular/router';
 import { AlertController, LoadingController, ModalController, NavController, IonIcon, IonContent, IonList, IonItem, IonToggle, IonLabel, IonInfiniteScroll, IonInfiniteScrollContent, IonPopover } from '@ionic/angular';
-import { TranslateService, TranslateModule } from '@ngx-translate/core';
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 import { firstValueFrom, Subject, takeUntil } from 'rxjs';
 import { AccountService } from 'src/app/account/shared/account.service';
 import { User } from 'src/app/account/shared/user.model';
@@ -33,7 +33,7 @@ const CLOSING_SOON_HOURS = 24;
     styleUrls: ['./appointment-list.page.scss'],
     imports: [
         DatePipe,
-        TranslateModule,
+        TranslatePipe,
         IonIcon,
         IonContent,
         IonList,

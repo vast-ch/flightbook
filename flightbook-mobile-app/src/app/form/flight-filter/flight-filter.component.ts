@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, computed, signal } from '@angular/core';
 import { ModalController, IonContent, IonIcon, IonInput, IonButton, IonModal, IonDatetime, IonSelect, IonSelectOption } from '@ionic/angular';
 import { Subject, Subscription, of } from 'rxjs';
-import { TranslateService, TranslateModule } from '@ngx-translate/core';
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 import { catchError, debounceTime, switchMap, takeUntil, tap } from 'rxjs/operators';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { Glider } from 'src/app/glider/shared/glider.model';
@@ -26,7 +26,7 @@ type PeriodKey = 'all' | 'last12' | string;
     imports: [
         FormsModule,
         DatePipe,
-        TranslateModule,
+        TranslatePipe,
         IonContent,
         IonIcon,
         IonInput,
@@ -94,7 +94,7 @@ export class FlightFilterComponent implements OnInit, OnDestroy {
         private gliderStore: GliderStore,
         private translate: TranslateService
     ) {
-        this.language = translate.currentLang;
+        this.language = translate.getCurrentLang();
         // Without registering it here, chevron-forward on the glider select
         // only resolves if some earlier page already registered it - see the
         // same gotcha noted in glider-form.ts.

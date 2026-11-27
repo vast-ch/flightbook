@@ -14,7 +14,7 @@ import WebGLTileLayer from 'ol/layer/WebGLTile';
 import IGCParser from 'igc-parser';
 import { ConfigurationService } from '../../services/configuration.service';
 import { firstValueFrom } from 'rxjs';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { IonRange, IonButton, IonIcon } from "@ionic/angular";
 import { addIcons } from 'ionicons';
 import { play, pause } from 'ionicons/icons';
@@ -50,7 +50,7 @@ const LANDING_COLOR = '#e0483a';
     templateUrl: './igc-map.component.html',
     styleUrls: ['./igc-map.component.scss'],
     imports: [
-        TranslateModule,
+        TranslatePipe,
         IonRange,
         IonButton,
         IonIcon

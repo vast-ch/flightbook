@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { AlertController, ModalController, IonIcon } from '@ionic/angular';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { chevronForward } from 'ionicons/icons';
 import { firstValueFrom } from 'rxjs';
@@ -20,7 +20,7 @@ const FREE_FLIGHT_LIMIT = 25;
     selector: 'app-add-sheet',
     templateUrl: './add-sheet.component.html',
     styleUrls: ['./add-sheet.component.scss'],
-    imports: [TranslateModule, IonIcon],
+    imports: [TranslatePipe, IonIcon],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AddSheetComponent {

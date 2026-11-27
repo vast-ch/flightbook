@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, ViewChild, OnDestroy } from '@angul
 import { NavController, LoadingController, ActionSheetController, IonIcon, IonContent, IonItem, IonList, IonInfiniteScroll, IonInfiniteScrollContent } from '@ionic/angular';
 import { takeUntil } from 'rxjs/operators';
 import { Subject, firstValueFrom } from 'rxjs';
-import { TranslateService, TranslateModule } from '@ngx-translate/core';
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 import { Place } from 'src/app/place/shared/place.model';
 import { XlsxExportService } from 'src/app/shared/services/xlsx-export.service';
 import { SpreadsheetDownloadService } from 'src/app/shared/services/spreadsheet-download.service';
@@ -24,7 +24,7 @@ import { add, locationOutline, shareOutline, chevronBack, chevronForward } from 
     imports: [
         RouterLink,
         FlagsModule,
-        TranslateModule,
+        TranslatePipe,
         IonIcon,
         IonContent,
         IonItem,
@@ -54,7 +54,7 @@ export class PlaceListPage implements OnDestroy {
         private xlsxExportService: XlsxExportService,
         private spreadsheetDownloadService: SpreadsheetDownloadService
     ) {
-        this.lang = this.translate.currentLang;
+        this.lang = this.translate.getCurrentLang();
         addIcons({
             add,
             locationOutline,

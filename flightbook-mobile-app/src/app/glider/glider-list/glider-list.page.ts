@@ -4,7 +4,7 @@ import { Subject, firstValueFrom } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { GliderFilterComponent } from '../glider-filter/glider-filter.component';
 import { GliderFilterChipsComponent } from '../glider-filter/glider-filter-chips.component';
-import { TranslateService, TranslateModule } from '@ngx-translate/core';
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 import { XlsxExportService } from 'src/app/shared/services/xlsx-export.service';
 import { SpreadsheetDownloadService } from 'src/app/shared/services/spreadsheet-download.service';
 import { Glider } from '../shared/glider.model';
@@ -23,7 +23,7 @@ import { NavigationService } from 'src/app/shared/services/navigation.service';
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         RouterLink,
-        TranslateModule,
+        TranslatePipe,
         HoursFormatPipe,
         DatePipe,
         IonIcon,

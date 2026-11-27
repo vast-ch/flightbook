@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, OnDestroy, computed, inject } from 
 import { Router } from '@angular/router';
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { IonButton, IonContent, IonIcon, IonSkeletonText } from '@ionic/angular';
-import { TranslateService, TranslateModule } from '@ngx-translate/core';
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { ALL_TIME, StatisticPeriod, StatisticStore } from './shared/statistic.store';
@@ -28,7 +28,7 @@ import { splitDistance, splitDuration, toHoursMinutes } from 'src/app/shared/uti
         AvatarButtonComponent,
         DatePipe,
         DecimalPipe,
-        TranslateModule,
+        TranslatePipe,
         ActivityHeatmapComponent,
         FlightsBarsComponent,
         SeasonGridComponent,

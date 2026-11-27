@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Output, computed, inject } from '@angular/core';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { IonIcon } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { close } from 'ionicons/icons';
@@ -19,7 +19,7 @@ type Chip = { label: string; clear: () => void };
 @Component({
     selector: 'fb-filter-chips',
     standalone: true,
-    imports: [TranslateModule, IonIcon],
+    imports: [TranslatePipe, IonIcon],
     templateUrl: './filter-chips.component.html',
     // .filter-summary* moved to tokens.scss when the glider list grew the same
     // row: two components draw it now, and neither owns the pattern.

@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, effect, inject, signal } from '@angular/core';
-import { TranslateService, TranslateModule } from '@ngx-translate/core';
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 import { AlertController, LoadingController, NavController, IonContent, IonButton, IonIcon, IonInput, IonTextarea, IonToggle } from '@ionic/angular';
 import HttpStatusCode from '../../shared/util/HttpStatusCode';
 import { User } from 'src/app/account/shared/user.model';
@@ -32,7 +32,7 @@ const LANGUAGES = ['fr', 'de', 'en', 'it'];
     imports: [
         FormsModule,
         DatePipe,
-        TranslateModule,
+        TranslatePipe,
         IonContent,
         IonButton,
         IonIcon,

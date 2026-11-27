@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, OnInit, OnDestroy, inject } from '@angular/core';
-import { TranslateService, TranslateModule } from '@ngx-translate/core';
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 import { NavController, AlertController, LoadingController, IonContent, IonInput, IonButton, IonIcon } from '@ionic/angular';
 import { UpperCasePipe } from '@angular/common';
 import { addIcons } from 'ionicons';
@@ -22,7 +22,7 @@ import { ActivatedRoute, Router } from '@angular/router';
     styleUrls: ['./login.page.scss'],
     imports: [
         FormsModule,
-        TranslateModule,
+        TranslatePipe,
         UpperCasePipe,
         IonContent,
         IonInput,

@@ -26,12 +26,12 @@ export function resolveLanguage(candidate?: string | null): string {
 /**
  * The active language, as a signal.
  *
- * ngx-translate 14 exposes `currentLang` as a plain string, so a computed() that
- * formats a date would never re-evaluate when the user switches language -
- * setLanguage() calls translate.use() without reloading the app. Mirroring the
- * language into a signal makes those labels reactive.
+ * setLanguage() calls translate.use() without reloading the app, so whatever
+ * formats a date must re-evaluate on a language switch. ngx-translate's own
+ * `currentLang()` signal is reactive too, but it can hold a language the app
+ * has no Angular locale data for (see resolveLanguage above).
  *
- * Read this - never `translate.currentLang` - wherever a date or number is
+ * Read this - never `translate.currentLang()` - wherever a date or number is
  * formatted, so the value is both reactive and known to be a registered locale.
  */
 @Injectable({
@@ -40,7 +40,7 @@ export function resolveLanguage(candidate?: string | null): string {
 export class LanguageService {
     private translate = inject(TranslateService);
 
-    private state = signal<string>(resolveLanguage(this.translate.currentLang || this.translate.getDefaultLang()));
+    private state = signal<string>(resolveLanguage(this.translate.getCurrentLang() || this.translate.getFallbackLang()));
 
     /** Read this wherever a date or number is formatted for display. */
     public readonly lang = this.state.asReadonly();

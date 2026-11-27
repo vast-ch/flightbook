@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, OnDestroy, computed, inject, signal
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AlertController, IonContent, IonIcon, IonInput, IonReorder, IonReorderGroup, IonToggle, ReorderEndCustomEvent, ToggleCustomEvent } from '@ionic/angular';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { add, chevronForward, openOutline, remove } from 'ionicons/icons';
 import { Browser } from '@capacitor/browser';
@@ -34,7 +34,7 @@ const SCHOOL_WORD = /^(flugschule|flight\s+school|paragliding\s+school|school|[Ã
     imports: [
         AvatarButtonComponent,
         FormsModule,
-        TranslateModule,
+        TranslatePipe,
         IonContent,
         IonIcon,
         IonInput,
