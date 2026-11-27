@@ -10,7 +10,6 @@ import { Flight } from '../shared/flight.model';
 import { FlightStatistic } from '../shared/flightStatistic.model';
 import { DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
-import { FlagsModule } from 'nxt-flags';
 import { addIcons } from "ionicons";
 import {
     add,
@@ -33,7 +32,6 @@ import { toHoursMinutes } from 'src/app/shared/util/format';
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         AvatarButtonComponent,
-        FlagsModule,
         DatePipe,
         TranslatePipe,
         IonContent,

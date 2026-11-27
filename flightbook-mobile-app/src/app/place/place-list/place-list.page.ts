@@ -12,7 +12,7 @@ import { json2csv } from 'json-2-csv';
 import { MapUtil } from 'src/app/shared/util/MapUtil';
 import { RouterLink } from '@angular/router';
 import { NavigationService } from 'src/app/shared/services/navigation.service';
-import { FlagsModule } from 'nxt-flags';
+import { FlagComponent } from 'nxt-flags';
 import { addIcons } from "ionicons";
 import { add, locationOutline, shareOutline, chevronBack, chevronForward } from "ionicons/icons";
 
@@ -23,7 +23,7 @@ import { add, locationOutline, shareOutline, chevronBack, chevronForward } from 
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         RouterLink,
-        FlagsModule,
+        FlagComponent,
         TranslatePipe,
         IonIcon,
         IonContent,
