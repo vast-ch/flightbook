@@ -1,6 +1,6 @@
 # CLAUDE.md — flightbook-mobile-app
 
-Angular 21 (standalone components, signals, zoneless, OnPush) + Ionic 9 + Capacitor. A paragliding
+Angular 22 (standalone components, signals, zoneless, OnPush) + Ionic 9 + Capacitor. A paragliding
 logbook. This file records what is specific to *this* app and what has actually
 caught people out; the global `~/.claude/CLAUDE.md` still applies for everything
 else.
@@ -131,8 +131,15 @@ and `docker` are replaced at build time.
 
 - `npx tsc --noEmit -p tsconfig.app.json` and `npx ng build`. The sandbox aborts
   `ng build` with SIGABRT — run it unsandboxed.
-- `tsconfig.app.json` sets `"strict": false`. There are ~299 pre-existing strict
-  errors; don't add more. `Number.isFinite()` does **not** narrow
+- `"strict": false` is pinned in `tsconfig.json` (TypeScript 6 defaults it to
+  true). There are ~299 pre-existing strict errors; don't add more.
+  `strictTemplates: false` is pinned too (Angular 22 defaults it to true).
+- No `baseUrl` (deprecated in TS 6): `'src/...'` imports resolve through
+  `paths` in `tsconfig.json`.
+- Template `?.` returns `undefined` since Angular 22 (was `null`). Don't add
+  `$safeNavigationMigration(...)`; write templates that don't care which.
+- `HttpClient` stays on XHR (`withXhr()` in `app.config.ts`); Angular 22's
+  default is `fetch`. `Number.isFinite()` does **not** narrow
   `number | undefined`.
 - **Unit tests:** `npx ng test --watch=false --browsers=ChromeHeadless` (run
   unsandboxed). Only pure-logic specs live here (`shared/util/format.spec.ts`,

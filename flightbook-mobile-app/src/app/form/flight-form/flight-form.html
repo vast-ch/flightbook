@@ -146,7 +146,7 @@
     <!-- ---- Card: tandem school custom fields ---- -->
     @if (flight.tandemSchoolData?.tandemSchool && activeCustomFields.length > 0) {
       <div class="fb-section-label form-section-label">
-        {{ 'flight.customSchoolFields' | translate: {schoolName: flight.tandemSchoolData?.tandemSchool?.name} }}
+        {{ 'flight.customSchoolFields' | translate: {schoolName: flight.tandemSchoolData.tandemSchool.name} }}
       </div>
 
       <div class="fb-card--flush form-card">

@@ -9,7 +9,7 @@ import { DatePipe, registerLocaleData } from '@angular/common';
 import germanLocale from '@angular/common/locales/de';
 import italianLocale from '@angular/common/locales/it';
 import frenchLocale from '@angular/common/locales/fr';
-import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi, withXhr } from '@angular/common/http';
 import { PreloadAllModules, provideRouter, RouteReuseStrategy, withPreloading } from '@angular/router';
 import { IonicRouteStrategy, provideIonicAngular } from '@ionic/angular';
 import { provideTranslateService } from '@ngx-translate/core';
@@ -43,7 +43,7 @@ export const appConfig: ApplicationConfig = {
         provideRouter(routes, withPreloading(PreloadAllModules)),
         { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
         provideIonicAngular(ionicConfig()),
-        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClient(withXhr(), withInterceptorsFromDi()),
         { provide: HTTP_INTERCEPTORS, useClass: HttpAuthInterceptor, multi: true },
         { provide: HTTP_INTERCEPTORS, useClass: HttpErrorInterceptor, multi: true },
         // Bundles are fetched through HttpClient (useHttpBackend: false), so the

@@ -1,7 +1,9 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "baseUrl": "./",
+    "paths": {
+      "src/*": ["./src/*"]
+    },
     "outDir": "./dist/out-tsc",
     "sourceMap": true,
     "declaration": false,
@@ -16,7 +18,8 @@
       "node_modules/@types"
     ],
     "resolveJsonModule": true,
-    "useDefineForClassFields": false
+    "useDefineForClassFields": false,
+    "strict": false
   },
   "angularCompilerOptions": {
     "fullTemplateTypeCheck": true,
