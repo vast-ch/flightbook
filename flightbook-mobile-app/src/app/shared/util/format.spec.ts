@@ -27,8 +27,8 @@ describe('localDate', () => {
     /** Silently inventing 1 Jan 1900 out of '' is worse than admitting defeat. */
     it('returns an Invalid Date for input it cannot read', () => {
         for (const value of ['', 'not-a-date', null as unknown as string, undefined as unknown as string]) {
-            expect(isNaN(localDate(value).getTime()))
-                .withContext(`expected an Invalid Date for ${JSON.stringify(value)}`).toBe(true);
+            expect(isNaN(localDate(value).getTime()), `expected an Invalid Date for ${JSON.stringify(value)}`)
+                .toBe(true);
         }
     });
 });

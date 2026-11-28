@@ -144,8 +144,12 @@ and `docker` are replaced at build time.
 - `HttpClient` stays on XHR (`withXhr()` in `app.config.ts`); Angular 22's
   default is `fetch`. `Number.isFinite()` does **not** narrow
   `number | undefined`.
-- **Unit tests:** `npx ng test --watch=false --browsers=ChromeHeadless` (run
-  unsandboxed). Only pure-logic specs live here (`shared/util/format.spec.ts`,
+- **Unit tests:** `npx ng test --watch=false` (run unsandboxed). Vitest via
+  `@angular/build:unit-test` in browser mode (Playwright Chromium, headless) -
+  not jsdom: the marker spec really loads an image. Vitest globals, not
+  Jasmine: `expect(value, 'message')`, not `.withContext()`; `vi.fn()`, not
+  `jasmine.createSpy`. Test `polyfills` is `[]` (zoneless). Only pure-logic
+  specs live here (`shared/util/format.spec.ts`,
   `place-map/place-marker.style.spec.ts`); the generated "should create" smoke
   specs were deleted because they tested nothing the e2e suite doesn't. Add unit
   specs for logic (formatting, parsing, store calculations), not for rendering.

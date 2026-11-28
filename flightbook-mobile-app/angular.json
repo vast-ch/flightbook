@@ -160,28 +160,12 @@
                     }
                 },
                 "test": {
-                    "builder": "@angular/build:karma",
+                    "builder": "@angular/build:unit-test",
                     "options": {
-                        "main": "src/test.ts",
-                        "polyfills": ["src/polyfills.ts"],
+                        "runner": "vitest",
                         "tsConfig": "tsconfig.spec.json",
-                        "karmaConfig": "karma.conf.js",
-                        "styles": [],
-                        "scripts": [],
-                        "assets": [
-                            {
-                                "glob": "favicon.ico",
-                                "input": "src/",
-                                "output": "/"
-                            },
-                            {
-                                "glob": "**/*",
-                                "input": "src/assets",
-                                "output": "/assets"
-                            },
-                            "src/manifest.webmanifest"
-                        ],
-                        "webWorkerTsConfig": "tsconfig.worker.json"
+                        "browsers": ["ChromiumHeadless"],
+                        "polyfills": []
                     },
                     "configurations": {
                         "ci": {
