@@ -14,6 +14,7 @@ import { PreloadAllModules, provideRouter, RouteReuseStrategy, withPreloading } 
 import { IonicRouteStrategy, provideIonicAngular } from '@ionic/angular';
 import { provideTranslateService } from '@ngx-translate/core';
 import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
+import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 
 import { routes } from './app.routes';
 import { environment } from '../environments/environment';
@@ -52,6 +53,9 @@ export const appConfig: ApplicationConfig = {
         provideTranslateService({
             loader: provideTranslateHttpLoader({ prefix: './assets/i18n/', suffix: '.json' }),
         }),
+        // Chart.js controllers, scales and plugins for BaseChartDirective
+        // (ng2-charts 3 registered all of them on import).
+        provideCharts(withDefaultRegisterables()),
         // PdfExportService formats dates with it.
         DatePipe,
         // NavigationService listens to router events from the first navigation

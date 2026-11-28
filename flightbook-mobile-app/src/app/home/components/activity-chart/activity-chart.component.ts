@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, Input, computed, inject, signal } from '@angular/core';
 import { Chart, ChartConfiguration, ChartData, ChartType, Plugin } from 'chart.js';
-import { NgChartsModule } from 'ng2-charts';
+import { BaseChartDirective } from 'ng2-charts';
 import { FlightStatistic } from '../../../flight/shared/flightStatistic.model';
 import { LanguageService } from '../../../shared/services/language.service';
 import { themeColor } from 'src/app/shared/util/theme-color';
@@ -48,11 +48,11 @@ function barValueFont(canvas: HTMLCanvasElement): string {
 const BAR_VALUES: Plugin<'bar'> = {
     id: 'barValues',
     /*
-     * Opt-in per chart, and it has to be. ng2-charts registers whatever is
-     * passed to [plugins] with Chart.register - globally, not on the one canvas
-     * - so without this gate the flight counts were drawn on every Chart.js
-     * chart in the app, printing raw unrounded hours over the cumulative
-     * airtime line.
+     * Opt-in per chart. ng2-charts 3 registered [plugins] globally with
+     * Chart.register, which drew raw unrounded hours over the cumulative
+     * airtime line. Since ng2-charts 4 [plugins] goes into this one chart's
+     * config, but the gate stays: anything that ever registers this plugin
+     * globally must not repaint every chart in the app.
      */
     afterDatasetsDraw(chart: Chart<'bar'>, _args: unknown, options: { enabled?: boolean }) {
         if (!options?.enabled) {
@@ -100,7 +100,7 @@ export interface MonthColumn {
     selector: 'fb-activity-chart',
     templateUrl: './activity-chart.component.html',
     styleUrls: ['./activity-chart.component.scss'],
-    imports: [NgChartsModule],
+    imports: [BaseChartDirective],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ActivityChartComponent {
@@ -206,8 +206,8 @@ export class ActivityChartComponent {
             airtime: { display: false, beginAtZero: true, position: 'right' }
         },
         plugins: {
-            // This chart is the one that wants the printed counts; the gate is
-            // in the plugin, because registration is global.
+            // This chart is the one that wants the printed counts (see the
+            // gate in BAR_VALUES).
             barValues: { enabled: true },
             legend: { display: false },
             tooltip: {

@@ -78,6 +78,9 @@ file and the surrounding code.
   `TranslatePipe`. `translate.currentLang` is a signal (`getCurrentLang()` for a
   snapshot); the old default language is the "fallback" language
   (`setFallbackLang`).
+- Charts: ng2-charts 11 + chart.js 4. Components import `BaseChartDirective`;
+  Chart.js registerables come from `provideCharts(withDefaultRegisterables())`
+  in `app.config.ts`. `[plugins]` applies to that one chart only.
 
 ## State
 

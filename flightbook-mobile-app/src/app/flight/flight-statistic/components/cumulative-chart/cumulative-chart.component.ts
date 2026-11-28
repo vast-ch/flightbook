@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, Input, computed, signal } from '@angular/core';
 import { ChartConfiguration, ChartData } from 'chart.js';
-import { NgChartsModule } from 'ng2-charts';
+import { BaseChartDirective } from 'ng2-charts';
 import { CumulativePoint } from '../../shared/statistic.store';
 import { themeColor, withAlpha } from 'src/app/shared/util/theme-color';
 
@@ -14,7 +14,7 @@ import { themeColor, withAlpha } from 'src/app/shared/util/theme-color';
     selector: 'fb-cumulative-chart',
     templateUrl: './cumulative-chart.component.html',
     styleUrls: ['./cumulative-chart.component.scss'],
-    imports: [NgChartsModule],
+    imports: [BaseChartDirective],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CumulativeChartComponent {
